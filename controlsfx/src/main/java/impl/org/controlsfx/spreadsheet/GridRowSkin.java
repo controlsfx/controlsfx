@@ -183,11 +183,15 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         boolean needToBeShifted;
         boolean rowHeightChange = false;
         for (int indexColumn = 0; indexColumn < columns.size(); indexColumn++) {
-
+            //FIXME Problem qwith column span
+            if(!skin.getSkinnable().getColumns().get(indexColumn).isVisible()){
+                continue;
+            }
             width = snapSize(columns.get(indexColumn).getWidth()) - snapSize(horizontalPadding);
 
             final SpreadsheetCell spreadsheetCell = row.get(indexColumn);
-            boolean isVisible = !isInvisible(x, width, hbarValue, headerWidth, spreadsheetCell.getColumnSpan());
+            final int columnSpan = spreadsheetView.getColumnSpan(spreadsheetCell);
+            boolean isVisible = !isInvisible(x, width, hbarValue, headerWidth, columnSpan);
 
             if (columns.get(indexColumn).isFixed()) {
                 isVisible = true;
@@ -222,10 +226,11 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
              * fixedColumnWidth will be wrong.
              */
             boolean increaseFixedWidth = false;
+            final int viewColumn =spreadsheetView.getViewColumn(spreadsheetCell.getColumn()); 
             //Virtualization of column
             // We translate that column by the Hbar Value if it's fixed
             if (columns.get(indexColumn).isFixed()) {
-                if (hbarValue + fixedColumnWidth > x && spreadsheetCell.getColumn() == indexColumn) {
+                if (hbarValue + fixedColumnWidth > x &&  viewColumn== indexColumn) {
                     increaseFixedWidth = true;
                     tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
 //                	 tableCell.toFront();
@@ -290,15 +295,15 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                         }
                 }
 
-                if (spreadsheetCell.getColumnSpan() > 1) {
+                if (columnSpan > 1) {
                     /**
                      * we need to span multiple columns, so we sum up the width
                      * of the additional columns, adding it to the width
                      * variable
                      */
-                    for (int i = 1, colSpan = spreadsheetCell.getColumnSpan(), max1 = columns
-                            .size() - indexColumn; i < colSpan && i < max1; i++) {
-                        double tempWidth = snapSize(columns.get(indexColumn + i).getWidth());
+                    final int max = columns.size() - indexColumn;
+                    for (int i = 1, colSpan = columnSpan; i < colSpan && i < max; i++) {
+                        double tempWidth = snapSize(skin.getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
                         width += tempWidth;
                         if (increaseFixedWidth) {
                             fixedColumnWidth += tempWidth;

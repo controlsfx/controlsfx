@@ -155,6 +155,7 @@ public class VerticalHeader extends StackPane {
         // When the Grid is changing, we need to update our information.
         handle.getView().gridProperty().addListener(layout);
         handle.getView().hiddenRowsProperty().addListener(layout);
+        handle.getView().hiddenColumnsProperty().addListener(layout);
 
         // Clip property to stay within bounds
         clip = new Rectangle(getVerticalHeaderWidth(), snapSize(skin.getSkinnable().getHeight()));

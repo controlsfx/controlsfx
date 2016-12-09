@@ -126,6 +126,7 @@ public interface Grid {
      * @return the height of a row.
      */
     public double getRowHeight(int row);
+    public void toto();
 
     /**
      * Return true if the specified row is resizable.

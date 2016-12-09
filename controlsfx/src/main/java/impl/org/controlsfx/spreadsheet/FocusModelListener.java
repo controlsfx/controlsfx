@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -62,7 +62,11 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
     public void changed(ObservableValue<? extends TablePosition<ObservableList<SpreadsheetCell>, ?>> ov,
             final TablePosition<ObservableList<SpreadsheetCell>, ?> oldPosition,
             final TablePosition<ObservableList<SpreadsheetCell>, ?> newPosition) {
-        final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(newPosition.getRow(), newPosition.getColumn());
+        int columnIndex = -1;
+        if (newPosition != null && newPosition.getTableColumn() != null) {
+            columnIndex = newPosition.getTableColumn().getColumns().indexOf(newPosition.getTableColumn());
+        }
+        final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(newPosition.getRow(), columnIndex);
         switch (spanType) {
             case ROW_SPAN_INVISIBLE:
                 // If we notice that the new focused cell is the previous one,
@@ -96,7 +100,7 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
                 if (!spreadsheetView.isPressed() && oldPosition.getColumn() == newPosition.getColumn() - 1 && oldPosition.getRow() == newPosition.getRow()) {
 
                     Platform.runLater(() -> {
-                        tfm.focus(oldPosition.getRow(), getTableColumnSpan(oldPosition, cellsView));
+                        tfm.focus(oldPosition.getRow(), getTableColumnSpan(oldPosition, cellsView, spreadsheetView));
                     });
                 } else {
                     // If the current focused cell if hidden by column span, we
@@ -118,9 +122,9 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
      * @param t the current TablePosition
      * @return
      */
-    static TableColumn<ObservableList<SpreadsheetCell>, ?> getTableColumnSpan(final TablePosition<?, ?> t, SpreadsheetGridView cellsView) {
+    static TableColumn<ObservableList<SpreadsheetCell>, ?> getTableColumnSpan(final TablePosition<?, ?> t, SpreadsheetGridView cellsView, SpreadsheetView spv) {
         return cellsView.getVisibleLeafColumn(t.getColumn()
-                + cellsView.getItems().get(t.getRow()).get(t.getColumn()).getColumnSpan());
+                + spv.getColumnSpan(cellsView.getItems().get(t.getRow()).get(t.getColumn())));
     }
 
     /**
@@ -135,8 +139,8 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
         return spv.getRowSpan(cellsView.getItems().get(pos.getRow()).get(pos.getColumn()))
                 + spv.getViewRow(cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRow());
     }
-    
+
     public static int getPreviousRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView, SpreadsheetView spv) {
-        return spv.getViewRow(cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRow()) -1;
+        return spv.getViewRow(cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRow()) - 1;
     }
 }

@@ -424,7 +424,14 @@ public class SpreadsheetView extends Control{
             @Override
             public void invalidated(Observable observable) {
                 computeRowMap();
-                 initRowFix(grid);
+                initRowFix(grid);
+            }
+        });
+        hiddenColumnsProperty.addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                computeColumnMap();
+                initRowFix(grid);
             }
         });
         getStyleClass().add("SpreadsheetView"); //$NON-NLS-1$
@@ -534,32 +541,94 @@ public class SpreadsheetView extends Control{
     }
 
     //The visible rows.
-    private ObjectProperty<BitSet> hiddenRowsProperty = new SimpleObjectProperty<>();
-    private HashMap<Integer,Integer> rowMap = new HashMap<>();
+    private final ObjectProperty<BitSet> hiddenRowsProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<BitSet> hiddenColumnsProperty = new SimpleObjectProperty<>();
+    private HashMap<Integer, Integer> rowMap = new HashMap<>();
+    private HashMap<Integer, Integer> columnMap = new HashMap<>();
     private Integer filteredRow;
     private FilteredList<ObservableList<SpreadsheetCell>> filteredList;
-    
-    public boolean isRowHidden(int row){
+
+    /**
+     * Return true is this row is hidden.
+     *
+     * @param row
+     * @return
+     */
+    public boolean isRowHidden(int row) {
         return hiddenRowsProperty.get().get(row);
     }
-    
-    public BitSet getHiddenRows(){
+
+    /**
+     * Return a BitSet of the Hidden rows, where true means the row is hidden.
+     *
+     * @return
+     */
+    public BitSet getHiddenRows() {
         return hiddenRowsProperty.get();
     }
-    
-    public final ObjectProperty<BitSet> hiddenRowsProperty(){
+
+    public final ObjectProperty<BitSet> hiddenRowsProperty() {
         return hiddenRowsProperty;
     }
-    
-    public void setHiddenRows(BitSet hiddenRows){
+
+    /**
+     * Give a complete new BitSet of the hidden rows. The BitSet MUST have the
+     * size of {@link Grid#getRowCount() }.
+     *
+     * @param hiddenRows
+     */
+    public void setHiddenRows(BitSet hiddenRows) {
         this.hiddenRowsProperty.setValue(hiddenRows);
         requestLayout();
     }
-    
-    public Integer getFilteredRow(){
+
+    /**
+     * Give a complete new BitSet of the hidden columns. The BitSet MUST have
+     * the size of {@link Grid#getColumnCount() () }.
+     *
+     * @param hiddenColumns
+     */
+    public void setHiddenColumns(BitSet hiddenColumns) {
+        BitSet bitSet = new BitSet(hiddenColumns.size());
+        bitSet.or(hiddenColumns);
+        this.hiddenColumnsProperty.setValue(bitSet);
+        requestLayout();
+    }
+
+    /**
+     * Return true if this column index (regarding to {@link #getColumns() } is
+     * hidden.
+     *
+     * @param column
+     * @return
+     */
+    public boolean isColumnHidden(int column) {
+        return hiddenColumnsProperty.get().get(column);
+    }
+
+    /**
+     * Return a BitSet of the Hidden columns, where true means the column is
+     * hidden.
+     *
+     * @return
+     */
+    public BitSet getHiddenColumns() {
+        return hiddenColumnsProperty.get();
+    }
+
+    public final ObjectProperty<BitSet> hiddenColumnsProperty() {
+        return hiddenColumnsProperty;
+    }
+
+    /**
+     * Return the row where the {@link Filter} will be shown.
+     *
+     * @return
+     */
+    public Integer getFilteredRow() {
         return filteredRow;
     }
-    
+
     public void setFilteredRow(Integer row) {
         if (row == null || row > getGrid().getRowCount()) {
             filteredRow = null;
@@ -567,23 +636,43 @@ public class SpreadsheetView extends Control{
             filteredRow = row;
         }
     }
-    
-    public void hideRow(int row){
-        if(getHiddenRows().get(row)){
+
+    /**
+     * Hide the specified row.
+     *
+     * @param row
+     */
+    public void hideRow(int row) {
+        if (getHiddenRows().get(row)) {
             return;
         }
-        getHiddenRows().set(row, false);
-        computeRowMap();
+        getHiddenRows().set(row, true);
+        setHiddenRows(getHiddenRows());
     }
-    
-    private void computeRowMap(){
-        rowMap = new HashMap<>(getGrid().getRows().size());
+
+    /**
+     * Hide the specified {@link SpreadsheetColumn}.
+     *
+     * @param column
+     */
+    public void hideColumn(SpreadsheetColumn column) {
+        int indexColumn = getColumns().indexOf(column);
+        if (getHiddenColumns().get(indexColumn)) {
+            return;
+        }
+        getHiddenColumns().set(indexColumn, true);
+        setHiddenColumns(getHiddenColumns());
+    }
+
+    private void computeRowMap() {
+        final int rowCount = getGrid().getRowCount();
+        rowMap = new HashMap<>(rowCount);
         int visibleRow = 0;
-        for(int i=0;i<getGrid().getRows().size();++i ){
-            if(!getHiddenRows().get(i)){
-               rowMap.put(i,visibleRow++);
-            }else{
-              rowMap.put(i,visibleRow);
+        for (int i = 0; i < rowCount; ++i) {
+            if (!getHiddenRows().get(i)) {
+                rowMap.put(i, visibleRow++);
+            } else {
+                rowMap.put(i, visibleRow);
             }
         }
         filteredList.setPredicate(new Predicate<ObservableList<SpreadsheetCell>>() {
@@ -593,15 +682,62 @@ public class SpreadsheetView extends Control{
             }
         });
     }
-    
-    public void showRow(int row){
-        if(!getHiddenRows().get(row)){
+
+    private void computeColumnMap() {
+        final int columnCount = getGrid().getColumnCount();
+        columnMap = new HashMap<>(columnCount);
+        int visibleColumn = 0;
+        final int columnSize = getColumns().size();
+        for (int i = 0; i < columnCount; ++i) {
+            if (!getHiddenColumns().get(i)) {
+                if (i < columnSize) {
+                    getColumns().get(i).column.setVisible(true);
+                }
+                columnMap.put(i, visibleColumn++);
+            } else {
+                if (i < columnSize) {
+                    getColumns().get(i).column.setVisible(false);
+                }
+                columnMap.put(i, visibleColumn);
+            }
+        }
+    }
+
+    /**
+     * Show the specified row.
+     *
+     * @param row
+     */
+    public void showRow(int row) {
+        if (!getHiddenRows().get(row)) {
             return;
         }
-         getHiddenRows().set(row, true);
+        getHiddenRows().set(row, false);
         computeRowMap();
     }
-    
+
+    /**
+     * Show the specified {@link SpreadsheetColumn}.
+     *
+     * @param column
+     */
+    public void showColumn(SpreadsheetColumn column) {
+        int indexColumn = getColumns().indexOf(column);
+        if (!getHiddenColumns().get(indexColumn)) {
+            return;
+        }
+        getHiddenColumns().set(indexColumn, false);
+        setHiddenColumns(getHiddenColumns());
+    }
+
+    /**
+     * Given a row index base on the {@link Grid}, return the index used in the
+     * SpreadsheetView. Beware ,if the row is hidden, the returned index is not
+     * relevant because no row is assigned to it.
+     *
+     * @param modelRow
+     * @return
+     */
     public int getViewRow(int modelRow) {
         try {
             return rowMap.get(modelRow);
@@ -611,8 +747,31 @@ public class SpreadsheetView extends Control{
         }
     }
 
+    /**
+     * Given a column index based on the {@link #getColumns() } list, return an
+     * index based on the visible columns in the SpreadsheetView.
+     *
+     * @param modelColumn
+     * @return
+     */
+    public int getViewColumn(int modelColumn) {
+        try {
+            return columnMap.get(modelColumn);
+        } catch (NullPointerException ex) {
+            System.out.println("Problem in getViewColumn for " + modelColumn);
+            return modelColumn;
+        }
+    }
+
+    /**
+     * Given an index on the SpreadsheetView, return a {@link Grid} index it is
+     * related to.
+     *
+     * @param viewRow
+     * @return
+     */
     public int getModelRow(int viewRow) {
-        if (viewRow < 0) {
+        if (viewRow < 0 || viewRow > filteredList.size()) {
             return viewRow;
         }
         try {
@@ -622,13 +781,33 @@ public class SpreadsheetView extends Control{
             return viewRow;
         }
     }
-    
+
+    /**
+     * Return the current row span of a Cell considering all hidden rows.
+     *
+     * @param cell
+     * @return
+     */
     public int getRowSpan(SpreadsheetCell cell) {
         int rowSpan = cell.getRowSpan();
         for (int i = cell.getRow(); i < cell.getRow() + cell.getRowSpan(); ++i) {
             rowSpan -= getHiddenRows().get(i) ? 1 : 0;
         }
         return rowSpan;
+    }
+
+    /**
+     * Return the current column span of a Cell considering all hidden columns.
+     *
+     * @param cell
+     * @return
+     */
+    public int getColumnSpan(SpreadsheetCell cell) {
+        int colSpan = cell.getColumnSpan();
+        for (int i = cell.getColumn(); i < cell.getColumn() + cell.getColumnSpan(); ++i) {
+            colSpan -= getHiddenColumns().get(i) ? 1 : 0;
+        }
+        return colSpan;
     }
     /**
      * Return the zoomFactor used for the SpreadsheetView.
@@ -696,6 +875,7 @@ public class SpreadsheetView extends Control{
         gridProperty.set(grid);
         filteredList = new FilteredList<>(grid.getRows());
         setHiddenRows(new BitSet(filteredList.getSource().size()));
+        setHiddenColumns(new BitSet(grid.getColumnCount()));
         initRowFix(grid);
 
         /**

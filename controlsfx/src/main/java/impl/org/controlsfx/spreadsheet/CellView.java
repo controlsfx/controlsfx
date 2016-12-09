@@ -178,7 +178,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * @return 
      */
     Filter getFilter() {
-        Filter filter = getItem() != null ? handle.getView().getColumns().get(getItem().getColumn()).getFilter() : null;
+        Filter filter = getItem() != null ? handle.getView().getColumns().get(handle.getView().getViewColumn(getItem().getColumn())).getFilter() : null;
         return filter != null &&  handle.getView().getFilteredRow()== getIndex() ? filter : null;
     }
 
@@ -527,7 +527,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         // For spanned Cells
         final SpreadsheetCell cell = (SpreadsheetCell) getItem();
         final int rowCell = handle.getView().getViewRow(cell.getRow()) + handle.getView().getRowSpan(cell) - 1;
-        final int columnCell = cell.getColumn() + cell.getColumnSpan() - 1;
+        final int columnCell = handle.getView().getViewColumn(cell.getColumn()) + handle.getView().getColumnSpan(cell) - 1;
 
         final TableViewFocusModel<?> fm = tableView.getFocusModel();
         if (fm == null) {
@@ -561,8 +561,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             if (!e.isShortcutDown())
                 sm.clearSelection();
             if (minColumn != -1 && maxColumn != -1)
-                sm.selectRange(minRow, tableView.getColumns().get(minColumn), maxRow,
-                        tableView.getColumns().get(maxColumn));
+                sm.selectRange(minRow, tableView.getVisibleLeafColumn(minColumn), maxRow,
+                        tableView.getVisibleLeafColumn(maxColumn));
             setAnchor(tableView, anchor);
         }
 

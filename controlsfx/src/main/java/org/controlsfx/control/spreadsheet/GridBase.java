@@ -140,6 +140,9 @@ public class GridBase implements Grid, EventTarget {
         resizableRow.set(0, rowCount, true);
     }
 
+    public void toto(){
+        
+    }
     /***************************************************************************
      * 
      * Public Methods (Inherited from Grid)
@@ -179,42 +182,54 @@ public class GridBase implements Grid, EventTarget {
         return columnCount;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public SpanType getSpanType(final SpreadsheetView spv, final int viewRow, final int column) {
-        if (viewRow < 0 || column < 0 || viewRow >= getRowCount() || column >= columnCount) {
+    public SpanType getSpanType(final SpreadsheetView spv, final int viewRow, final int modelColumn) {
+        if (viewRow < 0 || modelColumn < 0 || viewRow >= getRowCount() || modelColumn >= columnCount) {
             return SpanType.NORMAL_CELL;
         }
-        
-        final SpreadsheetCell cell =  spv.getCellsView().getItems().get(viewRow).get(column);
 
-        final int cellColumn = cell.getColumn();
+        final SpreadsheetCell cell = spv.getCellsView().getItems().get(viewRow).get(modelColumn);
+
+        final int cellColumn = spv.getHiddenColumns().nextClearBit(cell.getColumn());
         final int cellRow = spv.getViewRow(cell.getRow());
         final int cellRowSpan = spv.getRowSpan(cell);//cell.getRowSpan();
 
-        if (cellColumn == column && cellRow == viewRow && cellRowSpan == 1) {
+        if (cellColumn == modelColumn && cellRow == viewRow && cellRowSpan == 1) {
             return SpanType.NORMAL_CELL;
         }
 
-        final int cellColumnSpan = cell.getColumnSpan();
+        final int cellColumnSpan = spv.getColumnSpan(cell);
         /**
          * This is a consuming operation so we place it after the normal_cell
          * case since this is the most typical case.
          */
         final GridViewSkin skin = spv.getCellsViewSkin();
         final boolean containsRowMinusOne = skin == null ? true : skin.containsRow(viewRow - 1);
-        if (containsRowMinusOne && cellColumnSpan > 1 && cellColumn != column && cellRowSpan > 1
+        if (containsRowMinusOne && cellColumnSpan > 1 && cellColumn != modelColumn && cellRowSpan > 1
                 && cellRow != viewRow) {
             return SpanType.BOTH_INVISIBLE;
-        } else if (cellRowSpan > 1 && cellColumn == column) {
+        } else if (cellRowSpan > 1 && cellColumn == modelColumn) {
             if ((cellRow == viewRow || !containsRowMinusOne)) {
                 return SpanType.ROW_VISIBLE;
             } else {
                 return SpanType.ROW_SPAN_INVISIBLE;
             }
-        } else if (cellColumnSpan > 1 && cellColumn != column && (cellRow == viewRow || !containsRowMinusOne)) {
-            return SpanType.COLUMN_SPAN_INVISIBLE;
-        } else {
+        } else if (cellColumnSpan > 1 && (cellRow == viewRow || !containsRowMinusOne)) {
+            /**
+             * If the next visible column from the starting column is my
+             * viewColumn, it means all columns before me are hidden and I must
+             * show myself.
+             */
+            int columnVisible = spv.getHiddenColumns().nextClearBit(cell.getColumn());
+            if (columnVisible == modelColumn) {
+                return SpanType.NORMAL_CELL;
+            } else {
+                return SpanType.COLUMN_SPAN_INVISIBLE;
+            }
+        }else{
             return SpanType.NORMAL_CELL;
         }
     }

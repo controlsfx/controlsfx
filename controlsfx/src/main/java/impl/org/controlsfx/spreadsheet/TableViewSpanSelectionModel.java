@@ -60,7 +60,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
  * The Selection Model adapted for the SpreadsheetView regarding span.
  */
 public class TableViewSpanSelectionModel extends
-        TableView.TableViewSelectionModel<ObservableList<SpreadsheetCell>>{
+        TableView.TableViewSelectionModel<ObservableList<SpreadsheetCell>> {
 
     private boolean shift = false; // Register state of 'shift' key
     private boolean key = false; // Register if we last touch the keyboard
@@ -88,7 +88,7 @@ public class TableViewSpanSelectionModel extends
      * starting column of the spanning cell but on the same column we arrived
      * previously.
      */
-    private int oldCol = -1;
+//    private int oldCol = -1;
     private TableColumn oldTableColumn = null;
     private int oldRow = -1;
     Pair<Integer, Integer> direction;
@@ -175,6 +175,7 @@ public class TableViewSpanSelectionModel extends
      */
     /**
      * Constructor
+     *
      * @param spreadsheetView
      * @param cellsView
      */
@@ -238,8 +239,8 @@ public class TableViewSpanSelectionModel extends
         // Variable we need for algorithm
         TablePosition<ObservableList<SpreadsheetCell>, ?> posFinal = new TablePosition<>(getTableView(), row,
                 column);
-
-        final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(row, posFinal.getColumn());
+        int columnIndex = cellsView.getColumns().indexOf(column);
+        final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(row, columnIndex);
 
         /**
          * We check if we are on covered cell. If so we have the algorithm of
@@ -284,11 +285,11 @@ public class TableViewSpanSelectionModel extends
                 // already on the cell and we wanted to go right.
                 if (old != null && !shift && old.getColumn() == posFinal.getColumn() - 1
                         && old.getRow() == posFinal.getRow()) {
-                    posFinal = getVisibleCell(old.getRow(), FocusModelListener.getTableColumnSpan(old, cellsView), getTableColumnSpanInt(old));
+                    posFinal = getVisibleCell(old.getRow(), FocusModelListener.getTableColumnSpan(old, cellsView, spreadsheetView), getTableColumnSpanInt(old));
                 } else {
                     // If the current selected cell if hidden by column span, we
                     // go left
-                        posFinal = getVisibleCell(row, column, posFinal.getColumn());
+                    posFinal = getVisibleCell(row, column, posFinal.getColumn());
                 }
             default:
                 break;
@@ -301,7 +302,8 @@ public class TableViewSpanSelectionModel extends
              * column.
              */
             if (direction.getKey() != 0 && oldColSpan > 1) {
-                posFinal = getVisibleCell(posFinal.getRow(), oldTableColumn, oldCol);
+                //FIXME
+                posFinal = getVisibleCell(posFinal.getRow(), oldTableColumn, 0);
             } else if (direction.getValue() != 0 && oldRowSpan > 1) {
                 posFinal = getVisibleCell(oldRow, posFinal.getTableColumn(), posFinal.getColumn());
             }
@@ -311,25 +313,23 @@ public class TableViewSpanSelectionModel extends
         //If it's a click, we register everything.
         if (!key) {
             oldRow = old.getRow();
-            oldCol = old.getColumn();
+//            oldCol = old.getColumn();
             oldTableColumn = old.getTableColumn();
-        } else {
-            //If we're going up or down, we register the row changing, not the column.
-            if (direction != null && direction.getKey() != 0) {
-                oldRow = old.getRow();
-            } else if (direction != null && direction.getValue() != 0) {
-                oldCol = old.getColumn();
-                oldTableColumn = old.getTableColumn();
-            }
+        } else //If we're going up or down, we register the row changing, not the column.
+        if (direction != null && direction.getKey() != 0) {
+            oldRow = old.getRow();
+        } else if (direction != null && direction.getValue() != 0) {
+//            oldCol = old.getColumn();
+            oldTableColumn = old.getTableColumn();
         }
         if (getSelectionMode() == SelectionMode.SINGLE) {
             quietClearSelection();
         }
-        SpreadsheetCell cell = cellsView.getItems().get(old.getRow()).get(old.getColumn());
+        SpreadsheetCell cell = (SpreadsheetCell) old.getTableColumn().getCellData(old.getRow());
         oldRowSpan = spreadsheetView.getRowSpan(cell);
-        oldColSpan = cell.getColumnSpan();
+        oldColSpan = spreadsheetView.getColumnSpan(cell);
         for (int i = spreadsheetView.getViewRow(cell.getRow()); i < spreadsheetView.getRowSpan(cell) + spreadsheetView.getViewRow(cell.getRow()); ++i) {
-            for (int j = cell.getColumn(); j < cell.getColumnSpan() + cell.getColumn(); ++j) {
+            for (int j = spreadsheetView.getViewColumn(cell.getColumn()); j < spreadsheetView.getColumnSpan(cell) + spreadsheetView.getViewColumn(cell.getColumn()); ++j) {
                 posFinal = new TablePosition<>(getTableView(), i, getTableView().getVisibleLeafColumn(j));
                 selectedCellsMap.add(posFinal);
             }
@@ -431,10 +431,10 @@ public class TableViewSpanSelectionModel extends
             pos = getVisibleCell(position.getKey(), column, position.getValue());
             // We store all the selectedColumn and Rows, we will update
             // just once at the end
-            final SpreadsheetCell cell = cellsView.getItems().get(pos.getRow()).get(pos.getColumn());
+            final SpreadsheetCell cell = (SpreadsheetCell) column.getCellData(pos.getRow());
             for (int i = spreadsheetView.getViewRow(cell.getRow()); i < spreadsheetView.getRowSpan(cell) + spreadsheetView.getViewRow(cell.getRow()); ++i) {
                 selectedColumns.add(i);
-                for (int j = cell.getColumn(); j < cell.getColumnSpan() + cell.getColumn(); ++j) {
+                for (int j = spreadsheetView.getViewColumn(cell.getColumn()); j < spreadsheetView.getColumnSpan(cell) + spreadsheetView.getViewColumn(cell.getColumn()); ++j) {
                     selectedRows.add(j);
                     pos = new TablePosition<>(getTableView(), i, getTableView().getVisibleLeafColumn(j));
                     newList.add(pos);
@@ -548,10 +548,10 @@ public class TableViewSpanSelectionModel extends
 
                 // We store all the selectedColumn and Rows, we will update
                 // just once at the end
-                cell = cellsView.getItems().get(pos.getRow()).get(pos.getColumn());
+                cell = (SpreadsheetCell) column.getCellData(pos.getRow());
                 for (int i = spreadsheetView.getViewRow(cell.getRow()); i < spreadsheetView.getRowSpan(cell) + spreadsheetView.getViewRow(cell.getRow()); ++i) {
                     selectedColumns.add(i);
-                    for (int j = cell.getColumn(); j < cell.getColumnSpan() + cell.getColumn(); ++j) {
+                    for (int j = spreadsheetView.getViewColumn(cell.getColumn()); j < spreadsheetView.getColumnSpan(cell) + spreadsheetView.getViewColumn(cell.getColumn()); ++j) {
                         selectedRows.add(j);
                         pos = new TablePosition<>(getTableView(), i, getTableView().getVisibleLeafColumn(j));
                         selectedCellsMap.add(pos);
@@ -674,12 +674,13 @@ public class TableViewSpanSelectionModel extends
             return null;
         }
 
-        final SpreadsheetCell cell = cellsView.getItems().get(row).get(col);
+        final SpreadsheetCell cell = (SpreadsheetCell) column.getCellData(row);
+
         final int infRow = spreadsheetView.getViewRow(cell.getRow());
         final int supRow = infRow + spreadsheetView.getRowSpan(cell);
 
-        final int infCol = cell.getColumn();
-        final int supCol = infCol + cell.getColumnSpan();
+        final int infCol = spreadsheetView.getViewColumn(cell.getColumn());
+        final int supCol = infCol + spreadsheetView.getColumnSpan(cell);
         List<TablePosition<ObservableList<SpreadsheetCell>, ?>> selectedCells = new ArrayList<>();
         for (final TablePosition<ObservableList<SpreadsheetCell>, ?> tp : getSelectedCells()) {
             if (tp.getRow() >= infRow && tp.getRow() < supRow && tp.getColumn() >= infCol
@@ -687,7 +688,7 @@ public class TableViewSpanSelectionModel extends
                 selectedCells.add(tp);
             }
         }
-        return selectedCells.isEmpty()? null : selectedCells;
+        return selectedCells.isEmpty() ? null : selectedCells;
     }
 
     /**
@@ -695,25 +696,25 @@ public class TableViewSpanSelectionModel extends
      * * Support code * *
      * ********************************************************************
      */
-    private void addSelectedRowsAndColumns(TablePosition<?, ?> position) {
+    private void addSelectedRowsAndColumns(TablePosition<?, ?> pos) {
         GridViewSkin skin = getSpreadsheetViewSkin();
         if (skin == null) {
             return;
         }
-        final SpreadsheetCell cell = cellsView.getItems().get(position.getRow()).get(position.getColumn());
+        final SpreadsheetCell cell = (SpreadsheetCell) pos.getTableColumn().getCellData(pos.getRow());
         for (int i = spreadsheetView.getViewRow(cell.getRow()); i < spreadsheetView.getRowSpan(cell) + spreadsheetView.getViewRow(cell.getRow()); ++i) {
             skin.getSelectedRows().add(i);
-            for (int j = cell.getColumn(); j < cell.getColumnSpan() + cell.getColumn(); ++j) {
+            for (int j = spreadsheetView.getViewColumn(cell.getColumn()); j < spreadsheetView.getColumnSpan(cell) + spreadsheetView.getViewColumn(cell.getColumn()); ++j) {
                 skin.getSelectedColumns().add(j);
             }
         }
     }
 
-    private void removeSelectedRowsAndColumns(TablePosition<?, ?> position) {
-        final SpreadsheetCell cell = cellsView.getItems().get(position.getRow()).get(position.getColumn());
+    private void removeSelectedRowsAndColumns(TablePosition<?, ?> pos) {
+        final SpreadsheetCell cell = (SpreadsheetCell) pos.getTableColumn().getCellData(pos.getRow());
         for (int i = spreadsheetView.getViewRow(cell.getRow()); i < spreadsheetView.getRowSpan(cell) + spreadsheetView.getViewRow(cell.getRow()); ++i) {
             getSpreadsheetViewSkin().getSelectedRows().remove(Integer.valueOf(i));
-            for (int j = cell.getColumn(); j < cell.getColumnSpan() + cell.getColumn(); ++j) {
+            for (int j = spreadsheetView.getViewColumn(cell.getColumn()); j < spreadsheetView.getColumnSpan(cell) + spreadsheetView.getViewColumn(cell.getColumn()); ++j) {
                 getSpreadsheetViewSkin().getSelectedColumns().remove(Integer.valueOf(j));
             }
         }
@@ -721,13 +722,13 @@ public class TableViewSpanSelectionModel extends
 
     @Override
     public void clearAndSelect(int row, TableColumn<ObservableList<SpreadsheetCell>, ?> column) {
-            // RT-33558 if this method has been called with a given row/column
+        // RT-33558 if this method has been called with a given row/column
         // intersection, and that row/column intersection is the only
         // selection currently, then this method becomes a no-op.
 
         // This is understandable but not compatible with spanning
         // selection.
-            /*
+        /*
          * if (getSelectedCells().size() == 1 && isSelected(row, column)) {
          * return; }
          */
@@ -748,7 +749,7 @@ public class TableViewSpanSelectionModel extends
         // fire off a single add/remove/replace notification (rather than
         // individual remove and add notifications) - see RT-33324
         if (old != null && old.getColumn() >= 0) {
-            TableColumn<ObservableList<SpreadsheetCell>, ?> columnFinal = getTableView().getColumns().get(
+            TableColumn<ObservableList<SpreadsheetCell>, ?> columnFinal = getTableView().getVisibleLeafColumn(
                     old.getColumn());
             int changeIndex = selectedCellsSeq.indexOf(new TablePosition<>(getTableView(), old.getRow(),
                     columnFinal));
@@ -863,12 +864,13 @@ public class TableViewSpanSelectionModel extends
      *
      * @param row
      * @param column
-     * @param col
+     * @param viewCol
      * @return
      */
     private TablePosition<ObservableList<SpreadsheetCell>, ?> getVisibleCell(int row,
-            TableColumn<ObservableList<SpreadsheetCell>, ?> column, int col) {
-        final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(row, col);
+            TableColumn<ObservableList<SpreadsheetCell>, ?> column, int viewCol) {
+        int modelColumn = cellsView.getColumns().indexOf(column);
+        final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(row, modelColumn);
         switch (spanType) {
             case NORMAL_CELL:
             case ROW_VISIBLE:
@@ -877,13 +879,13 @@ public class TableViewSpanSelectionModel extends
             case COLUMN_SPAN_INVISIBLE:
             case ROW_SPAN_INVISIBLE:
             default:
-                final SpreadsheetCell cellSpan = cellsView.getItems().get(row).get(col);
+                final SpreadsheetCell cellSpan = cellsView.getItems().get(row).get(modelColumn);
                 if (getCellsViewSkin() == null || (getCellsViewSkin().getCellsSize() != 0 && getNonFixedRow(0).getIndex() <= spreadsheetView.getViewRow(cellSpan.getRow()))) {
-                    return new TablePosition<>(cellsView, spreadsheetView.getViewRow(cellSpan.getRow()), cellsView.getColumns().get(
-                            cellSpan.getColumn()));
+                    return new TablePosition<>(cellsView, spreadsheetView.getViewRow(cellSpan.getRow()), 
+                            cellsView.getVisibleLeafColumn(spreadsheetView.getViewColumn(cellSpan.getColumn())));
                 } else { // If it's not, then it's the firstkey
-                    return new TablePosition<>(cellsView, getNonFixedRow(0).getIndex(), cellsView.getColumns().get(
-                            cellSpan.getColumn()));
+                    return new TablePosition<>(cellsView, getNonFixedRow(0).getIndex(), 
+                            cellsView.getVisibleLeafColumn(spreadsheetView.getViewColumn(cellSpan.getColumn())));
                 }
         }
     }
@@ -912,8 +914,8 @@ public class TableViewSpanSelectionModel extends
      * @param t the current TablePosition
      * @return
      */
-    private int getTableColumnSpanInt(final TablePosition<?, ?> t) {
-        return t.getColumn() + cellsView.getItems().get(t.getRow()).get(t.getColumn()).getColumnSpan();
+    private int getTableColumnSpanInt(final TablePosition<?, ?> pos) {
+        return pos.getColumn() + spreadsheetView.getColumnSpan((SpreadsheetCell) pos.getTableColumn().getCellData(pos.getRow()));
     }
 
 }

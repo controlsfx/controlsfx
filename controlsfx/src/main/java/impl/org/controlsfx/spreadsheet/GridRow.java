@@ -76,6 +76,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         
         handle.getView().gridProperty().addListener(weakPrefHeightListener);
         handle.getView().hiddenRowsProperty().addListener(weakPrefHeightListener);
+        handle.getView().hiddenColumnsProperty().addListener(weakPrefHeightListener);
         
         /**
          * When the height is changing elsewhere, we need to update ourself if necessary.

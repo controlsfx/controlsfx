@@ -30,8 +30,10 @@ import java.util.List;
 import java.util.TreeSet;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.IndexedCell;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
@@ -142,7 +144,7 @@ public class RectangleSelection extends Rectangle {
             return;
         }
         SpreadsheetCell cell = skin.getSkinnable().getItems().get(maxRow).get(maxColumn);
-        handleHorizontalPositioning(minColumn, maxColumn, cell.getColumnSpan());
+        handleHorizontalPositioning(minColumn, maxColumn, skin.spreadsheetView.getColumnSpan(cell));
 
         //If we are out of sight
         if (getX() + getWidth() < 0) {
@@ -213,14 +215,16 @@ public class RectangleSelection extends Rectangle {
     private void handleHorizontalPositioning(int minColumn, int maxColumn, int columnSpan) {
         double x = 0;
 
+        final List<TableColumn<ObservableList<SpreadsheetCell>, ?>> visibleColumns = skin.handle.getGridView().getVisibleLeafColumns();
+        final List<TableColumn<ObservableList<SpreadsheetCell>, ?>> allColumns = skin.handle.getGridView().getColumns();
         final List<SpreadsheetColumn> columns = skin.spreadsheetView.getColumns();
-        if(columns.size() <= minColumn || columns.size() <= maxColumn){
+        if(visibleColumns.size() <= minColumn || visibleColumns.size() <= maxColumn){
             return;
         }
         //We first compute the total space between the left edge and our first column
         for (int i = 0; i < minColumn; ++i) {
             //Here we use Ceil because we want to "snapSize" otherwise we may end up with a weird shift.
-            x += snapSize(columns.get(i).getWidth());
+            x += snapSize(visibleColumns.get(i).getWidth());
         }
         
 
@@ -234,7 +238,7 @@ public class RectangleSelection extends Rectangle {
         //Then we compute the width by adding the space between the min and max column
         double width = 0;
         for (int i = minColumn; i <= maxColumn /*+ (columnSpan - 1)*/; ++i) {
-            width += snapSize(columns.get(i).getWidth());
+            width += snapSize(visibleColumns.get(i).getWidth());
         }
 
         //FIXED COLUMNS
@@ -244,7 +248,7 @@ public class RectangleSelection extends Rectangle {
          * translate the starting point in because the rectangle must also be
          * hidden by the fixed column.
          */
-        if (!skin.spreadsheetView.getFixedColumns().contains(columns.get(minColumn))) {
+        if (!skin.spreadsheetView.getFixedColumns().contains(columns.get(allColumns.indexOf(visibleColumns.get(minColumn))))) {
             if (x < skin.fixedColumnWidth) {
                 //Since I translate the starting point, I must reduce the width by the value I'm translating.
                 width -= skin.fixedColumnWidth - x;

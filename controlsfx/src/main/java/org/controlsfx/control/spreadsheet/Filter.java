@@ -26,92 +26,21 @@
  */
 package org.controlsfx.control.spreadsheet;
 
-import java.util.BitSet;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.CustomMenuItem;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
-import javafx.util.Callback;
 
-public class Filter {
-
-    private final SpreadsheetView spv;
-    private final int column;
-    private MenuButton menuButton;
-    private BitSet hiddenRows;
-
-    /**
-     * Default constructor, the default "picker-label" styleClass is applied.
-     *
-     * @param spv
-     * @param row
-     */
-    public Filter(SpreadsheetView spv, int column) {
-        this.spv = spv;
-        this.column = column;
-    }
+/**
+ *
+ * The interface for implementing Filters on {@link SpreadsheetColumn}. Simply
+ * set a Filtered row on the {@link SpreadsheetView} by using {@link SpreadsheetView#setFilteredRow(java.lang.Integer)
+ * }.
+ * 
+ * Then construct the Filters and add them to each {@link SpreadsheetColumn}.
+ */
+public interface Filter {
 
     /**
-     * This method will be called whenever the user clicks on this picker.
-     *
-     * @return
+     * Return the MenuButton displayed into the bottom-right corner of the cell.
+     * @return 
      */
-    public MenuButton getMenuButton() {
-        if (menuButton == null) {
-            menuButton = new MenuButton();
-
-            menuButton.showingProperty().addListener(new ChangeListener<Boolean>() {
-                @Override
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    if (newValue) {
-                        addMenuItems();
-                        hiddenRows = new BitSet(spv.getHiddenRows().size());
-                        hiddenRows.or(spv.getHiddenRows());
-                    } else {
-                        spv.setHiddenRows(hiddenRows);
-                    }
-                }
-            });
-        }
-        return menuButton;
-    }
-
-    private void addMenuItems() {
-        if (menuButton.getItems().isEmpty()) {
-            ListView<SpreadsheetCell> listView = new ListView<>();
-            listView.setCellFactory(new Callback<ListView<SpreadsheetCell>, ListCell<SpreadsheetCell>>() {
-                @Override
-                public ListCell<SpreadsheetCell> call(ListView<SpreadsheetCell> param) {
-                    return new ListCell<SpreadsheetCell>() {
-                        @Override
-                        public void updateItem(SpreadsheetCell item, boolean empty) {
-                            super.updateItem(item, empty);
-                            setText(item == null ? "" : item.getText());
-                            if (item != null) {
-                                CheckBox checkBox = new CheckBox();
-                                checkBox.setSelected(!hiddenRows.get(item.getRow()));
-                                checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
-                                    @Override
-                                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                                        hiddenRows.set(item.getRow(), !newValue);
-                                    }
-                                });
-                                setGraphic(checkBox);
-                            }
-                        }
-                    };
-                }
-            });
-
-            for (int i = spv.getFilteredRow(); i < spv.getGrid().getRowCount(); ++i) {
-                listView.getItems().add(spv.getGrid().getRows().get(i).get(column));
-            }
-            CustomMenuItem customMenuItem = new CustomMenuItem(listView);
-            customMenuItem.setHideOnClick(false);
-            menuButton.getItems().add(customMenuItem);
-        }
-    }
+    public MenuButton getMenuButton();
 }

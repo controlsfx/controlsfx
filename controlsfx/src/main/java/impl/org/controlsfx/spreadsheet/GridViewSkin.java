@@ -242,6 +242,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          */
         handle.getView().gridProperty().addListener(rowToLayoutListener);
         handle.getView().hiddenRowsProperty().addListener(rowToLayoutListener);
+        handle.getView().hiddenColumnsProperty().addListener(rowToLayoutListener);
         
         hBarValue = new BitSet(getItemCount());
         rowToLayout = initRowToLayoutBitSet();
@@ -635,8 +636,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                  * calculation on the current width which will be modified.
                  */
                 SpreadsheetCell spc = gridRows.get(row).get(indexColumn);
-                if (spc.getColumnSpan() > 1) {
-                    for (int i = spc.getColumn(); i < spc.getColumn() + spc.getColumnSpan(); ++i) {
+                if (spreadsheetView.getColumnSpan(spc) > 1) {
+                    for (int i = spreadsheetView.getViewColumn(spc.getColumn()); i < spreadsheetView.getViewColumn(spc.getColumn()) + spreadsheetView.getColumnSpan(spc); ++i) {
                         if(i != indexColumn){
                             width -= spreadsheetView.getColumns().get(i).getWidth();
                         }
@@ -972,7 +973,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                         if (spreadsheetView.getGrid().getRows().size() > unfixedRow) {
                             List<SpreadsheetCell> myRow = spreadsheetView.getGrid().getRows().get(unfixedRow);
                             for (SpreadsheetCell cell : myRow) {
-                                if (spreadsheetView.getRowSpan(cell) > 1 || cell.getColumnSpan() > 1) {
+                                if (spreadsheetView.getRowSpan(cell) > 1 || spreadsheetView.getColumnSpan(cell) > 1) {
                                     rowToLayout.set(unfixedRow, true);
                                     break;
                                 }

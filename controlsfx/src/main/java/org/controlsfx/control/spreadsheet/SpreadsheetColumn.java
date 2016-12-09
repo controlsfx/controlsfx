@@ -329,7 +329,7 @@ public final class SpreadsheetColumn {
         return canFix && spreadsheetView.isFixingColumnsAllowed();
     }
 
-    public void setFilter(FilterBase filter){
+    public void setFilter(Filter filter){
         this.filterProperty.setValue(filter);
     }
     

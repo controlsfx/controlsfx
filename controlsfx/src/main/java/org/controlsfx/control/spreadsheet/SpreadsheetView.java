@@ -752,7 +752,6 @@ public class SpreadsheetView extends Control{
         try {
             return rowMap.get(modelRow);
         } catch (NullPointerException ex) {
-            System.out.println("Problem in getViewRow for " + modelRow);
             return modelRow;
         }
     }
@@ -768,7 +767,6 @@ public class SpreadsheetView extends Control{
         try {
             return columnMap.get(modelColumn);
         } catch (NullPointerException ex) {
-            System.out.println("Problem in getViewColumn for " + modelColumn);
             return modelColumn;
         }
     }
@@ -781,13 +779,12 @@ public class SpreadsheetView extends Control{
      * @return
      */
     public int getModelRow(int viewRow) {
-        if (viewRow < 0 || viewRow > filteredList.size()) {
+        if (viewRow < 0 || viewRow >= filteredList.size()) {
             return viewRow;
         }
         try {
             return filteredList.getSourceIndex(viewRow);
         } catch (NullPointerException | IndexOutOfBoundsException ex) {
-            System.out.println("Problem in getModelRow for " + viewRow);
             return viewRow;
         }
     }

@@ -578,7 +578,9 @@ public class SpreadsheetView extends Control{
      * @param hiddenRows
      */
     public void setHiddenRows(BitSet hiddenRows) {
-        this.hiddenRowsProperty.setValue(hiddenRows);
+        BitSet bitSet = new BitSet(hiddenRows.size());
+        bitSet.or(hiddenRows);
+        this.hiddenRowsProperty.setValue(bitSet);
         requestLayout();
     }
 

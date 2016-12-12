@@ -119,12 +119,12 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
      * Return the TableColumn right after the current TablePosition (including
      * the ColumSpan to be on a visible Cell)
      *
-     * @param t the current TablePosition
+     * @param pos the current TablePosition
      * @return
      */
-    static TableColumn<ObservableList<SpreadsheetCell>, ?> getTableColumnSpan(final TablePosition<?, ?> t, SpreadsheetGridView cellsView, SpreadsheetView spv) {
-        return cellsView.getVisibleLeafColumn(t.getColumn()
-                + spv.getColumnSpan(cellsView.getItems().get(t.getRow()).get(t.getColumn())));
+    static TableColumn<ObservableList<SpreadsheetCell>, ?> getTableColumnSpan(final TablePosition<?, ?> pos, SpreadsheetGridView cellsView, SpreadsheetView spv) {
+        return cellsView.getVisibleLeafColumn(pos.getColumn()
+                + spv.getColumnSpan(cellsView.getItems().get(pos.getRow()).get(cellsView.getColumns().indexOf(pos.getTableColumn()))));
     }
 
     /**
@@ -136,11 +136,11 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
      * @return
      */
     public static int getNextRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView, SpreadsheetView spv) {
-        return spv.getRowSpan(cellsView.getItems().get(pos.getRow()).get(pos.getColumn()))
-                + spv.getViewRow(cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRow());
+        return spv.getRowSpan(cellsView.getItems().get(pos.getRow()).get(cellsView.getColumns().indexOf(pos.getTableColumn())))
+                + spv.getViewRow(cellsView.getItems().get(pos.getRow()).get(cellsView.getColumns().indexOf(pos.getTableColumn())).getRow());
     }
 
     public static int getPreviousRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView, SpreadsheetView spv) {
-        return spv.getViewRow(cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRow()) - 1;
+        return spv.getViewRow(cellsView.getItems().get(pos.getRow()).get(cellsView.getColumns().indexOf(pos.getTableColumn())).getRow()) - 1;
     }
 }

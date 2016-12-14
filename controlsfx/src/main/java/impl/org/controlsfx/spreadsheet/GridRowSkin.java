@@ -324,7 +324,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                     double tempHeight = tableCell.prefHeight(width);
                     if (tempHeight > customHeight) {
                         rowHeightChange = true;
-                        skin.rowHeightMap.put(index, tempHeight);
+                        skin.rowHeightMap.put(spreadsheetCell.getRow(), tempHeight);
                         for (CellView cell : cells) {
                             /**
                              * We need to add the difference between the
@@ -357,7 +357,26 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                     }
                 }
 
-                tableCell.resize(width, height);
+                //Fix for JDK-8146406
+                needToBeShifted = false;
+                /**
+                 * If the current cell has no left border, and the previous cell
+                 * had no right border. We may have the problem
+                 * where there is a tiny gap between the cells when scrolling
+                 * horizontally. Thus we must enlarge this cell a bit, and shift
+                 * it a bit in order to mask that gap. If the cell has a border
+                 * defined, the problem seems not to happen.
+                 * If the cell is not added to its parent, it has no border by default so we must not check it.
+                 */
+                if (/*spreadsheetView.getFixedRows().contains(spreadsheetCell.getRow())
+                        && */lastCell != null
+                        && !hasRightBorder(lastCell)
+                        && !hasLeftBorder(tableCell)) {
+                    tableCell.resize(width + 1, height);
+                    needToBeShifted = true;
+                } else {
+                    tableCell.resize(width, height);
+                }
                 lastCell = tableCell;
                 // We want to place the layout always at the starting cell.
                 double spaceBetweenTopAndMe = 0;
@@ -365,7 +384,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                     spaceBetweenTopAndMe += skin.getRowHeight(p);
                 }
 
-                tableCell.relocate(x + tableCellX, snappedTopInset()
+                tableCell.relocate(x + tableCellX + (needToBeShifted? -1 : 0), snappedTopInset()
                         - spaceBetweenTopAndMe + ((GridRow) getSkinnable()).verticalShift.get());
 
                 // Request layout is here as (partial) fix for RT-28684
@@ -389,6 +408,18 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         if (rowHeightChange && spreadsheetView.getFixedRows().contains(spreadsheetView.getModelRow(index))) {
             skin.computeFixedRowHeight();
         }
+    }
+
+    private boolean hasRightBorder(CellView tableCell) {
+        return tableCell.getBorder() != null 
+                && !tableCell.getBorder().isEmpty() 
+                && tableCell.getBorder().getStrokes().get(0).getWidths().getRight() > 0;
+    }
+    
+    private boolean hasLeftBorder(CellView tableCell) {
+        return tableCell.getBorder() != null 
+                && !tableCell.getBorder().isEmpty() 
+                && tableCell.getBorder().getStrokes().get(0).getWidths().getLeft()> 0;
     }
 
     /**

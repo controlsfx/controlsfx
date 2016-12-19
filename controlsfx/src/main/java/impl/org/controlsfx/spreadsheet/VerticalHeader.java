@@ -512,7 +512,7 @@ public class VerticalHeader extends StackPane {
             if (selectedRows.get(row.getIndex())) {
                 double height = row.getHeight();
                 for (int i = selectedRows.nextSetBit(0); i >= 0; i = selectedRows.nextSetBit(i + 1)) {
-                    skin.rowHeightMap.put(i, height);
+                    skin.rowHeightMap.put(spreadsheetView.getModelRow(i), height);
                     Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(spreadsheetView.getModelRow(i), height));
                 }
             }

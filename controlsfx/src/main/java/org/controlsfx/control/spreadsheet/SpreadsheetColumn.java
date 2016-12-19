@@ -163,10 +163,12 @@ public final class SpreadsheetColumn {
                     //FIXME Only one row can be filtered.
                     if (spreadsheetView.getFilteredRow() == null) {
                         setFilter(null);
+                        return;
                     }
                     SpreadsheetCell cell = spreadsheetView.getGrid().getRows().get(spreadsheetView.getFilteredRow()).get(indexColumn);
                     if (cell.getColumnSpan() > 1) {
                         setFilter(null);
+                        return;
                     }
                 }
                 Event.fireEvent(column, new Event(CellViewSkin.FILTER_EVENT_TYPE));

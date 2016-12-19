@@ -331,9 +331,9 @@ public class SpreadsheetView extends Control{
     
     //Zoom for the SpreadsheetView.
     private DoubleProperty zoomFactor = new SimpleDoubleProperty(1);
-    private static final double MIN_ZOOM = 0.25;
+    private static final double MIN_ZOOM = 0.1;
     private static final double MAX_ZOOM = 2;
-    private static final double STEP_ZOOM = 0.15;
+    private static final double STEP_ZOOM = 0.10;
 
     /**
      * Since the default with applied to TableColumn is 80. If a user sets a
@@ -770,6 +770,22 @@ public class SpreadsheetView extends Control{
             return modelColumn;
         }
     }
+    
+    /**
+     * Given a column index based on the visible column list, for example when
+     * dealing with {@link TablePosition#getColumn() }. It returns an index
+     * based on the {@link #getColumns() } list of the SpreadsheetView.
+     *
+     * @param viewColumn
+     * @return
+     */
+    public int getModelColumn(int viewColumn) {
+        try {
+            return cellsView.getColumns().indexOf(cellsView.getVisibleLeafColumn(viewColumn));
+        } catch (NullPointerException ex) {
+            return viewColumn;
+        }
+    }
 
     /**
      * Given an index on the SpreadsheetView, return a {@link Grid} index it is
@@ -826,7 +842,7 @@ public class SpreadsheetView extends Control{
 
     /**
      * Set a new zoomFactor for the SpreadsheetView. 
-     * Advice is not to go beyond 3 and below 0.25.
+     * Advice is not to go beyond 2 and below 0.1.
      * @param zoomFactor 
      */
     public final void setZoomFactor(Double zoomFactor) {
@@ -842,8 +858,8 @@ public class SpreadsheetView extends Control{
     }
 
     /**
-     * Increment the level of zoom by 0.15. The base is 1 so we will try to stay
-     * of the intervals (0.1-0.25-0.4-0.55-0.7-0.85-1 etc).
+     * Increment the level of zoom by 0.10. The base is 1 so we will try to stay
+     * of the intervals.
      *
      */
     public void incrementZoom() {
@@ -854,9 +870,8 @@ public class SpreadsheetView extends Control{
     }
 
     /**
-     * Decrement the level of zoom by 0.15. It will block at 0.25.The base is 1
-     * so we will try to stay of the intervals (0.1-0.25-0.4-0.55-0.7-0.85-1
-     * etc).
+     * Decrement the level of zoom by 0.10. It will block at 0.25.The base is 1
+     * so we will try to stay of the intervals.
      */
     public void decrementZoom() {
         double newZoom = getZoomFactor()- 0.01;
@@ -2209,7 +2224,8 @@ public class SpreadsheetView extends Control{
         }else if (!keyEvent.isControlDown() && 
                 (keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey())) {
             getCellsView().edit(position.getRow(), position.getTableColumn());
-        }else if(keyEvent.isShortcutDown() && KeyCode.NUMPAD0.equals(keyEvent.getCode())){
+        }else if(keyEvent.isShortcutDown() && (KeyCode.NUMPAD0.equals(keyEvent.getCode())
+                || KeyCode.DIGIT0.equals(keyEvent.getCode()))){
             //Reset zoom to zero.
             setZoomFactor(1.0);
         }else if(keyEvent.isShortcutDown() && KeyCode.ADD.equals(keyEvent.getCode())){

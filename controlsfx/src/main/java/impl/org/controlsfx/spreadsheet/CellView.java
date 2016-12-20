@@ -184,7 +184,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * @return 
      */
     Filter getFilter() {
-        Filter filter = getItem() != null ? handle.getView().getColumns().get(handle.getView().getViewColumn(getItem().getColumn())).getFilter() : null;
+        Filter filter = getItem() != null ? handle.getView().getColumns().get(getItem().getColumn()).getFilter() : null;
         return filter != null &&  handle.getView().getFilteredRow()== getIndex() ? filter : null;
     }
 

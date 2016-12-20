@@ -40,8 +40,11 @@ import javafx.collections.SetChangeListener;
 import javafx.collections.WeakSetChangeListener;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
+import javafx.geometry.Side;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
@@ -78,6 +81,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * since it's really time-consuming.
      */
     private Tooltip tooltip;
+    //Handler for drag n drop in lazy instantiation.
+    private EventHandler<DragEvent> dragOverHandler;
+    private EventHandler<DragEvent> dragDropHandler;
 
     /***************************************************************************
      * * Static Fields * *
@@ -301,38 +307,12 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         
         setWrapText(cell.isWrapText());
 
-        setEditable(cell.isEditable());
+        setEditable(cell.hasPopup() ? false : cell.isEditable());
         
         if (cell.getCellType().acceptDrop()) {
-            setOnDragOver(new EventHandler<DragEvent>() {
-
-                @Override
-                public void handle(DragEvent event) {
-                    Dragboard db = event.getDragboard();
-                    if (db.hasFiles()) {
-                        event.acceptTransferModes(TransferMode.ANY);
-                    } else {
-                        event.consume();
-                    }
-                }
-            });
+            setOnDragOver(getDragOverHandler());
             // Dropping over surface
-            setOnDragDropped(new EventHandler<DragEvent>() {
-                @Override
-                public void handle(DragEvent event) {
-                    Dragboard db = event.getDragboard();
-                    boolean success = false;
-                    if (db.hasFiles() && db.getFiles().size() == 1) {
-                        if (getItem().getCellType().match(db.getFiles().get(0))) {
-                            handle.getView().getGrid().setCellValue(getItem().getRow(), getItem().getColumn(),
-                                    getItem().getCellType().convertValue(db.getFiles().get(0)));
-                            success = true;
-                        }
-                    }
-                    event.setDropCompleted(success);
-                    event.consume();
-                }
-            });
+            setOnDragDropped(getDragDropHandler());
         } else {
             setOnDragOver(null);
             setOnDragDropped(null);
@@ -367,21 +347,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
         Node graphic = item.getGraphic();
         if (graphic != null) {
-            /**
-             * This workaround is added for the first row containing a graphic
-             * because for an unknown reason, the graphic is translated to a
-             * negative value so it's not fully visible. So we add those
-             * listener that watch those changes, and try to get the previous
-             * value (the right one) if the new value goes out of bounds.
-             */
-//            if (item.getRow() == 0) {
-//                graphic.layoutXProperty().removeListener(firstRowLayoutXListener);
-//                graphic.layoutXProperty().addListener(firstRowLayoutXListener);
-//
-//                graphic.layoutYProperty().removeListener(firstRowLayoutYListener);
-//                graphic.layoutYProperty().addListener(firstRowLayoutYListener);
-//            }
-            
             if (graphic instanceof ImageView) {
                 ImageView image = (ImageView) graphic;
                 image.setCache(true);
@@ -466,6 +431,46 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         } else {
             return null;
         }
+    }
+    
+    private EventHandler<DragEvent> getDragOverHandler() {
+        if (dragOverHandler == null) {
+            dragOverHandler = new EventHandler<DragEvent>() {
+
+                @Override
+                public void handle(DragEvent event) {
+                    Dragboard db = event.getDragboard();
+                    if (db.hasFiles()) {
+                        event.acceptTransferModes(TransferMode.ANY);
+                    } else {
+                        event.consume();
+                    }
+                }
+            };
+        }
+        return dragOverHandler;
+    }
+
+    private EventHandler<DragEvent> getDragDropHandler() {
+        if (dragDropHandler == null) {
+            dragDropHandler = new EventHandler<DragEvent>() {
+                @Override
+                public void handle(DragEvent event) {
+                    Dragboard db = event.getDragboard();
+                    boolean success = false;
+                    if (db.hasFiles() && db.getFiles().size() == 1) {
+                        if (getItem().getCellType().match(db.getFiles().get(0))) {
+                            handle.getView().getGrid().setCellValue(getItem().getRow(), getItem().getColumn(),
+                                    getItem().getCellType().convertValue(db.getFiles().get(0)));
+                            success = true;
+                        }
+                    }
+                    event.setDropCompleted(success);
+                    event.consume();
+                }
+            };
+        }
+        return dragDropHandler;
     }
 
     private final ChangeListener<Node> graphicListener = new ChangeListener<Node>() {
@@ -612,30 +617,53 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             if (oldItem != null) {
                 oldItem.getStyleClass().removeListener(weakStyleClassListener);
                 oldItem.graphicProperty().removeListener(weakGraphicListener);
-                
-                if(oldItem.styleProperty() != null){
+
+                if (oldItem.styleProperty() != null) {
                     oldItem.styleProperty().removeListener(weakStyleListener);
                 }
             }
             if (newItem != null) {
-         getStyleClass().clear();
+                getStyleClass().clear();
                 getStyleClass().setAll(newItem.getStyleClass());
 
                 newItem.getStyleClass().addListener(weakStyleClassListener);
                 setCellGraphic(newItem);
                 newItem.graphicProperty().addListener(weakGraphicListener);
-                
-                if(newItem.styleProperty() != null){
+
+                if (newItem.styleProperty() != null) {
                     initStyleListener();
                     newItem.styleProperty().addListener(weakStyleListener);
                     setStyle(newItem.getStyle());
-                }else{
+                } else {
                     //We clear the previous style.
                     setStyle(null);
                 }
-    }
+                if (newItem.hasPopup()) {
+                    setOnMouseClicked(weakActionhandler);
+                    setCursor(Cursor.HAND);
+                } else {
+                    setOnMouseClicked(null);
+                    setCursor(Cursor.DEFAULT);
+                }
+            }
         }
     };
+    
+    /**
+     * Event Handler when the cell is simply clicked in order to display the
+     * possible actions in MenuItem.
+     */
+    private final EventHandler<MouseEvent> actionEventHandler = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+            if (getItem() != null && getItem().hasPopup() && MouseButton.PRIMARY.equals(event.getButton())) {
+                ContextMenu menu = new ContextMenu();
+                menu.getItems().setAll(getItem().getPopupItems());
+                menu.show(CellView.this, Side.BOTTOM, 0, 0);
+            }
+        }
+    };
+    private final WeakEventHandler weakActionhandler = new WeakEventHandler(actionEventHandler);
     
     private void initStyleListener(){
         if(styleListener == null){

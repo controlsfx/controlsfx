@@ -27,6 +27,8 @@
 package org.controlsfx.control.spreadsheet;
 
 import com.sun.javafx.event.EventHandlerManager;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javafx.beans.property.ObjectProperty;
@@ -44,6 +46,7 @@ import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
 import javafx.scene.Node;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 
 /**
@@ -207,6 +210,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     //The Bit position for the editable Property.
     private static final int EDITABLE_BIT_POSITION = 4;
     private static final int WRAP_BIT_POSITION = 5;
+    private static final int POPUP_BIT_POSITION = 6;
     private final SpreadsheetCellType type;
     private final int row;
     private final int column;
@@ -226,6 +230,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
     private ObservableSet<String> styleClass;
+    private List<MenuItem> actionsList;
 
     /***************************************************************************
      * 
@@ -341,6 +346,27 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
         if (setMask(wrapText, WRAP_BIT_POSITION)) {
             Event.fireEvent(this, new Event(WRAP_EVENT_TYPE));
         }
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public boolean hasPopup(){
+        return isSet(POPUP_BIT_POSITION);
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public void setHasPopup(boolean value){
+        setMask(value, POPUP_BIT_POSITION);
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public List<MenuItem> getPopupItems(){
+        if(actionsList == null){
+            actionsList = new ArrayList<>();
+        }
+        return actionsList;
     }
 
    /** {@inheritDoc} */

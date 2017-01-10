@@ -315,7 +315,7 @@ public class VerticalHeader extends StackPane {
                     continue;
                 }
                 //Changing the index right
-                viewRow = spreadsheetView.getViewRow(modelRow);
+                viewRow = spreadsheetView.getFilteredRow(modelRow);
                 if (!currentlyFixedRow.contains(viewRow)) {
                     break;
                 }
@@ -399,7 +399,7 @@ public class VerticalHeader extends StackPane {
             /**
              * Picker
              */
-            modelRow = spreadsheetView.getModelRow(rowIndex);
+            modelRow = spreadsheetView.getFilteredSourceIndex(rowIndex);
             if (row.getLayoutY() >= fixedRowHeight && spreadsheetView.getRowPickers().containsKey(modelRow)) {
                 Label picker = getPicker(spreadsheetView.getRowPickers().get(modelRow));
                 picker.resize(PICKER_SIZE, height);
@@ -686,7 +686,7 @@ public class VerticalHeader extends StackPane {
      * @return
      */
     private String getRowHeader(int index) {
-        int newIndex = spreadsheetView.getModelRow(index);
+        int newIndex = spreadsheetView.getFilteredSourceIndex(index);
         return spreadsheetView.getGrid().getRowHeaders().size() > newIndex ? spreadsheetView
                 .getGrid().getRowHeaders().get(newIndex) : String.valueOf(newIndex + 1);
     }

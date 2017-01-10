@@ -241,7 +241,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             }
 
             if (isVisible) {
-                final SpreadsheetView.SpanType spanType = grid.getSpanType(spreadsheetView, index, indexColumn);
+                final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(index, indexColumn);
 
                 switch (spanType) {
                     case ROW_SPAN_INVISIBLE:
@@ -347,12 +347,12 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                  * the rows. The height of the current row is ignored and the
                  * whole value is computed.
                  */
-                int rowSpan = spreadsheetView.getRowSpan(spreadsheetCell);
-                int spvRow = spreadsheetView.getViewRow(spreadsheetCell.getRow());
+                int rowSpan = spreadsheetView.getRowSpan(spreadsheetCell, index);
+//                int spvRow = spreadsheetView.getViewRow(spreadsheetCell.getRow());
                 if (rowSpan > 1) {
                     height = 0;
-                    final int maxRow = spvRow + rowSpan;
-                    for (int i = spvRow; i < maxRow; ++i) {
+                    final int maxRow = index + rowSpan;
+                    for (int i = index; i < maxRow; ++i) {
                         height += snapSize(skin.getRowHeight(i));
                     }
                 }
@@ -380,9 +380,9 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                 lastCell = tableCell;
                 // We want to place the layout always at the starting cell.
                 double spaceBetweenTopAndMe = 0;
-                for (int p = spreadsheetCell.getRow(); p < index; ++p) {
-                    spaceBetweenTopAndMe += skin.getRowHeight(p);
-                }
+//                for (int p = spreadsheetCell.getRow(); p < index; ++p) {
+//                    spaceBetweenTopAndMe += skin.getRowHeight(p);
+//                }
 
                 tableCell.relocate(x + tableCellX + (needToBeShifted? -1 : 0), snappedTopInset()
                         - spaceBetweenTopAndMe + ((GridRow) getSkinnable()).verticalShift.get());
@@ -547,7 +547,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
      */
     private double getFixedRowShift(int index) {
         double tableCellY = 0;
-        int positionY = spreadsheetView.getFixedRows().indexOf(spreadsheetView.getModelRow(index));
+        int positionY = spreadsheetView.getFixedRows().indexOf(spreadsheetView.getFilteredSourceIndex(index));
 
         //FIXME Integrate if fixedCellSize is enabled
         //Computing how much space we need to translate
@@ -555,7 +555,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         double space = 0;
         for (int o = 0; o < positionY; ++o) {
             if(!spreadsheetView.isRowHidden(o)){
-                space += handle.getCellsViewSkin().getRowHeight(spreadsheetView.getViewRow(spreadsheetView.getFixedRows().get(o)));
+                space += handle.getCellsViewSkin().getRowHeight(spreadsheetView.getFixedRows().get(o));
             }
         }
 

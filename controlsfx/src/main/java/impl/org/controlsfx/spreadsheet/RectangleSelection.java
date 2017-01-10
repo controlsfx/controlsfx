@@ -159,7 +159,7 @@ public class RectangleSelection extends Rectangle {
         }
         setVisible(true);
 
-        handleVerticalPositioning(minRow, maxRow, gridMinRow, gridMaxRow, skin.spreadsheetView.getRowSpan(cell));
+        handleVerticalPositioning(minRow, maxRow, gridMinRow, gridMaxRow);
     }
 
     /**
@@ -170,7 +170,7 @@ public class RectangleSelection extends Rectangle {
      * @param maxRow
      * @param gridMinRow
      */
-    private void handleVerticalPositioning(int minRow, int maxRow, GridRow gridMinRow, GridRow gridMaxRow, int rowSpan) {
+    private void handleVerticalPositioning(int minRow, int maxRow, GridRow gridMinRow, GridRow gridMaxRow) {
         double height = 0;
         for (int i = maxRow; i <= maxRow /*+ (rowSpan - 1)*/; ++i) {
             height += skin.getRowHeight(i);

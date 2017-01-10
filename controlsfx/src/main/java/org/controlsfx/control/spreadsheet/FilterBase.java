@@ -27,16 +27,21 @@
 package org.controlsfx.control.spreadsheet;
 
 import java.util.BitSet;
+import java.util.Comparator;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
-public class FilterBase implements Filter{
+public class FilterBase implements Filter {
 
     private final SpreadsheetView spv;
     private final int column;
@@ -54,6 +59,34 @@ public class FilterBase implements Filter{
         this.column = column;
     }
 
+    private Comparator ascendingComp = new Comparator<ObservableList<SpreadsheetCell>>() {
+        @Override
+        public int compare(ObservableList<SpreadsheetCell> o1, ObservableList<SpreadsheetCell> o2) {
+            //If we are 
+            if (o1.get(column).getRow() <= spv.getFilteredRow()) {
+                return Integer.compare(o1.get(column).getRow(), o2.get(column).getRow());
+            } else if (o2.get(column).getRow() <= spv.getFilteredRow()) {
+                return Integer.compare(o1.get(column).getRow(), o2.get(column).getRow());
+            } else {
+                return o1.get(column).getText().compareToIgnoreCase(o2.get(column).getText());
+            }
+        }
+    };
+
+    private Comparator descendingComp = new Comparator<ObservableList<SpreadsheetCell>>() {
+        @Override
+        public int compare(ObservableList<SpreadsheetCell> o1, ObservableList<SpreadsheetCell> o2) {
+            //If we are 
+            if (o1.get(column).getRow() <= spv.getFilteredRow()) {
+                return Integer.compare(o1.get(column).getRow(), o2.get(column).getRow());
+            } else if (o2.get(column).getRow() <= spv.getFilteredRow()) {
+                return Integer.compare(o1.get(column).getRow(), o2.get(column).getRow());
+            } else {
+                return o2.get(column).getText().compareToIgnoreCase(o1.get(column).getText());
+            }
+        }
+    };
+
     /**
      * This method will be called whenever the user clicks on this picker.
      *
@@ -62,6 +95,20 @@ public class FilterBase implements Filter{
     public MenuButton getMenuButton() {
         if (menuButton == null) {
             menuButton = new MenuButton();
+            menuButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    if (event.getButton() == MouseButton.SECONDARY) {
+                        if (spv.getComparator() == ascendingComp) {
+                            spv.setComparator(descendingComp, 0);
+                        } else if (spv.getComparator() == descendingComp) {
+                            spv.setComparator(null, 0);
+                        } else {
+                            spv.setComparator(ascendingComp, 0);
+                        }
+                    }
+                }
+            });
 
             menuButton.showingProperty().addListener(new ChangeListener<Boolean>() {
                 @Override

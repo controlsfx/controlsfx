@@ -97,9 +97,9 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
              */
             int newRow;
             if (delta < 0) {
-                newRow = skin.spreadsheetView.getViewRow(cell.getRow()) + delta;
+                newRow = skin.spreadsheetView.getFirstRow(cell, focusedCell.getRow()) + delta;
             } else {
-                newRow = skin.spreadsheetView.getViewRow(cell.getRow()) + skin.spreadsheetView.getRowSpan(cell) - 1 + delta;
+                newRow = focusedCell.getRow() + skin.spreadsheetView.getRowSpan(cell, focusedCell.getRow()) - 1 + delta;
             }
 
             // we don't let the newRow go outside the bounds of the data
@@ -295,7 +295,7 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
 
     
     @Override
-    protected void selectCell(int rowDiff, int columnDiff) {
+    public void selectCell(int rowDiff, int columnDiff) {
         TableViewSpanSelectionModel sm = (TableViewSpanSelectionModel) getSelectionModel();
         if (sm == null) {
             return;

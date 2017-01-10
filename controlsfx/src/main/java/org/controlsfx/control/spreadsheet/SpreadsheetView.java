@@ -30,6 +30,7 @@ import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
 import impl.org.controlsfx.spreadsheet.CellView;
 import impl.org.controlsfx.spreadsheet.FocusModelListener;
+import impl.org.controlsfx.spreadsheet.GridViewBehavior;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
 import impl.org.controlsfx.spreadsheet.RectangleSelection.GridRange;
 import impl.org.controlsfx.spreadsheet.RectangleSelection.SelectionRange;
@@ -41,6 +42,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -71,6 +73,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -543,10 +546,11 @@ public class SpreadsheetView extends Control{
     //The visible rows.
     private final ObjectProperty<BitSet> hiddenRowsProperty = new SimpleObjectProperty<>();
     private final ObjectProperty<BitSet> hiddenColumnsProperty = new SimpleObjectProperty<>();
-    private HashMap<Integer, Integer> rowMap = new HashMap<>();
+    private HashMap<Integer, Integer> rowMap;
     private HashMap<Integer, Integer> columnMap = new HashMap<>();
     private Integer filteredRow;
     private FilteredList<ObservableList<SpreadsheetCell>> filteredList;
+    private SortedList<ObservableList<SpreadsheetCell>> sortedList;
 
     /**
      * Return true is this row is hidden.
@@ -624,6 +628,7 @@ public class SpreadsheetView extends Control{
 
     /**
      * Return the row where the {@link Filter} will be shown.
+     * The row is based on the {@link Grid} indexes.
      *
      * @return
      */
@@ -631,6 +636,12 @@ public class SpreadsheetView extends Control{
         return filteredRow;
     }
 
+    /**
+     * Set the row (based of {@link Grid} indexes) where the filters will
+     * appear.
+     *
+     * @param row
+     */
     public void setFilteredRow(Integer row) {
         if (row == null || row > getGrid().getRowCount()) {
             filteredRow = null;
@@ -671,6 +682,12 @@ public class SpreadsheetView extends Control{
     }
 
     private void computeRowMap() {
+         filteredList.setPredicate(new Predicate<ObservableList<SpreadsheetCell>>() {
+            @Override
+            public boolean test(ObservableList<SpreadsheetCell> t) {
+                return !getHiddenRows().get(getGrid().getRows().indexOf(t));
+            }
+        });
         final int rowCount = getGrid().getRowCount();
         rowMap = new HashMap<>(rowCount);
         int visibleRow = 0;
@@ -681,12 +698,7 @@ public class SpreadsheetView extends Control{
                 rowMap.put(i, visibleRow);
             }
         }
-        filteredList.setPredicate(new Predicate<ObservableList<SpreadsheetCell>>() {
-            @Override
-            public boolean test(ObservableList<SpreadsheetCell> t) {
-                return !getHiddenRows().get(getGrid().getRows().indexOf(t));
-            }
-        });
+       
     }
 
     private void computeColumnMap() {
@@ -748,7 +760,7 @@ public class SpreadsheetView extends Control{
      * @param modelRow
      * @return
      */
-    public int getViewRow(int modelRow) {
+    public int getFilteredRow(int modelRow) {
         try {
             return rowMap.get(modelRow);
         } catch (NullPointerException ex) {
@@ -795,6 +807,17 @@ public class SpreadsheetView extends Control{
      * @return
      */
     public int getModelRow(int viewRow) {
+        if (viewRow < 0 || viewRow >= sortedList.size()) {
+            return viewRow;
+        }
+        try {
+            return getFilteredSourceIndex(sortedList.getSourceIndex(viewRow));
+        } catch (NullPointerException | IndexOutOfBoundsException ex) {
+            return viewRow;
+        }
+    }
+    
+    public int getFilteredSourceIndex(int viewRow) {
         if (viewRow < 0 || viewRow >= filteredList.size()) {
             return viewRow;
         }
@@ -809,13 +832,38 @@ public class SpreadsheetView extends Control{
      * Return the current row span of a Cell considering all hidden rows.
      *
      * @param cell
+     * @param index
      * @return
      */
-    public int getRowSpan(SpreadsheetCell cell) {
+    public int getRowSpan(SpreadsheetCell cell, int index) {
+        /**
+         * We return here the exact rowSpan of the considered index. So if a
+         * cell span on 4 but we give the second index, the rowspan will be 2.
+         */
+        int rowSpan = 0;
+        do {
+            ++rowSpan;
+        } while (++index < sortedList.size()
+                && sortedList.get(index).get(cell.getColumn()) == cell);
+
+        return rowSpan;
+    }
+    
+    public int getFirstRow(SpreadsheetCell cell, int index) {
+        do {
+            --index;
+        } while (index >= 0
+                && sortedList.get(index).get(cell.getColumn()) == cell);
+
+        return index + 1;
+    }
+    
+    public int getRowSpanFilter(SpreadsheetCell cell) {
         int rowSpan = cell.getRowSpan();
+        //First remove the filtered
         for (int i = cell.getRow(); i < cell.getRow() + cell.getRowSpan(); ++i) {
             rowSpan -= getHiddenRows().get(i) ? 1 : 0;
-        }
+       }
         return rowSpan;
     }
 
@@ -880,6 +928,23 @@ public class SpreadsheetView extends Control{
         setZoomFactor(newZoom < MIN_ZOOM ? MIN_ZOOM : newZoom);
     }
     
+    public Comparator getComparator(){
+        return sortedList.getComparator();
+    }
+    
+    public ObjectProperty<Comparator<? super ObservableList<SpreadsheetCell>>> comparatorProperty(){
+        return sortedList.comparatorProperty();
+    }
+    
+    public void setComparator(Comparator<ObservableList<SpreadsheetCell>> comparator, int filteredRow){
+        if(getFilteredRow() != null && getFilteredRow() != filteredRow){
+            return;
+        }
+        setFilteredRow(filteredRow);
+        sortedList.setComparator(comparator);
+        computeRowMap();
+        requestLayout();
+    }
     /**
      * Set a new Grid for the SpreadsheetView. This will be called by default by
      * {@link #SpreadsheetView(Grid)}. So this is useful when you want to
@@ -896,6 +961,7 @@ public class SpreadsheetView extends Control{
 //        verifyGrid(grid);
         gridProperty.set(grid);
         filteredList = new FilteredList<>(grid.getRows());
+        sortedList = new SortedList<>(filteredList);
         setHiddenRows(new BitSet(filteredList.getSource().size()));
         setHiddenColumns(new BitSet(grid.getColumnCount()));
         initRowFix(grid);
@@ -943,7 +1009,8 @@ public class SpreadsheetView extends Control{
 //            final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
 //                    .observableArrayList(grid.getRows());
 //            cellsView.getItems().clear();
-            cellsView.setItems(filteredList);
+            cellsView.setItems(sortedList);
+            computeRowMap();
 
             final int columnCount = grid.getColumnCount();
             columns.clear();
@@ -1110,7 +1177,7 @@ public class SpreadsheetView extends Control{
                         return false;
                     }
                     //We only want to consider the original cell.
-                    if (getRowSpan(cell) > maxSpan && cell.getRow() == row) {
+                    if (getRowSpan(cell, row) > maxSpan && cell.getRow() == row) {
                         maxSpan = cell.getRowSpan();
                     }
                 }
@@ -1431,10 +1498,10 @@ public class SpreadsheetView extends Control{
     
     /**
      * Scrolls the SpreadsheetView so that the given row is visible.
-     * @param row 
+     * @param modelRow 
      */
-    public void scrollToRow(int row){
-        cellsView.scrollTo(row);
+    public void scrollToRow(int modelRow){
+        cellsView.scrollTo(getFilteredRow(modelRow));
     }
     
     /**
@@ -1513,11 +1580,11 @@ public class SpreadsheetView extends Control{
      *
      * Scrolls the SpreadsheetView so that the given column index is visible.
      *
-     * @param columnIndex
+     * @param modelColumn
      *
      */
-    public void scrollToColumnIndex(int columnIndex) {
-        cellsView.scrollToColumnIndex(columnIndex);
+    public void scrollToColumnIndex(int modelColumn) {
+        cellsView.scrollToColumnIndex(modelColumn);
     }
 
     /**
@@ -1614,20 +1681,20 @@ public class SpreadsheetView extends Control{
         final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
 
         for (final TablePosition<?, ?> p : posList) {
-            SpreadsheetCell cell = getGrid().getRows().get(p.getRow()).get(p.getColumn());
+            SpreadsheetCell cell = getGrid().getRows().get(getModelRow(p.getRow())).get(getModelColumn(p.getColumn()));
             // Using SpreadsheetCell change to stock the information
             // FIXME a dedicated class should be used
             /**
              * We need to add every cell contained in a span otherwise the
              * rectangles computed when pasting will be wrong.
              */
-            for (int row = 0; row < getRowSpan(cell); ++row) {
-                for (int col = 0; col < cell.getColumnSpan(); ++col) {
+            for (int row = 0; row < getRowSpan(cell, p.getRow()); ++row) {
+                for (int col = 0; col < getColumnSpan(cell); ++col) {
                     try {
                         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(cell.getItem());
-                        list.add(new GridChange(cell.getRow() + row, cell.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem()));
+                        list.add(new GridChange(p.getRow() + row, p.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem()));
                     } catch (IOException exception) {
-                        list.add(new GridChange(cell.getRow() + row, cell.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem().toString()));
+                        list.add(new GridChange(p.getRow() + row, p.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem().toString()));
                     }
                 }
             }
@@ -1643,7 +1710,7 @@ public class SpreadsheetView extends Control{
      */
     private void pasteOneValue(GridChange change) {
         for (TablePosition position : getSelectionModel().getSelectedCells()) {
-            tryPasteCell(position.getRow(), position.getColumn(), change.getNewValue());
+            tryPasteCell(getModelRow(position.getRow()), getModelColumn(position.getColumn()), change.getNewValue());
         }
     }
 
@@ -1698,12 +1765,13 @@ public class SpreadsheetView extends Control{
                 //If the numbers of rows are the same and the targetColumnGap is a multiple of sourceColumnGap
                 if ((sourceRowGap == targetRowGap || targetRowGap == 1) && (targetColumnGap % sourceColumnGap) == 0) {
                     for (final GridChange change : list) {
-                        int row = change.getRow() + offsetRow;
+                        int row = getModelRow(change.getRow() + offsetRow);
                         int column = change.getColumn() + offsetCol;
                         do {
-                            if (row < getGrid().getRowCount() && column < getGrid().getColumnCount()
+                            int modelColumn = getModelColumn(column);
+                            if (row < getGrid().getRowCount() && modelColumn < getGrid().getColumnCount()
                                     && row >= 0 && column >= 0) {
-                                tryPasteCell(row, column, change.getNewValue());
+                                tryPasteCell(row, modelColumn, change.getNewValue());
                             }
                         } while ((column = column + sourceColumnGap) <= targetRange.getRight());
                     }
@@ -1712,11 +1780,12 @@ public class SpreadsheetView extends Control{
                     for (final GridChange change : list) {
 
                         int row = change.getRow() + offsetRow;
-                        int column = change.getColumn() + offsetCol;
+                        int column = getModelColumn(change.getColumn() + offsetCol);
                         do {
-                            if (row < getGrid().getRowCount() && column < getGrid().getColumnCount()
+                            int modelRow = getModelRow(row);
+                            if (modelRow < getGrid().getRowCount() && column < getGrid().getColumnCount()
                                     && row >= 0 && column >= 0) {
-                                tryPasteCell(row, column, change.getNewValue());
+                                tryPasteCell(modelRow, column, change.getNewValue());
                             }
                         } while ((row = row + sourceRowGap) <= targetRange.getBottom());
                     }
@@ -1763,8 +1832,8 @@ public class SpreadsheetView extends Control{
         int column;
 
         for (final GridChange change : list) {
-            row = change.getRow() + offsetRow;
-            column = change.getColumn() + offsetCol;
+            row = getModelRow(change.getRow() + offsetRow);
+            column = getModelColumn(change.getColumn() + offsetCol);
             if (row < rowCount && column < columnCount
                     && row >= 0 && column >= 0) {
                 tryPasteCell(row, column, change.getNewValue());
@@ -1852,7 +1921,7 @@ public class SpreadsheetView extends Control{
             @Override
             public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
-                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                SpreadsheetCell cell = getGrid().getRows().get(getModelRow(pos.getRow())).get(getModelColumn(pos.getColumn()));
                 cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_LEFT);
                 }
         });
@@ -1862,7 +1931,7 @@ public class SpreadsheetView extends Control{
             @Override
             public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
-                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                SpreadsheetCell cell = getGrid().getRows().get(getModelRow(pos.getRow())).get(getModelColumn(pos.getColumn()));
                 cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_RIGHT);
             }
         });
@@ -1872,7 +1941,7 @@ public class SpreadsheetView extends Control{
             @Override
             public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
-                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                SpreadsheetCell cell = getGrid().getRows().get(getModelRow(pos.getRow())).get(getModelColumn(pos.getColumn()));
                 cell.activateCorner(SpreadsheetCell.CornerPosition.BOTTOM_RIGHT);
             }
         });
@@ -1882,7 +1951,7 @@ public class SpreadsheetView extends Control{
             @Override
             public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
-                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                SpreadsheetCell cell = getGrid().getRows().get(getModelRow(pos.getRow())).get(getModelColumn(pos.getColumn()));
                 cell.activateCorner(SpreadsheetCell.CornerPosition.BOTTOM_LEFT);
             }
         });
@@ -1900,23 +1969,76 @@ public class SpreadsheetView extends Control{
      */
     public void deleteSelectedCells() {
         for (TablePosition<ObservableList<SpreadsheetCell>, ?> position : getSelectionModel().getSelectedCells()) {
-            getGrid().setCellValue(getModelRow(position.getRow()), position.getColumn(), null);
+            getGrid().setCellValue(getModelRow(position.getRow()), getModelColumn(position.getColumn()), null);
         }
     }
     
-     /**
+    /**
      * Return the {@link SpanType} of a cell, this is a shorcut for 
      * {@link Grid#getSpanType(org.controlsfx.control.spreadsheet.SpreadsheetView, int, int) }.
-     * 
+     *
      * @param viewRow
      * @param column
      * @return The {@link SpanType} of a cell
      */
-    public SpanType getSpanType(final int viewRow, final int column) {
+    public SpanType getSpanType(final int rowIndex, final int modelColumn) {
         if (getGrid() == null) {
             return SpanType.NORMAL_CELL;
         }
-        return getGrid().getSpanType(this, viewRow, column);
+        /**
+         * {@inheritDoc}
+         */
+//    @Override
+//    public SpanType getSpanType(final SpreadsheetView spv, final int rowIndex, final int modelColumn) {
+        if (rowIndex < 0 || modelColumn < 0 || rowIndex >= getCellsView().getItems().size() || modelColumn >= getGrid().getColumnCount()) {
+            return SpanType.NORMAL_CELL;
+        }
+
+        final SpreadsheetCell cell = getCellsView().getItems().get(rowIndex).get(modelColumn);
+
+        final int cellColumn = getHiddenColumns().nextClearBit(cell.getColumn());
+//        final int cellRow = spv.getViewRow(cell.getRow());
+        int cellRowSpan = getRowSpanFilter(cell);//cell.getRowSpan();
+
+        if (cellColumn == modelColumn /*&& cellRow == rowIndex*/ && cellRowSpan == 1) {
+            return SpanType.NORMAL_CELL;
+        }
+//        cellRowSpan = spv.getRowSpanFilter(cell);
+        final int cellColumnSpan = getColumnSpan(cell);
+        /**
+         * This is a consuming operation so we place it after the normal_cell
+         * case since this is the most typical case.
+         */
+        final GridViewSkin skin = getCellsViewSkin();
+        final boolean containsRowMinusOne = skin == null ? true : skin.containsRow(rowIndex - 1);
+        //If the cell above is the same.
+        final boolean containsSameCellMinusOne = rowIndex > 0
+                ? getCellsView().getItems().get(rowIndex - 1).get(modelColumn) == cell
+                : false;
+        if (containsRowMinusOne && cellColumnSpan > 1 && cellColumn != modelColumn && cellRowSpan > 1
+                && containsSameCellMinusOne) {
+            return SpanType.BOTH_INVISIBLE;
+        } else if (cellRowSpan > 1 && cellColumn == modelColumn) {
+            if ((!containsSameCellMinusOne || !containsRowMinusOne)) {
+                return SpanType.ROW_VISIBLE;
+            } else {
+                return SpanType.ROW_SPAN_INVISIBLE;
+            }
+        } else if (cellColumnSpan > 1 && (!containsSameCellMinusOne || !containsRowMinusOne)) {
+            /**
+             * If the next visible column from the starting column is my
+             * viewColumn, it means all columns before me are hidden and I must
+             * show myself.
+             */
+//            int columnVisible = spv.getHiddenColumns().nextClearBit(cell.getColumn());
+            if (cellColumn == modelColumn) {
+                return SpanType.NORMAL_CELL;
+            } else {
+                return SpanType.COLUMN_SPAN_INVISIBLE;
+            }
+        } else {
+            return SpanType.NORMAL_CELL;
+        }
     }
 
     /***************************************************************************
@@ -1996,7 +2118,7 @@ public class SpreadsheetView extends Control{
         for (int r = 0; r < rows.size(); ++r) {
             ObservableList<SpreadsheetCell> row = rows.get(r);
             for (SpreadsheetCell cell : row) {
-                if (getRowSpan(cell) > 1) {
+                if (getRowSpanFilter(cell) > 1) {
                     continue rows;
                 }
             }
@@ -2195,9 +2317,9 @@ public class SpreadsheetView extends Control{
         if (getEditingCell() == null && KeyCode.ENTER.equals(keyEvent.getCode())) {
             if (position != null) {
                 if(keyEvent.isShiftDown()){
-                    getSelectionModel().clearAndSelectPreviousCell();
+                     ((GridViewBehavior)getCellsViewSkin().getBehavior()).selectCell(-1, 0);
                 }else{
-                    getSelectionModel().clearAndSelectNextCell();
+                     ((GridViewBehavior)getCellsViewSkin().getBehavior()).selectCell(1, 0);
                 }
                 //We consume the event because we don't want to go in edition
                 keyEvent.consume();

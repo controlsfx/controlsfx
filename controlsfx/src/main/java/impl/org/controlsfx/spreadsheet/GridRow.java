@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
     public GridRow(SpreadsheetHandle handle) {
         super();
         this.handle = handle;
-      
+
         /**
          *  FIXME Bug? When re-using the row, it should re-compute the prefHeight and not
          *  keep the old value.
@@ -77,6 +77,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         handle.getView().gridProperty().addListener(weakPrefHeightListener);
         handle.getView().hiddenRowsProperty().addListener(weakPrefHeightListener);
         handle.getView().hiddenColumnsProperty().addListener(weakPrefHeightListener);
+        handle.getView().comparatorProperty().addListener(weakComparatorListener);
         
         /**
          * When the height is changing elsewhere, we need to update ourself if necessary.
@@ -161,4 +162,17 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
     };
 
     private final WeakEventHandler<MouseEvent> weakDragHandler = new WeakEventHandler(dragDetectedEventHandler);
+    
+    /**
+     * When the comparator is changing, we may have an issue with the fixedRow
+     * not updating their inner cells. So we force it.
+     */
+    private final InvalidationListener comparatorListener = new InvalidationListener() {
+        @Override
+        public void invalidated(Observable o) {
+            updateIndex(getIndex());
+        }
+    };
+
+    private final WeakInvalidationListener weakComparatorListener = new WeakInvalidationListener(comparatorListener);
 }

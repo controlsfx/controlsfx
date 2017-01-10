@@ -335,6 +335,10 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         return fixedRowHeight;
     }
 
+    /**
+     * Contains the index of the sortedList.
+     * @return 
+     */
     public ObservableList<Integer> getSelectedRows() {
         return selectedRows;
     }
@@ -932,8 +936,12 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             }
             List<SpreadsheetCell> myRow = grid.getRows().get(row);
             for (SpreadsheetCell cell : myRow) {
-
-                if (spreadsheetView.getRowSpan(cell) > 1 /*|| cell.getColumnSpan() >1*/) {
+                /**
+                 * No matter what the sort will do, we want to be behave with
+                 * caution here, and take the rowSpan even if the cell is
+                 * splitted afterwards.
+                 */
+                if (spreadsheetView.getRowSpanFilter(cell) > 1 /*|| cell.getColumnSpan() >1*/) {
                     bitSet.set(row);
                     break;
                 }
@@ -973,7 +981,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                         if (spreadsheetView.getGrid().getRows().size() > unfixedRow) {
                             List<SpreadsheetCell> myRow = spreadsheetView.getGrid().getRows().get(unfixedRow);
                             for (SpreadsheetCell cell : myRow) {
-                                if (spreadsheetView.getRowSpan(cell) > 1 || spreadsheetView.getColumnSpan(cell) > 1) {
+                                if (spreadsheetView.getRowSpanFilter(cell) > 1 /*|| spreadsheetView.getColumnSpan(cell) > 1*/) {
                                     rowToLayout.set(unfixedRow, true);
                                     break;
                                 }

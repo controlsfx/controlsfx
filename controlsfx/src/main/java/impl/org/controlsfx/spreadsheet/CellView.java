@@ -151,7 +151,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         // We start to edit only if the Cell is a normal Cell (aka visible).
         final SpreadsheetView spv = handle.getView();
         final Grid grid = spv.getGrid();
-        final SpreadsheetView.SpanType type = grid.getSpanType(spv, row, column);
+        final SpreadsheetView.SpanType type = spv.getSpanType(row, column);
         //FIXME with the reverse algorithm in virtualFlow, is this still necessary?
         if (type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
 
@@ -185,7 +185,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      */
     Filter getFilter() {
         Filter filter = getItem() != null ? handle.getView().getColumns().get(getItem().getColumn()).getFilter() : null;
-        return filter != null &&  handle.getView().getFilteredRow()== getIndex() ? filter : null;
+        return filter != null && handle.getView().getFilteredRow() == handle.getView().getModelRow(getIndex()) ? filter : null;
     }
 
     @Override
@@ -531,7 +531,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
         // For spanned Cells
         final SpreadsheetCell cell = (SpreadsheetCell) getItem();
-        final int rowCell = handle.getView().getViewRow(cell.getRow()) + handle.getView().getRowSpan(cell) - 1;
+        final int rowCell = getIndex() + handle.getView().getRowSpan(cell, getIndex()) - 1;
         final int columnCell = handle.getView().getViewColumn(cell.getColumn()) + handle.getView().getColumnSpan(cell) - 1;
 
         final TableViewFocusModel<?> fm = tableView.getFocusModel();

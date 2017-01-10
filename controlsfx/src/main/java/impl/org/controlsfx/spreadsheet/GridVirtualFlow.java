@@ -158,7 +158,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         spv.getFixedRows().addListener((Observable observable) -> {
             List<T> toRemove = new ArrayList<>();
             for (T cell : myFixedCells) {
-                if (!spv.getFixedRows().contains(spreadSheetView.getModelRow(cell.getIndex()))) {
+                if (!spv.getFixedRows().contains(spreadSheetView.getFilteredSourceIndex(cell.getIndex()))) {
                     cell.setManaged(false);
                     cell.setVisible(false);
                     toRemove.add(cell);
@@ -404,7 +404,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                     continue;
                 }
                 //Changing the index to viewRow.
-                fixedRowIndex = spreadSheetView.getViewRow(fixedRowIndex);
+                fixedRowIndex = spreadSheetView.getFilteredRow(fixedRowIndex);
                 T lastCell = getLastVisibleCellWithinViewPort();
                 //If the fixed row is out of bounds
                 if (lastCell != null && fixedRowIndex > lastCell.getIndex()) {
@@ -469,21 +469,23 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 row.setVisible(true);
                 row.toFront();
                 row.requestLayout();
-            }
-        }
-    }
+                    }
+                }
+                }
 
     /**
      * Verify if the row has been added to myFixedCell
+     *
      * @param i
      * @return
      */
-    private T containsRows(int i){
-    	for(T cell:myFixedCells){
-    		if(cell.getIndex() == i)
-    			return cell;
-    	}
-    	return null;
+    private T containsRows(int i) {
+        for (T cell : myFixedCells) {
+            if (cell.getIndex() == i) {
+                return cell;
+            }
+        }
+        return null;
     }
     /**
      * Sort the rows so that they stay in order for layout

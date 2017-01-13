@@ -651,7 +651,7 @@ public class VerticalHeader extends StackPane {
 
                 @Override
                 public void handle(WindowEvent event) {
-                    if (spreadsheetView.getFixedRows().contains(spreadsheetView.getModelRow(row))) {
+                    if (spreadsheetView.getFixedRows().contains(spreadsheetView.getFilteredSourceIndex(row))) {
                         fixItem.setText(localize(asKey("spreadsheet.verticalheader.menu.unfix"))); //$NON-NLS-1$
                     } else {
                         fixItem.setText(localize(asKey("spreadsheet.verticalheader.menu.fix"))); //$NON-NLS-1$
@@ -663,7 +663,7 @@ public class VerticalHeader extends StackPane {
             fixItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent arg0) {
-                    Integer modelRow = spreadsheetView.getModelRow(row);
+                    Integer modelRow = spreadsheetView.getFilteredSourceIndex(row);
                     if (spreadsheetView.getFixedRows().contains(modelRow)) {
                         spreadsheetView.getFixedRows().remove(modelRow);
                     } else {

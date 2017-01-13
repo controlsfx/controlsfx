@@ -141,7 +141,7 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
                 +pos.getRow();
     }
 
-    public static int getPreviousRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView, SpreadsheetView spv) {
-        return spv.getFirstRow(cellsView.getItems().get(pos.getRow()).get(cellsView.getColumns().indexOf(pos.getTableColumn())), pos.getRow()) - 1;
-    }
+//    public static int getPreviousRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView, GridViewSkin skin) {
+//        return skin.getFirstRow(cellsView.getItems().get(pos.getRow()).get(cellsView.getColumns().indexOf(pos.getTableColumn())), pos.getRow()) - 1;
+//    }
 }

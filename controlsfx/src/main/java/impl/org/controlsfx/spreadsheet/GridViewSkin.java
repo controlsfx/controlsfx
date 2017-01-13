@@ -374,6 +374,15 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         return null;
     }
     
+    public int getFirstRow(SpreadsheetCell cell, int index) {
+        do {
+            --index;
+        } while (index >= 0
+                && spreadsheetView.getItems().get(index).get(cell.getColumn()) == cell);
+
+        return index + 1;
+    }
+    
     /**
      * This return the row at the specified index in the list. The index
      * specified HAS NOTHING to do with the index of the row.
@@ -926,7 +935,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * @return 
      */
     private BitSet initRowToLayoutBitSet() {
-        Grid grid = handle.getView().getGrid();
+//        Grid grid = handle.getView().getGrid();
         int rowCount = getItemCount();
         BitSet bitSet = new BitSet(rowCount);
         for (int row = 0; row < rowCount; ++row) {
@@ -934,7 +943,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                 bitSet.set(row);
                 continue;
             }
-            List<SpreadsheetCell> myRow = grid.getRows().get(row);
+            List<SpreadsheetCell> myRow = handle.getGridView().getItems().get(row);
             for (SpreadsheetCell cell : myRow) {
                 /**
                  * No matter what the sort will do, we want to be behave with
@@ -971,18 +980,18 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             while (c.next()) {
                 if (c.wasPermutated()) {
                     for (Integer fixedRow : c.getList()) {
-                        rowToLayout.set(fixedRow, true);
+                        rowToLayout.set(spreadsheetView.getFilteredRow(fixedRow), true);
                     }
                 } else {
                     for (Integer unfixedRow : c.getRemoved()) {
-                        rowToLayout.set(unfixedRow, false);
+                        rowToLayout.set(spreadsheetView.getFilteredRow(unfixedRow), false);
                     //If the grid permits it, we check the spanning in order not
                         //to remove a row that might need layout.
                         if (spreadsheetView.getGrid().getRows().size() > unfixedRow) {
                             List<SpreadsheetCell> myRow = spreadsheetView.getGrid().getRows().get(unfixedRow);
                             for (SpreadsheetCell cell : myRow) {
                                 if (spreadsheetView.getRowSpanFilter(cell) > 1 /*|| spreadsheetView.getColumnSpan(cell) > 1*/) {
-                                    rowToLayout.set(unfixedRow, true);
+                                    rowToLayout.set(spreadsheetView.getFilteredRow(unfixedRow), true);
                                     break;
                                 }
                             }
@@ -991,7 +1000,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
 
                     //We check for the newly fixedRow
                     for (Integer fixedRow : c.getAddedSubList()) {
-                        rowToLayout.set(fixedRow, true);
+                        rowToLayout.set(spreadsheetView.getFilteredRow(fixedRow), true);
                     }
                 }
             }

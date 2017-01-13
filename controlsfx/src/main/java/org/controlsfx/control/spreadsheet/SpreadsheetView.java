@@ -337,6 +337,14 @@ public class SpreadsheetView extends Control{
     private static final double MIN_ZOOM = 0.1;
     private static final double MAX_ZOOM = 2;
     private static final double STEP_ZOOM = 0.10;
+    //The visible rows.
+    private final ObjectProperty<BitSet> hiddenRowsProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<BitSet> hiddenColumnsProperty = new SimpleObjectProperty<>();
+    private HashMap<Integer, Integer> rowMap;
+    private HashMap<Integer, Integer> columnMap = new HashMap<>();
+    private Integer filteredRow;
+    private FilteredList<ObservableList<SpreadsheetCell>> filteredList;
+    private SortedList<ObservableList<SpreadsheetCell>> sortedList;
 
     /**
      * Since the default with applied to TableColumn is 80. If a user sets a
@@ -543,20 +551,11 @@ public class SpreadsheetView extends Control{
                 pos.getVpos());
     }
 
-    //The visible rows.
-    private final ObjectProperty<BitSet> hiddenRowsProperty = new SimpleObjectProperty<>();
-    private final ObjectProperty<BitSet> hiddenColumnsProperty = new SimpleObjectProperty<>();
-    private HashMap<Integer, Integer> rowMap;
-    private HashMap<Integer, Integer> columnMap = new HashMap<>();
-    private Integer filteredRow;
-    private FilteredList<ObservableList<SpreadsheetCell>> filteredList;
-    private SortedList<ObservableList<SpreadsheetCell>> sortedList;
-
     /**
      * Return true is this row is hidden.
      *
      * @param row
-     * @return
+     * @return true is this row is hidden.
      */
     public boolean isRowHidden(int row) {
         return hiddenRowsProperty.get().get(row);
@@ -565,12 +564,17 @@ public class SpreadsheetView extends Control{
     /**
      * Return a BitSet of the Hidden rows, where true means the row is hidden.
      *
-     * @return
+     * @return a BitSet of the Hidden rows, where true means the row is hidden.
      */
     public BitSet getHiddenRows() {
         return hiddenRowsProperty.get();
     }
 
+    /**
+     * Return the Objectproperty wrapping the hidden rows..
+     *
+     * @return the Objectproperty wrapping the hidden rows..
+     */
     public final ObjectProperty<BitSet> hiddenRowsProperty() {
         return hiddenRowsProperty;
     }
@@ -606,7 +610,8 @@ public class SpreadsheetView extends Control{
      * hidden.
      *
      * @param column
-     * @return
+     * @return true if this column index (regarding to {@link #getColumns() } is
+     * hidden.
      */
     public boolean isColumnHidden(int column) {
         return hiddenColumnsProperty.get().get(column);
@@ -616,28 +621,34 @@ public class SpreadsheetView extends Control{
      * Return a BitSet of the Hidden columns, where true means the column is
      * hidden.
      *
-     * @return
+     * @return a BitSet of the Hidden columns, where true means the column is
+     * hidden.
      */
     public BitSet getHiddenColumns() {
         return hiddenColumnsProperty.get();
     }
 
+    /**
+     * Return the Objectproperty wrapping the hidden columns.
+     *
+     * @return the Objectproperty wrapping the hidden columns.
+     */
     public final ObjectProperty<BitSet> hiddenColumnsProperty() {
         return hiddenColumnsProperty;
     }
 
     /**
-     * Return the row where the {@link Filter} will be shown.
-     * The row is based on the {@link Grid} indexes.
+     * Return the row where the {@link Filter} will be shown. The row is based
+     * on the {@link Grid} indexes.
      *
-     * @return
+     * @return the row where the {@link Filter} will be shown.
      */
     public Integer getFilteredRow() {
         return filteredRow;
     }
 
     /**
-     * Set the row (based of {@link Grid} indexes) where the filters will
+     * Set the row (based of {@link Grid} indexes) where the {@link Filter} will
      * appear.
      *
      * @param row
@@ -676,13 +687,13 @@ public class SpreadsheetView extends Control{
             return;
         }
         getHiddenColumns().set(indexColumn, true);
-         BitSet bitSet = new BitSet(getHiddenColumns().size());
+        BitSet bitSet = new BitSet(getHiddenColumns().size());
         bitSet.or(getHiddenColumns());
         setHiddenColumns(bitSet);
     }
 
     private void computeRowMap() {
-         filteredList.setPredicate(new Predicate<ObservableList<SpreadsheetCell>>() {
+        filteredList.setPredicate(new Predicate<ObservableList<SpreadsheetCell>>() {
             @Override
             public boolean test(ObservableList<SpreadsheetCell> t) {
                 return !getHiddenRows().get(getGrid().getRows().indexOf(t));
@@ -698,7 +709,7 @@ public class SpreadsheetView extends Control{
                 rowMap.put(i, visibleRow);
             }
         }
-       
+
     }
 
     private void computeColumnMap() {
@@ -731,7 +742,7 @@ public class SpreadsheetView extends Control{
             return;
         }
         getHiddenRows().set(row, false);
-         BitSet bitSet = new BitSet(getHiddenRows().size());
+        BitSet bitSet = new BitSet(getHiddenRows().size());
         bitSet.or(getHiddenRows());
         setHiddenRows(bitSet);
     }
@@ -747,7 +758,7 @@ public class SpreadsheetView extends Control{
             return;
         }
         getHiddenColumns().set(indexColumn, false);
-         BitSet bitSet = new BitSet(getHiddenColumns().size());
+        BitSet bitSet = new BitSet(getHiddenColumns().size());
         bitSet.or(getHiddenColumns());
         setHiddenColumns(bitSet);
     }
@@ -758,7 +769,7 @@ public class SpreadsheetView extends Control{
      * relevant because no row is assigned to it.
      *
      * @param modelRow
-     * @return
+     * @return the index used in the SpreadsheetView.
      */
     public int getFilteredRow(int modelRow) {
         try {
@@ -773,7 +784,7 @@ public class SpreadsheetView extends Control{
      * index based on the visible columns in the SpreadsheetView.
      *
      * @param modelColumn
-     * @return
+     * @return an index based on the visible columns in the SpreadsheetView.
      */
     public int getViewColumn(int modelColumn) {
         try {
@@ -782,14 +793,15 @@ public class SpreadsheetView extends Control{
             return modelColumn;
         }
     }
-    
+
     /**
      * Given a column index based on the visible column list, for example when
      * dealing with {@link TablePosition#getColumn() }. It returns an index
      * based on the {@link #getColumns() } list of the SpreadsheetView.
      *
      * @param viewColumn
-     * @return
+     * @return an index based on the {@link #getColumns() } list of the
+     * SpreadsheetView.
      */
     public int getModelColumn(int viewColumn) {
         try {
@@ -804,7 +816,8 @@ public class SpreadsheetView extends Control{
      * related to.
      *
      * @param viewRow
-     * @return
+     * @return a {@link Grid} index it is
+     * related to.
      */
     public int getModelRow(int viewRow) {
         if (viewRow < 0 || viewRow >= sortedList.size()) {
@@ -816,7 +829,18 @@ public class SpreadsheetView extends Control{
             return viewRow;
         }
     }
-    
+
+    /**
+     * Given an index on the SpreadsheetView, it will return the model row by
+     * simply considering the hidden rows (and not the acutal sort if any).
+     *
+     * If you hide the row 2, it means the row 2 in the SpreadsheetView will
+     * actually display the row 3 in the model {@link Grid}. Thus calling this
+     * method with the number 2 will give you the number 3.
+     *
+     * @param viewRow
+     * @return the model row
+     */
     public int getFilteredSourceIndex(int viewRow) {
         if (viewRow < 0 || viewRow >= filteredList.size()) {
             return viewRow;
@@ -829,11 +853,16 @@ public class SpreadsheetView extends Control{
     }
 
     /**
-     * Return the current row span of a Cell considering all hidden rows.
+     * Return the current row span for the given cell at the given position in
+     * the Table.
+     *
+     * If a sort is applied to the SpreadsheetView, some spanned cells may be
+     * splitted thus explaining why this method can give a different value than {@link SpreadsheetCell#getRowSpan()
+     * }.
      *
      * @param cell
      * @param index
-     * @return
+     * @return the current row span for the given cell.
      */
     public int getRowSpan(SpreadsheetCell cell, int index) {
         /**
@@ -848,30 +877,38 @@ public class SpreadsheetView extends Control{
 
         return rowSpan;
     }
-    
-    public int getFirstRow(SpreadsheetCell cell, int index) {
-        do {
-            --index;
-        } while (index >= 0
-                && sortedList.get(index).get(cell.getColumn()) == cell);
 
-        return index + 1;
-    }
-    
+    /**
+     * Return the row span for the given cell without considering the actual
+     * sort. Only the hidden rows are considered.
+     *
+     * @param cell
+     * @return the row span for the given cell.
+     */
     public int getRowSpanFilter(SpreadsheetCell cell) {
         int rowSpan = cell.getRowSpan();
         //First remove the filtered
         for (int i = cell.getRow(); i < cell.getRow() + cell.getRowSpan(); ++i) {
             rowSpan -= getHiddenRows().get(i) ? 1 : 0;
-       }
+        }
         return rowSpan;
+    }
+
+    /**
+     * Return the current list of rows set in the SpreadsheetView as they appear
+     * on the screen.
+     *
+     * @return the current list of rows.
+     */
+    public ObservableList<ObservableList<SpreadsheetCell>> getItems() {
+        return cellsView.getItems();
     }
 
     /**
      * Return the current column span of a Cell considering all hidden columns.
      *
      * @param cell
-     * @return
+     * @return the current column span of a Cell.
      */
     public int getColumnSpan(SpreadsheetCell cell) {
         int colSpan = cell.getColumnSpan();
@@ -880,8 +917,10 @@ public class SpreadsheetView extends Control{
         }
         return colSpan;
     }
+
     /**
      * Return the zoomFactor used for the SpreadsheetView.
+     *
      * @return the zoomFactor used for the SpreadsheetView.
      */
     public final Double getZoomFactor() {
@@ -889,9 +928,10 @@ public class SpreadsheetView extends Control{
     }
 
     /**
-     * Set a new zoomFactor for the SpreadsheetView. 
-     * Advice is not to go beyond 2 and below 0.1.
-     * @param zoomFactor 
+     * Set a new zoomFactor for the SpreadsheetView. Advice is not to go beyond
+     * 2 and below 0.1.
+     *
+     * @param zoomFactor
      */
     public final void setZoomFactor(Double zoomFactor) {
         this.zoomFactor.set(zoomFactor);
@@ -899,6 +939,7 @@ public class SpreadsheetView extends Control{
 
     /**
      * Return the zoomFactor used for the SpreadsheetView.
+     *
      * @return the zoomFactor used for the SpreadsheetView.
      */
     public final DoubleProperty zoomFactorProperty() {
@@ -922,25 +963,40 @@ public class SpreadsheetView extends Control{
      * so we will try to stay of the intervals.
      */
     public void decrementZoom() {
-        double newZoom = getZoomFactor()- 0.01;
+        double newZoom = getZoomFactor() - 0.01;
         int prevValue = (int) ((newZoom - MIN_ZOOM) / STEP_ZOOM);
         newZoom = (prevValue) * STEP_ZOOM + MIN_ZOOM;
         setZoomFactor(newZoom < MIN_ZOOM ? MIN_ZOOM : newZoom);
     }
-    
-    public Comparator getComparator(){
+
+    /**
+     * Return the comparator used in the {@link SortedList} for the
+     * SpreadsheetView.
+     *
+     * @return the comparator used in the {@link SortedList} for the
+     * SpreadsheetView.
+     */
+    public Comparator getComparator() {
         return sortedList.getComparator();
     }
-    
-    public ObjectProperty<Comparator<? super ObservableList<SpreadsheetCell>>> comparatorProperty(){
+
+    /**
+     * Return an ObjectProperty wrapping the comparator used in the
+     * SpreadsheetView.
+     *
+     * @return an ObjectProperty wrapping the comparator used in the
+     * SpreadsheetView.
+     */
+    public ObjectProperty<Comparator<? super ObservableList<SpreadsheetCell>>> comparatorProperty() {
         return sortedList.comparatorProperty();
     }
-    
-    public void setComparator(Comparator<ObservableList<SpreadsheetCell>> comparator, int filteredRow){
-        if(getFilteredRow() != null && getFilteredRow() != filteredRow){
-            return;
-        }
-        setFilteredRow(filteredRow);
+
+    /**
+     * Set a new Comparator for the SpreadsheetView in order to sort the rows.
+     *
+     * @param comparator
+     */
+    public void setComparator(Comparator<ObservableList<SpreadsheetCell>> comparator) {
         sortedList.setComparator(comparator);
         computeRowMap();
         requestLayout();
@@ -1977,20 +2033,16 @@ public class SpreadsheetView extends Control{
      * Return the {@link SpanType} of a cell, this is a shorcut for 
      * {@link Grid#getSpanType(org.controlsfx.control.spreadsheet.SpreadsheetView, int, int) }.
      *
-     * @param viewRow
-     * @param column
+     * @param rowIndex
+     * @param modelColumn
      * @return The {@link SpanType} of a cell
      */
     public SpanType getSpanType(final int rowIndex, final int modelColumn) {
         if (getGrid() == null) {
             return SpanType.NORMAL_CELL;
         }
-        /**
-         * {@inheritDoc}
-         */
-//    @Override
-//    public SpanType getSpanType(final SpreadsheetView spv, final int rowIndex, final int modelColumn) {
-        if (rowIndex < 0 || modelColumn < 0 || rowIndex >= getCellsView().getItems().size() || modelColumn >= getGrid().getColumnCount()) {
+
+        if (rowIndex < 0 || modelColumn < 0 || rowIndex >= getItems().size() || modelColumn >= getGrid().getColumnCount()) {
             return SpanType.NORMAL_CELL;
         }
 

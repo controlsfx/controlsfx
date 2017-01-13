@@ -888,7 +888,7 @@ public class TableViewSpanSelectionModel extends
             case ROW_SPAN_INVISIBLE:
             default:
                 final SpreadsheetCell cell = cellsView.getItems().get(row).get(modelColumn);
-                int firstRow = spreadsheetView.getFirstRow(cell, row);
+                int firstRow = getCellsViewSkin().getFirstRow(cell, row);
                 if (getCellsViewSkin() == null || (getCellsViewSkin().getCellsSize() != 0 && getNonFixedRow(0).getIndex() <= firstRow)) {
                     return new TablePosition<>(cellsView, firstRow,
                             cellsView.getVisibleLeafColumn(spreadsheetView.getViewColumn(cell.getColumn())));

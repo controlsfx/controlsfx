@@ -183,7 +183,7 @@ public interface Grid {
     public void setDisplaySelection(boolean value);
 
     /**
-     * Return the Boolean property associated with the displayed selecion of the
+     * Return the Boolean property associated with the displayed selection of the
      * Grid.
      *
      * @return the Boolean property associated with the displayed selecion of the

@@ -182,20 +182,51 @@ import org.controlsfx.tools.Utils;
  * <h3>Pickers</h3>
  * <br>
  * 
- * You can show some little images next to the headers. They will appear on the 
- * left of the VerticalHeader and on top on the HorizontalHeader. They are called
- * "picker" because they were used originally for picking a row or a column to 
- * insert in the SpreadsheetView.
+ * You can show some little images next to the headers. They will appear on the
+ * left of the VerticalHeader and on top on the HorizontalHeader. They are
+ * called "picker" because they were used originally for picking a row or a
+ * column to insert in the SpreadsheetView.
  * <br>
  * But you can do anything you want with it. Simply put a row or a column index
  * in {@link #getRowPickers() } and {@link #getColumnPickers() } along with an
  * instance of {@link Picker}. You can override the {@link Picker#onClick() }
  * method in order to react when the user click on the picker.
  * <br>
- * The pickers will appear on the top of the column's header and on the left of 
+ * The pickers will appear on the top of the column's header and on the left of
  * the row's header.
  * <br>
- * 
+ *
+ * For example, here is a picker displayed for a row that allow to group rows
+ * like Excel:
+ * <br>
+ * <center><img src="pickerExample.png" alt="A Picker that can hide some rows."></center>
+ * <br>
+ * Once we clicked on the picker (minus sign), the rows are hidden.
+ * <br>
+ * <center><img src="pickerExample2.png" alt="A Picker that can sho some rows."></center>
+ * <br>
+ * Here is the code related to the images :
+ * <pre>
+ * Picker picker = new Picker() {
+ *          &#64;Override
+ *          public void onClick() {
+ *          //If my details are hidden
+ *              if (getHiddenRows().get(3)) {
+ *                  showRow(3);
+ *                  showRow(4);
+ *                  showRow(5);
+ *                  showRow(6);
+ *              } else {
+ *                  hideRow(3);
+ *                  hideRow(4);
+ *                  hideRow(5);
+ *                  hideRow(6);
+ *              }
+ *          }
+ * };
+ * getRowPickers().put(2, picker);
+ *
+ * </pre>
  * <h3>Copy pasting</h3> You can copy any cell you want and paste it elsewhere.
  * Be aware that only the value inside will be pasted, not the style nor the
  * type. Thus the value you're trying to paste must be compatible with the
@@ -209,6 +240,32 @@ import org.controlsfx.tools.Utils;
  * 
  * <br>
  * <br>
+ * <h3>Hiding rows and columns</h3>
+ * <p>
+ * Rows and columns can be hidden if you need to. Simply call {@link #showRow(int)
+ * } or {@link #hideRow(int) } in order to toggle the visibility of a row. Same
+ * for the column.
+ * <br>
+ * Note that the span of the cell (in row or column) will automatically adapt
+ * based on the visible rows or columns. You have nothing to do.
+ *  <br>
+ * Because toggling visibility have an impact on the Grid, if you have a lot of
+ * rows/columns to show or hide, you may consider setting them all directly by
+ * using {@link #setHiddenRows(java.util.BitSet) }. The {@link BitSet} represent
+ * all your rows/columns and the bit associated to it represent its visibility.
+ *
+ * <h3>Zoom</h3>
+ * The SpreadsheetView offers the possibility to zoom in or out. This is useful
+ * when you have a second monitor and you want your whole grid to fit in. Or
+ * when you want to draw the attention on a particular portion of the grid.
+ * <br>
+ * You can modify the zoom factor by playing with {@link #setZoomFactor(java.lang.Double)
+ * }. We recommend using value between 2 and 0.1.
+ * <br>
+ * Also note that the SpreadsheetView is configured to react when CTRL + and
+ * CTRL - are triggered by, respectively, zooming in and zooming out by 10%.
+ * Also CTRL 0 will bring the zoom back to default (1).
+ * 
  * <h3>Code Samples</h3> Just like the {@link TableView}, you instantiate the
  * underlying model, a {@link Grid}. You will create some rows filled with {@link SpreadsheetCell}.
  * 
@@ -2032,8 +2089,8 @@ public class SpreadsheetView extends Control{
     }
     
     /**
-     * Return the {@link SpanType} of a cell, this is a shorcut for 
-     * {@link Grid#getSpanType(org.controlsfx.control.spreadsheet.SpreadsheetView, int, int) }.
+     * Return the {@link SpanType} of a cell. This is used internally by the
+     * SpreadsheetView but some users may find it useful.
      *
      * @param rowIndex
      * @param modelColumn

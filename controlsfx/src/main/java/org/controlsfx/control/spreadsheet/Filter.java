@@ -33,13 +33,15 @@ import javafx.scene.control.MenuButton;
  * The interface for implementing Filters on {@link SpreadsheetColumn}. Simply
  * set a Filtered row on the {@link SpreadsheetView} by using {@link SpreadsheetView#setFilteredRow(java.lang.Integer)
  * }.
- *
+ * <br>
  * Then construct the Filters and add them to each {@link SpreadsheetColumn}.
- *
+ * <br>
  * A Filter is simply a customizable {@link MenuButton} that will be displayed
  * over the cell. It is primarily designed to filter some rows in the
  * SpreadsheetView. But the MenuButton can serve any purpose since it is
  * entirely customizable.
+ * <br>
+ * <center><img src="filterExample.PNG" alt="Some filters set on cells."></center>
  */
 public interface Filter {
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015, ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,6 +48,7 @@ import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
+import javafx.stage.Popup;
 
 /**
  * The SpreadsheetCells serve as model for the {@link SpreadsheetView}. <br>
@@ -117,6 +118,13 @@ import javafx.scene.image.ImageView;
  * </pre>
  * 
  * <center><img src="dateFormat.PNG" alt="SpreadsheetCellBase with custom format"></center>
+ * 
+ * <h3>Popup</h3>
+ * Each cell can display a {@link Popup} when clicked. This is useful when some
+ * non editable cell wants to display several actions to take on the grid. This
+ * feature is completely different from the {@link Filter}. Filters are shown on
+ * one particular row whereas popup can be added to every cell.
+ *
  * 
  * <h3>Graphic</h3>
  * Each cell can have a graphic to display next to the text in the cells. Just

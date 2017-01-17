@@ -434,7 +434,8 @@ public class TableViewSpanSelectionModel extends
             // just once at the end
             final SpreadsheetCell cell = (SpreadsheetCell) column.getCellData(pos.getRow());
             final int rowSpan = spreadsheetView.getRowSpan(cell, pos.getRow());
-            for (int i = pos.getRow(); i < rowSpan + pos.getRow(); ++i) {
+            final int currentRow = pos.getRow();
+            for (int i = pos.getRow(); i < rowSpan + currentRow; ++i) {
                 selectedColumns.add(i);
                 for (int j = spreadsheetView.getViewColumn(cell.getColumn()); j < spreadsheetView.getColumnSpan(cell) + spreadsheetView.getViewColumn(cell.getColumn()); ++j) {
                     selectedRows.add(j);

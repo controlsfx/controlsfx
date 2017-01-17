@@ -49,7 +49,7 @@ import javafx.collections.ObservableList;
  * <h3>Visual:</h3> <center><img src="pickers.PNG" alt="Screenshot of Picker"></center>
  * 
  */
-public class Picker {
+public abstract class Picker {
 
     private final ObservableList<String> styleClass = FXCollections.observableArrayList();
 
@@ -87,7 +87,5 @@ public class Picker {
     /**
      * This method will be called whenever the user clicks on this picker.
      */
-    public void onClick(){
-        //no-op by default
-    }
+    public abstract void onClick();
 }

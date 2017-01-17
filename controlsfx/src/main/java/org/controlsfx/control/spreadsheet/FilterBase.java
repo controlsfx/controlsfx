@@ -45,7 +45,8 @@ import javafx.scene.control.MenuItem;
 import javafx.util.Callback;
 
 /**
- * A simple implementation of the {@link Filter}.
+ * A simple implementation of the {@link Filter}. It will show all rows
+ * available below it, and offer the possibility to sort and filter some row.
  */
 public class FilterBase implements Filter {
 
@@ -57,7 +58,7 @@ public class FilterBase implements Filter {
     private Set<String> copySet = new HashSet<>();
 
     /**
-     * Default constructor, the default "picker-label" styleClass is applied.
+     * Constructor for the Filter indicating on which column it's applied on.
      *
      * @param spv
      * @param column

@@ -374,6 +374,16 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         return null;
     }
     
+    /**
+     * This return the first index displaying a cell in case of a rowSpan. If
+     * the returned index is the same as given, it means the current cell is the
+     * one showing. Otherwise, it means another cell above will be the one
+     * drawn.
+     *
+     * @param cell
+     * @param index
+     * @return
+     */
     public int getFirstRow(SpreadsheetCell cell, int index) {
         do {
             --index;

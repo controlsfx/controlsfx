@@ -162,7 +162,7 @@ public class GridBase implements Grid, EventTarget {
             Object convertedValue = cell.getCellType().convertValue(value);
             cell.setItem(convertedValue);
             if (!java.util.Objects.equals(previousItem, cell.getItem())) {
-                GridChange cellChange = new GridChange(modelRow, column, previousItem, convertedValue);
+                GridChange cellChange = new GridChange(cell.getRow(), cell.getColumn(), previousItem, convertedValue);
                 Event.fireEvent(this, cellChange);
             }
         }

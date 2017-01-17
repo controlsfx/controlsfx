@@ -126,6 +126,9 @@ import org.controlsfx.tools.Utils;
  * shortcuts are also working.</li>
  * <li>{@link Picker} can be placed above column header or to the side of the
  * row header.</li>
+ * <li>Rows and columns can be hidden (like Excel grouping).</li>
+ * <li>Zoom in and out in order for the SpreadsheetView to fit on a monitor.</li>
+ * <li>Rows can be sorted using a {@link Comparator}.</li>
  * </ul>
  * 
  * <br>
@@ -709,7 +712,6 @@ public class SpreadsheetView extends Control{
                 rowMap.put(i, visibleRow);
             }
         }
-
     }
 
     private void computeColumnMap() {

@@ -35,12 +35,17 @@ import javafx.scene.control.MenuButton;
  * }.
  *
  * Then construct the Filters and add them to each {@link SpreadsheetColumn}.
+ *
+ * A Filter is simply a customizable {@link MenuButton} that will be displayed
+ * over the cell. It is primarily designed to filter some rows in the
+ * SpreadsheetView. But the MenuButton can serve any purpose since it is
+ * entirely customizable.
  */
 public interface Filter {
 
     /**
      * Return the MenuButton displayed into the bottom-right corner of the cell.
-     * This method will be called whenever the user clicks on this picker.
+     * This method will be called whenever the user clicks on this Filter.
      *
      * @return the MenuButton displayed into the bottom-right corner of the
      * cell.

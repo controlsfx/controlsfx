@@ -185,6 +185,19 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      */
     Filter getFilter() {
         Filter filter = getItem() != null ? handle.getView().getColumns().get(getItem().getColumn()).getFilter() : null;
+        //If we have a span, we check if the filteredRow is contained in the row span of this cell.
+        if (filter != null && getItem().getRowSpan() > 1) {
+            int rowSpan = handle.getView().getRowSpan(getItem(), getIndex());
+            int row = getItem().getRow();
+            for (int i = row; i < row + rowSpan; ++i) {
+                if (handle.getView().getFilteredRow() == handle.getView().getModelRow(i)) {
+                    return filter;
+                }
+            }
+            //If we're here, nothing has been found.
+            return null;
+        }
+        //If not we simply compare the filtered row.
         return filter != null && handle.getView().getFilteredRow() == handle.getView().getModelRow(getIndex()) ? filter : null;
     }
 

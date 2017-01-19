@@ -701,10 +701,11 @@ public class SpreadsheetView extends Control{
      * Return the row where the {@link Filter} will be shown. The row is based
      * on the {@link Grid} indexes.
      *
+     * Return -1 if no row is set for the filters.
      * @return the row where the {@link Filter} will be shown.
      */
-    public Integer getFilteredRow() {
-        return filteredRow;
+    public int getFilteredRow() {
+        return filteredRow == null ? -1 : filteredRow;
     }
 
     /**
@@ -753,12 +754,17 @@ public class SpreadsheetView extends Control{
     }
 
     private void computeRowMap() {
-        filteredList.setPredicate(new Predicate<ObservableList<SpreadsheetCell>>() {
-            @Override
-            public boolean test(ObservableList<SpreadsheetCell> t) {
-                return !getHiddenRows().get(getGrid().getRows().indexOf(t));
-            }
-        });
+        if (getHiddenRows().isEmpty()) {
+            filteredList.setPredicate(null);
+        } else {
+            filteredList.setPredicate(new Predicate<ObservableList<SpreadsheetCell>>() {
+                @Override
+                public boolean test(ObservableList<SpreadsheetCell> t) {
+                    int index = getGrid().getRows().indexOf(t);
+                    return !getHiddenRows().get(index) || index == getFilteredRow();
+                }
+            });
+        }
         final int rowCount = getGrid().getRowCount();
         rowMap = new HashMap<>(rowCount);
         int visibleRow = 0;

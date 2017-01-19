@@ -161,7 +161,7 @@ public final class SpreadsheetColumn {
                 if (newFilter != null) {
                     //We verify this cell can actually be filtered.
                     //FIXME Only one row can be filtered.
-                    if (spreadsheetView.getFilteredRow() == null) {
+                    if (spreadsheetView.getFilteredRow() == -1) {
                         setFilter(null);
                         return;
                     }

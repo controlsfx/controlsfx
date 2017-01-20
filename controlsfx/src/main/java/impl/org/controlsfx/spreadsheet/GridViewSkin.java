@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2017 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -637,6 +637,10 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if (cell.getSkin() == null) {
             cell.setSkin(new CellViewSkin((CellView) cell));
         }
+         SpreadsheetColumn column = spreadsheetView.getColumns().get(indexColumn);
+        //We add the size of the menuButton of the filter if necessary.
+        double cellFilterWidth = 0;
+        
         for (int row = 0; row < rows; row++) {
             cell.updateIndex(row);
             
@@ -648,6 +652,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                 }
                 cell.impl_processCSS(false);
                 double width = cell.prefWidth(-1);
+                if(row == spreadsheetView.getFilteredRow()){
+                    cellFilterWidth = width;
+                }
                 /**
                  * If the cell is spanning in column, we need to take the other
                  * columns into account in the calculation of the width. So we
@@ -679,9 +686,14 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if (handle.getGridView().getColumnResizePolicy() == TableView.CONSTRAINED_RESIZE_POLICY) {
             widthMax = Math.max(widthMax, col.getWidth());
         }
-
+        
         if (datePresent && widthMax < DATE_CELL_MIN_WIDTH) {
             widthMax = DATE_CELL_MIN_WIDTH;
+        }
+        if (column.getFilter() != null) {
+            //We get the maximum between our widthMax and the cell with a filter.
+            cellFilterWidth += column.getFilter().getMenuButton().getWidth() <= 0 ? 24.0 : column.getFilter().getMenuButton().getWidth();
+            widthMax = Math.max(widthMax, cellFilterWidth);
         }
         /**
          * This method is called by the system at initialisation and later by

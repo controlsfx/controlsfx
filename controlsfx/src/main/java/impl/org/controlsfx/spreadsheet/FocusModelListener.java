@@ -64,7 +64,7 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
             final TablePosition<ObservableList<SpreadsheetCell>, ?> newPosition) {
         int columnIndex = -1;
         if (newPosition != null && newPosition.getTableColumn() != null) {
-            columnIndex = newPosition.getTableColumn().getColumns().indexOf(newPosition.getTableColumn());
+            columnIndex = cellsView.getColumns().indexOf(newPosition.getTableColumn());
         }
         final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(newPosition.getRow(), columnIndex);
         switch (spanType) {

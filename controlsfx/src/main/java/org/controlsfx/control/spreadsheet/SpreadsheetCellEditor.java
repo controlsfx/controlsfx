@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -190,7 +190,20 @@ public abstract class SpreadsheetCellEditor {
      * 
      * @param item
      */
-    public abstract void startEdit(Object item);
+    public void startEdit(Object item){
+        startEdit(item, null);
+    }
+    
+    /**
+     * Does the same as {@link #startEdit(java.lang.Object) } but you have also
+     * the {@link SpreadsheetCell#getFormat() } sent. This is useful when
+     * editing Date for example, when you want to display it with the cell
+     * format.
+     *
+     * @param item
+     * @param format
+     */
+    public abstract void startEdit(Object item, String format);
 
     /**
      * Return the control used for controlling the input. This is called at the
@@ -255,7 +268,7 @@ public abstract class SpreadsheetCellEditor {
          * * Public Methods * *
          **************************************************************************/
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
             if (value instanceof String) {
                 tf.setText(value.toString());
             }
@@ -325,7 +338,7 @@ public abstract class SpreadsheetCellEditor {
          * * Public Methods * *
          **************************************************************************/
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
 
             if (value instanceof String || value == null) {
                 tf.setText((String) value);
@@ -397,6 +410,7 @@ public abstract class SpreadsheetCellEditor {
         public TextAreaEditor(SpreadsheetView view) {
             super(view);
             textArea = new TextArea();
+            textArea.setWrapText(true);
             //The textArea is not respecting the maxHeight if we are not setting the min..
             textArea.minHeightProperty().bind(textArea.maxHeightProperty());
         }
@@ -407,7 +421,7 @@ public abstract class SpreadsheetCellEditor {
          * ************************************************************************
          */
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
             if (value instanceof String || value == null) {
                 textArea.setText((String) value);
             }
@@ -526,7 +540,7 @@ public abstract class SpreadsheetCellEditor {
          **************************************************************************/
         /** {@inheritDoc} */
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
             if (value instanceof Double) {
                 //We want to set the text in its proper form regarding the Locale.
                 decimalFormat.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Localization.getLocale()));
@@ -652,7 +666,7 @@ public abstract class SpreadsheetCellEditor {
          **************************************************************************/
         /** {@inheritDoc} */
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
             if (value instanceof Integer) {
                 tf.setText(Integer.toString((Integer) value));
             } else {
@@ -762,7 +776,7 @@ public abstract class SpreadsheetCellEditor {
 
         /** {@inheritDoc} */
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
             if (value instanceof String) {
                 originalValue = value.toString();
             } else {
@@ -854,7 +868,7 @@ public abstract class SpreadsheetCellEditor {
          **************************************************************************/
         /** {@inheritDoc} */
         @Override
-        public void startEdit(Object value) {
+        public void startEdit(Object value, String format) {
             if (value instanceof LocalDate) {
                 datePicker.setValue((LocalDate) value);
             }

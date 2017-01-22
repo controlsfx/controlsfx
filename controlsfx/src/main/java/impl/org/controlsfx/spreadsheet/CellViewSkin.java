@@ -70,7 +70,7 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
 
     public CellViewSkin(TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> tableCell) {
         super(tableCell);
-        tableCell.itemProperty().addListener(new WeakChangeListener<>(itemChangeListener));
+        tableCell.itemProperty().addListener(weakItemChangeListener);
         if (tableCell.getItem() != null) {
             tableCell.getItem().addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, weakTriangleEventHandler);
         }
@@ -220,4 +220,5 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
             }
         }
     };
+    private final WeakChangeListener<SpreadsheetCell> weakItemChangeListener = new WeakChangeListener<>(itemChangeListener);
 }

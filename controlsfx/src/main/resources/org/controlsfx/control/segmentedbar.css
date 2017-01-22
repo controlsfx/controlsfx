@@ -1,0 +1,55 @@
+.segmented-bar {
+}
+
+.segmented-bar > .segment-view > .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 1.2em;
+    -fx-padding: 4;
+}
+
+.segmented-bar > .segment {
+    -fx-background-color: steelblue;
+}
+
+.segmented-bar:horizontal > .only-segment {
+    -fx-background-radius: 3;
+    -fx-border-radius: 3;
+}
+.segmented-bar:horizontal > .first-segment {
+    -fx-background-insets: 0 2 0 0;
+    -fx-background-radius: 3 0 0 3;
+    -fx-background-radius: 3 0 0 3;
+}
+
+.segmented-bar:horizontal > .middle-segment {
+    -fx-background-insets: 0 2 0 0;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.segmented-bar:horizontal > .last-segment {
+    -fx-background-radius: 0 3 3 0;
+    -fx-border-radius: 0 3 3 0;
+}
+
+.segmented-bar:vertical > .only-segment {
+    -fx-background-radius: 3;
+    -fx-border-radius: 3;
+}
+.segmented-bar:vertical > .first-segment {
+    -fx-background-insets: 2 0 0 0;
+    -fx-background-radius: 0 0 3 3;
+    -fx-background-radius: 0 0 3 3;
+}
+
+.segmented-bar:vertical > .middle-segment {
+    -fx-background-insets: 2 0 0 0;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.segmented-bar:vertical > .last-segment {
+    -fx-background-radius: 3 3 0 0;
+    -fx-border-radius: 3 3 0 0;
+}

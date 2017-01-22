@@ -33,8 +33,12 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.WeakEventHandler;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableRow;
+import javafx.scene.input.MouseEvent;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -79,13 +83,20 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
 
             @Override
             public void onChanged(MapChangeListener.Change<? extends Integer, ? extends Double> change) {
-                if(change.wasAdded() && change.getKey() == getIndex()){
+                if (change.wasAdded() && change.getKey() == getIndex()) {
                     setRowHeight(change.getValueAdded());
-                }else if(change.wasRemoved() && change.getKey() == getIndex()){
+                } else if (change.wasRemoved() && change.getKey() == getIndex()) {
                     setRowHeight(computePrefHeight(-1));
                 }
             }
         });
+        /**
+         * When we are adding deported cells (fixed in columns) into a row via
+         * addCell. The cell is not receiving the DRAG_DETECTED eventHandler
+         * because it's the row that receives it first. If it's the case, we
+         * must give the event to the cell underneath.
+         */
+        this.addEventHandler(MouseEvent.DRAG_DETECTED, weakDragHandler);
     }
     /***************************************************************************
      * * Protected Methods * *
@@ -136,4 +147,16 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         setPrefHeight(height);
         handle.getCellsViewSkin().rectangleSelection.updateRectangle();
     }
+    
+    private final EventHandler<MouseEvent> dragDetectedEventHandler = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+            if (event.getTarget().getClass().equals(GridRow.class) && event.getPickResult().getIntersectedNode() != null 
+                    && event.getPickResult().getIntersectedNode().getClass().equals(CellView.class)) {
+                Event.fireEvent(event.getPickResult().getIntersectedNode(), event);
+            }
+        }
+    };
+
+    private final WeakEventHandler<MouseEvent> weakDragHandler = new WeakEventHandler(dragDetectedEventHandler);
 }

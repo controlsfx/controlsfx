@@ -3,6 +3,7 @@ syntax: glob
 # Gradle
 .gradle/
 build/
+gradle.properties
 
 # IntelliJ IDEA
 .idea/

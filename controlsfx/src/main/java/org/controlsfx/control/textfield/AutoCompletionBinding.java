@@ -64,7 +64,6 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      * Private fields                                                          *
      *                                                                         *
      **************************************************************************/
-    private static final long AUTO_COMPLETE_DELAY = 250;
     private final Node completionTarget;
     private final AutoCompletePopup<T> autoCompletionPopup;
     private final Object suggestionsTaskLock = new Object();
@@ -72,6 +71,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     private FetchSuggestionsTask suggestionsTask = null;
     private Callback<ISuggestionRequest, Collection<T>> suggestionProvider = null;
     private boolean ignoreInputChanges = false;
+    private long delay = 250;
 
     /***************************************************************************
      *                                                                         *
@@ -133,6 +133,15 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
         if(!isIgnoreInputChanges()){
             onUserInputChanged(userText);
         }
+    }
+
+    /**
+     * Sets the delay in ms between a key press and the suggestion popup being displayed.
+     *
+     * @param delay
+     */
+    public final void setDelay(long delay) {
+        this.delay = delay;
     }
 
     /**
@@ -325,7 +334,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
                 suggestionsTask.cancel(); 
             }
             // create a new fetcher task
-            suggestionsTask = new FetchSuggestionsTask(userText);
+            suggestionsTask = new FetchSuggestionsTask(userText, delay);
             new Thread(suggestionsTask).start();
         }
     }
@@ -382,22 +391,24 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      */
     private class FetchSuggestionsTask extends Task<Void> implements ISuggestionRequest {
         private final String userText;
+        private final long delay;
 
-        public FetchSuggestionsTask(String userText){
+        public FetchSuggestionsTask(String userText, long delay){
             this.userText = userText;
+            this.delay = delay;
         }
 
         @Override
         protected Void call() throws Exception {
             Callback<ISuggestionRequest, Collection<T>> provider = suggestionProvider;
             if(provider != null){
-            	long start_time = System.currentTimeMillis();
-                final Collection<T> fetchedSuggestions = provider.call(this);
-                long sleep_time = start_time + AUTO_COMPLETE_DELAY - System.currentTimeMillis();
-                if (sleep_time > 0 && !isCancelled()) {
-                	Thread.sleep(sleep_time);
+                long startTime = System.currentTimeMillis();
+                long sleepTime = startTime + delay - System.currentTimeMillis();
+                if (sleepTime > 0 && !isCancelled()) {
+                    Thread.sleep(sleepTime);
                 }
                 if(!isCancelled()){
+                    final Collection<T> fetchedSuggestions = provider.call(this);
                     Platform.runLater(() -> {
                         if(fetchedSuggestions != null && !fetchedSuggestions.isEmpty()){
                             autoCompletionPopup.getSuggestions().setAll(fetchedSuggestions);

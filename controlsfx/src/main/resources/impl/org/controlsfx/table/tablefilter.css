@@ -1,0 +1,7 @@
+.column-filter .custom-menu-item:focused {
+    -fx-background-color: transparent;
+}
+
+.filter-panel {
+    -fx-spacing: 10px
+}

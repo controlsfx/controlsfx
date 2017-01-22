@@ -136,7 +136,6 @@ class SVGLoader {
         "</head>"; //$NON-NLS-1$
                 
         
-        System.out.println(content);
         
         eng.loadContent(content);
         

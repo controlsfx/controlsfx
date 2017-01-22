@@ -37,7 +37,6 @@ import javafx.css.StyleableProperty;
 import javafx.css.converter.SizeConverter;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
@@ -52,10 +51,11 @@ import java.util.List;
  */
 public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
 {
-    StackPane thumb;
-    StackPane thumbArea;
-    Label label;
-    StackPane labelContainer;
+    private final StackPane thumb;
+    private final StackPane thumbArea;
+    private final Label label;
+    private final StackPane labelContainer;
+    private final TranslateTransition transition;
 
     /**
      * Constructor for all ToggleSwitchSkin instances.
@@ -69,6 +69,7 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         thumbArea = new StackPane();
         label = new Label();
         labelContainer = new StackPane();
+        transition = new TranslateTransition(Duration.millis(getThumbMoveAnimationTime()), thumb);
 
         label.textProperty().bind(control.textProperty());
         getChildren().addAll(labelContainer, thumbArea, thumb);
@@ -87,14 +88,24 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
     }
 
     private void selectedStateChanged() {
-        TranslateTransition transition = new TranslateTransition(Duration.millis(getThumbMoveAnimationTime()), thumb);
+        if(transition != null){
+            transition.stop();
+        }
+        
         double thumbAreaWidth = snapSize(thumbArea.prefWidth(-1));
         double thumbWidth = snapSize(thumb.prefWidth(-1));
-
-        if (!getSkinnable().isSelected())
-            transition.setByX(-(thumbAreaWidth - thumbWidth));
-        else {
-            transition.setByX(thumbAreaWidth - thumbWidth);
+        double distance = thumbAreaWidth - thumbWidth;
+        /**
+         * If we are not selected, we need to go from right to left.
+         */
+        if (!getSkinnable().isSelected()) {
+            thumb.setLayoutX(thumbArea.getLayoutX());
+            transition.setFromX(distance);
+            transition.setToX(0);
+        } else {
+            thumb.setTranslateX(thumbArea.getLayoutX());
+            transition.setFromX(0);
+            transition.setToX(distance);
         }
         transition.setCycleCount(1);
         transition.play();
@@ -141,10 +152,14 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
     @Override
     protected void layoutChildren(double contentX, double contentY, double contentWidth, double contentHeight) {
         ToggleSwitch toggleSwitch = getSkinnable();
-
         double thumbWidth = snapSize(thumb.prefWidth(-1));
         double thumbHeight = snapSize(thumb.prefHeight(-1));
         thumb.resize(thumbWidth, thumbHeight);
+        //We must reset the TranslateX otherwise the thumb is mis-aligned when window is resized.
+         if (transition != null) {
+            transition.stop();
+        }
+        thumb.setTranslateX(0);
 
         double thumbAreaY = snapPosition(contentY);
         double thumbAreaWidth = snapSize(thumbArea.prefWidth(-1));

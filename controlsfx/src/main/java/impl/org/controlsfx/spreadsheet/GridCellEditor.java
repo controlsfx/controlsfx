@@ -38,7 +38,6 @@ import javafx.scene.control.Control;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
@@ -186,7 +185,7 @@ public class GridCellEditor {
         // Then we call the user editor in order for it to be ready
         Object value = modelCell.getItem();
         //We don't want the editor to go beyond the cell boundaries
-        Double maxHeight = Math.min(handle.getCellsViewSkin().getRowHeight(viewCell.getIndex()), spreadsheetCellEditor.getMaxHeight());
+        Double maxHeight = Math.min(viewCell.getHeight(), spreadsheetCellEditor.getMaxHeight());
         
         if (editor != null) {
             viewCell.setGraphic(editor);
@@ -194,7 +193,7 @@ public class GridCellEditor {
             editor.setPrefWidth(viewCell.getWidth());
         }
 
-        spreadsheetCellEditor.startEdit(value);
+        spreadsheetCellEditor.startEdit(value, modelCell.getFormat());
         
         if (editor != null) {
             focusProperty = getFocusProperty(editor);

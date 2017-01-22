@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2016, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@ package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.NotificationBar;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -105,6 +106,7 @@ public class Notifications {
     private boolean hideCloseButton;
     private EventHandler<ActionEvent> onAction;
     private Window owner;
+    private Screen screen = Screen.getPrimary();
 
     private List<String> styleClass = new ArrayList<>();
 
@@ -163,12 +165,17 @@ public class Notifications {
     }
 
     /**
-     * The dialog window owner - if specified the notifications will be inside
+     * The dialog window owner - which can be {@link Screen}, {@link Window}
+     * or {@link Node}. If specified, the notifications will be inside
      * the owner, otherwise the notifications will be shown within the whole
-     * screen.
+     * primary (default) screen.
      */
     public Notifications owner(Object owner) {
-        this.owner = Utils.getWindow(owner);
+        if (owner instanceof Screen) {
+            this.screen = (Screen) owner;
+        } else {
+            this.owner = Utils.getWindow(owner);
+        }
         return this;
     }
 
@@ -271,8 +278,6 @@ public class Notifications {
 
         private static final NotificationPopupHandler INSTANCE = new NotificationPopupHandler();
 
-        private static final Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-
         private double startX;
         private double startY;
         private double screenWidth;
@@ -291,13 +296,14 @@ public class Notifications {
         private boolean isShowing = false;
 
         public void show(Notifications notification) {
-            Window window = null;
+            Window window;
             if (notification.owner == null) {
                 /*
                  * If the owner is not set, we work with the whole screen.
                  */
-                startX = 0;
-                startY = 0;
+                Rectangle2D screenBounds = notification.screen.getVisualBounds();
+                startX = screenBounds.getMinX();
+                startY = screenBounds.getMinY();
                 screenWidth = screenBounds.getWidth();
                 screenHeight = screenBounds.getHeight();
 
@@ -593,17 +599,7 @@ public class Notifications {
                 final double oldAnchorY = _popup.getAnchorY();
                 final double distance = anchorYTarget - oldAnchorY;
 
-                Transition t = new Transition() {
-                    {
-                        setCycleDuration(Duration.millis(350));
-                    }
-
-                    @Override
-                    protected void interpolate(double frac) {
-                        double newAnchorY = oldAnchorY + distance * frac;
-                        _popup.setAnchorY(newAnchorY);
-                    }
-                };
+                Transition t = new CustomTransition(_popup, oldAnchorY, distance);
                 t.setCycleCount(1);
                 parallelTransition.getChildren().add(t);
             }
@@ -619,6 +615,30 @@ public class Notifications {
             default:
                 return false;
             }
+        }
+
+        class CustomTransition extends Transition {
+
+            private WeakReference<Popup> popupWeakReference;
+            private double oldAnchorY;
+            private double distance;
+
+            CustomTransition(Popup popup, double oldAnchorY, double distance) {
+                popupWeakReference = new WeakReference<>(popup);
+                this.oldAnchorY = oldAnchorY;
+                this.distance = distance;
+                setCycleDuration(Duration.millis(350.0));
+            }
+
+            @Override
+            protected void interpolate(double frac) {
+                Popup popup = popupWeakReference.get();
+                if (popup != null) {
+                    double newAnchorY = oldAnchorY + distance * frac;
+                    popup.setAnchorY(newAnchorY);
+                }
+            }
+
         }
     }
 }

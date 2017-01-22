@@ -35,8 +35,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
-
+import java.util.stream.*;
 
 /**Applies a filtering control to a provided {@link TableView} instance. 
  * The filter will be applied immediately on construction, and 
@@ -53,26 +54,48 @@ public final class TableFilter<T> {
     private final TableView<T> tableView;
     private final ObservableList<T> backingList;
     private final FilteredList<T> filteredList;
-    private final SortedList<T> sortedControlList;
 
-    private final ObservableList<ColumnFilter<T>> columnFilters = FXCollections.observableArrayList();
+    private final ObservableList<ColumnFilter<T,?>> columnFilters = FXCollections.observableArrayList();
 
-    /**Constructor applies a filtering control to the provided {@link TableView} instance.
-     * 
-     * @param tableView
+
+    /**
+     * Use TableFilter.forTableView() factory and leverage Builder
      */
+    @Deprecated
     public TableFilter(TableView<T> tableView) {
-        this.tableView = tableView;
-        this.backingList = tableView.getItems();
-        this.filteredList = new FilteredList<>(new SortedList<>(backingList));
-        this.sortedControlList = new SortedList<>(this.filteredList);
+        this(tableView,false);
+    }
 
-        this.filteredList.setPredicate(v -> true);
+    private TableFilter(TableView<T> tableView, boolean isLazy) {
+        this.tableView = tableView;
+        backingList = tableView.getItems();
+        filteredList = new FilteredList<>(new SortedList<>(backingList));
+        SortedList<T> sortedControlList = new SortedList<>(this.filteredList);
+
+        filteredList.setPredicate(v -> true);
 
         sortedControlList.comparatorProperty().bind(tableView.comparatorProperty());
         tableView.setItems(sortedControlList);
 
-        this.applyForAllColumns();
+        applyForAllColumns(isLazy);
+        tableView.getStylesheets().add("/impl/org/controlsfx/table/tablefilter.css");
+
+        if (!isLazy) {
+            columnFilters.forEach(ColumnFilter::initialize);
+        }
+    }
+
+    /**
+     * Allows specifying a different behavior for the search box on the TableFilter.
+     * By default, the contains() method on a String is used to evaluate the search box input to qualify the distinct filter values.
+     * But you can specify a different behavior by providing a simple BiPredicate argument to this method.
+     * The BiPredicate argument allows you take the input value and target value and use a lambda to evaluate a boolean.
+     * For instance, you can implement a comparison by assuming the input value is a regular expression, and call matches()
+     * on the target value to see if it aligns to the pattern.
+     * @param searchStrategy
+     */
+    public void setSearchStrategy(BiPredicate<String,String> searchStrategy) {
+        columnFilters.forEach(cf -> cf.setSearchStrategy(searchStrategy));
     }
     /**
      * Returns the backing {@link ObservableList} originally provided to the constructor.
@@ -91,18 +114,61 @@ public final class TableFilter<T> {
     /** 
      * @treatAsPrivate
      */
-    private void applyForAllColumns() { 
-        columnFilters.setAll(this.tableView.getColumns().stream()
+    private void applyForAllColumns(boolean isLazy) {
+        columnFilters.setAll(tableView.getColumns().stream().flatMap(this::extractNestedColumns)
                 .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
-    /** 
-     * @treatAsPrivate
+    private <S> Stream<TableColumn<T,?>> extractNestedColumns(TableColumn<T,S> tableColumn) {
+        if (tableColumn.getColumns().size() == 0) {
+            return Stream.of(tableColumn);
+        } else {
+            return tableColumn.getColumns().stream().flatMap(this::extractNestedColumns);
+        }
+    }
+
+    /**
+     * Programmatically selects value for the specified TableColumn
      */
-    public void executeFilter() { 
-        filteredList.setPredicate(r -> !columnFilters.parallelStream()
-                .filter(cf -> cf.getFilterValue(cf.getTableColumn().getCellObservableValue(r))
-                        .map(ov -> !ov.getSelectedProperty().getValue()).orElse(false))
-                .findAny().isPresent());
+    public void selectValue(TableColumn<?,?> column, Object value) {
+        columnFilters.stream().filter(c -> c.getTableColumn() == column)
+                .forEach(c -> c.selectValue(value));
+    }
+    /**
+     * Programmatically unselects value for the specified TableColumn
+     */
+    public void unselectValue(TableColumn<?,?> column, Object value) {
+        columnFilters.stream().filter(c -> c.getTableColumn() == column)
+                .forEach(c -> c.unselectValue(value));
+    }
+
+    /**
+     * Programmatically selects all values for the specified TableColumn
+
+     */
+    public void selectAllValues(TableColumn<?,?> column) {
+        columnFilters.stream().filter(c -> c.getTableColumn() == column)
+                .forEach(ColumnFilter::selectAllValues);
+    }
+
+    /**
+     * Programmatically unselect all values for the specified TableColumn
+     */
+    public void unSelectAllValues(TableColumn<?,?> column) {
+        columnFilters.stream().filter(c -> c.getTableColumn() == column)
+                .forEach(ColumnFilter::unSelectAllValues);
+    }
+    public void executeFilter() {
+        if (columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent()) {
+            filteredList.setPredicate(item -> !columnFilters.stream()
+                    .filter(cf -> !cf.evaluate(item))
+                    .findAny().isPresent());
+        }
+        else {
+            resetFilter();
+        }
+    }
+    public void resetFilter() {
+        filteredList.setPredicate(item -> true);
     }
     /** 
      * @treatAsPrivate
@@ -113,15 +179,47 @@ public final class TableFilter<T> {
     /** 
      * @treatAsPrivate
      */
-    public ObservableList<ColumnFilter<T>> getColumnFilters() { 
+    public ObservableList<ColumnFilter<T,?>> getColumnFilters() {
         return columnFilters;
     }
     /** 
      * @treatAsPrivate
      */
-    public Optional<ColumnFilter<T>> getColumnFilter(TableColumn<T,?> tableColumn) { 
+    public Optional<ColumnFilter<T,?>> getColumnFilter(TableColumn<T,?> tableColumn) {
         return columnFilters.stream().filter(f -> f.getTableColumn().equals(tableColumn)).findAny();
     }
-    
+    public boolean isDirty() {
+        return columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent();
+    }
+
+    /**
+     * Returns a TableFilter.Builder to configure a TableFilter on the specified TableView. Call apply() to initialize and return the TableFilter
+     * @param tableView
+     * @param <T>
+     */
+    public static <T> Builder<T> forTableView(TableView<T> tableView) {
+        return new Builder<T>(tableView);
+    }
+
+    /**
+     * A Builder for a TableFilter against a specified TableView
+     * @param <T>
+     */
+    public static final class Builder<T> {
+
+        private final TableView<T> tableView;
+        private volatile boolean lazyInd = false;
+
+        private Builder(TableView<T> tableView) {
+            this.tableView = tableView;
+        }
+        public Builder<T> lazy(boolean isLazy) {
+            this.lazyInd = isLazy;
+            return this;
+        }
+        public TableFilter<T> apply() {
+            return new TableFilter<>(tableView, lazyInd);
+        }
+    }
     
 }

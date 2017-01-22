@@ -26,13 +26,6 @@
  */
 package org.controlsfx.samples.actions;
 
-import static org.controlsfx.control.action.ActionMap.action;
-import static org.controlsfx.control.action.ActionMap.actions;
-import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -48,15 +41,18 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.control.action.ActionGroup;
-import org.controlsfx.control.action.ActionMap;
-import org.controlsfx.control.action.ActionProxy;
-import org.controlsfx.control.action.ActionUtils;
+import org.controlsfx.control.action.*;
 import org.controlsfx.control.action.ActionUtils.ActionTextBehavior;
 import org.controlsfx.samples.Utils;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import static org.controlsfx.control.action.ActionMap.action;
+import static org.controlsfx.control.action.ActionMap.actions;
+import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
+import static org.controlsfx.control.action.ActionUtils.ACTION_SPAN;
 
 public class HelloActionProxy extends ControlsFXSample {
     
@@ -70,7 +66,8 @@ public class HelloActionProxy extends ControlsFXSample {
 		actions = Arrays.asList(
 	        new ActionGroup("Group 1", image, actions("action11","action12") ),
 			new ActionGroup("Group 2", image, actions("action21","---","action22", "action221","action222","action23") ),
-			ACTION_SEPARATOR,                                    
+            ACTION_SPAN,
+            ACTION_SEPARATOR,
 			action("action3"),
 			new ActionGroup("Group 4",  image, actions("action41","action42"))
 		);
@@ -80,7 +77,8 @@ public class HelloActionProxy extends ControlsFXSample {
     private void action11() {
     	 System.out.println( "Action 1.1 is executed");
     }
-    
+
+    @ActionCheck
     @ActionProxy(text="Action 1.2", graphic="http://icons.iconarchive.com/icons/custom-icon-design/mini-3/16/teacher-male-icon.png") 
     private void action12() {
     	 System.out.println( "Action 1.2 is executed");
@@ -110,7 +108,8 @@ public class HelloActionProxy extends ControlsFXSample {
     private void action23() {
     	 System.out.println( "Action 2.3 is executed");
     }
-    
+
+    @ActionCheck
     @ActionProxy(text="Action 3", graphic="font>FontAwesome|STAR")
     private void action3() {
     	 System.out.println( "Action 3 is executed");

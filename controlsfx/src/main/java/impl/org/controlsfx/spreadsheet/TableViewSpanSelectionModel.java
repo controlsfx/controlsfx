@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -101,19 +101,26 @@ public class TableViewSpanSelectionModel extends
 
     private final EventHandler<ActionEvent> timerEventHandler = (ActionEvent event) -> {
         GridViewSkin skin = (GridViewSkin) getCellsViewSkin();
+        //If my event is not within the grid, it means I have to scroll.
         if (mouseEvent != null && !cellsView.contains(mouseEvent.getX(), mouseEvent.getY())) {
+            //Pick up the current mouse location.
             double sceneX = mouseEvent.getSceneX();
             double sceneY = mouseEvent.getSceneY();
-            double layoutX = cellsView.getLayoutX();
-            double layoutY = cellsView.getLayoutY();
+            //Pick up the Grid top-left location.
+            double layoutX = cellsView.getLocalToSceneTransform().getTx();
+            double layoutY = cellsView.getLocalToSceneTransform().getTy();
+            //Pick up Grid bottom-right location.
             double layoutXMax = layoutX + cellsView.getWidth();
             double layoutYMax = layoutY + cellsView.getHeight();
 
+            //If I go out of bounds, simply scroll.
             if (sceneX > layoutXMax) {
                 skin.getHBar().increment();
             } else if (sceneX < layoutX) {
                 skin.getHBar().decrement();
             }
+            //Note the separate "if" here in order 
+            //to scroll in both direction if necessary
             if (sceneY > layoutYMax) {
                 skin.getVBar().increment();
             } else if (sceneY < layoutY) {

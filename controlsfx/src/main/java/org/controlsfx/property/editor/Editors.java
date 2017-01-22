@@ -178,7 +178,7 @@ public class Editors {
                     @Override protected Font edit(Font font) {
                         FontSelectorDialog dlg = new FontSelectorDialog(font);
                         Optional<Font> optionalFont = dlg.showAndWait();
-                        return optionalFont.get();
+                        return optionalFont.orElse(null);
                     }
                 }) {
 

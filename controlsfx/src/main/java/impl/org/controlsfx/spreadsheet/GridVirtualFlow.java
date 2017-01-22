@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@ import javafx.beans.binding.When;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.IndexedCell;
@@ -43,7 +44,9 @@ import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableRow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.transform.Scale;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -82,6 +85,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      */
     private final ArrayList<T> myFixedCells = new ArrayList<>();
     public final List<Node> sheetChildren;
+    private StackPane corner;
+    private Scale scale;
 
     /***************************************************************************
      * * Constructor * *
@@ -100,9 +105,9 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         widthProperty().addListener(hBarValueChangeListener);
         
         sheetChildren = findSheetChildren();
-        
+        findCorner();
         //When we click outside of the grid, we want to deselect all cells.
-        setOnMouseReleased((MouseEvent event) -> {
+        addEventHandler(MouseEvent.MOUSE_PRESSED, (MouseEvent event) -> {
             if (event.getTarget().getClass() == GridRow.class) {
                 spreadSheetView.getSelectionModel().clearSelection();
             }
@@ -128,8 +133,19 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 getHbar().setUnitIncrement(newValue.doubleValue()/20);
             }
         });
+        scale = new Scale(1 / spv.getZoomFactor(), 1 / spv.getZoomFactor());
+        scale.setPivotX(getHbar().getWidth() / 2);
+        getHbar().getTransforms().add(scale);
+        getVbar().getTransforms().add(scale);
+        corner.getTransforms().add(scale);
 
         this.spreadSheetView = spv;
+        
+        spreadSheetView.zoomFactorProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            scale.setX(1 / newValue.doubleValue());
+            scale.setY(1 / newValue.doubleValue());
+        });
+
        
         //We clip the rectangle selection with a rectangle, inception style.
         Rectangle rec = new Rectangle();
@@ -174,7 +190,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
         layoutTotal();
         layoutFixedRows();
-    }
+                }
 
     @Override
     public double adjustPixels(final double delta) {
@@ -234,6 +250,52 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 getVbar().setVisibleAmount(getCells().size() / (float) getCellCount());
             }
         }
+        /**
+         * If we have modify the Scale, the scrollBars will be smaller or
+         * bigger. But we want to have them the same size as before, so we
+         * reverse the effect of the scale applied, and place the bar to the
+         * proper space.
+         */
+        Pos pos = Pos.TOP_LEFT;
+        double width = getWidth();
+        double height = getHeight();
+        double top = getInsets().getTop();
+        double right = getInsets().getRight();
+        double left = getInsets().getLeft();
+        double bottom = getInsets().getBottom();
+        double scaleX = scale.getX();
+        double shift = 1 - scaleX;
+        double contentWidth = (width / scaleX) - left - right - getVbar().getWidth();
+        double contentHeight = (height / scaleX) - top - bottom - getHbar().getHeight();
+
+        //HBAR
+        /**
+         * Magic numbers coming out of nowhere but I don't understand why
+         * the bar are shifting away when zooming...
+         */
+        layoutInArea(getHbar(), 0 - shift * 10,
+                height - (getHbar().getHeight() * scaleX),
+                contentWidth, contentHeight,
+                0, null,
+                pos.getHpos(),
+                pos.getVpos());
+        //VBAR
+        layoutInArea(getVbar(), width - getVbar().getWidth() + shift,
+                0,
+                contentWidth, contentHeight,
+                0, null,
+                pos.getHpos(),
+                pos.getVpos());
+
+        //CORNER
+        if (corner != null) {
+            layoutInArea(corner, width - getVbar().getWidth() + shift,
+                    getHeight() - (getHbar().getHeight() * scaleX),
+                    corner.getWidth(), corner.getHeight(),
+                    0, null,
+                    pos.getHpos(),
+                    pos.getVpos());
+        }
     }
 
     /**
@@ -258,7 +320,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         }
         
         for (GridRow cell : (List<GridRow>)getCells()) {
-            if (cell != null &&  (!gridViewSkin.hBarValue.get(cell.getIndex()) || gridViewSkin.rowToLayout.get(cell.getIndex()))) {
+            if (cell != null && cell.getIndex() >= 0 && (!gridViewSkin.hBarValue.get(cell.getIndex()) || gridViewSkin.rowToLayout.get(cell.getIndex()))) {
                 cell.requestLayout();
             }
         }
@@ -299,6 +361,20 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             }
         }
         return new ArrayList<>();
+    }
+    
+    /**
+     * WARNING : This is bad but no other options right now. This will find the
+     * corner where the two scrollBars are joigning.
+     */
+    private void findCorner() {
+        if (!getChildren().isEmpty()) {
+            for (Node node : getChildren()) {
+                if (node instanceof StackPane) {
+                    corner = (StackPane) node;
+                }
+            }
+        }
     }
     
     /**

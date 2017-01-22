@@ -145,7 +145,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
          */
         double controlHeight = getTableRowHeight(index);
         double customHeight = controlHeight == Grid.AUTOFIT ? GridViewSkin.DEFAULT_CELL_HEIGHT : controlHeight;
-        
+
         final GridViewSkin skin = handle.getCellsViewSkin();
         skin.hBarValue.set(index, true);
 
@@ -165,10 +165,13 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         putCellsInCache();
 
         boolean firstVisibleCell = false;
+        CellView lastCell = null;
+        boolean needToBeShifted;
+        boolean rowHeightChange = false;
         for (int indexColumn = 0; indexColumn < columns.size(); indexColumn++) {
 
             width = snapSize(columns.get(indexColumn).getWidth()) - snapSize(horizontalPadding);
-            
+
             final SpreadsheetCell spreadsheetCell = row.get(indexColumn);
             boolean isVisible = !isInvisible(x, width, hbarValue, headerWidth, spreadsheetCell.getColumnSpan());
 
@@ -238,14 +241,14 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
 //                        final TableViewSpanSelectionModel sm = (TableViewSpanSelectionModel) handle.getGridView().getSelectionModel();
 //                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tableViewColumns.get(indexColumn);
 
-                        /**
-                         * In case this cell was selected before but we scroll
-                         * up/down and it's invisible now. It has to pass his
+                    /**
+                     * In case this cell was selected before but we scroll
+                     * up/down and it's invisible now. It has to pass his
                          * "selected property" to the new Cell in charge of
                          * spanning
-                         */
+                     */
 //                        final TablePosition<ObservableList<SpreadsheetCell>, ?> selectedPosition = sm.isSelectedRange(index, col, indexColumn);
-                        // If the selected cell is in the same row, no need to re-select it
+                    // If the selected cell is in the same row, no need to re-select it
 //                        if (selectedPosition != null
 //                                //When shift selecting, all cells become ROW_VISIBLE so
 //                                //We avoid loop selecting here
@@ -271,7 +274,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                         if (tableCell.getParent() == null) {
                             getChildren().add(0, tableCell);
                         }
-                        }
+                }
 
                 if (spreadsheetCell.getColumnSpan() > 1) {
                     /**
@@ -301,6 +304,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                 if (controlHeight == Grid.AUTOFIT && !tableCell.isEditing()) {
                     double tempHeight = tableCell.prefHeight(width);
                     if (tempHeight > customHeight) {
+                        rowHeightChange = true;
                         skin.rowHeightMap.put(index, tempHeight);
                         for (CellView cell : cells) {
                             /**
@@ -316,7 +320,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                         skin.getFlow().layoutChildren();
                     }
                 }
-                
+
                 height = customHeight;
                 height = snapSize(height) - snapSize(verticalPadding);
                 /**
@@ -332,13 +336,8 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                     }
                 }
 
-                //Fix for JDK-8146406
-                if (spreadsheetView.getFixedRows().contains(index)) {
-                    tableCell.resize(width + 1, height);
-                } else {
-                    tableCell.resize(width, height);
-                }
-
+                tableCell.resize(width, height);
+                lastCell = tableCell;
                 // We want to place the layout always at the starting cell.
                 double spaceBetweenTopAndMe = 0;
                 for (int p = spreadsheetCell.getRow(); p < index; ++p) {
@@ -358,8 +357,16 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         skin.fixedColumnWidth = fixedColumnWidth;
         handleFixedCell(fixedCells, index);
         removeUselessCell(index);
-        if(handle.getCellsViewSkin().lastRowLayout.get() == true){
+        if (handle.getCellsViewSkin().lastRowLayout.get() == true) {
             handle.getCellsViewSkin().lastRowLayout.setValue(false);
+        }
+        /**
+         * If we modified an height here, ROW_HEIGHT_CHANGE will not be
+         * triggered, because it's not the user who has modified that. So the
+         * rectangle will not update, we need to force it here.
+         */
+        if (rowHeightChange && spreadsheetView.getFixedRows().contains(index)) {
+            skin.computeFixedRowHeight();
         }
     }
 
@@ -375,9 +382,9 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
      */
     private void removeUselessCell(int index) {
         getChildren().removeIf((Node t) -> {
-            if(t instanceof CellView){
-                return !cells.contains(t) && ((CellView)t).getIndex() == index;
-                }
+            if (t instanceof CellView) {
+                return !cells.contains(t) && ((CellView) t).getIndex() == index;
+            }
             return false;
         });
     }
@@ -389,10 +396,10 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
      * @param index
      */
     private void handleFixedCell(List<CellView> fixedCells, int index) {
-        if(fixedCells.isEmpty()){
+        if (fixedCells.isEmpty()) {
             return;
         }
-        
+
         /**
          * If we have a fixedCell (in column) and that cell may be recovered by
          * a rowSpan, we want to put that tableCell ahead in term of z-order. So

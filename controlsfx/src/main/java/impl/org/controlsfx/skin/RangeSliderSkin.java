@@ -30,6 +30,9 @@ import static impl.org.controlsfx.behavior.RangeSliderBehavior.FocusedChild.HIGH
 import static impl.org.controlsfx.behavior.RangeSliderBehavior.FocusedChild.LOW_THUMB;
 import static impl.org.controlsfx.behavior.RangeSliderBehavior.FocusedChild.NONE;
 import static impl.org.controlsfx.behavior.RangeSliderBehavior.FocusedChild.RANGE_BAR;
+
+import java.util.List;
+
 import impl.org.controlsfx.behavior.RangeSliderBehavior;
 import impl.org.controlsfx.behavior.RangeSliderBehavior.FocusedChild;
 import javafx.beans.binding.ObjectBinding;
@@ -40,6 +43,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Side;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.SkinBase;
 import javafx.scene.input.KeyCode;
@@ -50,8 +54,10 @@ import javafx.util.Callback;
 
 import org.controlsfx.control.RangeSlider;
 
+import com.sun.javafx.scene.traversal.Algorithm;
 import com.sun.javafx.scene.traversal.Direction;
 import com.sun.javafx.scene.traversal.ParentTraversalEngine;
+import com.sun.javafx.scene.traversal.TraversalContext;
 
 public class RangeSliderSkin extends SkinBase<RangeSlider> {
         
@@ -170,12 +176,100 @@ public class RangeSliderSkin extends SkinBase<RangeSlider> {
         });
 
         EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
+            /** The algorithm to be passed to
+             * {@link ParentTraversalEngine}{@code 's} constructor. */
+            private final Algorithm algorithm = new Algorithm() {
+                
+                @Override
+                public Node selectLast(final TraversalContext context) {
+                    final List<Node> focusTraversableNodes =
+                            context.getAllTargetNodes();
+                    
+                    return focusTraversableNodes.get(
+                            focusTraversableNodes.size() - 1);
+                }
+                
+                
+                /**
+                 * Method is not used in current implementation. But in case of
+                 * using may return RangeSlider object itself instead of
+                 * {@link #lowThumb}, if RangeSlider is the first
+                 * focus traversable Node on the root pane.
+                 */
+                @Override
+                public Node selectFirst(final TraversalContext context) {
+                    return context.getAllTargetNodes().get(0);
+                }
+                
+                
+                /**
+                 * In case of passing {@link Direction#LEFT},
+                 * {@link Direction#PREVIOUS} or {@link Direction#UP} returns
+                 * Node <u>before</u> previous.
+                 * This method is called when pressing Shift + Tab on
+                 * the focused {@link #lowThumb}. The Node before 'lowThumb' is
+                 * RangeSlider object itself, so visually focus is lost and
+                 * focus traversing becomes distrupted.
+                 */
+                @Override
+                public Node select(
+                        final Node owner,
+                        final Direction dir,
+                        final TraversalContext context) {
+                    /* Determines focus moving direction to next
+                     * focus traversable node */
+                    final int direction;
+                    
+                    switch (dir)
+                    {
+                    case DOWN:
+                    case RIGHT:
+                    case NEXT:
+                    case NEXT_IN_LINE:
+                        direction = 1;
+                        
+                        break;
+                        
+                        
+                    case LEFT:
+                    case PREVIOUS:
+                    case UP:
+                        direction = -2;
+                        
+                        break;
+                        
+                        
+                    default:
+                        throw new EnumConstantNotPresentException(
+                                dir.getClass(), dir.name());
+                    }
+                    
+                    final List<Node> focusTraversableNodes =
+                            context.getAllTargetNodes();
+                    final int focusReceiverIndex =
+                            focusTraversableNodes.indexOf(owner) + direction;
+                    
+                    if (focusReceiverIndex < 0) {
+                        return focusTraversableNodes.get(
+                                focusTraversableNodes.size() - 1);
+                    }
+                    if (focusReceiverIndex == focusTraversableNodes.size()) {
+                        return focusTraversableNodes.get(0);
+                    }
+                    
+                    return focusTraversableNodes.get(focusReceiverIndex);
+                }
+            };
+            
             @Override public void handle(KeyEvent event) {
                 if (KeyCode.TAB.equals(event.getCode())) {
                     if (lowThumb.isFocused()) {
                         if (event.isShiftDown()) {
                             lowThumb.setFocus(false);
-                            new ParentTraversalEngine(rangeSlider).select(rangeSlider, Direction.PREVIOUS);
+                            new ParentTraversalEngine(
+                                    rangeSlider.getScene().getRoot(), algorithm)
+                            .select(lowThumb, Direction.PREVIOUS)
+                            .requestFocus();
                         } else {
                             lowThumb.setFocus(false);
                             highThumb.setFocus(true);
@@ -187,7 +281,10 @@ public class RangeSliderSkin extends SkinBase<RangeSlider> {
                             lowThumb.setFocus(true);
                         } else {
                             highThumb.setFocus(false);
-                            new ParentTraversalEngine(rangeSlider).select(rangeSlider, Direction.NEXT);
+                            new ParentTraversalEngine(
+                                    rangeSlider.getScene().getRoot(), algorithm)
+                            .select(highThumb, Direction.NEXT)
+                            .requestFocus();
                         }
                         event.consume();
                     }
@@ -332,6 +429,14 @@ public class RangeSliderSkin extends SkinBase<RangeSlider> {
         getChildren().add(rangeBar);
     }
 
+    /**
+     * When ticks or labels are changing of visibility, we compute the new
+     * visibility and add the necessary objets. After this method, we must be
+     * sure to add the high Thumb and the rangeBar.
+     *
+     * @param ticksVisible
+     * @param labelsVisible
+     */
     private void setShowTickMarks(boolean ticksVisible, boolean labelsVisible) {
         showTickMarks = (ticksVisible || labelsVisible);
         RangeSlider rangeSlider = getSkinnable();

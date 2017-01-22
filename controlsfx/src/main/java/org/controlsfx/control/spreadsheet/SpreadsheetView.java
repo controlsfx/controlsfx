@@ -36,6 +36,9 @@ import impl.org.controlsfx.spreadsheet.RectangleSelection.SelectionRange;
 import impl.org.controlsfx.spreadsheet.SpreadsheetGridView;
 import impl.org.controlsfx.spreadsheet.SpreadsheetHandle;
 import impl.org.controlsfx.spreadsheet.TableViewSpanSelectionModel;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.IdentityHashMap;
@@ -49,6 +52,7 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -67,6 +71,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.event.WeakEventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
@@ -87,6 +92,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.transform.Scale;
 import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import org.controlsfx.tools.Utils;
@@ -316,6 +323,12 @@ public class SpreadsheetView extends Control{
      * The vertical header width, just for the Label, not the Pickers.
      */
     private final DoubleProperty rowHeaderWidth = new SimpleDoubleProperty(DEFAULT_ROW_HEADER_WIDTH);
+    
+    //Zoom for the SpreadsheetView.
+    private DoubleProperty zoomFactor = new SimpleDoubleProperty(1);
+    private static final double MIN_ZOOM = 0.25;
+    private static final double MAX_ZOOM = 2;
+    private static final double STEP_ZOOM = 0.15;
 
     /**
      * Since the default with applied to TableColumn is 80. If a user sets a
@@ -419,6 +432,7 @@ public class SpreadsheetView extends Control{
             public void dispose() {
                 // no-op
             }
+            
         });
 
         this.cellsView = new SpreadsheetGridView(handle);
@@ -463,11 +477,99 @@ public class SpreadsheetView extends Control{
         // Listeners & handlers
         fixedRows.addListener(fixedRowsListener);
         fixedColumns.addListener(fixedColumnsListener);
+        Scale scale = new Scale(1, 1);
+            getTransforms().add(scale);
+
+            zoomFactor.addListener(new ChangeListener<Number>() {
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    scale.setX(newValue.doubleValue());
+                    scale.setY(newValue.doubleValue());
+                    requestLayout();
+                }
+            });
+        //Zoom
+        addEventFilter(ScrollEvent.ANY, (ScrollEvent event) -> {
+            if (event.isShortcutDown()) {
+                if (event.getTextDeltaY() > 0) {
+                    incrementZoom();
+                } else {
+                    decrementZoom();
+                }
+                event.consume();
+            }
+        });
     }
     /***************************************************************************
      * * Public Methods * *
      **************************************************************************/
+    @Override
+    protected void layoutChildren() {
+        super.layoutChildren();
+        Pos pos = Pos.TOP_LEFT;
+        double width = getWidth();
+        double height = getHeight();
+        double top = getInsets().getTop();
+        double right = getInsets().getRight();
+        double left = getInsets().getLeft();
+        double bottom = getInsets().getBottom();
+        double contentWidth = (width - left - right) / zoomFactor.get();
+        double contentHeight = (height - top - bottom) / zoomFactor.get();
+        layoutInArea(getChildren().get(0), left, top,
+                contentWidth, contentHeight,
+                0, null,
+                pos.getHpos(),
+                pos.getVpos());
+    }
 
+    /**
+     * Return the zoomFactor used for the SpreadsheetView.
+     * @return 
+     */
+    public final Double getZoomFactor() {
+        return zoomFactor.get();
+    }
+
+    /**
+     * Set a new zoomFactor for the SpreadsheetView. 
+     * Advice is not to go beyond 3 and below 0.25.
+     * @param zoomFactor 
+     */
+    public final void setZoomFactor(Double zoomFactor) {
+        this.zoomFactor.set(zoomFactor);
+    }
+
+    /**
+     * Return the zoomFactor used for the SpreadsheetView.
+     * @return 
+     */
+    public final DoubleProperty zoomFactorProperty() {
+        return zoomFactor;
+    }
+
+    /**
+     * Increment the level of zoom by 0.15. The base is 1 so we will try to stay
+     * of the intervals (0.1-0.25-0.4-0.55-0.7-0.85-1 etc).
+     *
+     */
+    public void incrementZoom() {
+        double newZoom = getZoomFactor();
+        int prevValue = (int) ((newZoom - MIN_ZOOM) / STEP_ZOOM);
+        newZoom = (prevValue + 1) * STEP_ZOOM + MIN_ZOOM;
+        setZoomFactor(newZoom > MAX_ZOOM ? MAX_ZOOM : newZoom);
+    }
+
+    /**
+     * Decrement the level of zoom by 0.15. It will block at 0.25.The base is 1
+     * so we will try to stay of the intervals (0.1-0.25-0.4-0.55-0.7-0.85-1
+     * etc).
+     */
+    public void decrementZoom() {
+        double newZoom = getZoomFactor()- 0.01;
+        int prevValue = (int) ((newZoom - MIN_ZOOM) / STEP_ZOOM);
+        newZoom = (prevValue) * STEP_ZOOM + MIN_ZOOM;
+        setZoomFactor(newZoom < MIN_ZOOM ? MIN_ZOOM : newZoom);
+    }
+    
     /**
      * Set a new Grid for the SpreadsheetView. This will be called by default by
      * {@link #SpreadsheetView(Grid)}. So this is useful when you want to
@@ -964,8 +1066,10 @@ public class SpreadsheetView extends Control{
      * a height where each content of each cell could be fully visible.\n
      * Use this method wisely because it can degrade performance on great grid.
      */
-    public void resizeRowsToFitContent(){
-        getCellsViewSkin().resizeRowsToFitContent();
+    public void resizeRowsToFitContent() {
+        if (getCellsViewSkin() != null) {
+            getCellsViewSkin().resizeRowsToFitContent();
+        }
     }
     
     /**
@@ -975,15 +1079,19 @@ public class SpreadsheetView extends Control{
      * your performance on great grid.
      */
     public void resizeRowsToMaximum(){
-        getCellsViewSkin().resizeRowsToMaximum();
+        if (getCellsViewSkin() != null) {
+            getCellsViewSkin().resizeRowsToMaximum();
+        }
     }
     
     /**
      * This method will wipe all changes made to the row's height and set all row's
      * height back to their default height defined in the model Grid.
      */
-    public void resizeRowsToDefault(){
-        getCellsViewSkin().resizeRowsToDefault();
+    public void resizeRowsToDefault() {
+        if (getCellsViewSkin() != null) {
+            getCellsViewSkin().resizeRowsToDefault();
+        }
     }
     
     /**
@@ -1037,9 +1145,17 @@ public class SpreadsheetView extends Control{
      * @param value
      */
     public void setHBarValue(double value) {
+        setHBarValue(value,0);
+    }
+    
+    private void setHBarValue(double value, int attempt) {
+        if(attempt > 10){
+            return;
+        }
         if (getCellsViewSkin() == null) {
+            final int newAttempt = ++attempt;
             Platform.runLater(() -> {
-                setHBarValue(value);
+                setHBarValue(value, newAttempt);
             });
             return;
         }
@@ -1053,7 +1169,10 @@ public class SpreadsheetView extends Control{
      * @return
      */
     public double getVBarValue() {
-        return getCellsViewSkin().getVBar().getValue();
+        if (getCellsViewSkin() != null && getCellsViewSkin().getVBar() != null) {
+            return getCellsViewSkin().getVBar().getValue();
+        }
+        return 0.0;
     }
 
     /**
@@ -1063,7 +1182,10 @@ public class SpreadsheetView extends Control{
      * @return
      */
     public double getHBarValue() {
-        return getCellsViewSkin().getHBar().getValue();
+        if (getCellsViewSkin() != null && getCellsViewSkin().getHBar() != null) {
+            return getCellsViewSkin().getHBar().getValue();
+        }
+        return 0.0;
     }
     
     /**
@@ -1138,6 +1260,31 @@ public class SpreadsheetView extends Control{
         return cellsView.editableProperty();
     }
 
+    /**
+     * This Node is shown to the user when the SpreadsheetView has no content to show.
+     */
+    public final ObjectProperty<Node> placeholderProperty() {
+        return cellsView.placeholderProperty();
+    }
+
+    /**
+     * Sets the value of the placeholder property
+     *
+     * @param placeholder the node to show when the SpreadsheetView has no content to show.
+     */
+    public final void setPlaceholder(final Node placeholder) {
+        cellsView.setPlaceholder(placeholder);
+    }
+
+    /**
+     * Gets the value of the placeholder property.
+     *
+     * @return the Node used as a placeholder that is shown when the SpreadsheetView has no content to show.
+     */
+    public final Node getPlaceholder() {
+        return cellsView.getPlaceholder();
+    }
+
     
     /***************************************************************************
      * COPY / PASTE METHODS
@@ -1163,11 +1310,15 @@ public class SpreadsheetView extends Control{
              */
             for (int row = 0; row < cell.getRowSpan(); ++row) {
                 for (int col = 0; col < cell.getColumnSpan(); ++col) {
-                    list.add(new GridChange(cell.getRow() + row, cell.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem().toString()));
+                    try {
+                        new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(cell.getItem());
+                        list.add(new GridChange(cell.getRow() + row, cell.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem()));
+                    } catch (IOException exception) {
+                        list.add(new GridChange(cell.getRow() + row, cell.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem().toString()));
+                    }
                 }
             }
         }
-
         final ClipboardContent content = new ClipboardContent();
         content.put(fmt, list);
         Clipboard.getSystemClipboard().setContent(content);
@@ -1390,7 +1541,7 @@ public class SpreadsheetView extends Control{
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
                 SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
                 cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_LEFT);
-            }
+                }
         });
         final MenuItem topRightItem = new MenuItem(localize(asKey("spreadsheet.view.menu.comment.top-right"))); //$NON-NLS-1$
         topRightItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -1740,7 +1891,9 @@ public class SpreadsheetView extends Control{
             }
             getCellsViewSkin().scrollHorizontally();
             // Go to next cell
-        } else if (getEditingCell() == null && KeyCode.TAB.equals(keyEvent.getCode())) {
+        } else if (getEditingCell() == null 
+                && KeyCode.TAB.equals(keyEvent.getCode()) 
+                && !keyEvent.isShortcutDown()) {
             if (position != null) {
                 if (keyEvent.isShiftDown()) {
                     getSelectionModel().clearAndSelectLeftCell();
@@ -1754,17 +1907,17 @@ public class SpreadsheetView extends Control{
             // We want to erase values when delete key is pressed.
         } else if (KeyCode.DELETE.equals(keyEvent.getCode())) {
             deleteSelectedCells();
-            /**
-             * We want NOT to go in edition if we're pressing SHIFT and if we're
-             * using the navigation keys. But we still want the user to go in
-             * edition with SHIFT and some letters for example if he wants a
-             * capital letter.
-             * FIXME Add a test to prevent the Shift fail case.
-             */
-        }else if (keyEvent.getCode() != KeyCode.SHIFT && !keyEvent.isShortcutDown() 
-                && !keyEvent.getCode().isNavigationKey() 
-                && keyEvent.getCode() != KeyCode.ESCAPE) {
+            //Go in edition if we're typing a letter or a digit simply..
+        }else if (!keyEvent.isControlDown() && 
+                (keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey())) {
             getCellsView().edit(position.getRow(), position.getTableColumn());
+        }else if(keyEvent.isShortcutDown() && KeyCode.NUMPAD0.equals(keyEvent.getCode())){
+            //Reset zoom to zero.
+            setZoomFactor(1.0);
+        }else if(keyEvent.isShortcutDown() && KeyCode.ADD.equals(keyEvent.getCode())){
+            incrementZoom();
+        }else if(keyEvent.isShortcutDown() && KeyCode.SUBTRACT.equals(keyEvent.getCode())){
+            decrementZoom();
         }
     };
     

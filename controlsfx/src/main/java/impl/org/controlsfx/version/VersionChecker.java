@@ -75,10 +75,10 @@ public class VersionChecker {
             return;
         }
         
-        String[] splitSpecVersion = controlsFXSpecVersion.split("\\."); //$NON-NLS-1$
+        Comparable[] splitSpecVersion = toComparable(controlsFXSpecVersion.split("\\.")); //$NON-NLS-1$
         
         // javaFXVersion may contain '-' like 8.0.20-ea so replace them with '.' before splitting.
-        String[] splitJavaVersion = javaFXVersion.replace('-', '.').split("\\."); //$NON-NLS-1$
+        Comparable[] splitJavaVersion = toComparable(javaFXVersion.replace('-', '.').split("\\.")); //$NON-NLS-1$
 
         boolean notSupportedVersion = false;
 
@@ -96,6 +96,20 @@ public class VersionChecker {
             throw new RuntimeException("ControlsFX Error: ControlsFX " + //$NON-NLS-1$
                 controlsFXImpVersion + " requires at least " + controlsFXSpecTitle); //$NON-NLS-1$
         }
+    }
+
+    private static Comparable<Comparable>[] toComparable(String[] tokens) {
+        Comparable[] ret= new Comparable[tokens.length];
+        for (int i = 0; i<tokens.length; i++) {
+            String token = tokens[i];
+            try {
+                ret[i] = new Integer(token);
+            }
+            catch (NumberFormatException e) {
+                ret[i] = token;
+            }
+        }
+        return ret;
     }
 
     private static String getControlsFXSpecificationTitle() {

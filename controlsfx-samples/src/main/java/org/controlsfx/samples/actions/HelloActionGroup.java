@@ -26,11 +26,6 @@
  */
 package org.controlsfx.samples.actions;
 
-import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -46,13 +41,19 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionCheck;
 import org.controlsfx.control.action.ActionGroup;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.action.ActionUtils.ActionTextBehavior;
 import org.controlsfx.samples.Utils;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
+import static org.controlsfx.control.action.ActionUtils.ACTION_SPAN;
 
 public class HelloActionGroup extends ControlsFXSample {
     
@@ -60,19 +61,20 @@ public class HelloActionGroup extends ControlsFXSample {
     
     private Collection<? extends Action> actions = Arrays.asList(
         new ActionGroup("Group 1", image, new DummyAction("Action 1.1", image), 
-                                          new DummyAction("Action 1.2") ),
+                                          new CheckDummyAction("Action 1.2") ),
         new ActionGroup("Group 2", image, new DummyAction("Action 2.1"), 
                                           ACTION_SEPARATOR,
                                           new ActionGroup("Action 2.2", new DummyAction("Action 2.2.1"), 
-                                                                        new DummyAction("Action 2.2.2")),
+                                                                        new CheckDummyAction("Action 2.2.2")),
                                           new DummyAction("Action 2.3") ),
-        ACTION_SEPARATOR,                                    
-        new DummyAction("Action 3", image),
+        ACTION_SPAN,
+        ACTION_SEPARATOR,
+        new CheckDummyAction("Action 3", image),
         new ActionGroup("Group 4",  image, new DummyAction("Action 4.1", image), 
-                                           new DummyAction("Action 4.2"))
+                                           new CheckDummyAction("Action 4.2"))
     );
     
-    static class DummyAction extends Action {
+    private static class DummyAction extends Action {
         public DummyAction(String name, Node image) {
             super(name);
             setGraphic(image);
@@ -80,6 +82,23 @@ public class HelloActionGroup extends ControlsFXSample {
         }
         
         public DummyAction( String name ) {
+            super(name);
+        }
+
+        @Override public String toString() {
+            return getText();
+        }
+    }
+
+    @ActionCheck
+    private static class CheckDummyAction extends Action {
+        public CheckDummyAction(String name, Node image) {
+            super(name);
+            setGraphic(image);
+            setEventHandler(ae -> String.format("Action '%s' is executed", getText()) );
+        }
+
+        public CheckDummyAction( String name ) {
             super(name);
         }
 

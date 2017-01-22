@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -113,9 +113,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         // will be fired
         this.addEventHandler(MouseEvent.DRAG_DETECTED, new WeakEventHandler<>(startFullDragEventHandler));
         setOnMouseDragEntered(new WeakEventHandler<>(dragMouseEventHandler));
-        
+
         itemProperty().addListener(itemChangeListener);
-            }
+    }
 
     /***************************************************************************
      * * Public Methods * *
@@ -204,6 +204,11 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setContentDisplay(ContentDisplay.LEFT);
         updateItem(getItem(), false);
 
+        //We release the editor if it has not been done.
+        GridCellEditor editor = handle.getCellsViewSkin().getSpreadsheetCellEditorImpl();
+        if (editor.isEditing()) {
+            editor.endEdit(false);
+        }
         if (getTableView() != null) {
             getTableView().requestFocus();
         }
@@ -405,24 +410,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     }
 
-//    private final ChangeListener<Number> firstRowLayoutXListener = new ChangeListener<Number>() {
-//        @Override
-//        public void changed(ObservableValue<? extends Number> ov, Number oldLayoutX, Number newLayoutX) {
-//            if (getItem() != null && getItem().getGraphic() != null && newLayoutX.doubleValue() < 0 && oldLayoutX != null) {
-//                getItem().getGraphic().setLayoutX(oldLayoutX.doubleValue());
-//            }
-//        }
-//    };
-//    
-//    private final ChangeListener<Number> firstRowLayoutYListener = new ChangeListener<Number>() {
-//        @Override
-//        public void changed(ObservableValue<? extends Number> ov, Number oldLayoutY, Number newLayoutY) {
-//            if (getItem() != null && getItem().getGraphic() != null && newLayoutY.doubleValue() < 0 && oldLayoutY != null) {
-//                getItem().getGraphic().setLayoutY(oldLayoutY.doubleValue());
-//            }
-//        }
-//    };
-    
     /**
      * Return an instance of Editor specific to the Cell type We are not using
      * the build-in editor-Cell because we cannot know in advance which editor

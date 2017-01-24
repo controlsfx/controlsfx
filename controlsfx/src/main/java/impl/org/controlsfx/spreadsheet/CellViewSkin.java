@@ -108,8 +108,8 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         }
         return super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
     }
-    
-     @Override
+
+    @Override
     protected void layoutChildren(double x, final double y, final double w, final double h) {
         super.layoutChildren(x, y, w, h);
         if (getSkinnable().getItem() != null) {
@@ -132,12 +132,20 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
     private void handleFilter(double x, final double y, final double w, final double h) {
         Filter filter = ((CellView) getSkinnable()).getFilter();
         if (filter != null) {
+            //We first remove it.
+            removeMenuButton();
             filterButton = filter.getMenuButton();
             if (!getChildren().contains(filterButton)) {
                 getChildren().add(filterButton);
             }
             layoutInArea(filterButton, x, y, w, h, 0, HPos.RIGHT, VPos.BOTTOM);
         } else if (filterButton != null) {
+            removeMenuButton();
+        }
+    }
+
+    private void removeMenuButton() {
+        if (filterButton != null && getChildren().contains(filterButton)) {
             getChildren().remove(filterButton);
             filterButton = null;
         }

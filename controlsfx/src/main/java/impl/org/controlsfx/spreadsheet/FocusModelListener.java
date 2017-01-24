@@ -107,7 +107,7 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
                     // go left
 
                     Platform.runLater(() -> {
-                        tfm.focus(newPosition.getRow(), cellsView.getColumns().get(newPosition.getColumn() - 1));
+                        tfm.focus(newPosition.getRow(), cellsView.getVisibleLeafColumn(newPosition.getColumn() - 1));
                     });
                 }
             default:

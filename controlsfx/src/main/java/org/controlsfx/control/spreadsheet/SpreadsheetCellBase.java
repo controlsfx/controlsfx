@@ -366,6 +366,8 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     @Override
     public void setHasPopup(boolean value){
         setMask(value, POPUP_BIT_POSITION);
+        //We want to refresh the cell.
+        Event.fireEvent(this, new Event(CORNER_EVENT_TYPE));
     }
     
     /** {@inheritDoc} */

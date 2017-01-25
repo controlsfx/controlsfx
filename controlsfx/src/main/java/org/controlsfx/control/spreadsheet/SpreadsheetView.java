@@ -971,7 +971,7 @@ public class SpreadsheetView extends Control{
         int rowSpan = 0;
         do {
             ++rowSpan;
-        } while (++index < sortedList.size()
+        } while (++index < sortedList.size() && cell.getColumn() < getGrid().getColumnCount()
                 && sortedList.get(index).get(cell.getColumn()) == cell);
 
         return rowSpan;

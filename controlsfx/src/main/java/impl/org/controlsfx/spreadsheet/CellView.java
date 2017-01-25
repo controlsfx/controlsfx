@@ -62,7 +62,6 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
 import javafx.util.Duration;
 import org.controlsfx.control.spreadsheet.Filter;
-import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
@@ -129,16 +128,15 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      **************************************************************************/
     @Override
     public void startEdit() {
-        if (!isEditable()) {
-            getTableView().edit(-1, null);
-            return;
-        } 
         /**
          * If this CellView has no parent, this means that it was stacked into
          * the cellsMap of the GridRowSkin, but the weakRef was dropped. So this
          * CellView is still reacting to events, but it's not part of the
          * sceneGraph! So we must deactivate this cell and let the real Cell in
          * the sceneGraph take the edition.
+         *
+         * This MUST be the first action because if this cell is not part of the
+         * scene, we MUST NOT consider it at all.
          */
         if(getParent() == null){
             updateTableView(null);
@@ -146,11 +144,16 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             updateTableColumn(null);
             return;
         }
+        
+        if (!isEditable()) {
+            getTableView().edit(-1, null);
+            return;
+        } 
+        
         final int column = this.getTableView().getColumns().indexOf(this.getTableColumn());
         final int row = getIndex();
         // We start to edit only if the Cell is a normal Cell (aka visible).
         final SpreadsheetView spv = handle.getView();
-        final Grid grid = spv.getGrid();
         final SpreadsheetView.SpanType type = spv.getSpanType(row, column);
         //FIXME with the reverse algorithm in virtualFlow, is this still necessary?
         if (type == SpreadsheetView.SpanType.NORMAL_CELL || type == SpreadsheetView.SpanType.ROW_VISIBLE) {
@@ -322,6 +325,13 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
         setEditable(cell.hasPopup() ? false : cell.isEditable());
         
+        if (cell.hasPopup()) {
+            setOnMouseClicked(weakActionhandler);
+            setCursor(Cursor.HAND);
+        } else {
+            setOnMouseClicked(null);
+            setCursor(Cursor.DEFAULT);
+        }
         if (cell.getCellType().acceptDrop()) {
             setOnDragOver(getDragOverHandler());
             // Dropping over surface
@@ -650,13 +660,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 } else {
                     //We clear the previous style.
                     setStyle(null);
-                }
-                if (newItem.hasPopup()) {
-                    setOnMouseClicked(weakActionhandler);
-                    setCursor(Cursor.HAND);
-                } else {
-                    setOnMouseClicked(null);
-                    setCursor(Cursor.DEFAULT);
                 }
             }
         }

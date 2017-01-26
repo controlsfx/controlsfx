@@ -167,7 +167,7 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
      * 
      **************************************************************************/
     
-    private String buildString() {
+    protected String buildString() {
         final StringBuilder sb = new StringBuilder();
         for (int i = 0, max = selectedItems.size(); i < max; i++) {
             T item = selectedItems.get(i);

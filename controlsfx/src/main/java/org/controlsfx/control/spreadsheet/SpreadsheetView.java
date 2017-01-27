@@ -648,23 +648,9 @@ public class SpreadsheetView extends Control{
     public void setHiddenRows(BitSet hiddenRows) {
         BitSet bitSet = new BitSet(hiddenRows.size());
         bitSet.or(hiddenRows);
-        //We need to update the focused cell afterwards
-        Pair<Integer, Integer> focusedPair = null;
-        TablePosition focusedCell = cellsView.getFocusModel().getFocusedCell();
-        if (focusedCell != null && focusedCell.getRow() != -1 && focusedCell.getColumn() != -1) {
-            focusedPair = new Pair(focusedCell.getRow(), focusedCell.getColumn());
-        }
-        List<Pair<Integer, Integer>> selectedCells = new ArrayList<>();
-        for (TablePosition position : getSelectionModel().getSelectedCells()) {
-            selectedCells.add(new Pair<>(position.getRow(), position.getColumn()));
-        }
+        
         this.hiddenRowsProperty.setValue(bitSet);
 
-        ((TableViewSpanSelectionModel) cellsView.getSelectionModel()).verifySelectedCells(selectedCells);
-        //Just like the selected cell we update the focused cell.
-        if (focusedPair != null && focusedPair.getKey() < getGrid().getRowCount() && focusedPair.getValue() < getGrid().getColumnCount()) {
-            cellsView.getFocusModel().focus(focusedPair.getKey(), cellsView.getColumns().get(focusedPair.getValue()));
-        }
         requestLayout();
     }
 
@@ -678,24 +664,8 @@ public class SpreadsheetView extends Control{
         BitSet bitSet = new BitSet(hiddenColumns.size());
         bitSet.or(hiddenColumns);
 
-        //We need to update the focused cell afterwards
-        Pair<Integer, Integer> focusedPair = null;
-        TablePosition focusedCell = cellsView.getFocusModel().getFocusedCell();
-        if (focusedCell != null && focusedCell.getRow() != -1 && focusedCell.getColumn() != -1) {
-            focusedPair = new Pair(focusedCell.getRow(), focusedCell.getColumn());
-        }
-
-         List<Pair<Integer, Integer>> selectedCells = new ArrayList<>();
-        for (TablePosition position : getSelectionModel().getSelectedCells()) {
-            selectedCells.add(new Pair<>(position.getRow(), position.getColumn()));
-        }
         this.hiddenColumnsProperty.setValue(bitSet);
 
-         ((TableViewSpanSelectionModel) cellsView.getSelectionModel()).verifySelectedCells(selectedCells);
-        //Just like the selected cell we update the focused cell.
-        if (focusedPair != null && focusedPair.getKey() < getGrid().getRowCount() && focusedPair.getValue() < getGrid().getColumnCount()) {
-            cellsView.getFocusModel().focus(focusedPair.getKey(), cellsView.getColumns().get(focusedPair.getValue()));
-        }
         requestLayout();
     }
 

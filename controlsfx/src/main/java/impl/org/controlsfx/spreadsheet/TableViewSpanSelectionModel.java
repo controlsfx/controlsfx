@@ -894,7 +894,8 @@ public class TableViewSpanSelectionModel extends
                     return new TablePosition<>(cellsView, firstRow,
                             cellsView.getVisibleLeafColumn(spreadsheetView.getViewColumn(cell.getColumn())));
                 } else { // If it's not, then it's the firstkey
-                    return new TablePosition<>(cellsView, getNonFixedRow(0).getIndex(),
+                    GridRow gridRow = getNonFixedRow(0);
+                    return new TablePosition<>(cellsView, gridRow == null ? row : gridRow.getIndex(),
                             cellsView.getVisibleLeafColumn(spreadsheetView.getViewColumn(cell.getColumn())));
                 }
         }

@@ -1,18 +1,23 @@
 syntax: glob
-*.class
-*.iml
-.DS_Store
+
+# Gradle
+.gradle/
+build/
+
+# IntelliJ IDEA
+.idea/
+out/
+
+# Netbeans
+.nb-gradle/
 .nb-gradle-properties
-controlsfx/build/*
-controlsfx-samples/build/*
-fxsampler/build/*
-.idea/*
-.gradle/*
-.nb-gradle/*
-bin/*
-doc/*
-.settings/*
-build/*
-lib/*
-controlsfx/classes/*
-gradle.properties
+
+# Eclipse
+.settings/
+bin/
+
+# MacOS
+.DS_Store
+
+# Miscellenous
+classes/

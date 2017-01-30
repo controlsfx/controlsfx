@@ -415,7 +415,7 @@ public class TableViewSpanSelectionModel extends
         clearSelection();
 
         final int itemCount = getItemCount();
-        final int columnSize = getTableView().getColumns().size();
+        final int columnSize = getTableView().getVisibleLeafColumns().size();
         final HashSet<Integer> selectedRows = new HashSet<>();
         final HashSet<Integer> selectedColumns = new HashSet<>();
         TablePosition<ObservableList<SpreadsheetCell>, ?> pos = null;

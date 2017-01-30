@@ -672,7 +672,13 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     private final EventHandler<MouseEvent> actionEventHandler = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent event) {
-            if (getItem() != null && getItem().hasPopup() && MouseButton.PRIMARY.equals(event.getButton())) {
+            /**
+             * If we have some items to show and also we don't have a current
+             * filter on this cell showing. If it is, we must block this Popup,
+             * otherwise we will have two contextMenu overlapping each others.
+             */
+            if (getItem() != null && getItem().hasPopup() && MouseButton.PRIMARY.equals(event.getButton())
+                    && (getFilter() == null || !getFilter().getMenuButton().isShowing())) {
                 ContextMenu menu = new ContextMenu();
                 menu.getItems().setAll(getItem().getPopupItems());
                 menu.show(CellView.this, Side.BOTTOM, 0, 0);

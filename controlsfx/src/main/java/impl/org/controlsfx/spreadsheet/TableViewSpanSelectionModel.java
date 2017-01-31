@@ -433,14 +433,16 @@ public class TableViewSpanSelectionModel extends
             // We store all the selectedColumn and Rows, we will update
             // just once at the end
             final SpreadsheetCell cell = (SpreadsheetCell) column.getCellData(pos.getRow());
-            final int rowSpan = spreadsheetView.getRowSpan(cell, pos.getRow());
-            final int currentRow = pos.getRow();
-            for (int i = pos.getRow(); i < rowSpan + currentRow; ++i) {
-                selectedColumns.add(i);
-                for (int j = spreadsheetView.getViewColumn(cell.getColumn()); j < spreadsheetView.getColumnSpan(cell) + spreadsheetView.getViewColumn(cell.getColumn()); ++j) {
-                    selectedRows.add(j);
-                    pos = new TablePosition<>(getTableView(), i, getTableView().getVisibleLeafColumn(j));
-                    newList.add(pos);
+            if (cell != null) {
+                final int rowSpan = spreadsheetView.getRowSpan(cell, pos.getRow());
+                final int currentRow = pos.getRow();
+                for (int i = pos.getRow(); i < rowSpan + currentRow; ++i) {
+                    selectedColumns.add(i);
+                    for (int j = spreadsheetView.getViewColumn(cell.getColumn()); j < spreadsheetView.getColumnSpan(cell) + spreadsheetView.getViewColumn(cell.getColumn()); ++j) {
+                        selectedRows.add(j);
+                        pos = new TablePosition<>(getTableView(), i, getTableView().getVisibleLeafColumn(j));
+                        newList.add(pos);
+                    }
                 }
             }
         }
@@ -889,7 +891,7 @@ public class TableViewSpanSelectionModel extends
             case ROW_SPAN_INVISIBLE:
             default:
                 final SpreadsheetCell cell = cellsView.getItems().get(row).get(modelColumn);
-                int firstRow = getCellsViewSkin().getFirstRow(cell, row);
+                int firstRow = getCellsViewSkin() == null ? -1 : getCellsViewSkin().getFirstRow(cell, row);
                 if (getCellsViewSkin() == null || (getCellsViewSkin().getCellsSize() != 0 && getNonFixedRow(0).getIndex() <= firstRow)) {
                     return new TablePosition<>(cellsView, firstRow,
                             cellsView.getVisibleLeafColumn(spreadsheetView.getViewColumn(cell.getColumn())));

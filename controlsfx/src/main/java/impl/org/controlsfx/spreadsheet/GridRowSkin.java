@@ -257,26 +257,6 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
 //                        cells.remove(tableCell);
                         continue; // we don't want to fall through
                     case ROW_VISIBLE:
-//                        final TableViewSpanSelectionModel sm = (TableViewSpanSelectionModel) handle.getGridView().getSelectionModel();
-//                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tableViewColumns.get(indexColumn);
-
-                    /**
-                     * In case this cell was selected before but we scroll
-                     * up/down and it's invisible now. It has to pass his
-                         * "selected property" to the new Cell in charge of
-                         * spanning
-                     */
-//                        final TablePosition<ObservableList<SpreadsheetCell>, ?> selectedPosition = sm.isSelectedRange(index, col, indexColumn);
-                    // If the selected cell is in the same row, no need to re-select it
-//                        if (selectedPosition != null
-//                                //When shift selecting, all cells become ROW_VISIBLE so
-//                                //We avoid loop selecting here
-//                                && skin.containsRow(index)
-//                                && selectedPosition.getRow() != index) {
-//                            sm.clearSelection(selectedPosition.getRow(),
-//                                    selectedPosition.getTableColumn());
-//                            sm.select(index, col);
-//                        }
                     case NORMAL_CELL: // fall through and carry on
                         if (tableCell.getIndex() != index) {
                             tableCell.updateIndex(index);
@@ -321,7 +301,8 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                  * next rows needs to know that this row is bigger than usual.
                  */
                 if (controlHeight == Grid.AUTOFIT && !tableCell.isEditing()) {
-                    double tempHeight = tableCell.prefHeight(width);
+                    //We have the problem when we are just one pixel short in height..
+                    double tempHeight = tableCell.prefHeight(width) + tableCell.snappedTopInset();
                     if (tempHeight > customHeight) {
                         rowHeightChange = true;
                         skin.rowHeightMap.put(spreadsheetCell.getRow(), tempHeight);
@@ -348,7 +329,6 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                  * whole value is computed.
                  */
                 int rowSpan = spreadsheetView.getRowSpan(spreadsheetCell, index);
-//                int spvRow = spreadsheetView.getViewRow(spreadsheetCell.getRow());
                 if (rowSpan > 1) {
                     height = 0;
                     final int maxRow = index + rowSpan;

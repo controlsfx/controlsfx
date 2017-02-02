@@ -494,17 +494,32 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         double maxHeight;
         maxHeight = 0;
         getChildren().add(cell);
-
-        for (TableColumn column : getSkinnable().getColumns()) {
+        int columnSize = getSkinnable().getColumns().size();
+        for (int viewColumn = 0; viewColumn < columnSize; ++viewColumn) {
+            TableColumn column = getSkinnable().getColumns().get(viewColumn);
             cell.updateTableColumn(column);
             cell.updateTableView(handle.getGridView());
             cell.updateIndex(modelRow);
+            SpreadsheetCell spc = cell.getItem();
+            double width = column.getWidth();
+            if (spc != null && spc.getColumn() == viewColumn && spc.getColumnSpan() > 1) {
+                /**
+                 * we need to span multiple columns, so we sum up the width of
+                 * the additional columns, adding it to the width variable
+                 */
+                final int max = getSkinnable().getColumns().size() - viewColumn;
+                for (int i = 1, colSpan = spc.getColumnSpan(); i < colSpan && i < max; i++) {
+                    double tempWidth = snapSize(getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
+                    width += tempWidth;
+                }
+            }
 
-            if ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null) {
+            if (spc != null && spc.getColumn() == viewColumn && 
+                    ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null)) {
                 cell.setWrapText(true);
 
                 cell.impl_processCSS(false);
-                maxHeight = Math.max(maxHeight, cell.prefHeight(column.getWidth()));
+                maxHeight = Math.max(maxHeight, cell.prefHeight(width));
             }
         }
         getChildren().remove(cell);

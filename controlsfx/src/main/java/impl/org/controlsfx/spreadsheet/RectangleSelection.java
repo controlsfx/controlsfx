@@ -151,7 +151,7 @@ public class RectangleSelection extends Rectangle {
             return;
         }
         SpreadsheetCell cell = skin.getSkinnable().getItems().get(maxRow).get(skin.spreadsheetView.getModelColumn(maxColumn));
-        handleHorizontalPositioning(minColumn, cell.getColumn() + skin.spreadsheetView.getColumnSpan(cell) -1);
+        handleHorizontalPositioning(minColumn, skin.spreadsheetView.getViewColumn(cell.getColumn()) + skin.spreadsheetView.getColumnSpan(cell) - 1);
 
         //If we are out of sight
         if (getX() + getWidth() < 0) {

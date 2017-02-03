@@ -2463,9 +2463,8 @@ public class SpreadsheetView extends Control{
             // We want to erase values when delete key is pressed.
         } else if (KeyCode.DELETE.equals(keyEvent.getCode())) {
             deleteSelectedCells();
-            //Go in edition if we're typing a letter or a digit simply..
-        }else if (!keyEvent.isControlDown() && 
-                (keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey())) {
+            
+        }else if (isEditionKey(keyEvent)) {
             getCellsView().edit(position.getRow(), position.getTableColumn());
         }else if(keyEvent.isShortcutDown() && (KeyCode.NUMPAD0.equals(keyEvent.getCode())
                 || KeyCode.DIGIT0.equals(keyEvent.getCode()))){
@@ -2477,6 +2476,23 @@ public class SpreadsheetView extends Control{
             decrementZoom();
         }
     };
+    
+    /**
+     * We go in edition if we're typing a letter or a digit simply. Also add the
+     * sign because we can directly modify the number by typing "+1" in a cell.
+     *
+     * @param keyEvent
+     * @return
+     */
+    private boolean isEditionKey(KeyEvent keyEvent){
+        return !keyEvent.isControlDown() && 
+                (keyEvent.getCode().isLetterKey() 
+                || keyEvent.getCode().isDigitKey() 
+                || KeyCode.ADD.equals(keyEvent.getCode())
+                || KeyCode.SUBTRACT.equals(keyEvent.getCode())
+                || KeyCode.DIVIDE.equals(keyEvent.getCode())
+                || KeyCode.MULTIPLY.equals(keyEvent.getCode()));
+    }
     
     /**
      * This event is thrown on the SpreadsheetView when the user resize a row

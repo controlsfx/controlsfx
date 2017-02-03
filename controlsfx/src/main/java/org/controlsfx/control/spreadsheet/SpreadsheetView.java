@@ -784,21 +784,25 @@ public class SpreadsheetView extends Control{
     private void computeColumnMap() {
         final int columnCount = getGrid().getColumnCount();
         columnMap = new HashMap<>(columnCount);
-        int visibleColumn = 0;
+
         final int columnSize = getColumns().size();
-        for (int i = 0; i < columnCount; ++i) {
-            if (!getHiddenColumns().get(i)) {
-                if (i < columnSize) {
-                    getColumns().get(i).column.setVisible(true);
+        //Toggling visibility can cause NotOnFxThread Exception.
+        CellView.getValue(() -> {
+            int visibleColumn = 0;
+            for (int i = 0; i < columnCount; ++i) {
+                if (!getHiddenColumns().get(i)) {
+                    if (i < columnSize) {
+                        getColumns().get(i).column.setVisible(true);
+                    }
+                    columnMap.put(i, visibleColumn++);
+                } else {
+                    if (i < columnSize) {
+                        getColumns().get(i).column.setVisible(false);
+                    }
+                    columnMap.put(i, visibleColumn);
                 }
-                columnMap.put(i, visibleColumn++);
-            } else {
-                if (i < columnSize) {
-                    getColumns().get(i).column.setVisible(false);
-                }
-                columnMap.put(i, visibleColumn);
             }
-        }
+        });
     }
 
     /**

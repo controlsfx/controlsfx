@@ -281,7 +281,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                      * of the additional columns, adding it to the width
                      * variable
                      */
-                    final int max = columns.size() - indexColumn;
+                    final int max = skin.getSkinnable().getVisibleLeafColumns().size() - indexColumn;
                     for (int i = 1, colSpan = columnSpan; i < colSpan && i < max; i++) {
                         double tempWidth = snapSize(skin.getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
                         width += tempWidth;

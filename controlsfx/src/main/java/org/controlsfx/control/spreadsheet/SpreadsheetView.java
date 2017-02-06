@@ -551,7 +551,6 @@ public class SpreadsheetView extends Control{
          * Keyboard action, maybe use an accelerator
          */
         cellsView.setOnKeyPressed(keyPressedHandler);
-        
         /**
          * ContextMenu handling.
          */
@@ -2467,35 +2466,40 @@ public class SpreadsheetView extends Control{
             // We want to erase values when delete key is pressed.
         } else if (KeyCode.DELETE.equals(keyEvent.getCode())) {
             deleteSelectedCells();
-            
-        }else if (isEditionKey(keyEvent)) {
+
+        } 
+        else if (isEditionKey(keyEvent)) {
             getCellsView().edit(position.getRow(), position.getTableColumn());
-        }else if(keyEvent.isShortcutDown() && (KeyCode.NUMPAD0.equals(keyEvent.getCode())
-                || KeyCode.DIGIT0.equals(keyEvent.getCode()))){
+        } else if (keyEvent.isShortcutDown() && (KeyCode.NUMPAD0.equals(keyEvent.getCode())
+                || KeyCode.DIGIT0.equals(keyEvent.getCode()))) {
             //Reset zoom to zero.
             setZoomFactor(1.0);
-        }else if(keyEvent.isShortcutDown() && KeyCode.ADD.equals(keyEvent.getCode())){
+        } else if (keyEvent.isShortcutDown() && KeyCode.ADD.equals(keyEvent.getCode())) {
             incrementZoom();
-        }else if(keyEvent.isShortcutDown() && KeyCode.SUBTRACT.equals(keyEvent.getCode())){
+        } else if (keyEvent.isShortcutDown() && KeyCode.SUBTRACT.equals(keyEvent.getCode())) {
             decrementZoom();
         }
     };
     
     /**
+     * We want NOT to go in edition if we're pressing SHIFT and if we're using
+     * the navigation keys. But we still want the user to go in edition with
+     * SHIFT and some letters for example if he wants a capital letter. FIXME
+     * Add a test to prevent the Shift fail case.
+     *
      * We go in edition if we're typing a letter or a digit simply. Also add the
      * sign because we can directly modify the number by typing "+1" in a cell.
      *
      * @param keyEvent
      * @return
      */
-    private boolean isEditionKey(KeyEvent keyEvent){
-        return !keyEvent.isControlDown() && 
-                (keyEvent.getCode().isLetterKey() 
-                || keyEvent.getCode().isDigitKey() 
-                || KeyCode.ADD.equals(keyEvent.getCode())
-                || KeyCode.SUBTRACT.equals(keyEvent.getCode())
-                || KeyCode.DIVIDE.equals(keyEvent.getCode())
-                || KeyCode.MULTIPLY.equals(keyEvent.getCode()));
+    private boolean isEditionKey(KeyEvent keyEvent) {
+        return !keyEvent.isShortcutDown()
+                && !keyEvent.getCode().isNavigationKey()
+                && !keyEvent.getCode().isFunctionKey()
+                && !keyEvent.getCode().isModifierKey()
+                && !keyEvent.getCode().isMediaKey()
+                && keyEvent.getCode() != KeyCode.ESCAPE;
     }
     
     /**

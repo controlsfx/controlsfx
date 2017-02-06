@@ -680,6 +680,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             if (getItem() != null && getItem().hasPopup() && MouseButton.PRIMARY.equals(event.getButton())
                     && (getFilter() == null || !getFilter().getMenuButton().isShowing())) {
                 ContextMenu menu = new ContextMenu();
+                menu.getScene().getStylesheets().add(SpreadsheetView.class.getResource("spreadsheet.css").toExternalForm());
+                menu.getStyleClass().add("popup-button");
                 menu.getItems().setAll(getItem().getPopupItems());
                 menu.show(CellView.this, Side.BOTTOM, 0, 0);
             }

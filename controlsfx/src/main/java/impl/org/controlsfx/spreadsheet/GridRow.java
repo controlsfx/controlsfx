@@ -171,6 +171,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         @Override
         public void invalidated(Observable o) {
             updateIndex(getIndex());
+            setRowHeight(computePrefHeight(-1));
         }
     };
 

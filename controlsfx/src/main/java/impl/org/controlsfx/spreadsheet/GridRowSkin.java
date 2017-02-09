@@ -188,7 +188,10 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                 continue;
             }
             width = snapSize(columns.get(indexColumn).getWidth()) - snapSize(horizontalPadding);
-
+            //When setting a new grid with less columns, we may have this situation.
+            if (row.size() <= indexColumn) {
+                break;
+            }
             final SpreadsheetCell spreadsheetCell = row.get(indexColumn);
             final int columnSpan = spreadsheetView.getColumnSpan(spreadsheetCell);
             boolean isVisible = !isInvisible(x, width, hbarValue, headerWidth, columnSpan);
@@ -323,7 +326,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
 
                 height = customHeight;
                 height = snapSize(height) - snapSize(verticalPadding);
-                /**
+               /**
                  * We need to span multiple rows, so we sum up the height of all
                  * the rows. The height of the current row is ignored and the
                  * whole value is computed.

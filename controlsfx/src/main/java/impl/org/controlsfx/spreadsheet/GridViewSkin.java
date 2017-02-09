@@ -918,12 +918,15 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         int index = getColumns().indexOf(col);
         double start = 0;// scrollX;
 
-        for (int i = 0; i < index; ++i) {
-            SpreadsheetColumn column = spreadsheetView.getColumns().get(i);
-            if (column.isFixed()) {
-                fixedColumnWidth += column.getWidth();
+        for (int columnIndex = 0; columnIndex < index; ++columnIndex) {
+            //Do not add the width of hidden column!
+            if (!spreadsheetView.isColumnHidden(columnIndex)) {
+                SpreadsheetColumn column = spreadsheetView.getColumns().get(columnIndex);
+                if (column.isFixed()) {
+                    fixedColumnWidth += column.getWidth();
+                }
+                start += column.getWidth();
             }
-            start += column.getWidth();
         }
 
         final double end = start + col.getWidth();

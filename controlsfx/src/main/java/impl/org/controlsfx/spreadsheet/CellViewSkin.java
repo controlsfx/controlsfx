@@ -159,7 +159,8 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
             if (!getChildren().contains(topLeftRegion)) {
                 getChildren().add(topLeftRegion);
             }
-            topLeftRegion.relocate(0, snappedTopInset() - 1);
+            //We do not wants snappedTopInset because it takes the padding in consideration!
+            topLeftRegion.relocate(0, 0);
         } else if (topLeftRegion != null) {
             getChildren().remove(topLeftRegion);
             topLeftRegion = null;
@@ -174,7 +175,8 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
             if (!getChildren().contains(topRightRegion)) {
                 getChildren().add(topRightRegion);
             }
-            topRightRegion.relocate(getSkinnable().getWidth() - TRIANGLE_SIZE, snappedTopInset() - 1);
+            //We do not wants snappedTopInset because it takes the padding in consideration!
+            topRightRegion.relocate(getSkinnable().getWidth() - TRIANGLE_SIZE, 0);
         } else if (topRightRegion != null) {
             getChildren().remove(topRightRegion);
             topRightRegion = null;

@@ -919,15 +919,4 @@ public class TableViewSpanSelectionModel extends
     private GridRow getNonFixedRow(int index) {
         return getCellsViewSkin().getRow(index);
     }
-
-    /**
-     * Return the TableColumn right after the current TablePosition (including
-     * the ColumSpan to be on a visible Cell)
-     *
-     * @param t the current TablePosition
-     * @return
-     */
-//    private int getTableColumnSpanInt(final TablePosition<?, ?> pos) {
-//        return pos.getColumn() + spreadsheetView.getColumnSpan((SpreadsheetCell) pos.getTableColumn().getCellData(pos.getRow()));
-//    }
 }

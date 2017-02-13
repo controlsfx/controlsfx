@@ -401,7 +401,10 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * @return
      */
     public GridRow getRow(int index) {
-        return (GridRow) getFlow().getCells().get(index);
+        if (getFlow().getCells().size() < index) {
+            return (GridRow) getFlow().getCells().get(index);
+        }
+        return null;
     }
 
     /**

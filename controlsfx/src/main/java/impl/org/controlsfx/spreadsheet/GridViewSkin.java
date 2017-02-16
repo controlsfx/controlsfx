@@ -803,6 +803,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if (spreadsheetView.showColumnHeaderProperty().get()) {
             // position the table header
             tableHeaderRowHeight = getTableHeaderRow().prefHeight(-1);
+            //For unknow reason, the height of the columnHeader is smaller when nothing is clicked in the grid..
+            tableHeaderRowHeight = tableHeaderRowHeight < DEFAULT_CELL_HEIGHT ? DEFAULT_CELL_HEIGHT : tableHeaderRowHeight;
             layoutInArea(getTableHeaderRow(), x, y, w, tableHeaderRowHeight, baselineOffset, HPos.CENTER, VPos.CENTER);
 
             y += tableHeaderRowHeight;

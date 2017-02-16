@@ -29,6 +29,7 @@ package impl.org.controlsfx.spreadsheet;
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
+import static impl.org.controlsfx.spreadsheet.GridViewSkin.DEFAULT_CELL_HEIGHT;
 import java.util.BitSet;
 import java.util.List;
 import javafx.application.Platform;
@@ -345,5 +346,27 @@ public class HorizontalHeader extends TableHeaderRow {
             getRootHeader().layoutFixedColumns();
             updateHighlightSelection();
         }
+    }
+   
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected double computePrefHeight(double width) {
+        /**
+         * We have a weird situation where the headerRow is 22.0 when no cells
+         * is clicked in the Grid..
+         */
+        //If it's not showing, height is 0!
+        if (!gridViewSkin.handle.getView().isShowColumnHeader()) {
+            return 0.0;
+        }
+        // we hardcode 24.0 here to avoid RT-37616, where the
+        // entire header row would disappear when all columns were hidden.
+        double headerPrefHeight = getRootHeader().prefHeight(width);
+        headerPrefHeight = headerPrefHeight == 0.0 ? 24.0 : headerPrefHeight;
+        double height = snappedTopInset() + headerPrefHeight + snappedBottomInset();
+        height = height < DEFAULT_CELL_HEIGHT ? DEFAULT_CELL_HEIGHT : height;
+        return height;
     }
 }

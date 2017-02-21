@@ -305,7 +305,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                  */
                 if (controlHeight == Grid.AUTOFIT && !tableCell.isEditing()) {
                     //We have the problem when we are just one pixel short in height..
-                    double tempHeight = tableCell.prefHeight(width) + tableCell.snappedTopInset();
+                    double tempHeight = tableCell.prefHeight(width) + tableCell.snappedTopInset() + tableCell.snappedBottomInset();
                     if (tempHeight > customHeight) {
                         rowHeightChange = true;
                         skin.rowHeightMap.put(spreadsheetCell.getRow(), tempHeight);

@@ -510,7 +510,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                  * we need to span multiple columns, so we sum up the width of
                  * the additional columns, adding it to the width variable
                  */
-                final int max = getSkinnable().getColumns().size() - viewColumn;
+                final int max = getSkinnable().getVisibleLeafColumns().size() - viewColumn;
                 for (int i = 1, colSpan = spc.getColumnSpan(); i < colSpan && i < max; i++) {
                     double tempWidth = snapSize(getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
                     width += tempWidth;

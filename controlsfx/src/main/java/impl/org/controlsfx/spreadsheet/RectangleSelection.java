@@ -37,10 +37,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
-import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.GridChange;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 /**
  *
@@ -63,7 +63,7 @@ public class RectangleSelection extends Rectangle {
         this.selectedCellListener = (Observable observable) -> {
             skin.getHorizontalHeader().clearSelectedColumns();
             skin.verticalHeader.clearSelectedRows();
-            selectionRange.fill(sm.getSelectedCells(), skin.spreadsheetView.getGrid());
+            selectionRange.fill(sm.getSelectedCells(), skin.spreadsheetView);
             updateRectangle();
         };
         skin.getVBar().valueProperty().addListener(layoutListener);
@@ -342,16 +342,16 @@ public class RectangleSelection extends Rectangle {
          * row and the value is column.
          *
          * @param list
-         * @param grid
+         * @param spv
          */
-        public void fill(List<TablePosition> list, Grid grid) {
+        public void fill(List<TablePosition> list, SpreadsheetView spv) {
             set.clear();
             range = null;
             for (TablePosition pos : list) {
                 long key = key(pos.getRow(), pos.getColumn());
                 set.add(key);
                 //I just check that a selected cell is not against it.
-                if (!grid.isCellDisplaySelection(pos.getRow(), pos.getColumn())) {
+                if (!spv.getGrid().isCellDisplaySelection(spv.getModelRow(pos.getRow()), spv.getModelColumn(pos.getColumn()))) {
                     return;
                 }
             }

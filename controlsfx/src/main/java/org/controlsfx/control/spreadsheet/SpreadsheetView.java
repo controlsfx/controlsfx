@@ -1042,6 +1042,20 @@ public class SpreadsheetView extends Control{
     }
 
     /**
+     * Causes the cell at the given row/column view indexes to switch into
+     * its editing state, if it is not already in it, and assuming that the
+     * SpreadsheetView and column are also editable.
+     *
+     * <p><strong>Note:</strong> This method will cancel editing if the given row
+     * value is less than zero and the given column is null.</p>
+     * @param row
+     * @param column
+     */
+    public void edit(int row, SpreadsheetColumn column) {
+       cellsView.edit(row, column.column);
+    }
+    
+    /**
      * Return the comparator used in the {@link SortedList} for the
      * SpreadsheetView.
      *

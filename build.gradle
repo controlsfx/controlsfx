@@ -42,11 +42,7 @@ subprojects {
        }
     }
 
-    task wrapper(type: Wrapper) {
-        gradleVersion = '2.0'
-    }
-
-    compileJava {  
+    compileJava {
         options.encoding = "UTF-8"
     }
 

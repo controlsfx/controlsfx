@@ -44,6 +44,7 @@ subprojects {
 
     compileJava {
         options.encoding = "UTF-8"
+        options.incremental = true
     }
 
     task sourceJar(type: Jar) {

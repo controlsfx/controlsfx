@@ -31,40 +31,43 @@ sourceSets {
 }
 
 
-task downloadTranslations << {
+task downloadTranslations {
     description = "Download translations from Transifex"
-    
-    if (transifex_username.equals("") || transifex_password.equals("")) {
-        logger.warn "----------------------------------------------------------"
-        logger.warn "Cannot determine Transifex Username/Password."
-        logger.warn "If you want to build ControlsFX with its translations then"
-        logger.warn "you need to create a Transifex account and set"
-        logger.warn "transifex.username & transifex.password properties in your" 
-        logger.warn "gradle.properties file." 
-        logger.warn "----------------------------------------------------------"
-    } else {
-        javaexec {
-            main = 'impl.build.transifex.Transifex'
-            classpath = sourceSets.main.runtimeClasspath
-            systemProperty 'transifex.username', transifex_username
-            systemProperty 'transifex.password', transifex_password
+    doLast {
+        if (transifex_username.equals("") || transifex_password.equals("")) {
+            logger.warn "----------------------------------------------------------"
+            logger.warn "Cannot determine Transifex Username/Password."
+            logger.warn "If you want to build ControlsFX with its translations then"
+            logger.warn "you need to create a Transifex account and set"
+            logger.warn "transifex.username & transifex.password properties in your"
+            logger.warn "gradle.properties file."
+            logger.warn "----------------------------------------------------------"
+        } else {
+            javaexec {
+                main = 'impl.build.transifex.Transifex'
+                classpath = sourceSets.main.runtimeClasspath
+                systemProperty 'transifex.username', transifex_username
+                systemProperty 'transifex.password', transifex_password
+            }
         }
     }
 }
 
 processResources.finalizedBy(downloadTranslations)
 
-task compileCSS << {
-    ant.delete (includeEmptyDirs: 'true') { 
-        fileset(dir: file("build/resources/main"), includes: "**/*.bss") 
-    }
-    javaexec {
-        main = "com.sun.javafx.tools.packager.Main"
-        classpath = files("${System.properties['java.home']}/../lib/ant-javafx.jar")
-        args = [ "-createbss",
-            "-srcdir", "src/main/resources",
-            "-outdir", "build/resources/main"
-        ]
+task compileCSS {
+    doLast {
+        ant.delete(includeEmptyDirs: 'true') {
+            fileset(dir: file("build/resources/main"), includes: "**/*.bss")
+        }
+        javaexec {
+            main = "com.sun.javafx.tools.packager.Main"
+            classpath = files("${System.properties['java.home']}/../lib/ant-javafx.jar")
+            args = ["-createbss",
+                    "-srcdir", "src/main/resources",
+                    "-outdir", "build/resources/main"
+            ]
+        }
     }
 }
 

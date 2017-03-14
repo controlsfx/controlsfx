@@ -1063,7 +1063,7 @@ public class SpreadsheetView extends Control{
      * SpreadsheetView.
      */
     public Comparator getComparator() {
-        return sortedList.getComparator();
+        return sortedList == null ? null : sortedList.getComparator();
     }
 
     /**
@@ -1101,9 +1101,9 @@ public class SpreadsheetView extends Control{
         }
         // Reactivate that after
 //        verifyGrid(grid);
-        gridProperty.set(grid);
         filteredList = new FilteredList<>(grid.getRows());
         sortedList = new SortedList<>(filteredList);
+        gridProperty.set(grid);
         setHiddenRows(new BitSet(filteredList.getSource().size()));
         setHiddenColumns(new BitSet(grid.getColumnCount()));
         initRowFix(grid);

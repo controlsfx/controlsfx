@@ -74,7 +74,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         this.indexProperty().addListener(weakPrefHeightListener);
         this.visibleProperty().addListener(weakPrefHeightListener);
         
-        handle.getView().gridProperty().addListener(weakPrefHeightListener);
+        handle.getView().gridProperty().addListener(weakGridListener);
         handle.getView().hiddenRowsProperty().addListener(weakPrefHeightListener);
         handle.getView().hiddenColumnsProperty().addListener(weakPrefHeightListener);
         handle.getView().comparatorProperty().addListener(weakComparatorListener);
@@ -162,7 +162,21 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
     };
 
     private final WeakEventHandler<MouseEvent> weakDragHandler = new WeakEventHandler(dragDetectedEventHandler);
-    
+   
+    /**
+     * When the Grid is changing, we have recreated a new SortedList, therefore
+     * we must re-attach our listener to the Comparator.
+     */
+    private final InvalidationListener gridListener = new InvalidationListener() {
+
+        @Override
+        public void invalidated(Observable o) {
+            setRowHeight(computePrefHeight(-1));
+            handle.getView().comparatorProperty().addListener(weakComparatorListener);
+        }
+    };
+
+    private final WeakInvalidationListener weakGridListener = new WeakInvalidationListener(gridListener);
     /**
      * When the comparator is changing, we may have an issue with the fixedRow
      * not updating their inner cells. So we force it.

@@ -444,24 +444,28 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             GridRow gridRow = handle.getCellsViewSkin().getFlow().getTopRow();
             if (gridRow != null) {
                 for (CellView cell : fixedCells) {
-                    final double originalLayoutY = getSkinnable().getLayoutY() + cell.getLayoutY();
-                    gridRow.removeCell(cell);
-                    gridRow.addCell(cell);
-                    if (handle.getCellsViewSkin().deportedCells.containsKey(gridRow)) {
-                        handle.getCellsViewSkin().deportedCells.get(gridRow).add(cell);
-                    } else {
-                        Set<CellView> temp = new HashSet<>();
-                        temp.add(cell);
-                        handle.getCellsViewSkin().deportedCells.put(gridRow, temp);
+                    if(!cell.isEditing()){
+                        gridRow.removeCell(cell);
+                        gridRow.addCell(cell);
                     }
-                    /**
-                     * I need to have the layoutY of the original row, but also
-                     * to remove the layoutY of the row I'm adding in. Because
-                     * if the first row is fixed and is undergoing a bit of
-                     * translate in order to be visible, we need to remove that
-                     * "bit of translate".
-                     */
-                    cell.relocate(cell.getLayoutX(), originalLayoutY - gridRow.getLayoutY());
+                        final double originalLayoutY = getSkinnable().getLayoutY() + cell.getLayoutY();
+                        
+                        if (handle.getCellsViewSkin().deportedCells.containsKey(gridRow)) {
+                            handle.getCellsViewSkin().deportedCells.get(gridRow).add(cell);
+                        } else {
+                            Set<CellView> temp = new HashSet<>();
+                            temp.add(cell);
+                            handle.getCellsViewSkin().deportedCells.put(gridRow, temp);
+                        }
+                        /**
+                         * I need to have the layoutY of the original row, but
+                         * also to remove the layoutY of the row I'm adding in.
+                         * Because if the first row is fixed and is undergoing a
+                         * bit of translate in order to be visible, we need to
+                         * remove that "bit of translate".
+                         */
+                        cell.setLayoutX(cell.getLayoutX());
+                        cell.setLayoutY(originalLayoutY - gridRow.getLayoutY());
                 }
             }
         } else {

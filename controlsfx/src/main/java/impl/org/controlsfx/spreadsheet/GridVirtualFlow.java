@@ -310,7 +310,9 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
          */
         for(GridRow row : gridViewSkin.deportedCells.keySet()){
             for(CellView cell: gridViewSkin.deportedCells.get(row)){
-                row.removeCell(cell);
+                if(!cell.isEditing()){
+                    row.removeCell(cell);
+                }
             }
         }
         gridViewSkin.deportedCells.clear();

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015, ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
 package org.controlsfx.control.spreadsheet;
 
 import com.sun.javafx.event.EventHandlerManager;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javafx.beans.property.ObjectProperty;
@@ -44,7 +46,9 @@ import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
 import javafx.scene.Node;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
+import javafx.stage.Popup;
 
 /**
  * The SpreadsheetCells serve as model for the {@link SpreadsheetView}. <br>
@@ -114,6 +118,13 @@ import javafx.scene.image.ImageView;
  * </pre>
  * 
  * <center><img src="dateFormat.PNG" alt="SpreadsheetCellBase with custom format"></center>
+ * 
+ * <h3>Popup</h3>
+ * Each cell can display a {@link Popup} when clicked. This is useful when some
+ * non editable cell wants to display several actions to take on the grid. This
+ * feature is completely different from the {@link Filter}. Filters are shown on
+ * one particular row whereas popup can be added to every cell.
+ *
  * 
  * <h3>Graphic</h3>
  * Each cell can have a graphic to display next to the text in the cells. Just
@@ -207,6 +218,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     //The Bit position for the editable Property.
     private static final int EDITABLE_BIT_POSITION = 4;
     private static final int WRAP_BIT_POSITION = 5;
+    private static final int POPUP_BIT_POSITION = 6;
     private final SpreadsheetCellType type;
     private final int row;
     private final int column;
@@ -226,6 +238,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
 
     private ObservableSet<String> styleClass;
+    private List<MenuItem> actionsList;
 
     /***************************************************************************
      * 
@@ -341,6 +354,29 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
         if (setMask(wrapText, WRAP_BIT_POSITION)) {
             Event.fireEvent(this, new Event(WRAP_EVENT_TYPE));
         }
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public boolean hasPopup(){
+        return isSet(POPUP_BIT_POSITION);
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public void setHasPopup(boolean value){
+        setMask(value, POPUP_BIT_POSITION);
+        //We want to refresh the cell.
+        Event.fireEvent(this, new Event(CORNER_EVENT_TYPE));
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public List<MenuItem> getPopupItems(){
+        if(actionsList == null){
+            actionsList = new ArrayList<>();
+        }
+        return actionsList;
     }
 
    /** {@inheritDoc} */

@@ -29,15 +29,19 @@ package org.controlsfx.control.spreadsheet;
 import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
 import impl.org.controlsfx.spreadsheet.CellView;
+import impl.org.controlsfx.spreadsheet.CellViewSkin;
 import java.util.List;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -93,6 +97,8 @@ public final class SpreadsheetColumn {
     private final boolean canFix;
     private final Integer indexColumn;
     private MenuItem fixItem;
+    //The current filter applied on this column if any.
+    private final ObjectProperty<Filter> filterProperty = new SimpleObjectProperty<>();
 
     /***************************************************************************
      * * Constructor * *
@@ -146,6 +152,26 @@ public final class SpreadsheetColumn {
             @Override
             public void invalidated(Observable arg0) {
                 initCanFix(grid);
+            }
+        });
+       
+        filterProperty.addListener(new ChangeListener<Filter>() {
+            @Override
+            public void changed(ObservableValue<? extends Filter> observable, Filter oldFilter, Filter newFilter) {
+                if (newFilter != null) {
+                    //We verify this cell can actually be filtered.
+                    //FIXME Only one row can be filtered.
+                    if (spreadsheetView.getFilteredRow() == -1) {
+                        setFilter(null);
+                        return;
+                    }
+                    SpreadsheetCell cell = spreadsheetView.getGrid().getRows().get(spreadsheetView.getFilteredRow()).get(indexColumn);
+                    if (cell.getColumnSpan() > 1) {
+                        setFilter(null);
+                        return;
+                    }
+                }
+                Event.fireEvent(column, new Event(CellViewSkin.FILTER_EVENT_TYPE));
             }
         });
     }
@@ -209,7 +235,7 @@ public final class SpreadsheetColumn {
     /**
      * Return the Property related to the actual width of the column.
      *
-     * @return
+     * @return the Property related to the actual width of the column.
      */
     public final ReadOnlyDoubleProperty widthProperty() {
         return column.widthProperty();
@@ -227,7 +253,7 @@ public final class SpreadsheetColumn {
     /**
      * Return the minimum width for this SpreadsheetColumn.
      *
-     * @return
+     * @return the minimum width for this SpreadsheetColumn.
      */
     public final double getMinWidth() {
         return column.getMinWidth();
@@ -237,7 +263,8 @@ public final class SpreadsheetColumn {
      * Return the Property related to the minimum width of this
      * SpreadsheetColumn.
      *
-     * @return
+     * @return the Property related to the minimum width of this
+     * SpreadsheetColumn.
      */
     public final DoubleProperty minWidthProperty() {
         return column.minWidthProperty();
@@ -247,7 +274,8 @@ public final class SpreadsheetColumn {
      * Return the Property related to the maximum width of this
      * SpreadsheetColumn.
      *
-     * @return
+     * @return the Property related to the maximum width of this
+     * SpreadsheetColumn.
      */
     public final DoubleProperty maxWidthProperty() {
         return column.maxWidthProperty();
@@ -265,7 +293,7 @@ public final class SpreadsheetColumn {
     /**
      * Return the maximum width for this SpreadsheetColumn.
      *
-     * @return
+     * @return the maximum width for this SpreadsheetColumn.
      */
     public final double getMaxWidth() {
         return column.getMaxWidth();
@@ -303,6 +331,17 @@ public final class SpreadsheetColumn {
         return canFix && spreadsheetView.isFixingColumnsAllowed();
     }
 
+    public void setFilter(Filter filter){
+        this.filterProperty.setValue(filter);
+    }
+    
+    public Filter getFilter(){
+        return filterProperty.get();
+    }
+    public ObjectProperty filterProperty(){
+        return filterProperty;
+    }
+    
     /***************************************************************************
      * * Private Methods * *
      **************************************************************************/

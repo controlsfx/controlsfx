@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,11 +27,12 @@
 package org.controlsfx.control.spreadsheet;
 
 import com.sun.javafx.event.EventHandlerManager;
-import impl.org.controlsfx.spreadsheet.GridViewSkin;
+import static impl.org.controlsfx.spreadsheet.RectangleSelection.SelectionRange.key;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -43,10 +44,69 @@ import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
 import javafx.util.Callback;
-import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
 /**
  * A base implementation of the {@link Grid} interface.
+ *
+ * <h3>How to span</h3>
+ * <p>
+ * First of all, the Grid must have all its rows filled with the same number of
+ * {@link SpreadsheetCell}. A span is materialized by the same cell (same
+ * instance of SpreadsheetCell) repeated all over the covered part. In order to
+ * materialize span, you have two ways :
+ * <p>
+ * - First way is to manually add the same cell where you want to span. For
+ * example, we will make the first cell span on two columns :
+ * <pre>
+ * //I create a sample grid
+ * int rowCount = 15;
+ *     int columnCount = 10;
+ *     GridBase grid = new GridBase(rowCount, columnCount);
+ *
+ *     ObservableList&lt;ObservableList&lt;SpreadsheetCell&gt;&gt; rows = FXCollections.observableArrayList();
+ *     for (int row = 0; row &lt; grid.getRowCount(); ++row) {
+ *         final ObservableList&lt;SpreadsheetCell&gt; list = FXCollections.observableArrayList();
+ *         for (int column = 0; column &lt; grid.getColumnCount(); ++column) {
+ *             list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,"value"));
+ *         }
+ *         rows.add(list);
+ *     }
+ *      //I create my SpreadsheetCell spanning on two columns.
+ *      SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(0, 0, 1, 2,"value");
+ *      //I add them in the area covered by the span.
+ *      rows.get(0).set(0, cell);
+ *      rows.get(0).set(1, cell);
+ *      grid.setRows(rows);
+ *
+ *     SpreadsheetView spv = new SpreadsheetView(grid);
+ * </pre> 
+ * 
+ * - The second way is to build the SpreadsheetView, but to use the {@link #spanRow(int, int, int)
+ * } or {@link #spanColumn(int, int, int) } methods. These methods will take the
+ * SpreadsheetCell at the specified position, and enlarge the span by modifying
+ * the rowSpan or columnSpan of the cell. And also put the SpreadsheetCell in
+ * the area covered by the span.
+ * <pre>
+ * //I create a sample grid
+ * int rowCount = 15;
+ *     int columnCount = 10;
+ *     GridBase grid = new GridBase(rowCount, columnCount);
+ *
+ *     ObservableList&lt;ObservableList&lt;SpreadsheetCell&gt;&gt; rows = FXCollections.observableArrayList();
+ *     for (int row = 0; row &lt; grid.getRowCount(); ++row) {
+ *         final ObservableList&lt;SpreadsheetCell&gt; list = FXCollections.observableArrayList();
+ *         for (int column = 0; column &lt; grid.getColumnCount(); ++column) {
+ *             list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,"value"));
+ *         }
+ *         rows.add(list);
+ *     }
+ *      //I First set the rows in the grid.
+ *      grid.setRows(rows);
+ *      //Then I simply tell the grid to span the first cell
+ *      grid.spanColumn(2,0,0);
+ *
+ *     SpreadsheetView spv = new SpreadsheetView(grid);
+ * </pre> 
  * 
  * <h3>Row Height</h3>
  * 
@@ -85,7 +145,24 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
  *         });
  * 
  * </pre>
- * 
+ *
+ * <h3>Display selection</h3>
+ *
+ * By default, the SpreadsheetView will display a black rectangle around your
+ * selection if it's contiguous. Some may want to disable that effect. Therefore
+ * a simple call to {@link #setDisplaySelection(boolean) } with a false value
+ * will make that rectangle disappear.
+ *
+ * <h3>Headers</h3>
+ * The SpreadsheetView is displaying row numbers and column letters by default.
+ * Just like any other spreadsheet would do. However, some may want to customize
+ * theose headers. You can use the {@link #getColumnHeaders() } and {@link #getRowHeaders()
+ * } in order to customize what will appear in these headers.
+ *  <br>
+ * If you put some long text in the row headers, it will not fit. Thus you may
+ * consider using {@link SpreadsheetView#setRowHeaderWidth(double) }
+ * in order to enlarge the row header so that your text can fit properly.
+ *
  * 
  * @see Grid
  * @see GridChange
@@ -97,7 +174,7 @@ public class GridBase implements Grid, EventTarget {
      * Private Fields
      * 
      **************************************************************************/
-    private final ObservableList<ObservableList<SpreadsheetCell>> rows;
+    private ObservableList<ObservableList<SpreadsheetCell>> rows;
 
     private int rowCount;
     private int columnCount;
@@ -107,6 +184,9 @@ public class GridBase implements Grid, EventTarget {
     private final ObservableList<String> rowsHeader;
     private final ObservableList<String> columnsHeader;
     private BitSet resizableRow;
+    private final TreeSet<Long> displaySelectionCells = new TreeSet<>();
+    private final TreeSet<Long> noDisplaySelectionCells = new TreeSet<>();
+    private final BooleanProperty displaySelection = new SimpleBooleanProperty(true);
 
     /***************************************************************************
      * 
@@ -149,14 +229,14 @@ public class GridBase implements Grid, EventTarget {
 
     /** {@inheritDoc} */
     @Override
-    public void setCellValue(int row, int column, Object value) {
-        if (row < rowCount && column < columnCount && !isLocked()) {
-            SpreadsheetCell cell = getRows().get(row).get(column);
+    public void setCellValue(int modelRow, int column, Object value) {
+        if (modelRow < getRowCount() && column < columnCount && !isLocked()) {
+            SpreadsheetCell cell = getRows().get(modelRow).get(column);
             Object previousItem = cell.getItem();
             Object convertedValue = cell.getCellType().convertValue(value);
             cell.setItem(convertedValue);
             if (!java.util.Objects.equals(previousItem, cell.getItem())) {
-                GridChange cellChange = new GridChange(row, column, previousItem, convertedValue);
+                GridChange cellChange = new GridChange(cell.getRow(), cell.getColumn(), previousItem, convertedValue);
                 Event.fireEvent(this, cellChange);
             }
         }
@@ -172,46 +252,6 @@ public class GridBase implements Grid, EventTarget {
     @Override
     public int getColumnCount() {
         return columnCount;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column) {
-        if (row < 0 || column < 0 || row >= rowCount || column >= columnCount) {
-            return SpanType.NORMAL_CELL;
-        }
-        
-        final SpreadsheetCell cell =  getRows().get(row).get(column);
-
-        final int cellColumn = cell.getColumn();
-        final int cellRow = cell.getRow();
-        final int cellRowSpan = cell.getRowSpan();
-
-        if (cellColumn == column && cellRow == row && cellRowSpan == 1) {
-            return SpanType.NORMAL_CELL;
-        }
-
-        final int cellColumnSpan = cell.getColumnSpan();
-        /**
-         * This is a consuming operation so we place it after the normal_cell
-         * case since this is the most typical case.
-         */
-        final GridViewSkin skin = spv.getCellsViewSkin();
-        final boolean containsRowMinusOne = skin == null ? true : skin.containsRow(row - 1);
-        if (containsRowMinusOne && cellColumnSpan > 1 && cellColumn != column && cellRowSpan > 1
-                && cellRow != row) {
-            return SpanType.BOTH_INVISIBLE;
-        } else if (cellRowSpan > 1 && cellColumn == column) {
-            if ((cellRow == row || !containsRowMinusOne)) {
-                return SpanType.ROW_VISIBLE;
-            } else {
-                return SpanType.ROW_SPAN_INVISIBLE;
-            }
-        } else if (cellColumnSpan > 1 && cellColumn != column && (cellRow == row || !containsRowMinusOne)) {
-            return SpanType.COLUMN_SPAN_INVISIBLE;
-        } else {
-            return SpanType.NORMAL_CELL;
-        }
     }
 
     /**
@@ -287,14 +327,14 @@ public class GridBase implements Grid, EventTarget {
     /** {@inheritDoc} */
     @Override
     public void spanRow(int count, int rowIndex, int colIndex) {
-        if (count <= 0 || count > rowCount || rowIndex >= rowCount || colIndex >= columnCount) {
+        if (count <= 0 || count > getRowCount() || rowIndex >= getRowCount() || colIndex >= columnCount) {
             return;
         }
         final SpreadsheetCell cell = rows.get(rowIndex).get(colIndex);
         final int colSpan = cell.getColumnSpan();
         final int rowSpan = count;
         cell.setRowSpan(rowSpan);
-        for (int row = rowIndex; row < rowIndex + rowSpan && row < rowCount; ++row) {
+        for (int row = rowIndex; row < rowIndex + rowSpan && row < getRowCount(); ++row) {
             for (int col = colIndex; col < colIndex + colSpan && col < columnCount; ++col) {
                 if (row != rowIndex || col != colIndex) {
                     rows.get(row).set(col, cell);
@@ -306,14 +346,14 @@ public class GridBase implements Grid, EventTarget {
     /** {@inheritDoc} */
     @Override
     public void spanColumn(int count, int rowIndex, int colIndex) {
-        if (count <= 0 || count > columnCount || rowIndex >= rowCount || colIndex >= columnCount) {
+        if (count <= 0 || count > columnCount || rowIndex >= getRowCount() || colIndex >= columnCount) {
             return;
         }
         final SpreadsheetCell cell = rows.get(rowIndex).get(colIndex);
         final int colSpan = count;
         final int rowSpan = cell.getRowSpan();
         cell.setColumnSpan(colSpan);
-        for (int row = rowIndex; row < rowIndex + rowSpan && row < rowCount; ++row) {
+        for (int row = rowIndex; row < rowIndex + rowSpan && row < getRowCount(); ++row) {
             for (int col = colIndex; col < colIndex + colSpan && col < columnCount; ++col) {
                 if (row != rowIndex || col != colIndex) {
                     rows.get(row).set(col, cell);
@@ -348,6 +388,59 @@ public class GridBase implements Grid, EventTarget {
     @Override
     public boolean isRowResizable(int row) {
         return resizableRow.get(row);
+    }
+   
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isDisplaySelection() {
+        return displaySelection.get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setDisplaySelection(boolean value) {
+        displaySelection.setValue(value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BooleanProperty displaySelectionProperty() {
+        return displaySelection;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setCellDisplaySelection(int row, int column, boolean displaySelection) {
+        Long key = key(row, column);
+        if (displaySelection) {
+            displaySelectionCells.add(key);
+            noDisplaySelectionCells.remove(key);
+        } else {
+            displaySelectionCells.remove(key);
+            noDisplaySelectionCells.add(key);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isCellDisplaySelection(int row, int column) {
+        Long key = key(row, column);
+        if (displaySelectionCells.contains(key)) {
+            return true;
+        } else if (noDisplaySelectionCells.contains(key)) {
+            return false;
+        }
+        return isDisplaySelection();
     }
     
     /** {@inheritDoc} */

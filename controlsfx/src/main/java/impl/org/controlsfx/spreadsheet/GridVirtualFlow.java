@@ -158,7 +158,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         spv.getFixedRows().addListener((Observable observable) -> {
             List<T> toRemove = new ArrayList<>();
             for (T cell : myFixedCells) {
-                if (!spv.getFixedRows().contains(cell.getIndex())) {
+                if (!spv.getFixedRows().contains(spreadSheetView.getFilteredSourceIndex(cell.getIndex()))) {
                     cell.setManaged(false);
                     cell.setVisible(false);
                     toRemove.add(cell);
@@ -178,7 +178,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     @Override
     public void scrollTo(int index) {
         //If we have some fixedRows, we check if the selected row is not below them
-        if (!getCells().isEmpty() && spreadSheetView.getFixedRows().size() > 0) {
+        if (!getCells().isEmpty() && !VerticalHeader.isFixedRowEmpty(spreadSheetView)) {
             double offset = gridViewSkin.getFixedRowHeight();
 
             while (offset >= 0 && index > 0) {
@@ -310,7 +310,9 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
          */
         for(GridRow row : gridViewSkin.deportedCells.keySet()){
             for(CellView cell: gridViewSkin.deportedCells.get(row)){
-                row.removeCell(cell);
+                if(!cell.isEditing()){
+                    row.removeCell(cell);
+                }
             }
         }
         gridViewSkin.deportedCells.clear();
@@ -384,7 +386,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
 		//We must have a cell in ViewPort because otherwise
         //we short-circuit the VirtualFlow.
-        if (spreadSheetView.getFixedRows().size() > 0 && getFirstVisibleCellWithinViewPort() != null) {
+        if (!VerticalHeader.isFixedRowEmpty(spreadSheetView) && getFirstVisibleCellWithinViewPort() != null) {
             sortRows();
             /**
              * What I do is just going after the VirtualFlow in order to ADD
@@ -400,6 +402,11 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             rows:
             for (int i = spreadSheetView.getFixedRows().size() - 1; i >= 0; i--) {
                 fixedRowIndex = spreadSheetView.getFixedRows().get(i);
+                if(spreadSheetView.isRowHidden(i)){
+                    continue;
+                }
+                //Changing the index to viewRow.
+                fixedRowIndex = spreadSheetView.getFilteredRow(fixedRowIndex);
                 T lastCell = getLastVisibleCellWithinViewPort();
                 //If the fixed row is out of bounds
                 if (lastCell != null && fixedRowIndex > lastCell.getIndex()) {
@@ -464,21 +471,23 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 row.setVisible(true);
                 row.toFront();
                 row.requestLayout();
-            }
-        }
-    }
+                    }
+                }
+                }
 
     /**
      * Verify if the row has been added to myFixedCell
+     *
      * @param i
      * @return
      */
-    private T containsRows(int i){
-    	for(T cell:myFixedCells){
-    		if(cell.getIndex() == i)
-    			return cell;
-    	}
-    	return null;
+    private T containsRows(int i) {
+        for (T cell : myFixedCells) {
+            if (cell.getIndex() == i) {
+                return cell;
+            }
+        }
+        return null;
     }
     /**
      * Sort the rows so that they stay in order for layout

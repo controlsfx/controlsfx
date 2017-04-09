@@ -151,3 +151,16 @@ CellView >TextArea .scroll-bar:horizontal {
     -fx-stroke : black;
     -fx-stroke-width : 2;
 }
+
+.spreadsheet-cell .filter-menu-button{
+    -fx-background-color: transparent;
+    -fx-padding: 0 0 0 6;
+}
+.spreadsheet-cell .filter-menu-button > .label{
+    -fx-background-color: transparent;
+    -fx-padding: 0 0 0 0;
+}
+
+.spreadsheet-cell .filter-menu-button:hover{
+    -fx-cursor:hand;
+}

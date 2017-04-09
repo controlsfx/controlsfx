@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2017 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,15 +30,17 @@ import java.util.List;
 import java.util.TreeSet;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.IndexedCell;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
-import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.GridChange;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 /**
  *
@@ -58,38 +60,45 @@ public class RectangleSelection extends Rectangle {
         setMouseTransparent(true);
 
         selectionRange = new SelectionRange();
+        this.selectedCellListener = (Observable observable) -> {
+            skin.getHorizontalHeader().clearSelectedColumns();
+            skin.verticalHeader.clearSelectedRows();
+            selectionRange.fill(sm.getSelectedCells(), skin.spreadsheetView);
+            updateRectangle();
+        };
         skin.getVBar().valueProperty().addListener(layoutListener);
 
         //When draging, it's not working properly so we remove the rectangle.
-        skin.getVBar().addEventFilter(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
+        skin.getVBar().addEventFilter(MouseEvent.MOUSE_DRAGGED, mouseDraggedListener);
 
-            @Override
-            public void handle(MouseEvent event) {
-                skin.getVBar().valueProperty().removeListener(layoutListener);
-                setVisible(false);
-                skin.getVBar().addEventFilter(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
-
-                    @Override
-                    public void handle(MouseEvent event) {
-                        skin.getVBar().removeEventFilter(MouseEvent.MOUSE_RELEASED, this);
-                        skin.getVBar().valueProperty().addListener(layoutListener);
-                        updateRectangle();
-                    }
-                });
-            }
-        });
-
+        // When playing with the hidden indexes, we must recomputer the range because it is wrong.
+        skin.spreadsheetView.hiddenRowsProperty().addListener(selectedCellListener);
+        skin.spreadsheetView.hiddenColumnsProperty().addListener(selectedCellListener);
         skin.getHBar().valueProperty().addListener(layoutListener);
-        sm.getSelectedCells().addListener((Observable observable) -> {
-            skin.getHorizontalHeader().clearSelectedColumns();
-            skin.verticalHeader.clearSelectedRows();
-            selectionRange.fill(sm.getSelectedCells());
-            updateRectangle();
-        });
+        sm.getSelectedCells().addListener(selectedCellListener);
     }
 
+    private final InvalidationListener selectedCellListener;
     private final InvalidationListener layoutListener = (Observable observable) -> {
         updateRectangle();
+    };
+
+    private final EventHandler<MouseEvent> mouseDraggedListener = new EventHandler<MouseEvent>() {
+
+        @Override
+        public void handle(MouseEvent event) {
+            skin.getVBar().valueProperty().removeListener(layoutListener);
+            setVisible(false);
+            skin.getVBar().addEventFilter(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
+
+                @Override
+                public void handle(MouseEvent event) {
+                    skin.getVBar().removeEventFilter(MouseEvent.MOUSE_RELEASED, this);
+                    skin.getVBar().valueProperty().addListener(layoutListener);
+                    updateRectangle();
+                }
+            });
+        }
     };
 
     public final void updateRectangle() {
@@ -102,13 +111,13 @@ public class RectangleSelection extends Rectangle {
         }
 
         IndexedCell topRowCell = skin.getFlow().getTopRow();
-        if(topRowCell == null){
+        if (topRowCell == null) {
             return;
         }
         //We fetch the first and last row currently displayed
         int topRow = topRowCell.getIndex();
         IndexedCell bottomRowCell = skin.getFlow().getCells().get(skin.getFlow().getCells().size() - 1);
-        if(bottomRowCell == null){
+        if (bottomRowCell == null) {
             return;
         }
         int bottomRow = bottomRowCell.getIndex();
@@ -136,13 +145,13 @@ public class RectangleSelection extends Rectangle {
             return;
         }
 
-        Grid grid = skin.spreadsheetView.getGrid();
-        if (maxRow >= grid.getRowCount() || maxColumn >= grid.getColumnCount()) {
+        if (maxRow >= skin.getItemCount() || maxColumn >= skin.getSkinnable().getVisibleLeafColumns().size()
+                || minColumn < 0) {
             setVisible(false);
             return;
         }
-        SpreadsheetCell cell = grid.getRows().get(maxRow).get(maxColumn);
-        handleHorizontalPositioning(minColumn, maxColumn, cell.getColumnSpan());
+        SpreadsheetCell cell = skin.getSkinnable().getItems().get(maxRow).get(skin.spreadsheetView.getModelColumn(maxColumn));
+        handleHorizontalPositioning(minColumn, skin.spreadsheetView.getViewColumn(cell.getColumn()) + skin.spreadsheetView.getColumnSpan(cell) - 1);
 
         //If we are out of sight
         if (getX() + getWidth() < 0) {
@@ -157,7 +166,7 @@ public class RectangleSelection extends Rectangle {
         }
         setVisible(true);
 
-        handleVerticalPositioning(minRow, maxRow, gridMinRow, gridMaxRow, cell.getRowSpan());
+        handleVerticalPositioning(minRow, maxRow, gridMinRow, gridMaxRow);
     }
 
     /**
@@ -168,7 +177,7 @@ public class RectangleSelection extends Rectangle {
      * @param maxRow
      * @param gridMinRow
      */
-    private void handleVerticalPositioning(int minRow, int maxRow, GridRow gridMinRow, GridRow gridMaxRow, int rowSpan) {
+    private void handleVerticalPositioning(int minRow, int maxRow, GridRow gridMinRow, GridRow gridMaxRow) {
         double height = 0;
         for (int i = maxRow; i <= maxRow /*+ (rowSpan - 1)*/; ++i) {
             height += skin.getRowHeight(i);
@@ -210,19 +219,20 @@ public class RectangleSelection extends Rectangle {
      * @param minColumn
      * @param maxColumn
      */
-    private void handleHorizontalPositioning(int minColumn, int maxColumn, int columnSpan) {
+    private void handleHorizontalPositioning(int minColumn, int maxColumn) {
         double x = 0;
 
+        final List<TableColumn<ObservableList<SpreadsheetCell>, ?>> visibleColumns = skin.handle.getGridView().getVisibleLeafColumns();
+        final List<TableColumn<ObservableList<SpreadsheetCell>, ?>> allColumns = skin.handle.getGridView().getColumns();
         final List<SpreadsheetColumn> columns = skin.spreadsheetView.getColumns();
-        if(columns.size() <= minColumn || columns.size() <= maxColumn){
+        if (visibleColumns.size() <= minColumn || visibleColumns.size() <= maxColumn) {
             return;
         }
         //We first compute the total space between the left edge and our first column
         for (int i = 0; i < minColumn; ++i) {
             //Here we use Ceil because we want to "snapSize" otherwise we may end up with a weird shift.
-            x += snapSize(columns.get(i).getWidth());
+            x += snapSize(visibleColumns.get(i).getWidth());
         }
-        
 
         /**
          * We then substract the value of the Hbar in order to place it properly
@@ -234,7 +244,7 @@ public class RectangleSelection extends Rectangle {
         //Then we compute the width by adding the space between the min and max column
         double width = 0;
         for (int i = minColumn; i <= maxColumn /*+ (columnSpan - 1)*/; ++i) {
-            width += snapSize(columns.get(i).getWidth());
+            width += snapSize(visibleColumns.get(i).getWidth());
         }
 
         //FIXED COLUMNS
@@ -244,7 +254,7 @@ public class RectangleSelection extends Rectangle {
          * translate the starting point in because the rectangle must also be
          * hidden by the fixed column.
          */
-        if (!skin.spreadsheetView.getFixedColumns().contains(columns.get(minColumn))) {
+        if (!skin.spreadsheetView.getFixedColumns().contains(columns.get(allColumns.indexOf(visibleColumns.get(minColumn))))) {
             if (x < skin.fixedColumnWidth) {
                 //Since I translate the starting point, I must reduce the width by the value I'm translating.
                 width -= skin.fixedColumnWidth - x;
@@ -258,11 +268,11 @@ public class RectangleSelection extends Rectangle {
              * current position compared to each other.
              *
              */
-        } else {
-            /**
-             * If x + width is inferior, we can re-compute the width by checking
-             * our fixed columns interval
-             */
+        } else /**
+         * If x + width is inferior, we can re-compute the width by checking our
+         * fixed columns interval
+         */
+        {
             if (x + width < skin.fixedColumnWidth) {
                 x = 0;
                 width = 0;
@@ -305,7 +315,7 @@ public class RectangleSelection extends Rectangle {
     private double snapSize(double value) {
         return Math.ceil(value);
     }
-    
+
     /**
      * Utility class to transform a list of selected cells into a union of
      * ranges.
@@ -318,32 +328,51 @@ public class RectangleSelection extends Rectangle {
         public SelectionRange() {
         }
 
-        /**
-         * Construct a SelectionRange with a List of Pair where the value is the
-         * row (of the WsGrid) and the value is column(of the WsGrid).
-         *
-         * @param list
-         */
         public void fill(List<TablePosition> list) {
             set.clear();
             for (TablePosition pos : list) {
-                set.add(key(pos.getRow(), pos.getColumn()));
+                long key = key(pos.getRow(), pos.getColumn());
+                set.add(key);
             }
             computeRange();
         }
-        
+
+        /**
+         * Construct a SelectionRange with a List of Pair where the value is the
+         * row and the value is column.
+         *
+         * @param list
+         * @param spv
+         */
+        public void fill(List<TablePosition> list, SpreadsheetView spv) {
+            set.clear();
+            range = null;
+            for (TablePosition pos : list) {
+                long key = key(pos.getRow(), pos.getColumn());
+                set.add(key);
+                //I just check that a selected cell is not against it.
+                if (!spv.getGrid().isCellDisplaySelection(spv.getModelRow(pos.getRow()), spv.getModelColumn(pos.getColumn()))) {
+                    return;
+                }
+            }
+
+            computeRange();
+        }
+
         public void fillGridRange(List<GridChange> list) {
             set.clear();
+            range = null;
             for (GridChange pos : list) {
                 set.add(key(pos.getRow(), pos.getColumn()));
             }
             computeRange();
         }
 
-        public GridRange getRange(){
+        public GridRange getRange() {
             return range;
         }
-        private Long key(int row, int column) {
+
+        public static Long key(int row, int column) {
             return (((long) row) << 32) | column;
         }
 

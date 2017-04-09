@@ -30,6 +30,7 @@ import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
 import impl.org.controlsfx.spreadsheet.CellView;
 import impl.org.controlsfx.spreadsheet.FocusModelListener;
+import impl.org.controlsfx.spreadsheet.GridViewBehavior;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
 import impl.org.controlsfx.spreadsheet.RectangleSelection.GridRange;
 import impl.org.controlsfx.spreadsheet.RectangleSelection.SelectionRange;
@@ -41,15 +42,20 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -66,6 +72,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -118,6 +126,9 @@ import org.controlsfx.tools.Utils;
  * shortcuts are also working.</li>
  * <li>{@link Picker} can be placed above column header or to the side of the
  * row header.</li>
+ * <li>Rows and columns can be hidden (like Excel grouping).</li>
+ * <li>Zoom in and out in order for the SpreadsheetView to fit on a monitor.</li>
+ * <li>Rows can be sorted using a {@link Comparator}.</li>
  * </ul>
  * 
  * <br>
@@ -171,20 +182,51 @@ import org.controlsfx.tools.Utils;
  * <h3>Pickers</h3>
  * <br>
  * 
- * You can show some little images next to the headers. They will appear on the 
- * left of the VerticalHeader and on top on the HorizontalHeader. They are called
- * "picker" because they were used originally for picking a row or a column to 
- * insert in the SpreadsheetView.
+ * You can show some little images next to the headers. They will appear on the
+ * left of the VerticalHeader and on top on the HorizontalHeader. They are
+ * called "picker" because they were used originally for picking a row or a
+ * column to insert in the SpreadsheetView.
  * <br>
  * But you can do anything you want with it. Simply put a row or a column index
  * in {@link #getRowPickers() } and {@link #getColumnPickers() } along with an
  * instance of {@link Picker}. You can override the {@link Picker#onClick() }
  * method in order to react when the user click on the picker.
  * <br>
- * The pickers will appear on the top of the column's header and on the left of 
+ * The pickers will appear on the top of the column's header and on the left of
  * the row's header.
  * <br>
- * 
+ *
+ * For example, here is a picker displayed for a row that allow to group rows
+ * like Excel:
+ * <br>
+ * <center><img src="pickerExample.png" alt="A Picker that can hide some rows."></center>
+ * <br>
+ * Once we clicked on the picker (minus sign), the rows are hidden.
+ * <br>
+ * <center><img src="pickerExample2.png" alt="A Picker that can sho some rows."></center>
+ * <br>
+ * Here is the code related to the images :
+ * <pre>
+ * Picker picker = new Picker() {
+ *          &#64;Override
+ *          public void onClick() {
+ *          //If my details are hidden
+ *              if (getHiddenRows().get(3)) {
+ *                  showRow(3);
+ *                  showRow(4);
+ *                  showRow(5);
+ *                  showRow(6);
+ *              } else {
+ *                  hideRow(3);
+ *                  hideRow(4);
+ *                  hideRow(5);
+ *                  hideRow(6);
+ *              }
+ *          }
+ * };
+ * getRowPickers().put(2, picker);
+ *
+ * </pre>
  * <h3>Copy pasting</h3> You can copy any cell you want and paste it elsewhere.
  * Be aware that only the value inside will be pasted, not the style nor the
  * type. Thus the value you're trying to paste must be compatible with the
@@ -198,6 +240,32 @@ import org.controlsfx.tools.Utils;
  * 
  * <br>
  * <br>
+ * <h3>Hiding rows and columns</h3>
+ * <p>
+ * Rows and columns can be hidden if you need to. Simply call {@link #showRow(int)
+ * } or {@link #hideRow(int) } in order to toggle the visibility of a row. Same
+ * for the column.
+ * <br>
+ * Note that the span of the cell (in row or column) will automatically adapt
+ * based on the visible rows or columns. You have nothing to do.
+ *  <br>
+ * Because toggling visibility have an impact on the Grid, if you have a lot of
+ * rows/columns to show or hide, you may consider setting them all directly by
+ * using {@link #setHiddenRows(java.util.BitSet) }. The {@link BitSet} represent
+ * all your rows/columns and the bit associated to it represent its visibility.
+ *
+ * <h3>Zoom</h3>
+ * The SpreadsheetView offers the possibility to zoom in or out. This is useful
+ * when you have a second monitor and you want your whole grid to fit in. Or
+ * when you want to draw the attention on a particular portion of the grid.
+ * <br>
+ * You can modify the zoom factor by playing with {@link #setZoomFactor(java.lang.Double)
+ * }. We recommend using value between 2 and 0.1.
+ * <br>
+ * Also note that the SpreadsheetView is configured to react when CTRL + and
+ * CTRL - are triggered by, respectively, zooming in and zooming out by 10%.
+ * Also CTRL 0 will bring the zoom back to default (1).
+ * 
  * <h3>Code Samples</h3> Just like the {@link TableView}, you instantiate the
  * underlying model, a {@link Grid}. You will create some rows filled with {@link SpreadsheetCell}.
  * 
@@ -318,7 +386,7 @@ public class SpreadsheetView extends Control{
     private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor> editors = new IdentityHashMap<>();
     private final SpreadsheetViewSelectionModel selectionModel;
-    
+
     /**
      * The vertical header width, just for the Label, not the Pickers.
      */
@@ -326,9 +394,17 @@ public class SpreadsheetView extends Control{
     
     //Zoom for the SpreadsheetView.
     private DoubleProperty zoomFactor = new SimpleDoubleProperty(1);
-    private static final double MIN_ZOOM = 0.25;
+    private static final double MIN_ZOOM = 0.1;
     private static final double MAX_ZOOM = 2;
-    private static final double STEP_ZOOM = 0.15;
+    private static final double STEP_ZOOM = 0.10;
+    //The visible rows.
+    private final ObjectProperty<BitSet> hiddenRowsProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<BitSet> hiddenColumnsProperty = new SimpleObjectProperty<>();
+    private HashMap<Integer, Integer> rowMap;
+    private HashMap<Integer, Integer> columnMap = new HashMap<>();
+    private Integer filteredRow;
+    private FilteredList<ObservableList<SpreadsheetCell>> filteredList;
+    private SortedList<ObservableList<SpreadsheetCell>> sortedList;
 
     /**
      * Since the default with applied to TableColumn is 80. If a user sets a
@@ -411,8 +487,22 @@ public class SpreadsheetView extends Control{
         super();
         //We want to recompute the rectangleHeight when a fixedRow is resized.
         addEventHandler(RowHeightEvent.ROW_HEIGHT_CHANGE, (RowHeightEvent event) -> {
-            if(getFixedRows().contains(event.getRow()) && getCellsViewSkin() != null){
+            if(getFixedRows().contains(getModelRow(event.getRow())) && getCellsViewSkin() != null){
                 getCellsViewSkin().computeFixedRowHeight();
+            }
+        });
+        hiddenRowsProperty.addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                computeRowMap();
+                initRowFix(grid);
+            }
+        });
+        hiddenColumnsProperty.addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                computeColumnMap();
+                initRowFix(grid);
             }
         });
         getStyleClass().add("SpreadsheetView"); //$NON-NLS-1$
@@ -461,7 +551,6 @@ public class SpreadsheetView extends Control{
          * Keyboard action, maybe use an accelerator
          */
         cellsView.setOnKeyPressed(keyPressedHandler);
-        
         /**
          * ContextMenu handling.
          */
@@ -522,17 +611,401 @@ public class SpreadsheetView extends Control{
     }
 
     /**
+     * Return true is this row is hidden.
+     *
+     * @param row
+     * @return true is this row is hidden.
+     */
+    public boolean isRowHidden(int row) {
+        return hiddenRowsProperty.get().get(row);
+    }
+
+    /**
+     * Return a BitSet of the Hidden rows, where true means the row is hidden.
+     *
+     * @return a BitSet of the Hidden rows, where true means the row is hidden.
+     */
+    public BitSet getHiddenRows() {
+        return hiddenRowsProperty.get();
+    }
+
+    /**
+     * Return the Objectproperty wrapping the hidden rows..
+     *
+     * @return the Objectproperty wrapping the hidden rows..
+     */
+    public final ObjectProperty<BitSet> hiddenRowsProperty() {
+        return hiddenRowsProperty;
+    }
+
+    /**
+     * Give a complete new BitSet of the hidden rows. The BitSet MUST have the
+     * size of {@link Grid#getRowCount() }.
+     *
+     * @param hiddenRows
+     */
+    public void setHiddenRows(BitSet hiddenRows) {
+        BitSet bitSet = new BitSet(hiddenRows.size());
+        bitSet.or(hiddenRows);
+        
+        this.hiddenRowsProperty.setValue(bitSet);
+
+        requestLayout();
+    }
+
+    /**
+     * Give a complete new BitSet of the hidden columns. The BitSet MUST have
+     * the size of {@link Grid#getColumnCount() () }.
+     *
+     * @param hiddenColumns
+     */
+    public void setHiddenColumns(BitSet hiddenColumns) {
+        BitSet bitSet = new BitSet(hiddenColumns.size());
+        bitSet.or(hiddenColumns);
+
+        this.hiddenColumnsProperty.setValue(bitSet);
+
+        requestLayout();
+    }
+
+    /**
+     * Return true if this column index (regarding to {@link #getColumns() } is
+     * hidden.
+     *
+     * @param column
+     * @return true if this column index (regarding to {@link #getColumns() } is
+     * hidden.
+     */
+    public boolean isColumnHidden(int column) {
+        return hiddenColumnsProperty.get().get(column);
+    }
+
+    /**
+     * Return a BitSet of the Hidden columns, where true means the column is
+     * hidden.
+     *
+     * @return a BitSet of the Hidden columns, where true means the column is
+     * hidden.
+     */
+    public BitSet getHiddenColumns() {
+        return hiddenColumnsProperty.get();
+    }
+
+    /**
+     * Return the Objectproperty wrapping the hidden columns.
+     *
+     * @return the Objectproperty wrapping the hidden columns.
+     */
+    public final ObjectProperty<BitSet> hiddenColumnsProperty() {
+        return hiddenColumnsProperty;
+    }
+
+    /**
+     * Return the row where the {@link Filter} will be shown. The row is based
+     * on the {@link Grid} indexes.
+     *
+     * Return -1 if no row is set for the filters.
+     * @return the row where the {@link Filter} will be shown.
+     */
+    public int getFilteredRow() {
+        return filteredRow == null ? -1 : filteredRow;
+    }
+
+    /**
+     * Set the row (based of {@link Grid} indexes) where the {@link Filter} will
+     * appear.
+     *
+     * @param row
+     */
+    public void setFilteredRow(Integer row) {
+        if (row == null || row > getGrid().getRowCount()) {
+            filteredRow = null;
+        } else {
+            filteredRow = row;
+        }
+    }
+
+    /**
+     * Hide the specified row.
+     *
+     * @param row
+     */
+    public void hideRow(int row) {
+        if (getHiddenRows().get(row)) {
+            return;
+        }
+        getHiddenRows().set(row, true);
+        BitSet bitSet = new BitSet(getHiddenRows().size());
+        bitSet.or(getHiddenRows());
+        setHiddenRows(bitSet);
+    }
+
+    /**
+     * Hide the specified {@link SpreadsheetColumn}.
+     *
+     * @param column
+     */
+    public void hideColumn(SpreadsheetColumn column) {
+        int indexColumn = getColumns().indexOf(column);
+        if (getHiddenColumns().get(indexColumn)) {
+            return;
+        }
+        getHiddenColumns().set(indexColumn, true);
+        BitSet bitSet = new BitSet(getHiddenColumns().size());
+        bitSet.or(getHiddenColumns());
+        setHiddenColumns(bitSet);
+    }
+
+    private void computeRowMap() {
+        if (getHiddenRows().isEmpty()) {
+            filteredList.setPredicate(null);
+        } else {
+            filteredList.setPredicate(new Predicate<ObservableList<SpreadsheetCell>>() {
+                @Override
+                public boolean test(ObservableList<SpreadsheetCell> t) {
+                    int index = getGrid().getRows().indexOf(t);
+                    return !getHiddenRows().get(index) || index == getFilteredRow();
+                }
+            });
+        }
+        final int rowCount = getGrid().getRowCount();
+        rowMap = new HashMap<>(rowCount);
+        int visibleRow = 0;
+        for (int i = 0; i < rowCount; ++i) {
+            if (!getHiddenRows().get(i)) {
+                rowMap.put(i, visibleRow++);
+            } else {
+                rowMap.put(i, visibleRow);
+            }
+        }
+    }
+
+    private void computeColumnMap() {
+        int columnCount = getGrid().getColumnCount();
+        columnMap = new HashMap<>(columnCount);
+
+        final int columnSize = getColumns().size();
+        //Toggling visibility can cause NotOnFxThread Exception.
+        CellView.getValue(() -> {
+            //Column count can have changed..
+            int totalColumn = getGrid().getColumnCount();
+            int visibleColumn = 0;
+            for (int i = 0; i < totalColumn; ++i) {
+                if (!getHiddenColumns().get(i)) {
+                    if (i < columnSize) {
+                        getColumns().get(i).column.setVisible(true);
+                    }
+                    columnMap.put(i, visibleColumn++);
+                } else {
+                    if (i < columnSize) {
+                        getColumns().get(i).column.setVisible(false);
+                    }
+                    columnMap.put(i, visibleColumn);
+                }
+            }
+        });
+    }
+
+    /**
+     * Show the specified row.
+     *
+     * @param row
+     */
+    public void showRow(int row) {
+        if (!getHiddenRows().get(row)) {
+            return;
+        }
+        getHiddenRows().set(row, false);
+        BitSet bitSet = new BitSet(getHiddenRows().size());
+        bitSet.or(getHiddenRows());
+        setHiddenRows(bitSet);
+    }
+
+    /**
+     * Show the specified {@link SpreadsheetColumn}.
+     *
+     * @param column
+     */
+    public void showColumn(SpreadsheetColumn column) {
+        int indexColumn = getColumns().indexOf(column);
+        if (!getHiddenColumns().get(indexColumn)) {
+            return;
+        }
+        getHiddenColumns().set(indexColumn, false);
+        BitSet bitSet = new BitSet(getHiddenColumns().size());
+        bitSet.or(getHiddenColumns());
+        setHiddenColumns(bitSet);
+    }
+
+    /**
+     * Given a row index base on the {@link Grid}, return the index used in the
+     * SpreadsheetView. Beware ,if the row is hidden, the returned index is not
+     * relevant because no row is assigned to it.
+     *
+     * @param modelRow
+     * @return the index used in the SpreadsheetView.
+     */
+    public int getFilteredRow(int modelRow) {
+        try {
+            return rowMap.get(modelRow);
+        } catch (NullPointerException ex) {
+            return modelRow;
+        }
+    }
+
+    /**
+     * Given a column index based on the {@link #getColumns() } list, return an
+     * index based on the visible columns in the SpreadsheetView.
+     *
+     * @param modelColumn
+     * @return an index based on the visible columns in the SpreadsheetView.
+     */
+    public int getViewColumn(int modelColumn) {
+        try {
+            return columnMap.get(modelColumn);
+        } catch (NullPointerException ex) {
+            return modelColumn;
+        }
+    }
+
+    /**
+     * Given a column index based on the visible column list, for example when
+     * dealing with {@link TablePosition#getColumn() }. It returns an index
+     * based on the {@link #getColumns() } list of the SpreadsheetView.
+     *
+     * @param viewColumn
+     * @return an index based on the {@link #getColumns() } list of the
+     * SpreadsheetView.
+     */
+    public int getModelColumn(int viewColumn) {
+        try {
+            return cellsView.getColumns().indexOf(cellsView.getVisibleLeafColumn(viewColumn));
+        } catch (NullPointerException ex) {
+            return viewColumn;
+        }
+    }
+
+    /**
+     * Given an index on the SpreadsheetView, return a {@link Grid} index it is
+     * related to.
+     *
+     * @param viewRow
+     * @return a {@link Grid} index it is
+     * related to.
+     */
+    public int getModelRow(int viewRow) {
+        if (viewRow < 0 || viewRow >= sortedList.size()) {
+            return viewRow;
+        }
+        try {
+            return getFilteredSourceIndex(sortedList.getSourceIndex(viewRow));
+        } catch (NullPointerException | IndexOutOfBoundsException ex) {
+            return viewRow;
+        }
+    }
+
+    /**
+     * Given an index on the SpreadsheetView, it will return the model row by
+     * simply considering the hidden rows (and not the acutal sort if any).
+     *
+     * If you hide the row 2, it means the row 2 in the SpreadsheetView will
+     * actually display the row 3 in the model {@link Grid}. Thus calling this
+     * method with the number 2 will give you the number 3.
+     *
+     * @param viewRow
+     * @return the model row
+     */
+    public int getFilteredSourceIndex(int viewRow) {
+        if (viewRow < 0 || viewRow >= filteredList.size()) {
+            return viewRow;
+        }
+        try {
+            return filteredList.getSourceIndex(viewRow);
+        } catch (NullPointerException | IndexOutOfBoundsException ex) {
+            return viewRow;
+        }
+    }
+
+    /**
+     * Return the current row span for the given cell at the given position in
+     * the Table.
+     *
+     * If a sort is applied to the SpreadsheetView, some spanned cells may be
+     * splitted thus explaining why this method can give a different value than {@link SpreadsheetCell#getRowSpan()
+     * }.
+     *
+     * @param cell
+     * @param index
+     * @return the current row span for the given cell.
+     */
+    public int getRowSpan(SpreadsheetCell cell, int index) {
+        /**
+         * We return here the exact rowSpan of the considered index. So if a
+         * cell span on 4 but we give the second index, the rowspan will be 2.
+         */
+        int rowSpan = 0;
+        do {
+            ++rowSpan;
+        } while (++index < sortedList.size() && cell.getColumn() < getGrid().getColumnCount()
+                && sortedList.get(index).get(cell.getColumn()) == cell);
+
+        return rowSpan;
+    }
+
+    /**
+     * Return the row span for the given cell without considering the actual
+     * sort. Only the hidden rows are considered.
+     *
+     * @param cell
+     * @return the row span for the given cell.
+     */
+    public int getRowSpanFilter(SpreadsheetCell cell) {
+        int rowSpan = cell.getRowSpan();
+        //First remove the filtered
+        for (int i = cell.getRow(); i < cell.getRow() + cell.getRowSpan(); ++i) {
+            rowSpan -= getHiddenRows().get(i) ? 1 : 0;
+        }
+        return rowSpan;
+    }
+
+    /**
+     * Return the current list of rows set in the SpreadsheetView as they appear
+     * on the screen.
+     *
+     * @return the current list of rows.
+     */
+    public ObservableList<ObservableList<SpreadsheetCell>> getItems() {
+        return cellsView.getItems();
+    }
+
+    /**
+     * Return the current column span of a Cell considering all hidden columns.
+     *
+     * @param cell
+     * @return the current column span of a Cell.
+     */
+    public int getColumnSpan(SpreadsheetCell cell) {
+        int colSpan = cell.getColumnSpan();
+        for (int i = cell.getColumn(); i < cell.getColumn() + cell.getColumnSpan(); ++i) {
+            colSpan -= getHiddenColumns().get(i) ? 1 : 0;
+        }
+        return colSpan;
+    }
+
+    /**
      * Return the zoomFactor used for the SpreadsheetView.
-     * @return 
+     *
+     * @return the zoomFactor used for the SpreadsheetView.
      */
     public final Double getZoomFactor() {
         return zoomFactor.get();
     }
 
     /**
-     * Set a new zoomFactor for the SpreadsheetView. 
-     * Advice is not to go beyond 3 and below 0.25.
-     * @param zoomFactor 
+     * Set a new zoomFactor for the SpreadsheetView. Advice is not to go beyond
+     * 2 and below 0.1.
+     *
+     * @param zoomFactor
      */
     public final void setZoomFactor(Double zoomFactor) {
         this.zoomFactor.set(zoomFactor);
@@ -540,15 +1013,16 @@ public class SpreadsheetView extends Control{
 
     /**
      * Return the zoomFactor used for the SpreadsheetView.
-     * @return 
+     *
+     * @return the zoomFactor used for the SpreadsheetView.
      */
     public final DoubleProperty zoomFactorProperty() {
         return zoomFactor;
     }
 
     /**
-     * Increment the level of zoom by 0.15. The base is 1 so we will try to stay
-     * of the intervals (0.1-0.25-0.4-0.55-0.7-0.85-1 etc).
+     * Increment the level of zoom by 0.10. The base is 1 so we will try to stay
+     * of the intervals.
      *
      */
     public void incrementZoom() {
@@ -559,17 +1033,62 @@ public class SpreadsheetView extends Control{
     }
 
     /**
-     * Decrement the level of zoom by 0.15. It will block at 0.25.The base is 1
-     * so we will try to stay of the intervals (0.1-0.25-0.4-0.55-0.7-0.85-1
-     * etc).
+     * Decrement the level of zoom by 0.10. It will block at 0.25.The base is 1
+     * so we will try to stay of the intervals.
      */
     public void decrementZoom() {
-        double newZoom = getZoomFactor()- 0.01;
+        double newZoom = getZoomFactor() - 0.01;
         int prevValue = (int) ((newZoom - MIN_ZOOM) / STEP_ZOOM);
         newZoom = (prevValue) * STEP_ZOOM + MIN_ZOOM;
         setZoomFactor(newZoom < MIN_ZOOM ? MIN_ZOOM : newZoom);
     }
+
+    /**
+     * Causes the cell at the given row/column view indexes to switch into
+     * its editing state, if it is not already in it, and assuming that the
+     * SpreadsheetView and column are also editable.
+     *
+     * <p><strong>Note:</strong> This method will cancel editing if the given row
+     * value is less than zero and the given column is null.</p>
+     * @param row
+     * @param column
+     */
+    public void edit(int row, SpreadsheetColumn column) {
+       cellsView.edit(row, column.column);
+    }
     
+    /**
+     * Return the comparator used in the {@link SortedList} for the
+     * SpreadsheetView.
+     *
+     * @return the comparator used in the {@link SortedList} for the
+     * SpreadsheetView.
+     */
+    public Comparator getComparator() {
+        return sortedList == null ? null : sortedList.getComparator();
+    }
+
+    /**
+     * Return an ObjectProperty wrapping the comparator used in the
+     * SpreadsheetView.
+     *
+     * @return an ObjectProperty wrapping the comparator used in the
+     * SpreadsheetView.
+     */
+    public ObjectProperty<Comparator<? super ObservableList<SpreadsheetCell>>> comparatorProperty() {
+        return sortedList.comparatorProperty();
+    }
+
+    /**
+     * Set a new Comparator for the SpreadsheetView in order to sort the rows.
+     *
+     * @param comparator
+     */
+    public void setComparator(Comparator<ObservableList<SpreadsheetCell>> comparator) {
+        sortedList.setComparator(comparator);
+        computeRowMap();
+        requestLayout();
+    }
     /**
      * Set a new Grid for the SpreadsheetView. This will be called by default by
      * {@link #SpreadsheetView(Grid)}. So this is useful when you want to
@@ -584,7 +1103,11 @@ public class SpreadsheetView extends Control{
         }
         // Reactivate that after
 //        verifyGrid(grid);
+        filteredList = new FilteredList<>(grid.getRows());
+        sortedList = new SortedList<>(filteredList);
         gridProperty.set(grid);
+        setHiddenRows(new BitSet(filteredList.getSource().size()));
+        setHiddenColumns(new BitSet(grid.getColumnCount()));
         initRowFix(grid);
 
         /**
@@ -627,10 +1150,11 @@ public class SpreadsheetView extends Control{
         final Pair<Integer, Integer> finalPair = focusedPair;
         
         if (grid.getRows() != null) {
-            final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
-                    .observableArrayList(grid.getRows());
-            cellsView.getItems().clear();
-            cellsView.setItems(observableRows);
+//            final ObservableList<ObservableList<SpreadsheetCell>> observableRows = FXCollections
+//                    .observableArrayList(grid.getRows());
+//            cellsView.getItems().clear();
+            cellsView.setItems(sortedList);
+            computeRowMap();
 
             final int columnCount = grid.getColumnCount();
             columns.clear();
@@ -797,7 +1321,7 @@ public class SpreadsheetView extends Control{
                         return false;
                     }
                     //We only want to consider the original cell.
-                    if (cell.getRowSpan() > maxSpan && cell.getRow() == row) {
+                    if (getRowSpan(cell, row) > maxSpan && cell.getRow() == row) {
                         maxSpan = cell.getRowSpan();
                     }
                 }
@@ -1118,10 +1642,10 @@ public class SpreadsheetView extends Control{
     
     /**
      * Scrolls the SpreadsheetView so that the given row is visible.
-     * @param row 
+     * @param modelRow 
      */
-    public void scrollToRow(int row){
-        cellsView.scrollTo(row);
+    public void scrollToRow(int modelRow){
+        cellsView.scrollTo(getFilteredRow(modelRow));
     }
     
     /**
@@ -1166,7 +1690,7 @@ public class SpreadsheetView extends Control{
      * Return the value of the vertical scrollbar. See {@link ScrollBar#getValue()
      * }
      *
-     * @return
+     * @return the value of the vertical scrollbar.
      */
     public double getVBarValue() {
         if (getCellsViewSkin() != null && getCellsViewSkin().getVBar() != null) {
@@ -1179,7 +1703,7 @@ public class SpreadsheetView extends Control{
      * Return the value of the horizontal scrollbar. See {@link ScrollBar#getValue()
      * }
      *
-     * @return
+     * @return the value of the horizontal scrollbar.
      */
     public double getHBarValue() {
         if (getCellsViewSkin() != null && getCellsViewSkin().getHBar() != null) {
@@ -1200,11 +1724,11 @@ public class SpreadsheetView extends Control{
      *
      * Scrolls the SpreadsheetView so that the given column index is visible.
      *
-     * @param columnIndex
+     * @param modelColumn
      *
      */
-    public void scrollToColumnIndex(int columnIndex) {
-        cellsView.scrollToColumnIndex(columnIndex);
+    public void scrollToColumnIndex(int modelColumn) {
+        cellsView.scrollToColumnIndex(modelColumn);
     }
 
     /**
@@ -1301,20 +1825,20 @@ public class SpreadsheetView extends Control{
         final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
 
         for (final TablePosition<?, ?> p : posList) {
-            SpreadsheetCell cell = getGrid().getRows().get(p.getRow()).get(p.getColumn());
+            SpreadsheetCell cell = getGrid().getRows().get(getModelRow(p.getRow())).get(getModelColumn(p.getColumn()));
             // Using SpreadsheetCell change to stock the information
             // FIXME a dedicated class should be used
             /**
              * We need to add every cell contained in a span otherwise the
              * rectangles computed when pasting will be wrong.
              */
-            for (int row = 0; row < cell.getRowSpan(); ++row) {
-                for (int col = 0; col < cell.getColumnSpan(); ++col) {
+            for (int row = 0; row < getRowSpan(cell, p.getRow()); ++row) {
+                for (int col = 0; col < getColumnSpan(cell); ++col) {
                     try {
                         new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(cell.getItem());
-                        list.add(new GridChange(cell.getRow() + row, cell.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem()));
+                        list.add(new GridChange(p.getRow() + row, p.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem()));
                     } catch (IOException exception) {
-                        list.add(new GridChange(cell.getRow() + row, cell.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem().toString()));
+                        list.add(new GridChange(p.getRow() + row, p.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem().toString()));
                     }
                 }
             }
@@ -1330,7 +1854,7 @@ public class SpreadsheetView extends Control{
      */
     private void pasteOneValue(GridChange change) {
         for (TablePosition position : getSelectionModel().getSelectedCells()) {
-            tryPasteCell(position.getRow(), position.getColumn(), change.getNewValue());
+            tryPasteCell(getModelRow(position.getRow()), getModelColumn(position.getColumn()), change.getNewValue());
         }
     }
 
@@ -1385,12 +1909,13 @@ public class SpreadsheetView extends Control{
                 //If the numbers of rows are the same and the targetColumnGap is a multiple of sourceColumnGap
                 if ((sourceRowGap == targetRowGap || targetRowGap == 1) && (targetColumnGap % sourceColumnGap) == 0) {
                     for (final GridChange change : list) {
-                        int row = change.getRow() + offsetRow;
+                        int row = getModelRow(change.getRow() + offsetRow);
                         int column = change.getColumn() + offsetCol;
                         do {
-                            if (row < getGrid().getRowCount() && column < getGrid().getColumnCount()
+                            int modelColumn = getModelColumn(column);
+                            if (row < getGrid().getRowCount() && modelColumn < getGrid().getColumnCount()
                                     && row >= 0 && column >= 0) {
-                                tryPasteCell(row, column, change.getNewValue());
+                                tryPasteCell(row, modelColumn, change.getNewValue());
                             }
                         } while ((column = column + sourceColumnGap) <= targetRange.getRight());
                     }
@@ -1399,11 +1924,12 @@ public class SpreadsheetView extends Control{
                     for (final GridChange change : list) {
 
                         int row = change.getRow() + offsetRow;
-                        int column = change.getColumn() + offsetCol;
+                        int column = getModelColumn(change.getColumn() + offsetCol);
                         do {
-                            if (row < getGrid().getRowCount() && column < getGrid().getColumnCount()
+                            int modelRow = getModelRow(row);
+                            if (modelRow < getGrid().getRowCount() && column < getGrid().getColumnCount()
                                     && row >= 0 && column >= 0) {
-                                tryPasteCell(row, column, change.getNewValue());
+                                tryPasteCell(modelRow, column, change.getNewValue());
                             }
                         } while ((row = row + sourceRowGap) <= targetRange.getBottom());
                     }
@@ -1450,8 +1976,8 @@ public class SpreadsheetView extends Control{
         int column;
 
         for (final GridChange change : list) {
-            row = change.getRow() + offsetRow;
-            column = change.getColumn() + offsetCol;
+            row = getModelRow(change.getRow() + offsetRow);
+            column = getModelColumn(change.getColumn() + offsetCol);
             if (row < rowCount && column < columnCount
                     && row >= 0 && column >= 0) {
                 tryPasteCell(row, column, change.getNewValue());
@@ -1539,7 +2065,7 @@ public class SpreadsheetView extends Control{
             @Override
             public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
-                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                SpreadsheetCell cell = getGrid().getRows().get(getModelRow(pos.getRow())).get(getModelColumn(pos.getColumn()));
                 cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_LEFT);
                 }
         });
@@ -1549,7 +2075,7 @@ public class SpreadsheetView extends Control{
             @Override
             public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
-                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                SpreadsheetCell cell = getGrid().getRows().get(getModelRow(pos.getRow())).get(getModelColumn(pos.getColumn()));
                 cell.activateCorner(SpreadsheetCell.CornerPosition.TOP_RIGHT);
             }
         });
@@ -1559,7 +2085,7 @@ public class SpreadsheetView extends Control{
             @Override
             public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
-                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                SpreadsheetCell cell = getGrid().getRows().get(getModelRow(pos.getRow())).get(getModelColumn(pos.getColumn()));
                 cell.activateCorner(SpreadsheetCell.CornerPosition.BOTTOM_RIGHT);
             }
         });
@@ -1569,7 +2095,7 @@ public class SpreadsheetView extends Control{
             @Override
             public void handle(ActionEvent t) {
                 TablePosition<ObservableList<SpreadsheetCell>, ?> pos = cellsView.getFocusModel().getFocusedCell();
-                SpreadsheetCell cell = getGrid().getRows().get(pos.getRow()).get(pos.getColumn());
+                SpreadsheetCell cell = getGrid().getRows().get(getModelRow(pos.getRow())).get(getModelColumn(pos.getColumn()));
                 cell.activateCorner(SpreadsheetCell.CornerPosition.BOTTOM_LEFT);
             }
         });
@@ -1587,23 +2113,72 @@ public class SpreadsheetView extends Control{
      */
     public void deleteSelectedCells() {
         for (TablePosition<ObservableList<SpreadsheetCell>, ?> position : getSelectionModel().getSelectedCells()) {
-            getGrid().setCellValue(position.getRow(), position.getColumn(), null);
+            getGrid().setCellValue(getModelRow(position.getRow()), getModelColumn(position.getColumn()), null);
         }
     }
     
-     /**
-     * Return the {@link SpanType} of a cell, this is a shorcut for 
-     * {@link Grid#getSpanType(org.controlsfx.control.spreadsheet.SpreadsheetView, int, int) }.
-     * 
-     * @param row
-     * @param column
+    /**
+     * Return the {@link SpanType} of a cell. This is used internally by the
+     * SpreadsheetView but some users may find it useful.
+     *
+     * @param rowIndex
+     * @param modelColumn
      * @return The {@link SpanType} of a cell
      */
-    public SpanType getSpanType(final int row, final int column) {
+    public SpanType getSpanType(final int rowIndex, final int modelColumn) {
         if (getGrid() == null) {
             return SpanType.NORMAL_CELL;
         }
-        return getGrid().getSpanType(this, row, column);
+
+        if (rowIndex < 0 || modelColumn < 0 || rowIndex >= getItems().size() || modelColumn >= getGrid().getColumnCount()) {
+            return SpanType.NORMAL_CELL;
+        }
+
+        final SpreadsheetCell cell = getCellsView().getItems().get(rowIndex).get(modelColumn);
+
+        final int cellColumn = getHiddenColumns().nextClearBit(cell.getColumn());
+//        final int cellRow = spv.getViewRow(cell.getRow());
+        int cellRowSpan = getRowSpanFilter(cell);//cell.getRowSpan();
+
+        if (cellColumn == modelColumn /*&& cellRow == rowIndex*/ && cellRowSpan == 1) {
+            return SpanType.NORMAL_CELL;
+        }
+//        cellRowSpan = spv.getRowSpanFilter(cell);
+        final int cellColumnSpan = getColumnSpan(cell);
+        /**
+         * This is a consuming operation so we place it after the normal_cell
+         * case since this is the most typical case.
+         */
+        final GridViewSkin skin = getCellsViewSkin();
+        final boolean containsRowMinusOne = skin == null ? true : skin.containsRow(rowIndex - 1);
+        //If the cell above is the same.
+        final boolean containsSameCellMinusOne = rowIndex > 0
+                ? getCellsView().getItems().get(rowIndex - 1).get(modelColumn) == cell
+                : false;
+        if (containsRowMinusOne && cellColumnSpan > 1 && cellColumn != modelColumn && cellRowSpan > 1
+                && containsSameCellMinusOne) {
+            return SpanType.BOTH_INVISIBLE;
+        } else if (cellRowSpan > 1 && cellColumn == modelColumn) {
+            if ((!containsSameCellMinusOne || !containsRowMinusOne)) {
+                return SpanType.ROW_VISIBLE;
+            } else {
+                return SpanType.ROW_SPAN_INVISIBLE;
+            }
+        } else if (cellColumnSpan > 1 && (!containsSameCellMinusOne || !containsRowMinusOne)) {
+            /**
+             * If the next visible column from the starting column is my
+             * viewColumn, it means all columns before me are hidden and I must
+             * show myself.
+             */
+//            int columnVisible = spv.getHiddenColumns().nextClearBit(cell.getColumn());
+            if (cellColumn == modelColumn) {
+                return SpanType.NORMAL_CELL;
+            } else {
+                return SpanType.COLUMN_SPAN_INVISIBLE;
+            }
+        } else {
+            return SpanType.NORMAL_CELL;
+        }
     }
 
     /***************************************************************************
@@ -1663,7 +2238,7 @@ public class SpreadsheetView extends Control{
      */
     private static Grid getSampleGrid() {
         GridBase gridBase = new GridBase(100, 15);
-        List<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
+        ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
         for (int row = 0; row < gridBase.getRowCount(); ++row) {
             ObservableList<SpreadsheetCell> currentRow = FXCollections.observableArrayList();
@@ -1683,7 +2258,7 @@ public class SpreadsheetView extends Control{
         for (int r = 0; r < rows.size(); ++r) {
             ObservableList<SpreadsheetCell> row = rows.get(r);
             for (SpreadsheetCell cell : row) {
-                if (cell.getRowSpan() > 1) {
+                if (getRowSpanFilter(cell) > 1) {
                     continue rows;
                 }
             }
@@ -1882,9 +2457,9 @@ public class SpreadsheetView extends Control{
         if (getEditingCell() == null && KeyCode.ENTER.equals(keyEvent.getCode())) {
             if (position != null) {
                 if(keyEvent.isShiftDown()){
-                    getSelectionModel().clearAndSelectPreviousCell();
+                     ((GridViewBehavior)getCellsViewSkin().getBehavior()).selectCell(-1, 0);
                 }else{
-                    getSelectionModel().clearAndSelectNextCell();
+                     ((GridViewBehavior)getCellsViewSkin().getBehavior()).selectCell(1, 0);
                 }
                 //We consume the event because we don't want to go in edition
                 keyEvent.consume();
@@ -1907,19 +2482,41 @@ public class SpreadsheetView extends Control{
             // We want to erase values when delete key is pressed.
         } else if (KeyCode.DELETE.equals(keyEvent.getCode())) {
             deleteSelectedCells();
-            //Go in edition if we're typing a letter or a digit simply..
-        }else if (!keyEvent.isControlDown() && 
-                (keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey())) {
+
+        } 
+        else if (isEditionKey(keyEvent)) {
             getCellsView().edit(position.getRow(), position.getTableColumn());
-        }else if(keyEvent.isShortcutDown() && KeyCode.NUMPAD0.equals(keyEvent.getCode())){
+        } else if (keyEvent.isShortcutDown() && (KeyCode.NUMPAD0.equals(keyEvent.getCode())
+                || KeyCode.DIGIT0.equals(keyEvent.getCode()))) {
             //Reset zoom to zero.
             setZoomFactor(1.0);
-        }else if(keyEvent.isShortcutDown() && KeyCode.ADD.equals(keyEvent.getCode())){
+        } else if (keyEvent.isShortcutDown() && KeyCode.ADD.equals(keyEvent.getCode())) {
             incrementZoom();
-        }else if(keyEvent.isShortcutDown() && KeyCode.SUBTRACT.equals(keyEvent.getCode())){
+        } else if (keyEvent.isShortcutDown() && KeyCode.SUBTRACT.equals(keyEvent.getCode())) {
             decrementZoom();
         }
     };
+    
+    /**
+     * We want NOT to go in edition if we're pressing SHIFT and if we're using
+     * the navigation keys. But we still want the user to go in edition with
+     * SHIFT and some letters for example if he wants a capital letter. FIXME
+     * Add a test to prevent the Shift fail case.
+     *
+     * We go in edition if we're typing a letter or a digit simply. Also add the
+     * sign because we can directly modify the number by typing "+1" in a cell.
+     *
+     * @param keyEvent
+     * @return
+     */
+    private boolean isEditionKey(KeyEvent keyEvent) {
+        return !keyEvent.isShortcutDown()
+                && !keyEvent.getCode().isNavigationKey()
+                && !keyEvent.getCode().isFunctionKey()
+                && !keyEvent.getCode().isModifierKey()
+                && !keyEvent.getCode().isMediaKey()
+                && keyEvent.getCode() != KeyCode.ESCAPE;
+    }
     
     /**
      * This event is thrown on the SpreadsheetView when the user resize a row
@@ -1932,12 +2529,12 @@ public class SpreadsheetView extends Control{
          */
         public static final EventType<RowHeightEvent> ROW_HEIGHT_CHANGE = new EventType<>(Event.ANY, "RowHeightChange"); //$NON-NLS-1$
 
-        private final int row;
+        private final int modelRow;
         private final double height;
 
         public RowHeightEvent(int row, double height) {
             super(ROW_HEIGHT_CHANGE);
-            this.row = row;
+            this.modelRow = row;
             this.height = height;
         }
 
@@ -1946,7 +2543,7 @@ public class SpreadsheetView extends Control{
          * @return the row index that has been resized.
          */
         public int getRow() {
-            return row;
+            return modelRow;
         }
 
         /**

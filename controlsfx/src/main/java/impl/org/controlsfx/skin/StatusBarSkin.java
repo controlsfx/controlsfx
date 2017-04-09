@@ -27,7 +27,7 @@
 package impl.org.controlsfx.skin;
 
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SkinBase;
@@ -47,6 +47,8 @@ public class StatusBarSkin extends SkinBase<StatusBar> {
     public StatusBarSkin(StatusBar statusBar) {
         super(statusBar);
 
+        GridPane gridPane = new GridPane();
+        
         leftBox = new HBox();
         leftBox.getStyleClass().add("left-items"); //$NON-NLS-1$
 
@@ -54,15 +56,14 @@ public class StatusBarSkin extends SkinBase<StatusBar> {
         rightBox.getStyleClass().add("right-items"); //$NON-NLS-1$
 
         progressBar = new ProgressBar();
-        progressBar.progressProperty().bind(statusBar.progressProperty());
-        progressBar.visibleProperty().bind(
-                Bindings.notEqual(0, statusBar.progressProperty()));
+       
 
         label = new Label();
         label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         label.textProperty().bind(statusBar.textProperty());
         label.graphicProperty().bind(statusBar.graphicProperty());
         label.getStyleClass().add("status-label"); //$NON-NLS-1$
+        label.styleProperty().bind(getSkinnable().styleProperty());
 
         leftBox.getChildren().setAll(getSkinnable().getLeftItems());
 
@@ -76,8 +77,7 @@ public class StatusBarSkin extends SkinBase<StatusBar> {
                 (Observable evt) -> rightBox.getChildren().setAll(
                         getSkinnable().getRightItems()));
 
-        GridPane gridPane = new GridPane();
-
+        
         GridPane.setFillHeight(leftBox, true);
         GridPane.setFillHeight(rightBox, true);
         GridPane.setFillHeight(label, true);
@@ -96,5 +96,21 @@ public class StatusBarSkin extends SkinBase<StatusBar> {
         gridPane.add(rightBox, 4, 0);
 
         getChildren().add(gridPane);
+        
+        /**
+         * We want to remove the progressBar from the GridPane when no Task is
+         * being executed. We used to toggle its visibility but the progressBar
+         * was still there and messing with the alignment.
+         */
+        progressBar.progressProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            if (newValue.doubleValue() > 0.0) {
+                if (!gridPane.getChildren().contains(progressBar)) {
+                    gridPane.add(progressBar, 2, 0);
+                }
+            } else {
+                gridPane.getChildren().remove(progressBar);
+            }
+        });
+        progressBar.progressProperty().bind(statusBar.progressProperty());
     }
 }

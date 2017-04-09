@@ -132,7 +132,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             return;
         }
 
-        final List<SpreadsheetCell> row = grid.getRows().get(index);
+        final List<SpreadsheetCell> row = getSkinnable().getItem();//.get(index);
         final List<SpreadsheetColumn> columns = spreadsheetView.getColumns();
         final ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> tableViewColumns = gridView.getColumns();
         /**
@@ -183,11 +183,18 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         boolean needToBeShifted;
         boolean rowHeightChange = false;
         for (int indexColumn = 0; indexColumn < columns.size(); indexColumn++) {
-
+            //FIXME Problem qwith column span
+            if(!skin.getSkinnable().getColumns().get(indexColumn).isVisible()){
+                continue;
+            }
             width = snapSize(columns.get(indexColumn).getWidth()) - snapSize(horizontalPadding);
-
+            //When setting a new grid with less columns, we may have this situation.
+            if (row.size() <= indexColumn) {
+                break;
+            }
             final SpreadsheetCell spreadsheetCell = row.get(indexColumn);
-            boolean isVisible = !isInvisible(x, width, hbarValue, headerWidth, spreadsheetCell.getColumnSpan());
+            final int columnSpan = spreadsheetView.getColumnSpan(spreadsheetCell);
+            boolean isVisible = !isInvisible(x, width, hbarValue, headerWidth, columnSpan);
 
             if (columns.get(indexColumn).isFixed()) {
                 isVisible = true;
@@ -222,10 +229,11 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
              * fixedColumnWidth will be wrong.
              */
             boolean increaseFixedWidth = false;
+            final int viewColumn =spreadsheetView.getViewColumn(spreadsheetCell.getColumn()); 
             //Virtualization of column
             // We translate that column by the Hbar Value if it's fixed
             if (columns.get(indexColumn).isFixed()) {
-                if (hbarValue + fixedColumnWidth > x && spreadsheetCell.getColumn() == indexColumn) {
+                if (hbarValue + fixedColumnWidth > x &&  viewColumn== indexColumn) {
                     increaseFixedWidth = true;
                     tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
 //                	 tableCell.toFront();
@@ -236,7 +244,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             }
 
             if (isVisible) {
-                final SpreadsheetView.SpanType spanType = grid.getSpanType(spreadsheetView, index, indexColumn);
+                final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(index, indexColumn);
 
                 switch (spanType) {
                     case ROW_SPAN_INVISIBLE:
@@ -252,26 +260,6 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
 //                        cells.remove(tableCell);
                         continue; // we don't want to fall through
                     case ROW_VISIBLE:
-//                        final TableViewSpanSelectionModel sm = (TableViewSpanSelectionModel) handle.getGridView().getSelectionModel();
-//                        final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tableViewColumns.get(indexColumn);
-
-                    /**
-                     * In case this cell was selected before but we scroll
-                     * up/down and it's invisible now. It has to pass his
-                         * "selected property" to the new Cell in charge of
-                         * spanning
-                     */
-//                        final TablePosition<ObservableList<SpreadsheetCell>, ?> selectedPosition = sm.isSelectedRange(index, col, indexColumn);
-                    // If the selected cell is in the same row, no need to re-select it
-//                        if (selectedPosition != null
-//                                //When shift selecting, all cells become ROW_VISIBLE so
-//                                //We avoid loop selecting here
-//                                && skin.containsRow(index)
-//                                && selectedPosition.getRow() != index) {
-//                            sm.clearSelection(selectedPosition.getRow(),
-//                                    selectedPosition.getTableColumn());
-//                            sm.select(index, col);
-//                        }
                     case NORMAL_CELL: // fall through and carry on
                         if (tableCell.getIndex() != index) {
                             tableCell.updateIndex(index);
@@ -290,15 +278,15 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                         }
                 }
 
-                if (spreadsheetCell.getColumnSpan() > 1) {
+                if (columnSpan > 1) {
                     /**
                      * we need to span multiple columns, so we sum up the width
                      * of the additional columns, adding it to the width
                      * variable
                      */
-                    for (int i = 1, colSpan = spreadsheetCell.getColumnSpan(), max1 = columns
-                            .size() - indexColumn; i < colSpan && i < max1; i++) {
-                        double tempWidth = snapSize(columns.get(indexColumn + i).getWidth());
+                    final int max = skin.getSkinnable().getVisibleLeafColumns().size() - viewColumn;
+                    for (int i = 1, colSpan = columnSpan; i < colSpan && i < max; i++) {
+                        double tempWidth = snapSize(skin.getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
                         width += tempWidth;
                         if (increaseFixedWidth) {
                             fixedColumnWidth += tempWidth;
@@ -316,10 +304,11 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                  * next rows needs to know that this row is bigger than usual.
                  */
                 if (controlHeight == Grid.AUTOFIT && !tableCell.isEditing()) {
-                    double tempHeight = tableCell.prefHeight(width);
+                    //We have the problem when we are just one pixel short in height..
+                    double tempHeight = tableCell.prefHeight(width) + tableCell.snappedTopInset() + tableCell.snappedBottomInset();
                     if (tempHeight > customHeight) {
                         rowHeightChange = true;
-                        skin.rowHeightMap.put(index, tempHeight);
+                        skin.rowHeightMap.put(spreadsheetCell.getRow(), tempHeight);
                         for (CellView cell : cells) {
                             /**
                              * We need to add the difference between the
@@ -337,28 +326,48 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
 
                 height = customHeight;
                 height = snapSize(height) - snapSize(verticalPadding);
-                /**
+               /**
                  * We need to span multiple rows, so we sum up the height of all
                  * the rows. The height of the current row is ignored and the
                  * whole value is computed.
                  */
-                if (spreadsheetCell.getRowSpan() > 1) {
+                int rowSpan = spreadsheetView.getRowSpan(spreadsheetCell, index);
+                if (rowSpan > 1) {
                     height = 0;
-                    final int maxRow = spreadsheetCell.getRow() + spreadsheetCell.getRowSpan();
-                    for (int i = spreadsheetCell.getRow(); i < maxRow; ++i) {
+                    final int maxRow = index + rowSpan;
+                    for (int i = index; i < maxRow; ++i) {
                         height += snapSize(skin.getRowHeight(i));
                     }
                 }
 
-                tableCell.resize(width, height);
+                //Fix for JDK-8146406
+                needToBeShifted = false;
+                /**
+                 * If the current cell has no left border, and the previous cell
+                 * had no right border. We may have the problem
+                 * where there is a tiny gap between the cells when scrolling
+                 * horizontally. Thus we must enlarge this cell a bit, and shift
+                 * it a bit in order to mask that gap. If the cell has a border
+                 * defined, the problem seems not to happen.
+                 * If the cell is not added to its parent, it has no border by default so we must not check it.
+                 */
+                if (/*spreadsheetView.getFixedRows().contains(spreadsheetCell.getRow())
+                        && */lastCell != null
+                        && !hasRightBorder(lastCell)
+                        && !hasLeftBorder(tableCell)) {
+                    tableCell.resize(width + 1, height);
+                    needToBeShifted = true;
+                } else {
+                    tableCell.resize(width, height);
+                }
                 lastCell = tableCell;
                 // We want to place the layout always at the starting cell.
                 double spaceBetweenTopAndMe = 0;
-                for (int p = spreadsheetCell.getRow(); p < index; ++p) {
-                    spaceBetweenTopAndMe += skin.getRowHeight(p);
-                }
+//                for (int p = spreadsheetCell.getRow(); p < index; ++p) {
+//                    spaceBetweenTopAndMe += skin.getRowHeight(p);
+//                }
 
-                tableCell.relocate(x + tableCellX, snappedTopInset()
+                tableCell.relocate(x + tableCellX + (needToBeShifted? -1 : 0), snappedTopInset()
                         - spaceBetweenTopAndMe + ((GridRow) getSkinnable()).verticalShift.get());
 
                 // Request layout is here as (partial) fix for RT-28684
@@ -379,9 +388,21 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
          * triggered, because it's not the user who has modified that. So the
          * rectangle will not update, we need to force it here.
          */
-        if (rowHeightChange && spreadsheetView.getFixedRows().contains(index)) {
+        if (rowHeightChange && spreadsheetView.getFixedRows().contains(spreadsheetView.getModelRow(index))) {
             skin.computeFixedRowHeight();
         }
+    }
+
+    private boolean hasRightBorder(CellView tableCell) {
+        return tableCell.getBorder() != null 
+                && !tableCell.getBorder().isEmpty() 
+                && tableCell.getBorder().getStrokes().get(0).getWidths().getRight() > 0;
+    }
+    
+    private boolean hasLeftBorder(CellView tableCell) {
+        return tableCell.getBorder() != null 
+                && !tableCell.getBorder().isEmpty() 
+                && tableCell.getBorder().getStrokes().get(0).getWidths().getLeft()> 0;
     }
 
     /**
@@ -423,24 +444,28 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             GridRow gridRow = handle.getCellsViewSkin().getFlow().getTopRow();
             if (gridRow != null) {
                 for (CellView cell : fixedCells) {
-                    final double originalLayoutY = getSkinnable().getLayoutY() + cell.getLayoutY();
-                    gridRow.removeCell(cell);
-                    gridRow.addCell(cell);
-                    if (handle.getCellsViewSkin().deportedCells.containsKey(gridRow)) {
-                        handle.getCellsViewSkin().deportedCells.get(gridRow).add(cell);
-                    } else {
-                        Set<CellView> temp = new HashSet<>();
-                        temp.add(cell);
-                        handle.getCellsViewSkin().deportedCells.put(gridRow, temp);
+                    if(!cell.isEditing()){
+                        gridRow.removeCell(cell);
+                        gridRow.addCell(cell);
                     }
-                    /**
-                     * I need to have the layoutY of the original row, but also
-                     * to remove the layoutY of the row I'm adding in. Because
-                     * if the first row is fixed and is undergoing a bit of
-                     * translate in order to be visible, we need to remove that
-                     * "bit of translate".
-                     */
-                    cell.relocate(cell.getLayoutX(), originalLayoutY - gridRow.getLayoutY());
+                        final double originalLayoutY = getSkinnable().getLayoutY() + cell.getLayoutY();
+                        
+                        if (handle.getCellsViewSkin().deportedCells.containsKey(gridRow)) {
+                            handle.getCellsViewSkin().deportedCells.get(gridRow).add(cell);
+                        } else {
+                            Set<CellView> temp = new HashSet<>();
+                            temp.add(cell);
+                            handle.getCellsViewSkin().deportedCells.put(gridRow, temp);
+                        }
+                        /**
+                         * I need to have the layoutY of the original row, but
+                         * also to remove the layoutY of the row I'm adding in.
+                         * Because if the first row is fixed and is undergoing a
+                         * bit of translate in order to be visible, we need to
+                         * remove that "bit of translate".
+                         */
+                        cell.setLayoutX(cell.getLayoutX());
+                        cell.setLayoutY(originalLayoutY - gridRow.getLayoutY());
                 }
             }
         } else {
@@ -509,14 +534,16 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
      */
     private double getFixedRowShift(int index) {
         double tableCellY = 0;
-        int positionY = spreadsheetView.getFixedRows().indexOf(index);
+        int positionY = spreadsheetView.getFixedRows().indexOf(spreadsheetView.getFilteredSourceIndex(index));
 
         //FIXME Integrate if fixedCellSize is enabled
         //Computing how much space we need to translate
         //because each row has different space.
         double space = 0;
         for (int o = 0; o < positionY; ++o) {
-            space += handle.getCellsViewSkin().getRowHeight(spreadsheetView.getFixedRows().get(o));
+            if(!spreadsheetView.isRowHidden(o)){
+                space += handle.getCellsViewSkin().getRowHeight(spreadsheetView.getFixedRows().get(o));
+            }
         }
 
         //If true, this row is fixed
@@ -537,8 +564,8 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
      * @return
      */
     private double getTableRowHeight(int row) {
-        Double rowHeightCache = handle.getCellsViewSkin().rowHeightMap.get(row);
-        return rowHeightCache == null ? handle.getView().getGrid().getRowHeight(row) : rowHeightCache;
+        Double rowHeightCache = handle.getCellsViewSkin().rowHeightMap.get(spreadsheetView.getModelRow(row));
+        return rowHeightCache == null ? handle.getView().getGrid().getRowHeight(spreadsheetView.getModelRow(row)) : rowHeightCache;
     }
 
     /**

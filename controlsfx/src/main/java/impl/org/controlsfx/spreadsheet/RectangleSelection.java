@@ -277,7 +277,7 @@ public class RectangleSelection extends Rectangle {
                 x = 0;
                 width = 0;
                 for (SpreadsheetColumn column : skin.spreadsheetView.getFixedColumns()) {
-                    int indexColumn = columns.indexOf(column);
+                    int indexColumn = skin.spreadsheetView.getViewColumn(columns.indexOf(column));
                     if (indexColumn < minColumn && indexColumn != minColumn) {
                         x += snapSize(column.getWidth());
                     }
@@ -293,7 +293,7 @@ public class RectangleSelection extends Rectangle {
             } else if (x < skin.fixedColumnWidth) {
                 double tempX = 0;
                 for (SpreadsheetColumn column : skin.spreadsheetView.getFixedColumns()) {
-                    int indexColumn = columns.indexOf(column);
+                    int indexColumn = skin.spreadsheetView.getViewColumn(columns.indexOf(column));
                     if (indexColumn < minColumn && indexColumn != minColumn) {
                         tempX += snapSize(column.getWidth());
                     }

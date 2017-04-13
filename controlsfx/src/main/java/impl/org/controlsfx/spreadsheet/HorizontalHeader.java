@@ -273,7 +273,7 @@ public class HorizontalHeader extends TableHeaderRow {
      * @param column
      */
     private void fixColumn(SpreadsheetColumn column) {
-        addStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(column));
+        addStyleHeader(gridViewSkin.spreadsheetView.getViewColumn(gridViewSkin.spreadsheetView.getColumns().indexOf(column)));
     }
 
     /**
@@ -282,7 +282,7 @@ public class HorizontalHeader extends TableHeaderRow {
      * @param column
      */
     private void unfixColumn(SpreadsheetColumn column) {
-        removeStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(column));
+        removeStyleHeader(gridViewSkin.spreadsheetView.getViewColumn(gridViewSkin.spreadsheetView.getColumns().indexOf(column)));
     }
 
     /**

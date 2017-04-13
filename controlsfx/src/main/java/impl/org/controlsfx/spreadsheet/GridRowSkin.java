@@ -233,7 +233,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             //Virtualization of column
             // We translate that column by the Hbar Value if it's fixed
             if (columns.get(indexColumn).isFixed()) {
-                if (hbarValue + fixedColumnWidth > x &&  viewColumn== indexColumn) {
+                if (hbarValue + fixedColumnWidth > x /*&&  viewColumn== indexColumn*/) {
                     increaseFixedWidth = true;
                     tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
 //                	 tableCell.toFront();

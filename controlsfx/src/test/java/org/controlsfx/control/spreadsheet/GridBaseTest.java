@@ -92,29 +92,29 @@ public class GridBaseTest {
         SpreadsheetView spv = new SpreadsheetView(grid);
         SpreadsheetView.SpanType type = SpanType.NORMAL_CELL;
 
-        assertEquals(type, grid.getSpanType(spv, -1, -1));
-        assertEquals(type, grid.getSpanType(spv, Integer.MAX_VALUE, Integer.MAX_VALUE));
-        assertEquals(type, grid.getSpanType(spv, Integer.MAX_VALUE, -1));
-        assertEquals(type, grid.getSpanType(spv, -1, Integer.MAX_VALUE));
-        assertEquals(type, grid.getSpanType(spv, grid.getRowCount(), grid.getColumnCount()));
+        assertEquals(type, spv.getSpanType( -1, -1));
+        assertEquals(type, spv.getSpanType( Integer.MAX_VALUE, Integer.MAX_VALUE));
+        assertEquals(type, spv.getSpanType( Integer.MAX_VALUE, -1));
+        assertEquals(type, spv.getSpanType( -1, Integer.MAX_VALUE));
+        assertEquals(type, spv.getSpanType( grid.getRowCount(), grid.getColumnCount()));
         
         grid.spanColumn(5, 0, 0);
-        assertEquals(SpanType.NORMAL_CELL, grid.getSpanType(spv, 0, 0));
-        assertEquals(SpanType.COLUMN_SPAN_INVISIBLE, grid.getSpanType(spv, 0, 1));
-        assertEquals(SpanType.COLUMN_SPAN_INVISIBLE, grid.getSpanType(spv, 0, 2));
-        assertEquals(SpanType.COLUMN_SPAN_INVISIBLE, grid.getSpanType(spv, 0, 3));
-        assertEquals(SpanType.COLUMN_SPAN_INVISIBLE, grid.getSpanType(spv, 0, 4));
+        assertEquals(SpanType.NORMAL_CELL, spv.getSpanType( 0, 0));
+        assertEquals(SpanType.COLUMN_SPAN_INVISIBLE, spv.getSpanType( 0, 1));
+        assertEquals(SpanType.COLUMN_SPAN_INVISIBLE, spv.getSpanType( 0, 2));
+        assertEquals(SpanType.COLUMN_SPAN_INVISIBLE, spv.getSpanType( 0, 3));
+        assertEquals(SpanType.COLUMN_SPAN_INVISIBLE, spv.getSpanType( 0, 4));
         
         grid.spanRow(5, 0, 0);
-        assertEquals(SpanType.ROW_VISIBLE, grid.getSpanType(spv, 0, 0));
-        assertEquals(SpanType.ROW_SPAN_INVISIBLE, grid.getSpanType(spv, 1, 0));
-        assertEquals(SpanType.ROW_SPAN_INVISIBLE, grid.getSpanType(spv, 2, 0));
-        assertEquals(SpanType.ROW_SPAN_INVISIBLE, grid.getSpanType(spv, 3, 0));
-        assertEquals(SpanType.ROW_SPAN_INVISIBLE, grid.getSpanType(spv, 4, 0));
+        assertEquals(SpanType.ROW_VISIBLE, spv.getSpanType( 0, 0));
+        assertEquals(SpanType.ROW_SPAN_INVISIBLE, spv.getSpanType( 1, 0));
+        assertEquals(SpanType.ROW_SPAN_INVISIBLE, spv.getSpanType( 2, 0));
+        assertEquals(SpanType.ROW_SPAN_INVISIBLE, spv.getSpanType( 3, 0));
+        assertEquals(SpanType.ROW_SPAN_INVISIBLE, spv.getSpanType( 4, 0));
         
-        assertEquals(SpanType.BOTH_INVISIBLE, grid.getSpanType(spv, 1, 1));
-        assertEquals(SpanType.BOTH_INVISIBLE, grid.getSpanType(spv, 3, 4));
-        assertEquals(SpanType.BOTH_INVISIBLE, grid.getSpanType(spv, 2, 1));
+        assertEquals(SpanType.BOTH_INVISIBLE, spv.getSpanType( 1, 1));
+        assertEquals(SpanType.BOTH_INVISIBLE, spv.getSpanType( 3, 4));
+        assertEquals(SpanType.BOTH_INVISIBLE, spv.getSpanType( 2, 1));
     }
 
     /**

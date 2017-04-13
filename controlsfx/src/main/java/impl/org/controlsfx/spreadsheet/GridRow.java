@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
     public GridRow(SpreadsheetHandle handle) {
         super();
         this.handle = handle;
-      
+
         /**
          *  FIXME Bug? When re-using the row, it should re-compute the prefHeight and not
          *  keep the old value.
@@ -74,7 +74,10 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         this.indexProperty().addListener(weakPrefHeightListener);
         this.visibleProperty().addListener(weakPrefHeightListener);
         
-        handle.getView().gridProperty().addListener(weakPrefHeightListener);
+        handle.getView().gridProperty().addListener(weakGridListener);
+        handle.getView().hiddenRowsProperty().addListener(weakPrefHeightListener);
+        handle.getView().hiddenColumnsProperty().addListener(weakPrefHeightListener);
+        handle.getView().comparatorProperty().addListener(weakComparatorListener);
         
         /**
          * When the height is changing elsewhere, we need to update ourself if necessary.
@@ -83,9 +86,9 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
 
             @Override
             public void onChanged(MapChangeListener.Change<? extends Integer, ? extends Double> change) {
-                if (change.wasAdded() && change.getKey() == getIndex()) {
+                if (change.wasAdded() && change.getKey() == handle.getView().getModelRow(getIndex())) {
                     setRowHeight(change.getValueAdded());
-                } else if (change.wasRemoved() && change.getKey() == getIndex()) {
+                } else if (change.wasRemoved() && change.getKey() == handle.getView().getModelRow(getIndex())) {
                     setRowHeight(computePrefHeight(-1));
                 }
             }
@@ -159,4 +162,32 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
     };
 
     private final WeakEventHandler<MouseEvent> weakDragHandler = new WeakEventHandler(dragDetectedEventHandler);
+   
+    /**
+     * When the Grid is changing, we have recreated a new SortedList, therefore
+     * we must re-attach our listener to the Comparator.
+     */
+    private final InvalidationListener gridListener = new InvalidationListener() {
+
+        @Override
+        public void invalidated(Observable o) {
+            setRowHeight(computePrefHeight(-1));
+            handle.getView().comparatorProperty().addListener(weakComparatorListener);
+        }
+    };
+
+    private final WeakInvalidationListener weakGridListener = new WeakInvalidationListener(gridListener);
+    /**
+     * When the comparator is changing, we may have an issue with the fixedRow
+     * not updating their inner cells. So we force it.
+     */
+    private final InvalidationListener comparatorListener = new InvalidationListener() {
+        @Override
+        public void invalidated(Observable o) {
+            updateIndex(getIndex());
+            setRowHeight(computePrefHeight(-1));
+        }
+    };
+
+    private final WeakInvalidationListener weakComparatorListener = new WeakInvalidationListener(comparatorListener);
 }

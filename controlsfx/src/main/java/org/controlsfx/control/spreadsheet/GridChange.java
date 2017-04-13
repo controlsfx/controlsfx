@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX 
+ * Copyright (c) 2013, 2016 ControlsFX 
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ public class GridChange extends Event implements Serializable {
      * * Private Fields * *
      ************************************************************************* 
      */
-    private final int row;
+    private final int modelRow;
     private final int column;
     private final Object oldValue;
     private final Object newValue;
@@ -70,14 +70,14 @@ public class GridChange extends Event implements Serializable {
      * Constructor of a GridChange when a change inside a
      * {@link SpreadsheetCell} is happening.
      * 
-     * @param row
+     * @param modelRow
      * @param column
      * @param oldValue
      * @param newValue
      */
-    public GridChange(int row, int column, Object oldValue, Object newValue) {
+    public GridChange(int modelRow, int column, Object oldValue, Object newValue) {
         super(GRID_CHANGE_EVENT);
-        this.row = row;
+        this.modelRow = modelRow;
         this.column = column;
         this.oldValue = oldValue;
         this.newValue = newValue;
@@ -94,7 +94,7 @@ public class GridChange extends Event implements Serializable {
      * @return the row number of this change.
      */
     public int getRow() {
-        return row;
+        return modelRow;
     }
 
     /**

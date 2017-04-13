@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2017 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,8 +40,6 @@ import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -242,14 +240,11 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          * When we are changing the grid we re-instantiate the rowToLayout because
          * spans and fixedRow may have changed.
          */
-        handle.getView().gridProperty().addListener(new ChangeListener<Grid>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Grid> ov, Grid t, Grid t1) {
-                 rowToLayout = initRowToLayoutBitSet();
-            }
-        });
-        hBarValue = new BitSet(handle.getView().getGrid().getRowCount());
+        handle.getView().gridProperty().addListener(rowToLayoutListener);
+        handle.getView().hiddenRowsProperty().addListener(rowToLayoutListener);
+        handle.getView().hiddenColumnsProperty().addListener(rowToLayoutListener);
+        
+        hBarValue = new BitSet(getItemCount());
         rowToLayout = initRowToLayoutBitSet();
         // Because fixedRow Listener is not reacting first time.
         computeFixedRowHeight();
@@ -310,6 +305,12 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         registerChangeListener(tableView.fixedCellSizeProperty(), "FIXED_CELL_SIZE");
     }
 
+    private InvalidationListener rowToLayoutListener = new InvalidationListener() {
+        @Override
+        public void invalidated(Observable observable) {
+            rowToLayout = initRowToLayoutBitSet();
+        }
+    };
     /**
      * Compute the height of a particular row. If the row is in
      * {@link Grid#AUTOFIT}, {@link #DEFAULT_CELL_HEIGHT} is returned.
@@ -318,9 +319,12 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * @return
      */
     public double getRowHeight(int row) {
-        Double rowHeightCache = rowHeightMap.get(row);
+        if (row == -1) {
+            return DEFAULT_CELL_HEIGHT;
+        }
+        Double rowHeightCache = rowHeightMap.get(spreadsheetView.getModelRow(row));
         if (rowHeightCache == null) {
-            double rowHeight = handle.getView().getGrid().getRowHeight(row);
+            double rowHeight = handle.getView().getGrid().getRowHeight(spreadsheetView.getModelRow(row));
             return rowHeight == Grid.AUTOFIT ? DEFAULT_CELL_HEIGHT : rowHeight;
         } else {
             return rowHeightCache;
@@ -331,6 +335,10 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         return fixedRowHeight;
     }
 
+    /**
+     * Contains the index of the sortedList.
+     * @return 
+     */
     public ObservableList<Integer> getSelectedRows() {
         return selectedRows;
     }
@@ -367,6 +375,25 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     }
     
     /**
+     * This return the first index displaying a cell in case of a rowSpan. If
+     * the returned index is the same as given, it means the current cell is the
+     * one showing. Otherwise, it means another cell above will be the one
+     * drawn.
+     *
+     * @param cell
+     * @param index
+     * @return
+     */
+    public int getFirstRow(SpreadsheetCell cell, int index) {
+        do {
+            --index;
+        } while (index >= 0
+                && spreadsheetView.getItems().get(index).get(cell.getColumn()) == cell);
+
+        return index + 1;
+    }
+    
+    /**
      * This return the row at the specified index in the list. The index
      * specified HAS NOTHING to do with the index of the row.
      * @see #getRowIndexed(int) for a getting a row with its real index.
@@ -374,7 +401,10 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * @return
      */
     public GridRow getRow(int index) {
-        return (GridRow) getFlow().getCells().get(index);
+        if (index < getFlow().getCells().size()) {
+            return (GridRow) getFlow().getCells().get(index);
+        }
+        return null;
     }
 
     /**
@@ -426,9 +456,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * Will compute for the row the necessary height and fit the line.
      * This can degrade performance a lot so need to use it wisely. 
      * But I don't see other solutions right now.
-     * @param row
+     * @param modelRow
      */
-    public void resizeRowToFitContent(int row) {
+    public void resizeRowToFitContent(int modelRow) {
         if(getSkinnable().getColumns().isEmpty()){
             return;
         }
@@ -438,7 +468,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             return;
         }
         
-        if (!spreadsheetView.getGrid().isRowResizable(row)) {
+        if (!spreadsheetView.getGrid().isRowResizable(modelRow)) {
             return;
         }
         Callback/* <TableColumn<T, ?>, TableCell<T,?>> */ cellFactory = col.getCellFactory();
@@ -467,22 +497,37 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         double maxHeight;
         maxHeight = 0;
         getChildren().add(cell);
-
-        for (TableColumn column : getSkinnable().getColumns()) {
+        int columnSize = getSkinnable().getColumns().size();
+        for (int viewColumn = 0; viewColumn < columnSize; ++viewColumn) {
+            TableColumn column = getSkinnable().getColumns().get(viewColumn);
             cell.updateTableColumn(column);
             cell.updateTableView(handle.getGridView());
-            cell.updateIndex(row);
+            cell.updateIndex(modelRow);
+            SpreadsheetCell spc = cell.getItem();
+            double width = column.getWidth();
+            if (spc != null && spc.getColumn() == viewColumn && spc.getColumnSpan() > 1) {
+                /**
+                 * we need to span multiple columns, so we sum up the width of
+                 * the additional columns, adding it to the width variable
+                 */
+                final int max = getSkinnable().getVisibleLeafColumns().size() - viewColumn;
+                for (int i = 1, colSpan = spc.getColumnSpan(); i < colSpan && i < max; i++) {
+                    double tempWidth = snapSize(getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
+                    width += tempWidth;
+                }
+            }
 
-            if ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null) {
+            if (spc != null && spc.getColumn() == viewColumn && 
+                    ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null)) {
                 cell.setWrapText(true);
 
                 cell.impl_processCSS(false);
-                maxHeight = Math.max(maxHeight, cell.prefHeight(column.getWidth()));
+                maxHeight = Math.max(maxHeight, cell.prefHeight(width));
             }
         }
         getChildren().remove(cell);
-        rowHeightMap.put(row, maxHeight + padding);
-        Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(row, maxHeight + padding));
+        rowHeightMap.put(modelRow, maxHeight + padding);
+        Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(modelRow, maxHeight + padding));
 
         rectangleSelection.updateRectangle();
     }
@@ -500,11 +545,11 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         }
         
         rowHeightMap.clear();
-        int maxRows = handle.getView().getGrid().getRowCount();
-        for (int row = 0; row < maxRows; row++) {
-            if (grid.isRowResizable(row)) {
-                Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(row, maxHeight));
-                rowHeightMap.put(row, maxHeight);
+        int maxRows = handle.getView().getGrid().getRows().size();
+        for (int modelRow = 0; modelRow < maxRows; modelRow++) {
+            if (grid.isRowResizable(modelRow)) {
+                Event.fireEvent(spreadsheetView, new SpreadsheetView.RowHeightEvent(modelRow, maxHeight));
+                rowHeightMap.put(modelRow, maxHeight);
             }
         }
         rectangleSelection.updateRectangle();
@@ -519,7 +564,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          * the rows will not detect that maybe the height has changed.
          */
         for (GridRow row : (List<GridRow>) getFlow().getCells()) {
-            if (grid.isRowResizable(row.getIndex())) {
+            if (grid.isRowResizable(spreadsheetView.getModelRow(row.getIndex()))) {
                 double newHeight = row.computePrefHeight(-1);
                 if (row.getPrefHeight() != newHeight) {
                     row.setRowHeight(newHeight);
@@ -532,9 +577,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         getFlow().layoutChildren();
 
         for (GridRow row : (List<GridRow>) getFlow().getCells()) {
-            double height = getRowHeight(row.getIndex());
+            double height = getRowHeight(spreadsheetView.getModelRow(row.getIndex()));
             if (row.getHeight() != height) {
-                if (grid.isRowResizable(row.getIndex())) {
+                if (grid.isRowResizable(spreadsheetView.getModelRow(row.getIndex()))) {
                     row.setRowHeight(height);
                 }
             }
@@ -608,8 +653,12 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          * destroy the grid... So in that case, we manually set the skin...
          */
         if (cell.getSkin() == null) {
-            cell.setSkin(new CellViewSkin((TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell>) cell));
+            cell.setSkin(new CellViewSkin((CellView) cell));
         }
+         SpreadsheetColumn column = spreadsheetView.getColumns().get(indexColumn);
+        //We add the size of the menuButton of the filter if necessary.
+        double cellFilterWidth = 0;
+        
         for (int row = 0; row < rows; row++) {
             cell.updateIndex(row);
             
@@ -621,6 +670,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                 }
                 cell.impl_processCSS(false);
                 double width = cell.prefWidth(-1);
+                if(row == spreadsheetView.getFilteredRow()){
+                    cellFilterWidth = width;
+                }
                 /**
                  * If the cell is spanning in column, we need to take the other
                  * columns into account in the calculation of the width. So we
@@ -632,8 +684,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                  * calculation on the current width which will be modified.
                  */
                 SpreadsheetCell spc = gridRows.get(row).get(indexColumn);
-                if (spc.getColumnSpan() > 1) {
-                    for (int i = spc.getColumn(); i < spc.getColumn() + spc.getColumnSpan(); ++i) {
+                if (spreadsheetView.getColumnSpan(spc) > 1) {
+                    for (int i = spreadsheetView.getViewColumn(spc.getColumn()); i < spreadsheetView.getViewColumn(spc.getColumn()) + spreadsheetView.getColumnSpan(spc); ++i) {
                         if(i != indexColumn){
                             width -= spreadsheetView.getColumns().get(i).getWidth();
                         }
@@ -652,9 +704,14 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if (handle.getGridView().getColumnResizePolicy() == TableView.CONSTRAINED_RESIZE_POLICY) {
             widthMax = Math.max(widthMax, col.getWidth());
         }
-
+        
         if (datePresent && widthMax < DATE_CELL_MIN_WIDTH) {
             widthMax = DATE_CELL_MIN_WIDTH;
+        }
+        if (column.getFilter() != null) {
+            //We get the maximum between our widthMax and the cell with a filter.
+            cellFilterWidth += column.getFilter().getMenuButton().getWidth() <= 0 ? 24.0 : column.getFilter().getMenuButton().getWidth();
+            widthMax = Math.max(widthMax, cellFilterWidth);
         }
         /**
          * This method is called by the system at initialisation and later by
@@ -746,6 +803,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if (spreadsheetView.showColumnHeaderProperty().get()) {
             // position the table header
             tableHeaderRowHeight = getTableHeaderRow().prefHeight(-1);
+            //For unknow reason, the height of the columnHeader is smaller when nothing is clicked in the grid..
+            tableHeaderRowHeight = tableHeaderRowHeight < DEFAULT_CELL_HEIGHT ? DEFAULT_CELL_HEIGHT : tableHeaderRowHeight;
             layoutInArea(getTableHeaderRow(), x, y, w, tableHeaderRowHeight, baselineOffset, HPos.CENTER, VPos.CENTER);
 
             y += tableHeaderRowHeight;
@@ -770,6 +829,16 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         focusScroll();
     }
 
+    private int getFixedRowSize() {
+        int i = 0;
+        for (Integer fixedRow : spreadsheetView.getFixedRows()) {
+            if (!spreadsheetView.getHiddenRows().get(fixedRow)) {
+                i++;
+            }
+        }
+        return i;
+    }
+    
     void focusScroll() {
         final TableFocusModel<?, ?> fm = getFocusModel();
         if (fm == null) {
@@ -783,8 +852,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         final int row = fm.getFocusedIndex();
         // We try to make visible the rows that may be hidden by Fixed rows
         if (!getFlow().getCells().isEmpty()
-                && getFlow().getCells().get(spreadsheetView.getFixedRows().size()).getIndex() > row
-                && !spreadsheetView.getFixedRows().contains(row)) {
+                //FIXME
+                && getFlow().getCells().get(getFixedRowSize()).getIndex() > row
+                && !spreadsheetView.getFixedRows().contains(spreadsheetView.getModelRow(row))) {
             flow.scrollTo(row);
         } else {
             flow.show(row);
@@ -853,12 +923,15 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         int index = getColumns().indexOf(col);
         double start = 0;// scrollX;
 
-        for (int i = 0; i < index; ++i) {
-            SpreadsheetColumn column = spreadsheetView.getColumns().get(i);
-            if (column.isFixed()) {
-                fixedColumnWidth += column.getWidth();
+        for (int columnIndex = 0; columnIndex < index; ++columnIndex) {
+            //Do not add the width of hidden column!
+            if (!spreadsheetView.isColumnHidden(columnIndex)) {
+                SpreadsheetColumn column = spreadsheetView.getColumns().get(columnIndex);
+                if (column.isFixed()) {
+                    fixedColumnWidth += column.getWidth();
+                }
+                start += column.getWidth();
             }
-            start += column.getWidth();
         }
 
         final double end = start + col.getWidth();
@@ -906,18 +979,23 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * includes any row containing a span, or a fixed row.
      * @return 
      */
-    private BitSet initRowToLayoutBitSet(){
-        Grid grid =  handle.getView().getGrid();
-        BitSet bitSet = new BitSet(grid.getRowCount());
-        for(int row = 0;row<grid.getRowCount();++row){
-            if(spreadsheetView.getFixedRows().contains(row)){
+    private BitSet initRowToLayoutBitSet() {
+//        Grid grid = handle.getView().getGrid();
+        int rowCount = getItemCount();
+        BitSet bitSet = new BitSet(rowCount);
+        for (int row = 0; row < rowCount; ++row) {
+            if (spreadsheetView.getFixedRows().contains(spreadsheetView.getModelRow(row))) {
                 bitSet.set(row);
                 continue;
             }
-            List<SpreadsheetCell> myRow = grid.getRows().get(row);
-            for(SpreadsheetCell cell:myRow){
-                
-                if(cell.getRowSpan()>1 /*|| cell.getColumnSpan() >1*/){
+            List<SpreadsheetCell> myRow = handle.getGridView().getItems().get(row);
+            for (SpreadsheetCell cell : myRow) {
+                /**
+                 * No matter what the sort will do, we want to be behave with
+                 * caution here, and take the rowSpan even if the cell is
+                 * splitted afterwards.
+                 */
+                if (spreadsheetView.getRowSpanFilter(cell) > 1 /*|| cell.getColumnSpan() >1*/) {
                     bitSet.set(row);
                     break;
                 }
@@ -925,7 +1003,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         }
         return bitSet;
     }
-    
+
     /**
      * When the vertical moves, we update the verticalHeader
      */
@@ -947,18 +1025,18 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             while (c.next()) {
                 if (c.wasPermutated()) {
                     for (Integer fixedRow : c.getList()) {
-                        rowToLayout.set(fixedRow, true);
+                        rowToLayout.set(spreadsheetView.getFilteredRow(fixedRow), true);
                     }
                 } else {
                     for (Integer unfixedRow : c.getRemoved()) {
-                        rowToLayout.set(unfixedRow, false);
+                        rowToLayout.set(spreadsheetView.getFilteredRow(unfixedRow), false);
                     //If the grid permits it, we check the spanning in order not
                         //to remove a row that might need layout.
                         if (spreadsheetView.getGrid().getRows().size() > unfixedRow) {
                             List<SpreadsheetCell> myRow = spreadsheetView.getGrid().getRows().get(unfixedRow);
                             for (SpreadsheetCell cell : myRow) {
-                                if (cell.getRowSpan() > 1 || cell.getColumnSpan() > 1) {
-                                    rowToLayout.set(unfixedRow, true);
+                                if (spreadsheetView.getRowSpanFilter(cell) > 1 /*|| spreadsheetView.getColumnSpan(cell) > 1*/) {
+                                    rowToLayout.set(spreadsheetView.getFilteredRow(unfixedRow), true);
                                     break;
                                 }
                             }
@@ -967,7 +1045,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
 
                     //We check for the newly fixedRow
                     for (Integer fixedRow : c.getAddedSubList()) {
-                        rowToLayout.set(fixedRow, true);
+                        rowToLayout.set(spreadsheetView.getFilteredRow(fixedRow), true);
                     }
                 }
             }
@@ -1107,7 +1185,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     }
 
     @Override
-    public int getItemCount() {
+    public final int getItemCount() {
         return getSkinnable().getItems() == null ? 0 : getSkinnable().getItems().size();
     }
 

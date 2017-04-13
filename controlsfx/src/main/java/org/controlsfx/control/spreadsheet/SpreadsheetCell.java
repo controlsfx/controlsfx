@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import java.util.List;
 import java.util.Optional;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -35,6 +36,8 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.Node;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 
 /**
  *
@@ -61,7 +64,7 @@ public interface SpreadsheetCell {
      * when a corner state of a SpreadsheetCell is changed.
      */
     public static final EventType CORNER_EVENT_TYPE = new EventType("CornerEventType"); //$NON-NLS-1$
-
+    
     /**
      * This enum states the four different corner available for positioning 
      * some elements in a cell.
@@ -137,6 +140,31 @@ public interface SpreadsheetCell {
      */
     public void setWrapText(boolean wrapText);
 
+    /**
+     * Return true if this cell needs to display a popup when clicked in order
+     * to show some {@link MenuItem} like a {@link MenuButton}.
+     *
+     * @return true if this cell needs to display a popup.
+     */
+    public boolean hasPopup();
+
+    /**
+     * Set to true if this cell needs to display a popup when clicked in order
+     * to show some {@link MenuItem} like a {@link MenuButton}.
+     *
+     * @param value
+     */
+    public void setHasPopup(boolean value);
+
+    /**
+     * If {@link #hasPopup() } is set to true, this method will be called when
+     * the user clicks on the cell in order to gather the {@link MenuItem} to
+     * show in the Popup.
+     *
+     * @return the {@link MenuItem} to show in the Popup.
+     */
+    public List<MenuItem> getPopupItems();
+    
     /**
      * A string representation of the CSS style associated with this specific
      * Node. This is analogous to the "style" attribute of an HTML element. Note

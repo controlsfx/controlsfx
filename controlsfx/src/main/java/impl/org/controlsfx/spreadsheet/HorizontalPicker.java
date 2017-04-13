@@ -133,9 +133,11 @@ public class HorizontalPicker extends StackPane {
 
             getChildren().clear();
             int index = 0;
+            int modelColumn;
             for (TableColumnHeader column : horizontalHeader.getRootHeader().getColumnHeaders()) {
-                if (spv.getColumnPickers().containsKey(index)) {
-                    Label label = getPicker(spv.getColumnPickers().get(index));
+                modelColumn = spv.getModelColumn(index);
+                if (spv.getColumnPickers().containsKey(modelColumn)) {
+                    Label label = getPicker(spv.getColumnPickers().get(modelColumn));
                     label.resize(column.getWidth(), VerticalHeader.PICKER_SIZE);
                     label.layoutXProperty().bind(column.layoutXProperty());
 

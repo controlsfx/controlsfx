@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -62,7 +62,11 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
     public void changed(ObservableValue<? extends TablePosition<ObservableList<SpreadsheetCell>, ?>> ov,
             final TablePosition<ObservableList<SpreadsheetCell>, ?> oldPosition,
             final TablePosition<ObservableList<SpreadsheetCell>, ?> newPosition) {
-        final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(newPosition.getRow(), newPosition.getColumn());
+        int columnIndex = -1;
+        if (newPosition != null && newPosition.getTableColumn() != null) {
+            columnIndex = cellsView.getColumns().indexOf(newPosition.getTableColumn());
+        }
+        final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(newPosition.getRow(), columnIndex);
         switch (spanType) {
             case ROW_SPAN_INVISIBLE:
                 // If we notice that the new focused cell is the previous one,
@@ -70,7 +74,7 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
                 // already on the cell and we wanted to go below.
                 if (!spreadsheetView.isPressed() && oldPosition.getColumn() == newPosition.getColumn() && oldPosition.getRow() == newPosition.getRow() - 1) {
                     Platform.runLater(() -> {
-                        tfm.focus(getNextRowNumber(oldPosition, cellsView), oldPosition.getTableColumn());
+                        tfm.focus(getNextRowNumber(oldPosition, cellsView, spreadsheetView), oldPosition.getTableColumn());
                     });
 
                 } else {
@@ -96,14 +100,14 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
                 if (!spreadsheetView.isPressed() && oldPosition.getColumn() == newPosition.getColumn() - 1 && oldPosition.getRow() == newPosition.getRow()) {
 
                     Platform.runLater(() -> {
-                        tfm.focus(oldPosition.getRow(), getTableColumnSpan(oldPosition, cellsView));
+                        tfm.focus(oldPosition.getRow(), getTableColumnSpan(oldPosition, cellsView, spreadsheetView));
                     });
                 } else {
                     // If the current focused cell if hidden by column span, we
                     // go left
 
                     Platform.runLater(() -> {
-                        tfm.focus(newPosition.getRow(), cellsView.getColumns().get(newPosition.getColumn() - 1));
+                        tfm.focus(newPosition.getRow(), cellsView.getVisibleLeafColumn(newPosition.getColumn() - 1));
                     });
                 }
             default:
@@ -115,12 +119,12 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
      * Return the TableColumn right after the current TablePosition (including
      * the ColumSpan to be on a visible Cell)
      *
-     * @param t the current TablePosition
+     * @param pos the current TablePosition
      * @return
      */
-    static TableColumn<ObservableList<SpreadsheetCell>, ?> getTableColumnSpan(final TablePosition<?, ?> t, SpreadsheetGridView cellsView) {
-        return cellsView.getVisibleLeafColumn(t.getColumn()
-                + cellsView.getItems().get(t.getRow()).get(t.getColumn()).getColumnSpan());
+    static TableColumn<ObservableList<SpreadsheetCell>, ?> getTableColumnSpan(final TablePosition<?, ?> pos, SpreadsheetGridView cellsView, SpreadsheetView spv) {
+        return cellsView.getVisibleLeafColumn(pos.getColumn()
+                + spv.getColumnSpan(cellsView.getItems().get(pos.getRow()).get(cellsView.getColumns().indexOf(pos.getTableColumn()))));
     }
 
     /**
@@ -129,14 +133,15 @@ public class FocusModelListener implements ChangeListener<TablePosition<Observab
      *
      * @param pos
      * @param cellsView
+     * @param spv
      * @return
      */
-    public static int getNextRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView) {
-        return cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRowSpan()
-                + cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRow();
+    public static int getNextRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView, SpreadsheetView spv) {
+        return spv.getRowSpan(cellsView.getItems().get(pos.getRow()).get(cellsView.getColumns().indexOf(pos.getTableColumn())), pos.getRow())
+                +pos.getRow();
     }
-    
-    public static int getPreviousRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView) {
-        return cellsView.getItems().get(pos.getRow()).get(pos.getColumn()).getRow() -1;
-    }
+
+//    public static int getPreviousRowNumber(final TablePosition<?, ?> pos, TableView<ObservableList<SpreadsheetCell>> cellsView, GridViewSkin skin) {
+//        return skin.getFirstRow(cellsView.getItems().get(pos.getRow()).get(cellsView.getColumns().indexOf(pos.getTableColumn())), pos.getRow()) - 1;
+//    }
 }

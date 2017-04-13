@@ -31,7 +31,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
-import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
 /**
  * That class holds some {@link SpreadsheetCell} in order
@@ -110,15 +109,6 @@ public interface Grid {
     public void setCellValue(int row, int column, Object value);
     
     /**
-     * Return the {@link SpanType} for a given cell row/column intersection.
-     * @param spv
-     * @param row
-     * @param column
-     * @return the {@link SpanType} for a given cell row/column intersection.
-     */
-    public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column);
-    
-    /**
      * Return the height of a row. {@link #AUTOFIT } can be returned in order to
      * let the system compute the best row height.
      *
@@ -193,7 +183,7 @@ public interface Grid {
     public void setDisplaySelection(boolean value);
 
     /**
-     * Return the Boolean property associated with the displayed selecion of the
+     * Return the Boolean property associated with the displayed selection of the
      * Grid.
      *
      * @return the Boolean property associated with the displayed selecion of the

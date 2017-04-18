@@ -415,10 +415,15 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * @return
      */
     public final boolean containsRow(int index) {
+        /**
+         * When scrolling with mouse wheel, some row are present but will not be
+         * lay out. Thus we only consider the row with children as really
+         * available.
+         */
         for (Object obj : getFlow().getCells()) {
-            if (((GridRow) obj).getIndex() == index)
+            if (((GridRow) obj).getIndex() == index && !((GridRow) obj).getChildrenUnmodifiable().isEmpty())
                 return true;
-        }
+            }
         return false;
     }
 
@@ -980,7 +985,6 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * @return 
      */
     private BitSet initRowToLayoutBitSet() {
-//        Grid grid = handle.getView().getGrid();
         int rowCount = getItemCount();
         BitSet bitSet = new BitSet(rowCount);
         for (int row = 0; row < rowCount; ++row) {

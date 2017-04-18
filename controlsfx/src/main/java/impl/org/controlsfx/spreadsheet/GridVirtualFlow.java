@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import javafx.beans.Observable;
 import javafx.beans.binding.When;
 import javafx.beans.value.ChangeListener;
@@ -218,7 +220,16 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      */
     GridRow getTopRow() {
         if (!sheetChildren.isEmpty()) {
-            return (GridRow) sheetChildren.get(sheetChildren.size() - 1);
+            /**
+             * When scrolling with mouse wheel, some row are present but will
+             * not be lay out. Thus we only consider the row with children as
+             * really available.
+             */
+            int i = sheetChildren.size() - 1;
+            while (((GridRow) sheetChildren.get(i)).getChildrenUnmodifiable().isEmpty() && i > 0) {
+                --i;
+            }
+            return (GridRow) sheetChildren.get(i);
         }
         return null;
     }
@@ -303,28 +314,47 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      */
     protected void layoutTotal() {
         sortRows();
-        
-        /**
-         * When we layout, we also remove the cell that have been deported into
-         * other rows in order not to have some TableCell hanging out.
-         */
-        for(GridRow row : gridViewSkin.deportedCells.keySet()){
-            for(CellView cell: gridViewSkin.deportedCells.get(row)){
-                if(!cell.isEditing()){
-                    row.removeCell(cell);
-                }
-            }
-        }
-        gridViewSkin.deportedCells.clear();
+        removeDeportedCells();
+
         // When scrolling fast with fixed Rows, cells is empty and not recreated..
         if (getCells().isEmpty()) {
             reconfigureCells();
-        }
-        
+        } 
+       
         for (GridRow cell : (List<GridRow>)getCells()) {
             if (cell != null && cell.getIndex() >= 0 && (!gridViewSkin.hBarValue.get(cell.getIndex()) || gridViewSkin.rowToLayout.get(cell.getIndex()))) {
                 cell.requestLayout();
             }
+        }
+    }
+    
+    private void removeDeportedCells() {
+        /**
+         * When we layout, we also remove the cell that have been deported into
+         * other rows in order not to have some TableCell hanging out.
+         *
+         * When scrolling with mouse wheel, we will request the layout of all
+         * rows, but only one row will be really called. Thus by wiping entirely
+         * the deportedCell, all cells in fixedColumns are gone. So we must be
+         * smarter.
+         */
+        ArrayList<GridRow> rowToRemove = new ArrayList<>();
+        for (Entry<GridRow, Set<CellView>> entry : gridViewSkin.deportedCells.entrySet()) {
+            ArrayList<CellView> toRemove = new ArrayList<>();
+            for (CellView cell : entry.getValue()) {
+                //If we're not editing and the TableRow of the cell is not contained anymore, we remove.
+                if (!cell.isEditing() && !getCells().contains(cell.getTableRow())) {
+                    entry.getKey().removeCell(cell);
+                    toRemove.add(cell);
+                }
+            }
+            entry.getValue().removeAll(toRemove);
+            if (entry.getValue().isEmpty()) {
+                rowToRemove.add(entry.getKey());
+            }
+        }
+        for (GridRow row : rowToRemove) {
+            gridViewSkin.deportedCells.remove(row);
         }
     }
 

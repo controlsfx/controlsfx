@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -233,7 +234,13 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             //Virtualization of column
             // We translate that column by the Hbar Value if it's fixed
             if (columns.get(indexColumn).isFixed()) {
-                if (hbarValue + fixedColumnWidth > x /*&&  viewColumn== indexColumn*/) {
+                /**
+                 * Here we verify if our cell must be shifted. The second
+                 * condition is to determine that we are dealing with the very
+                 * first cell of a columnSpan. If we have the hidden cells, we
+                 * must not increase the fixedColumnWidth.
+                 */
+                if (hbarValue + fixedColumnWidth > x &&  spreadsheetCell.getColumn() == indexColumn) {
                     increaseFixedWidth = true;
                     tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
 //                	 tableCell.toFront();
@@ -271,9 +278,10 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                          * because this row may contain some deported cells from
                          * other rows in order to be on top in term of z-order.
                          * So the cell we're currently adding must not recover
-                         * them.
+                         * them. We must check that the parent is indeed the
+                         * getSkinnable because of the deportedCells.
                          */
-                        if (tableCell.getParent() == null) {
+                        if (!tableCell.isEditing() && tableCell.getParent() != getSkinnable()) {
                             getChildren().add(0, tableCell);
                         }
                 }
@@ -326,7 +334,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
 
                 height = customHeight;
                 height = snapSize(height) - snapSize(verticalPadding);
-               /**
+                /**
                  * We need to span multiple rows, so we sum up the height of all
                  * the rows. The height of the current row is ignored and the
                  * whole value is computed.
@@ -394,14 +402,14 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
     }
 
     private boolean hasRightBorder(CellView tableCell) {
-        return tableCell.getBorder() != null 
-                && !tableCell.getBorder().isEmpty() 
+        return tableCell.getBorder() != null
+                && !tableCell.getBorder().isEmpty()
                 && tableCell.getBorder().getStrokes().get(0).getWidths().getRight() > 0;
     }
-    
+
     private boolean hasLeftBorder(CellView tableCell) {
-        return tableCell.getBorder() != null 
-                && !tableCell.getBorder().isEmpty() 
+        return tableCell.getBorder() != null
+                && !tableCell.getBorder().isEmpty()
                 && tableCell.getBorder().getStrokes().get(0).getWidths().getLeft()> 0;
     }
 
@@ -424,48 +432,68 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         });
     }
 
+    private void removeDeportedCells() {
+        GridViewSkin skin = handle.getCellsViewSkin();
+        for (Map.Entry<GridRow, Set<CellView>> entry : skin.deportedCells.entrySet()) {
+            ArrayList<CellView> toRemove = new ArrayList<>();
+            for (CellView cell : entry.getValue()) {
+                /**
+                 * If that cell is mine, I can remove it because I will replace
+                 * it if necessary. If that cell is mine and I'm the top row, no
+                 * need to remove it because I may remove cells that were
+                 * deported but are not anymore and create blank space.
+                 */
+                if (!cell.isEditing() && cell.getTableRow() == getSkinnable() && entry.getKey() != getSkinnable()) {
+                    entry.getKey().removeCell(cell);
+                    toRemove.add(cell);
+                }
+            }
+            entry.getValue().removeAll(toRemove);
+        }
+    }
+
     /**
      * This handles the fixed cells in column.
      *
      * @param fixedCells
      * @param index
      */
-    private void handleFixedCell(List<CellView> fixedCells, int index) {
+     private void handleFixedCell(List<CellView> fixedCells, int index) {
+        removeDeportedCells();
         if (fixedCells.isEmpty()) {
             return;
         }
-
+        GridViewSkin skin = handle.getCellsViewSkin();
         /**
          * If we have a fixedCell (in column) and that cell may be recovered by
          * a rowSpan, we want to put that tableCell ahead in term of z-order. So
          * we need to put it in another row.
          */
-        if (handle.getCellsViewSkin().rowToLayout.get(index)) {
-            GridRow gridRow = handle.getCellsViewSkin().getFlow().getTopRow();
+        if (skin.rowToLayout.get(index)) {
+            GridRow gridRow = skin.getFlow().getTopRow();
             if (gridRow != null) {
                 for (CellView cell : fixedCells) {
-                    if(!cell.isEditing()){
+                    if (!cell.isEditing()) {
                         gridRow.removeCell(cell);
                         gridRow.addCell(cell);
                     }
-                        final double originalLayoutY = getSkinnable().getLayoutY() + cell.getLayoutY();
-                        
-                        if (handle.getCellsViewSkin().deportedCells.containsKey(gridRow)) {
-                            handle.getCellsViewSkin().deportedCells.get(gridRow).add(cell);
-                        } else {
-                            Set<CellView> temp = new HashSet<>();
-                            temp.add(cell);
-                            handle.getCellsViewSkin().deportedCells.put(gridRow, temp);
-                        }
-                        /**
-                         * I need to have the layoutY of the original row, but
-                         * also to remove the layoutY of the row I'm adding in.
-                         * Because if the first row is fixed and is undergoing a
-                         * bit of translate in order to be visible, we need to
-                         * remove that "bit of translate".
-                         */
-                        cell.setLayoutX(cell.getLayoutX());
-                        cell.setLayoutY(originalLayoutY - gridRow.getLayoutY());
+                    final double originalLayoutY = getSkinnable().getLayoutY() + cell.getLayoutY();
+
+                    if (skin.deportedCells.containsKey(gridRow)) {
+                        skin.deportedCells.get(gridRow).add(cell);
+                    } else {
+                        Set<CellView> temp = new HashSet<>();
+                        temp.add(cell);
+                        skin.deportedCells.put(gridRow, temp);
+                    }
+                    /**
+                     * I need to have the layoutY of the original row, but also
+                     * to remove the layoutY of the row I'm adding in. Because
+                     * if the first row is fixed and is undergoing a bit of
+                     * translate in order to be visible, we need to remove that
+                     * "bit of translate".
+                     */
+                    cell.relocate(cell.getLayoutX(), originalLayoutY - gridRow.getLayoutY());
                 }
             }
         } else {
@@ -541,7 +569,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         //because each row has different space.
         double space = 0;
         for (int o = 0; o < positionY; ++o) {
-            if(!spreadsheetView.isRowHidden(o)){
+            if (!spreadsheetView.isRowHidden(o)) {
                 space += handle.getCellsViewSkin().getRowHeight(spreadsheetView.getFixedRows().get(o));
             }
         }

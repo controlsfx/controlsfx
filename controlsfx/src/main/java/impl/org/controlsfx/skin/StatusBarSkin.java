@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2017 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@ package impl.org.controlsfx.skin;
 
 import javafx.beans.Observable;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SkinBase;
@@ -50,9 +51,11 @@ public class StatusBarSkin extends SkinBase<StatusBar> {
         GridPane gridPane = new GridPane();
         
         leftBox = new HBox();
+        leftBox.setAlignment(Pos.CENTER);
         leftBox.getStyleClass().add("left-items"); //$NON-NLS-1$
 
         rightBox = new HBox();
+        rightBox.setAlignment(Pos.CENTER);
         rightBox.getStyleClass().add("right-items"); //$NON-NLS-1$
 
         progressBar = new ProgressBar();

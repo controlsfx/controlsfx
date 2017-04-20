@@ -192,7 +192,7 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
         @Override
         protected boolean isMatch(T suggestion, ISuggestionRequest request) {
             String userTextLower = request.getUserText().toLowerCase();
-            String suggestionStr = suggestion.toString().toLowerCase();
+            String suggestionStr = stringConverter.call(suggestion).toLowerCase();
             return suggestionStr.contains(userTextLower);
         }
     }

@@ -80,7 +80,6 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
             switch (ke.getCode()) {
                 case TAB:
                 case ENTER:
-                case TAB:
                     onSuggestionChoosen(suggestionList.getSelectionModel().getSelectedItem());
                     break;
                 case ESCAPE:

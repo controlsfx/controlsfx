@@ -648,6 +648,39 @@ public class PopOver extends PopupControl {
         return headerAlwaysVisible.getValue();
     }
 
+    // enable close button
+
+    private final BooleanProperty closeButtonEnabled = new SimpleBooleanProperty(this, "closeButtonEnabled", true); //$NON-NLS-1$
+
+    /**
+     * Determines whether or not the header's close button should be available.
+     */
+    public final BooleanProperty closeButtonEnabledProperty() {
+        return closeButtonEnabled;
+    }
+
+    /**
+     * Sets the value of the closeButtonEnabled property.
+     *
+     * @param enabled
+     *            if false, the pop over will not be closeable by the header's close button
+     *
+     * @see #closeButtonEnabledProperty()
+     */
+    public final void setCloseButtonEnabled(boolean enabled) {
+        closeButtonEnabled.setValue(enabled);
+    }
+
+    /**
+     * Returns the value of the closeButtonEnabled property.
+     *
+     * @return true if the header's close button is enabled
+     *
+     * @see #closeButtonEnabledProperty()
+     */
+    public final boolean isCloseButtonEnabled() {
+        return closeButtonEnabled.getValue();
+    }
 
     // detach support
 

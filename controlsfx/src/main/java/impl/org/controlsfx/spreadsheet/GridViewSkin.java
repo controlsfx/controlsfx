@@ -26,6 +26,44 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import impl.org.controlsfx.ReflectionUtils;
+import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
+import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
+import javafx.scene.Node;
+import javafx.scene.control.IndexedCell;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumnBase;
+import javafx.scene.control.TableFocusModel;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.skin.TableHeaderRow;
+import javafx.scene.control.skin.TableViewSkinBase;
+import javafx.scene.control.skin.VirtualFlow;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.stage.Screen;
+import javafx.util.Callback;
+import org.controlsfx.control.spreadsheet.Grid;
+import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
+
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.BitSet;
@@ -34,51 +72,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
-import javafx.collections.ObservableSet;
-import javafx.collections.SetChangeListener;
-import javafx.event.EventHandler;
-import javafx.geometry.HPos;
-import javafx.geometry.VPos;
-import javafx.scene.Node;
-import javafx.scene.control.IndexedCell;
-import javafx.scene.control.ResizeFeaturesBase;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumnBase;
-import javafx.scene.control.TableFocusModel;
-import javafx.scene.control.TablePositionBase;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableSelectionModel;
-import javafx.scene.control.TableView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.stage.Screen;
-import javafx.util.Callback;
-
-import org.controlsfx.control.spreadsheet.Grid;
-import org.controlsfx.control.spreadsheet.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
-import org.controlsfx.control.spreadsheet.SpreadsheetView;
-
-import com.sun.javafx.scene.control.behavior.TableViewBehavior;
-import com.sun.javafx.scene.control.skin.TableHeaderRow;
-import com.sun.javafx.scene.control.skin.TableViewSkinBase;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
-import javafx.application.Platform;
-import javafx.event.Event;
-import javafx.scene.control.ScrollBar;
 
 /**
  * This skin is actually the skin of the SpreadsheetGridView (tableView)
@@ -90,11 +83,13 @@ import javafx.scene.control.ScrollBar;
  * TableViewBehavior.
  *
  */
-public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCell>,ObservableList<SpreadsheetCell>,TableView<ObservableList<SpreadsheetCell>>,TableViewBehavior<ObservableList<SpreadsheetCell>>,TableRow<ObservableList<SpreadsheetCell>>,TableColumn<ObservableList<SpreadsheetCell>,?>> {
+public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCell>, ObservableList<SpreadsheetCell>, TableView<ObservableList<SpreadsheetCell>>, TableRow<ObservableList<SpreadsheetCell>>, TableColumn<ObservableList<SpreadsheetCell>,?>> {
         
     /***************************************************************************
-     * * STATIC FIELDS * *
-     **************************************************************************/
+     *
+     * STATIC FIELDS
+     *
+     * *************************************************************************/
 
     /** Default height of a row. */
     public static final double DEFAULT_CELL_HEIGHT;
@@ -105,20 +100,11 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     static {
         double cell_size = 24.0;
         try {
-            Class<?> clazz = com.sun.javafx.scene.control.skin.CellSkinBase.class;
+            Class<?> clazz = javafx.scene.control.skin.CellSkinBase.class;
             Field f = clazz.getDeclaredField("DEFAULT_CELL_SIZE"); //$NON-NLS-1$
             f.setAccessible(true);
             cell_size = f.getDouble(null);
-        } catch (NoSuchFieldException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | SecurityException | IllegalAccessException | IllegalArgumentException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -136,9 +122,13 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * cells in order to remove them each time.
      */
     final Map<GridRow,Set<CellView>> deportedCells = new HashMap<>();
+
     /***************************************************************************
-     * * PRIVATE FIELDS * *
-     **************************************************************************/
+     *
+     * PRIVATE FIELDS
+     *
+     ***************************************************************************/
+
     /**
      * When resizing, we save the height here in order to override default row
      * height. package protected.
@@ -147,6 +137,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
 
     /** The editor. */
     private GridCellEditor gridCellEditor;
+    private GridViewBehavior behavior;
+    private VirtualFlow<TableRow<ObservableList<SpreadsheetCell>>> flow;
 
     protected final SpreadsheetHandle handle;
     protected SpreadsheetView spreadsheetView;
@@ -212,24 +204,25 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     BooleanProperty lastRowLayout = new SimpleBooleanProperty(true);
     
     /***************************************************************************
-     * * CONSTRUCTOR * *
-     **************************************************************************/
+     *
+     * CONSTRUCTOR
+     *
+     * *************************************************************************/
     public GridViewSkin(final SpreadsheetHandle handle) {
-        super(handle.getGridView(), new GridViewBehavior(handle.getGridView()));
-        super.init(handle.getGridView());
+        super(handle.getGridView());
+        // FIXME: JDK-9
+        // Method does not exist in base class
+        // super.init(handle.getGridView());
         
         this.handle = handle;
         this.spreadsheetView = handle.getView();
+        this.behavior = new GridViewBehavior(handle.getGridView());
+        this.flow = ReflectionUtils.getVirtualFlow(this);
         gridCellEditor = new GridCellEditor(handle);
         TableView<ObservableList<SpreadsheetCell>> tableView = handle.getGridView();
 
         //Set a new row factory, useful when handling row height.
-        tableView.setRowFactory(new Callback<TableView<ObservableList<SpreadsheetCell>>, TableRow<ObservableList<SpreadsheetCell>>>() {
-            @Override
-            public TableRow<ObservableList<SpreadsheetCell>> call(TableView<ObservableList<SpreadsheetCell>> p) {
-                return new GridRow(handle);
-            }
-        });
+        tableView.setRowFactory(p -> new GridRow(handle));
 
         tableView.getStyleClass().add("cell-spreadsheet"); //$NON-NLS-1$
 
@@ -242,13 +235,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          * When we are changing the grid we re-instantiate the rowToLayout because
          * spans and fixedRow may have changed.
          */
-        handle.getView().gridProperty().addListener(new ChangeListener<Grid>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Grid> ov, Grid t, Grid t1) {
-                 rowToLayout = initRowToLayoutBitSet();
-            }
-        });
+        handle.getView().gridProperty().addListener((ov, t, t1) -> rowToLayout = initRowToLayoutBitSet());
         hBarValue = new BitSet(handle.getView().getGrid().getRowCount());
         rowToLayout = initRowToLayoutBitSet();
         // Because fixedRow Listener is not reacting first time.
@@ -275,39 +262,20 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         getFlow().getHorizontalBar().addEventFilter(MouseEvent.MOUSE_PRESSED, ml);
 
         // init the behavior 'closures'
-        TableViewBehavior<ObservableList<SpreadsheetCell>> behavior = getBehavior();
-        behavior.setOnFocusPreviousRow(new Runnable() {
-            @Override public void run() { onFocusPreviousCell(); }
-        });
-        behavior.setOnFocusNextRow(new Runnable() {
-            @Override public void run() { onFocusNextCell(); }
-        });
-        behavior.setOnMoveToFirstCell(new Runnable() {
-            @Override public void run() { onMoveToFirstCell(); }
-        });
-        behavior.setOnMoveToLastCell(new Runnable() {
-            @Override public void run() { onMoveToLastCell(); }
-        });
-        behavior.setOnScrollPageDown(new Callback<Boolean, Integer>() {
-            @Override public Integer call(Boolean isFocusDriven) { return onScrollPageDown(isFocusDriven); }
-        });
-        behavior.setOnScrollPageUp(new Callback<Boolean, Integer>() {
-            @Override public Integer call(Boolean isFocusDriven) { return onScrollPageUp(isFocusDriven); }
-        });
-        behavior.setOnSelectPreviousRow(new Runnable() {
-            @Override public void run() { onSelectPreviousCell(); }
-        });
-        behavior.setOnSelectNextRow(new Runnable() {
-            @Override public void run() { onSelectNextCell(); }
-        });
-        behavior.setOnSelectLeftCell(new Runnable() {
-            @Override public void run() { onSelectLeftCell(); }
-        });
-        behavior.setOnSelectRightCell(new Runnable() {
-            @Override public void run() { onSelectRightCell(); }
-        });
+        behavior.setOnFocusPreviousRow(this::onFocusPreviousCell);
+        behavior.setOnFocusNextRow(this::onFocusNextCell);
+        behavior.setOnMoveToFirstCell(() -> ReflectionUtils.callMethod(GridViewSkin.this, "onMoveToFirstCell"));
+        behavior.setOnMoveToLastCell(() -> ReflectionUtils.callMethod(GridViewSkin.this, "onMoveToLastCell"));
+        behavior.setOnScrollPageDown(isFocusDriven -> ReflectionUtils.onScroll(GridViewSkin.this, "onScrollPageDown", isFocusDriven));
+        behavior.setOnScrollPageUp(isFocusDriven -> ReflectionUtils.onScroll(GridViewSkin.this, "onScrollPageUp", isFocusDriven));
+        behavior.setOnSelectPreviousRow(this::onSelectPreviousCell);
+        behavior.setOnSelectNextRow(this::onSelectNextCell);
+        behavior.setOnSelectLeftCell(() -> ReflectionUtils.callMethod(GridViewSkin.this, "onSelectLeftCell"));
+        behavior.setOnSelectRightCell(() -> ReflectionUtils.callMethod(GridViewSkin.this, "onSelectRightCell"));
 
-        registerChangeListener(tableView.fixedCellSizeProperty(), "FIXED_CELL_SIZE");
+        // FIXME: JDK-9
+        // No handleControlPropertyChanged declared
+        // registerChangeListener(tableView.fixedCellSizeProperty(), "FIXED_CELL_SIZE");
     }
 
     /**
@@ -476,7 +444,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             if ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null) {
                 cell.setWrapText(true);
 
-                cell.impl_processCSS(false);
+                // FIXME: JDK-9
+                // Method doesn't exist anymore
+                //cell.impl_processCSS(false);
                 maxHeight = Math.max(maxHeight, cell.prefHeight(column.getWidth()));
             }
         }
@@ -546,7 +516,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * use an editor that display a little icon on the right. Thus, that icon is
      * reducing the visibility of the date string.
      */
-    @Override
+    // FIXME: JDK-9
+    // This method doesn't exist in the base class to be overriden
+    /*@Override*/
     public void resizeColumnToFitContent(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, int maxRows) {
         
         final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tc;
@@ -619,7 +591,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                 if (((SpreadsheetCell) cell.getItem()).getItem() instanceof LocalDate) {
                     datePresent = true;
                 }
-                cell.impl_processCSS(false);
+                // FIXME: JDK-9
+                // Method doesn't exist anymore
+                //cell.impl_processCSS(false);
                 double width = cell.prefWidth(-1);
                 /**
                  * If the cell is spanning in column, we need to take the other
@@ -669,18 +643,21 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          * column with his mouse, we must force the column to resize because
          * setting the prefWidth again will not trigger the listeners.
          */
-        widthMax = snapSize(widthMax);
+        widthMax = snapSizeX(widthMax);
         if (col.getPrefWidth() == widthMax && col.getWidth() != widthMax) {
-            col.impl_setWidth(widthMax);
+            // FIXME: JDK-9
+            // Method doesn't exist anymore
+            // col.impl_setWidth(widthMax);
         } else {
             col.setPrefWidth(widthMax);
         }
-        
         rectangleSelection.updateRectangle();
     }
 
     /***************************************************************************
-     * * PRIVATE/PROTECTED METHOD * *
+     *
+     * PRIVATE/PROTECTED METHOD
+     *
      **************************************************************************/
     protected final void init() {
         rectangleSelection = new RectangleSelection(this, (TableViewSpanSelectionModel) handle.getGridView().getSelectionModel());
@@ -688,13 +665,14 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         verticalHeader = new VerticalHeader(handle);
         getChildren().add(verticalHeader);
 
-        ((HorizontalHeader) getTableHeaderRow()).init();
-        verticalHeader.init(this, (HorizontalHeader) getTableHeaderRow());
-        
-        horizontalPickers = new HorizontalPicker((HorizontalHeader) getTableHeaderRow(), spreadsheetView);
+        ReflectionUtils.getTableHeaderRowFrom(this).ifPresent(tableHeaderRow -> {
+            ((HorizontalHeader) tableHeaderRow).init();
+            verticalHeader.init(this, (HorizontalHeader) tableHeaderRow);
+            horizontalPickers = new HorizontalPicker((HorizontalHeader) tableHeaderRow, spreadsheetView);
+        });
         getChildren().add(horizontalPickers);
         getFlow().init(spreadsheetView);
-        ((GridViewBehavior)getBehavior()).setGridViewSkin(this);
+        behavior.setGridViewSkin(this);
     }
 
     protected final ObservableSet<Integer> getCurrentlyFixedRow() {
@@ -760,12 +738,16 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         }
     }
 
-    @Override
+    // FIXME: JDK-9
+    // Method doesn't exist in base class
+    // @Override
     protected void onFocusPreviousCell() {
         focusScroll();
     }
 
-    @Override
+    // FIXME: JDK-9
+    // Method doesn't exist in base class
+    // @Override
     protected void onFocusNextCell() {
         focusScroll();
     }
@@ -787,29 +769,37 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                 && !spreadsheetView.getFixedRows().contains(row)) {
             flow.scrollTo(row);
         } else {
-            flow.show(row);
+            // FIXME: JDK-9
+            // Method doesn't exist in VirtualFlow class
+            // flow.show(row);
         }
-        scrollHorizontally();
+        ReflectionUtils.callMethod(this, "scrollHorizontally");
         /**
          * ***************************************************************
          * END OF MODIFIED
          ****************************************************************
          */
     }
-    
-    @Override
+
+    // FIXME: JDK-9
+    // Method doesn't exist in base class
+    // @Override
     protected void onSelectPreviousCell() {
-        super.onSelectPreviousCell();
-        scrollHorizontally();
+        // super.onSelectPreviousCell();
+        ReflectionUtils.callMethod(this, "scrollHorizontally");
     }
 
-    @Override
+    // FIXME: JDK-9
+    // Method doesn't exist in base class
+    // @Override
     protected void onSelectNextCell() {
-        super.onSelectNextCell();
-        scrollHorizontally();
+        // super.onSelectNextCell();
+        ReflectionUtils.callMethod(this, "scrollHorizontally");
     }
 
-    @Override
+    // FIXME: JDK-9
+    // Method doesn't exist in base class
+    // @Override
     protected VirtualFlow<TableRow<ObservableList<SpreadsheetCell>>> createVirtualFlow() {
         return new GridVirtualFlow<>(this);
     }
@@ -827,12 +817,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         return tableMenuButtonVisibleProperty();
     }
 
-    @Override
-    public void scrollHorizontally(){
-        super.scrollHorizontally();
-    }
-    
-    @Override
+    // FIXME: JDK-9
+    // Method doesn't exist in base class
+    // @Override
     protected void scrollHorizontally(TableColumn<ObservableList<SpreadsheetCell>, ?> col) {
         if (col == null || !col.isVisible()) {
             return;
@@ -1012,14 +999,33 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         }
     };
 
-    @Override
-    protected TableSelectionModel<ObservableList<SpreadsheetCell>> getSelectionModel() {
-        return getSkinnable().getSelectionModel();
-    }
-
-    @Override
+    // FIXME: JDK-9
+    // The methods do not override but are used
+    // @Override
     protected TableFocusModel<ObservableList<SpreadsheetCell>, TableColumn<ObservableList<SpreadsheetCell>, ?>> getFocusModel() {
         return getSkinnable().getFocusModel();
+    }
+
+    // @Override
+    protected ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> getColumns() {
+        return getSkinnable().getColumns();
+    }
+
+    // @Override
+    protected ObjectProperty<ObservableList<ObservableList<SpreadsheetCell>>> itemsProperty() {
+        return getSkinnable().itemsProperty();
+    }
+
+    // @Override
+    protected BooleanProperty tableMenuButtonVisibleProperty() {
+        return getSkinnable().tableMenuButtonVisibleProperty();
+    }
+
+    // FIXME: JDK-9
+    // The following methods are neither abstract in super method nor used
+    /*@Override
+    protected TableSelectionModel<ObservableList<SpreadsheetCell>> getSelectionModel() {
+        return getSkinnable().getSelectionModel();
     }
 
     @Override
@@ -1043,18 +1049,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     }
 
     @Override
-    protected ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> getColumns() {
-        return getSkinnable().getColumns();
-    }
-
-    @Override
     protected ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> getSortOrder() {
         return getSkinnable().getSortOrder();
-    }
-
-    @Override
-    protected ObjectProperty<ObservableList<ObservableList<SpreadsheetCell>>> itemsProperty() {
-        return getSkinnable().itemsProperty();
     }
 
     @Override
@@ -1065,11 +1061,6 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     @Override
     protected ObjectProperty<Node> placeholderProperty() {
         return getSkinnable().placeholderProperty();
-    }
-
-    @Override
-    protected BooleanProperty tableMenuButtonVisibleProperty() {
-        return getSkinnable().tableMenuButtonVisibleProperty();
     }
 
     @Override
@@ -1104,7 +1095,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
 
         cell.updateTableView(getSkinnable());
         return cell;
-    }
+    }*/
 
     @Override
     public int getItemCount() {
@@ -1133,5 +1124,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             return;
         }
         getHBar().setValue(value);
+    }
+
+    TableHeaderRow getTableHeaderRow() {
+        return ReflectionUtils.getTableHeaderRowFrom(this).get();
     }
 }

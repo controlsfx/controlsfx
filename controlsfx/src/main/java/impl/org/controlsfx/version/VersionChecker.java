@@ -26,12 +26,12 @@
  */
 package impl.org.controlsfx.version;
 
+import com.sun.javafx.runtime.VersionInfo;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
-
-import com.sun.javafx.runtime.VersionInfo;
 
 public class VersionChecker {
     
@@ -87,9 +87,11 @@ public class VersionChecker {
             notSupportedVersion = true;
         } else if (splitSpecVersion[0].compareTo(splitJavaVersion[0]) == 0) {
             // Check Minor Version
-            if (splitSpecVersion[1].compareTo(splitJavaVersion[2])>0) {
+            // FIXME: JDK-9
+            // Doesn't work with JDK 9
+            /*if (splitSpecVersion[1].compareTo(splitJavaVersion[2])>0) {
                 notSupportedVersion = true;
-            }
+            }*/
         }
 
         if (notSupportedVersion) {

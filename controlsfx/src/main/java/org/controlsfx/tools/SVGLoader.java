@@ -26,8 +26,8 @@
  */
 package org.controlsfx.tools;
 
-import java.net.URL;
-
+import com.sun.webkit.WebPage;
+import impl.org.controlsfx.ReflectionUtils;
 import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Worker.State;
 import javafx.geometry.Rectangle2D;
@@ -42,8 +42,8 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import com.sun.javafx.webkit.Accessor;
-import com.sun.webkit.WebPage;
+import java.net.URL;
+import java.util.Optional;
 
 /**
  * Convenience class that will attempt to load a given URL as an .svg file.
@@ -109,9 +109,11 @@ class SVGLoader {
         final WebEngine eng = view.getEngine();
         
         // using non-public API to ensure background transparency
-        final WebPage webPage = Accessor.getPageFor(eng);
-        webPage.setBackgroundColor(webPage.getMainFrame(), 0xffffff00);
-        webPage.setOpaque(webPage.getMainFrame(), false); 
+        final Optional<WebPage> webPageOptional = ReflectionUtils.getPageFor(eng);
+        webPageOptional.ifPresent(webPage -> {
+            webPage.setBackgroundColor(webPage.getMainFrame(), 0xffffff00);
+            webPage.setOpaque(webPage.getMainFrame(), false);
+        });
         // end of non-public API
 
         // temporary scene / stage

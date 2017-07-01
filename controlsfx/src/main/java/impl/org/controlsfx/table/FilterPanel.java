@@ -26,10 +26,7 @@
  */
 package impl.org.controlsfx.table;
 
-import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableViewSkin;
-import static impl.org.controlsfx.i18n.Localization.getString;
+import impl.org.controlsfx.ReflectionUtils;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
@@ -41,6 +38,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
+import javafx.scene.control.skin.NestedTableColumnHeader;
+import javafx.scene.control.skin.TableColumnHeader;
+import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -51,6 +51,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import static impl.org.controlsfx.i18n.Localization.getString;
 
 
 public final class FilterPanel<T,R> extends VBox {
@@ -220,10 +222,13 @@ public final class FilterPanel<T,R> extends VBox {
 
     /* Methods below helps will anchor the context menu under the column */
     private static void checkChangeContextMenu(TableViewSkin<?> skin, TableColumn<?, ?> column, FilterPanel filterPanel) {
-        NestedTableColumnHeader header = skin.getTableHeaderRow().getRootHeader();
-        InvalidationListener listener = filterPanel.getOrCreateChangeListener(header, column);
-        header.getColumnHeaders().addListener(new WeakInvalidationListener(listener));
-        changeContextMenu(header, column);
+        ReflectionUtils.getTableHeaderRowFrom(skin).ifPresent(tableHeaderRow -> {
+            ReflectionUtils.getRootHeaderFrom(tableHeaderRow).ifPresent(header -> {
+                InvalidationListener listener = filterPanel.getOrCreateChangeListener(header, column);
+                header.getColumnHeaders().addListener(new WeakInvalidationListener(listener));
+                changeContextMenu(header, column);
+            });
+        });
     }
 
     private InvalidationListener getOrCreateChangeListener(NestedTableColumnHeader header, TableColumn<?, ?> column) {

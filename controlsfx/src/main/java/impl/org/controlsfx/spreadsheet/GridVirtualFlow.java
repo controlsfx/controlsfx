@@ -26,11 +26,7 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import com.sun.javafx.scene.control.skin.VirtualFlow;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import impl.org.controlsfx.ReflectionUtils;
 import javafx.beans.Observable;
 import javafx.beans.binding.When;
 import javafx.beans.value.ChangeListener;
@@ -42,6 +38,7 @@ import javafx.scene.Node;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableRow;
+import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -49,6 +46,12 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     
@@ -75,8 +78,10 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     };
 
     /***************************************************************************
-     * * Private Fields * *
-     **************************************************************************/
+     *
+     * Private Fields
+     *
+     * *************************************************************************/
     private SpreadsheetView spreadSheetView;
     private final GridViewSkin gridViewSkin;
     /**
@@ -89,8 +94,10 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     private Scale scale;
 
     /***************************************************************************
-     * * Constructor * *
-     **************************************************************************/
+     *
+     * Constructor
+     *
+     * *************************************************************************/
     public GridVirtualFlow(GridViewSkin gridViewSkin) {
         super();
         this.gridViewSkin = gridViewSkin;
@@ -115,8 +122,10 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     }
 
     /***************************************************************************
-     * * Public Methods * *
-     **************************************************************************/
+     *
+     * Public Methods
+     *
+     * *************************************************************************/
     public void init(SpreadsheetView spv) {
         /**
          * The idea is to work-around
@@ -168,12 +177,14 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         });
     }
 
-    @Override
+    // FIXME: JDK-9
+    // Method doesn't exist in base class
+    /*@Override
     public void show(int index) {
         super.show(index);
         layoutTotal();
         layoutFixedRows();
-    }
+    }*/
 
     @Override
     public void scrollTo(int index) {
@@ -192,7 +203,9 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         layoutFixedRows();
                 }
 
-    @Override
+    // FIXME: JDK-9
+    // Method doesn't exist in base class
+    /*@Override
     public double adjustPixels(final double delta) {
         final double returnValue = super.adjustPixels(delta);
 
@@ -200,14 +213,16 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         layoutFixedRows();
 
         return returnValue;
-    }
+    }*/
     
     List<T> getFixedCells(){
         return myFixedCells;
     }
     /***************************************************************************
-     * * Protected Methods * *
-     **************************************************************************/
+     *
+     *  Protected Methods
+     *
+     * *************************************************************************/
 
     /**
      * We need to return here the very top row in term of "z-order". Because we
@@ -316,7 +331,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         gridViewSkin.deportedCells.clear();
         // When scrolling fast with fixed Rows, cells is empty and not recreated..
         if (getCells().isEmpty()) {
-            reconfigureCells();
+            ReflectionUtils.reconfigureCells(this);
         }
         
         for (GridRow cell : (List<GridRow>)getCells()) {
@@ -333,14 +348,15 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         return getHbar();
     }
 
-    @Override
-    protected List<T> getCells() {
-        return super.getCells();
+    List<T> getCells() {
+        return ReflectionUtils.getCells(this);
     }
 
     /***************************************************************************
-     * * Private Methods * *
-     **************************************************************************/
+     *
+     * Private Methods
+     *
+     * *************************************************************************/
 
     /**
      * WARNING : This is bad but no other options right now. This will find the
@@ -384,7 +400,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
 		//We must have a cell in ViewPort because otherwise
         //we short-circuit the VirtualFlow.
-        if (spreadSheetView.getFixedRows().size() > 0 && getFirstVisibleCellWithinViewPort() != null) {
+        if (spreadSheetView.getFixedRows().size() > 0 && ReflectionUtils.getCellWithinViewPort(this, "getFirstVisibleCellWithinViewPort").isPresent()) {
             sortRows();
             /**
              * What I do is just going after the VirtualFlow in order to ADD
@@ -400,9 +416,9 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             rows:
             for (int i = spreadSheetView.getFixedRows().size() - 1; i >= 0; i--) {
                 fixedRowIndex = spreadSheetView.getFixedRows().get(i);
-                T lastCell = getLastVisibleCellWithinViewPort();
-                //If the fixed row is out of bounds
-                if (lastCell != null && fixedRowIndex > lastCell.getIndex()) {
+                Optional<T> lastCell = (Optional<T>) ReflectionUtils.getCellWithinViewPort(this, "getLastVisibleCellWithinViewPort");
+                // If the fixed row is out of bounds
+                if(lastCell.isPresent() && fixedRowIndex > lastCell.get().getIndex()) {
                     if (row != null) {
                         row.setVisible(false);
                         row.setManaged(false);
@@ -443,11 +459,13 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                      * getAvailableCell is not added our cell to the ViewPort in some cases.
                      * So we need to instantiate it ourselves.
                      */
-                    row = getCreateCell().call(this);
+                    // FIXME: JDK-9
+                    // Method doesn't exist in base class
+                    // row = getCreateCell().call(this);
                     row.getProperties().put("newcell", null); //$NON-NLS-1$
                 	 
                     setCellIndex(row, fixedRowIndex);
-                    resizeCellSize(row);
+                    ReflectionUtils.resizeCellSize(this, row);
                     myFixedCells.add(row);
                 }
                 
@@ -492,11 +510,18 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         }
     }
     
-    private final ChangeListener<Number> hBarValueChangeListener = new ChangeListener<Number>() {
+    private final ChangeListener<Number> hBarValueChangeListener = new ChangeListener<>() {
         @Override
         public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
             gridViewSkin.hBarValue.clear();
         }
     };
+
+    private ScrollBar getHbar() {
+        return ReflectionUtils.getBar(this, "getHBar").get();
+    }
+    private ScrollBar getVbar() {
+        return ReflectionUtils.getBar(this, "getVBar").get();
+    }
 }
 

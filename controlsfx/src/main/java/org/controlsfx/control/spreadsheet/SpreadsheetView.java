@@ -26,8 +26,7 @@
  */
 package org.controlsfx.control.spreadsheet;
 
-import static impl.org.controlsfx.i18n.Localization.asKey;
-import static impl.org.controlsfx.i18n.Localization.localize;
+import impl.org.controlsfx.ReflectionUtils;
 import impl.org.controlsfx.spreadsheet.CellView;
 import impl.org.controlsfx.spreadsheet.FocusModelListener;
 import impl.org.controlsfx.spreadsheet.GridViewSkin;
@@ -36,19 +35,6 @@ import impl.org.controlsfx.spreadsheet.RectangleSelection.SelectionRange;
 import impl.org.controlsfx.spreadsheet.SpreadsheetGridView;
 import impl.org.controlsfx.spreadsheet.SpreadsheetHandle;
 import impl.org.controlsfx.spreadsheet.TableViewSpanSelectionModel;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -97,6 +83,23 @@ import javafx.scene.transform.Scale;
 import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import org.controlsfx.tools.Utils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
 
 /**
  * The SpreadsheetView is a control similar to the JavaFX {@link TableView}
@@ -1889,7 +1892,7 @@ public class SpreadsheetView extends Control{
                 //We consume the event because we don't want to go in edition
                 keyEvent.consume();
             }
-            getCellsViewSkin().scrollHorizontally();
+            ReflectionUtils.callMethod(getCellsViewSkin(), "scrollHorizontally");
             // Go to next cell
         } else if (getEditingCell() == null 
                 && KeyCode.TAB.equals(keyEvent.getCode()) 
@@ -1903,7 +1906,7 @@ public class SpreadsheetView extends Control{
             }
             //We consume the event because we don't want to loose focus
             keyEvent.consume();
-            getCellsViewSkin().scrollHorizontally();
+            ReflectionUtils.callMethod(getCellsViewSkin(), "scrollHorizontally");
             // We want to erase values when delete key is pressed.
         } else if (KeyCode.DELETE.equals(keyEvent.getCode())) {
             deleteSelectedCells();

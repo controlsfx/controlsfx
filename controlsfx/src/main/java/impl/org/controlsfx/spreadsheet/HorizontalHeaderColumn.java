@@ -26,17 +26,18 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import org.controlsfx.control.spreadsheet.SpreadsheetView;
-
-import javafx.event.EventHandler;
-import javafx.scene.control.TableColumnBase;
-import javafx.scene.input.MouseEvent;
-
-import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableViewSkinBase;
+import impl.org.controlsfx.ReflectionUtils;
 import javafx.beans.Observable;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.control.TableColumnBase;
+import javafx.scene.control.skin.NestedTableColumnHeader;
+import javafx.scene.control.skin.TableColumnHeader;
+import javafx.scene.control.skin.TableViewSkinBase;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
+
+import java.util.Optional;
+
+import static impl.org.controlsfx.ReflectionUtils.columnReorderLine;
 
 /**
  * A cell column header.
@@ -45,9 +46,8 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
 
     int lastColumnResized = -1;
     
-    public HorizontalHeaderColumn(
-            TableViewSkinBase<?, ?, ?, ?, ?, ?> skin, TableColumnBase<?, ?> tc) {
-        super(skin, tc);
+    public HorizontalHeaderColumn(TableViewSkinBase<?, ?, ?, ?, ?> skin, TableColumnBase<?, ?> tc) {
+        super(tc);
         /**
          * Resolve https://bitbucket.org/controlsfx/controlsfx/issue/395
          * and https://bitbucket.org/controlsfx/controlsfx/issue/434
@@ -64,41 +64,47 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
          * this variable Layout is set to 0, it means the drag is done, so until
          * a beter solution is shown, it will do the trick.
          */
-        columnReorderLine.layoutXProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-            HorizontalHeader headerRow = (HorizontalHeader) ((GridViewSkin) skin).getTableHeaderRow();
-            GridViewSkin mySkin = ((GridViewSkin) skin);
-            if (newValue.intValue() == 0 && lastColumnResized >= 0) {
-                if (headerRow.selectedColumns.get(lastColumnResized)) {
-                    double width1 = mySkin.getColumns().get(lastColumnResized).getWidth();
-                    for (int i = headerRow.selectedColumns.nextSetBit(0); i >= 0; i = headerRow.selectedColumns.nextSetBit(i + 1)) {
-                        mySkin.getColumns().get(i).setPrefWidth(width1);
+        columnReorderLine(this).ifPresent(region -> {
+            region.layoutXProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+                ReflectionUtils.getTableHeaderRowFrom(skin).ifPresent(tableHeaderRow -> {
+                    HorizontalHeader headerRow = (HorizontalHeader) tableHeaderRow;
+                    GridViewSkin mySkin = ((GridViewSkin) skin);
+                    if (newValue.intValue() == 0 && lastColumnResized >= 0) {
+                        if (headerRow.selectedColumns.get(lastColumnResized)) {
+                            double width1 = mySkin.getColumns().get(lastColumnResized).getWidth();
+                            for (int i = headerRow.selectedColumns.nextSetBit(0); i >= 0; i = headerRow.selectedColumns.nextSetBit(i + 1)) {
+                                mySkin.getColumns().get(i).setPrefWidth(width1);
+                            }
+                        }
                     }
-                }
-            }
+                });
+            });
         });
     }
 
     @Override
     protected TableColumnHeader createTableColumnHeader(final TableColumnBase col) {
-        TableViewSkinBase<?,?,?,?,?,TableColumnBase<?,?>> tableViewSkin = getTableViewSkin();
-        if (col.getColumns().isEmpty()) {
-            final TableColumnHeader columnHeader = new TableColumnHeader(tableViewSkin, col);
-            /**
-             * When the user double click on a header, we want to resize the
-             * column to fit the content.
-             */
-            columnHeader.setOnMousePressed(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent mouseEvent) {
+        Optional<TableViewSkinBase<?, ?, ?, ?, TableColumnBase<?, ?>>> tableSkin = ReflectionUtils.getTableSkin(this);
+        if(tableSkin.isPresent()) {
+            if (col.getColumns().isEmpty()) {
+                final TableColumnHeader columnHeader = new TableColumnHeader(col);
+                /**
+                 * When the user double click on a header, we want to resize the
+                 * column to fit the content.
+                 */
+                columnHeader.setOnMousePressed(mouseEvent -> {
                     if (mouseEvent.getClickCount() == 2 && mouseEvent.isPrimaryButtonDown()) {
-                        ((GridViewSkin) (Object) tableViewSkin).resize(col, -1);
+                        ((GridViewSkin) (Object) tableSkin).resize(col, -1);
                     }
-                }
-            });
-            return columnHeader;
-        } else {
-            return new HorizontalHeaderColumn(getTableViewSkin(), col);
+                });
+                return columnHeader;
+            } else {
+                return new HorizontalHeaderColumn(tableSkin.get(), col);
+            }
         }
+        // FIXME: JDK-9
+        // What do we return here?
+        return null;
     }
 
     @Override
@@ -112,7 +118,7 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
      *
      */
     public void layoutFixedColumns() {
-        SpreadsheetHandle handle = ((GridViewSkin) (Object) getTableViewSkin()).handle;
+        SpreadsheetHandle handle = ((GridViewSkin) (Object) ReflectionUtils.getTableSkin(this)).handle;
         final SpreadsheetView spreadsheetView = handle.getView();
         if (handle.getCellsViewSkin() == null || getChildren().isEmpty()) {
             return;
@@ -144,6 +150,5 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
 
             x += prefWidth;
         }
-
     }
 }

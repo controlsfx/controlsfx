@@ -26,11 +26,12 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import java.util.Stack;
+import impl.org.controlsfx.ReflectionUtils;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
+import javafx.scene.control.skin.NestedTableColumnHeader;
 import javafx.scene.control.skin.TableColumnHeader;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
@@ -38,6 +39,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.spreadsheet.Picker;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
+
+import java.util.Optional;
+import java.util.Stack;
 
 /**
  *
@@ -51,16 +55,19 @@ public class HorizontalPicker extends StackPane {
     private static final String PICKER_INDEX = "PickerIndex"; //$NON-NLS-1$
 
     private final HorizontalHeader horizontalHeader;
-
     private final SpreadsheetView spv;
     private final Stack<Label> pickerPile;
     private final Stack<Label> pickerUsed;
-
     private final InnerHorizontalPicker innerPicker = new InnerHorizontalPicker();
+
+    private NestedTableColumnHeader rootHeader;
 
     public HorizontalPicker(HorizontalHeader horizontalHeader, SpreadsheetView spv) {
         this.horizontalHeader = horizontalHeader;
         this.spv = spv;
+
+        Optional<NestedTableColumnHeader> rootHeader = ReflectionUtils.getRootHeaderFrom(horizontalHeader);
+        rootHeader.ifPresent(nestedTableColumnHeader -> this.rootHeader = nestedTableColumnHeader);
 
         pickerPile = new Stack<>();
         pickerUsed = new Stack<>();
@@ -74,14 +81,18 @@ public class HorizontalPicker extends StackPane {
 
         getChildren().add(innerPicker);
 
-        horizontalHeader.getRootHeader().getColumnHeaders().addListener(layoutListener);
+        if (this.rootHeader != null) {
+            this.rootHeader.getColumnHeaders().addListener(layoutListener);
+        }
         spv.getColumnPickers().addListener(layoutListener);
     }
 
     @Override
     protected void layoutChildren() {
         //Just relocate the inner for sliding.
-        innerPicker.relocate(horizontalHeader.getRootHeader().getLayoutX(), snappedTopInset());
+        if (rootHeader != null) {
+            innerPicker.relocate(rootHeader.getLayoutX(), snappedTopInset());
+        }
         //We must turn off pickers that are behind fixed columns
         for (Label label : pickerUsed) {
             label.setVisible(label.getLayoutX() + innerPicker.getLayoutX() + label.getWidth() > horizontalHeader.gridViewSkin.fixedColumnWidth);
@@ -133,15 +144,17 @@ public class HorizontalPicker extends StackPane {
 
             getChildren().clear();
             int index = 0;
-            for (TableColumnHeader column : horizontalHeader.getRootHeader().getColumnHeaders()) {
-                if (spv.getColumnPickers().containsKey(index)) {
-                    Label label = getPicker(spv.getColumnPickers().get(index));
-                    label.resize(column.getWidth(), VerticalHeader.PICKER_SIZE);
-                    label.layoutXProperty().bind(column.layoutXProperty());
+            if (rootHeader != null) {
+                for (TableColumnHeader column : rootHeader.getColumnHeaders()) {
+                    if (spv.getColumnPickers().containsKey(index)) {
+                        Label label = getPicker(spv.getColumnPickers().get(index));
+                        label.resize(column.getWidth(), VerticalHeader.PICKER_SIZE);
+                        label.layoutXProperty().bind(column.layoutXProperty());
 
-                    getChildren().add(0, label);
+                        getChildren().add(0, label);
+                    }
+                    index++;
                 }
-                index++;
             }
         }
     }

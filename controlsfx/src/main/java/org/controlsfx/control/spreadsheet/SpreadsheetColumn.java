@@ -26,10 +26,7 @@
  */
 package org.controlsfx.control.spreadsheet;
 
-import static impl.org.controlsfx.i18n.Localization.asKey;
-import static impl.org.controlsfx.i18n.Localization.localize;
 import impl.org.controlsfx.spreadsheet.CellView;
-import java.util.List;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
@@ -46,6 +43,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.WindowEvent;
 import org.controlsfx.tools.Utils;
+
+import java.util.List;
+
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
 
 /**
  * A {@link SpreadsheetView} is made up of a number of {@link SpreadsheetColumn}
@@ -190,7 +192,9 @@ public final class SpreadsheetColumn {
     public void setPrefWidth(double width) {
         width = Math.ceil(width);
         if (column.getPrefWidth() == width && column.getWidth() != width) {
-            column.impl_setWidth(width);
+            // FIXME: JDK-9
+            // Method doesn't exist
+            /*column.impl_setWidth(width);*/
         } else {
             column.setPrefWidth(width);
         }

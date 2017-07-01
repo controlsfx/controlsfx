@@ -26,6 +26,7 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import impl.org.controlsfx.ReflectionUtils;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -137,7 +138,7 @@ public class GridCellEditor {
                     handle.getView().getSelectionModel().clearAndSelectNextCell();
                 } else if (KeyCode.TAB.equals(lastKeyPressed)) {
                     handle.getView().getSelectionModel().clearAndSelectRightCell();
-                    handle.getCellsViewSkin().scrollHorizontally();
+                    ReflectionUtils.callMethod(handle.getCellsViewSkin(), "scrollHorizontally");
                 }
             }
         }

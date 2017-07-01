@@ -27,6 +27,7 @@
 package impl.org.controlsfx.skin;
 
 import com.sun.javafx.scene.traversal.ParentTraversalEngine;
+import impl.org.controlsfx.ReflectionUtils;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
@@ -114,7 +115,7 @@ public class NotificationPaneSkin extends SkinBase<NotificationPane> {
 
         // Fix for Issue #522: Prevent NotificationPane from receiving focus
         ParentTraversalEngine engine = new ParentTraversalEngine(getSkinnable());
-        getSkinnable().setImpl_traversalEngine(engine);
+        ReflectionUtils.setTraversalEngine(control, engine);
         engine.setOverriddenFocusTraversability(false);
     }
     

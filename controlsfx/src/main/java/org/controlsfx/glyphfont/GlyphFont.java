@@ -26,7 +26,7 @@
  */
 package org.controlsfx.glyphfont;
 
-import com.sun.javafx.css.StyleManager;
+import impl.org.controlsfx.ReflectionUtils;
 import javafx.scene.text.Font;
 
 import java.io.InputStream;
@@ -54,7 +54,7 @@ import java.util.Map;
 public class GlyphFont {
 
     static {
-        StyleManager.getInstance().addUserAgentStylesheet(
+        ReflectionUtils.addUserAgentStylesheet(
                 GlyphFont.class.getResource("glyphfont.css").toExternalForm()); //$NON-NLS-1$
     }
 

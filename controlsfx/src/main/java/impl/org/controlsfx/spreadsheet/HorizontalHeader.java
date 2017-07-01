@@ -26,11 +26,7 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableHeaderRow;
-import java.util.BitSet;
-import java.util.List;
+import impl.org.controlsfx.ReflectionUtils;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -42,11 +38,19 @@ import javafx.event.EventHandler;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.control.skin.NestedTableColumnHeader;
+import javafx.scene.control.skin.TableColumnHeader;
+import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
+
+import java.util.BitSet;
+import java.util.List;
+
+import static impl.org.controlsfx.ReflectionUtils.getRootHeaderFrom;
 
 /**
  * The set of horizontal (column) headers.
@@ -113,31 +117,29 @@ public class HorizontalHeader extends TableHeaderRow {
          * those changes in order to re-apply our css style class. Otherwise
          * we'll end up with fixedColumns but no graphic confirmation.
          */
-        getRootHeader().getColumnHeaders().addListener((Observable o) -> {
-            for (SpreadsheetColumn fixItem : spv.getFixedColumns()) {
-                fixColumn(fixItem);
-            }
-            updateHighlightSelection();
-            installHeaderMouseEvent();
+        getRootHeaderFrom(this).ifPresent(rootHeader -> {
+            rootHeader.getColumnHeaders().addListener((Observable o) -> {
+                for (SpreadsheetColumn fixItem : spv.getFixedColumns()) {
+                    fixColumn(fixItem);
+                }
+                updateHighlightSelection();
+                installHeaderMouseEvent();
+            });
         });
-    }
-
-    @Override
-    public HorizontalHeaderColumn getRootHeader() {
-        return (HorizontalHeaderColumn) super.getRootHeader();
     }
 
     void clearSelectedColumns(){
         selectedColumns.clear();
     }
+
     /**************************************************************************
      * 
      * Protected methods
      * 
      **************************************************************************/
-    @Override
-    protected void updateTableWidth() {
-        super.updateTableWidth();
+
+    private void updateTableWidth() {
+        ReflectionUtils.callMethod(this, "updateTableWidth");
         // snapping added for RT-19428
         double padding = 0;
 
@@ -153,20 +155,21 @@ public class HorizontalHeader extends TableHeaderRow {
         clip.setWidth(clip.getWidth() == 0 ? 0 : clip.getWidth() - padding);
     }
 
-    @Override
-    protected void updateScrollX() {
-        super.updateScrollX();
+    private void updateScrollX() {
+        ReflectionUtils.callMethod(this, "updateScrollX");
         gridViewSkin.horizontalPickers.updateScrollX();
         
         if (working) {
             requestLayout();
-            getRootHeader().layoutFixedColumns();
+            // FIXME: JDK-9
+            // Method layoutFixedCoulmns() doesn't exist
+            // getRootHeader().layoutFixedColumns();
         }
     }
 
     @Override
     protected NestedTableColumnHeader createRootHeader() {
-        return new HorizontalHeaderColumn(getTableSkin(), null);
+        return new HorizontalHeaderColumn(gridViewSkin, null);
     }
 
     /**************************************************************************
@@ -179,14 +182,16 @@ public class HorizontalHeader extends TableHeaderRow {
      * When we click on header, we want to select the whole column.
      */
     private void installHeaderMouseEvent() {
-        for (final TableColumnHeader columnHeader : getRootHeader().getColumnHeaders()) {
-            EventHandler<MouseEvent> mouseEventHandler = (MouseEvent mouseEvent) -> {
-                if (mouseEvent.isPrimaryButtonDown()) {
-                    headerClicked((TableColumn) columnHeader.getTableColumn(), mouseEvent);
-                }
-            };
-            columnHeader.getChildrenUnmodifiable().get(0).setOnMousePressed(mouseEventHandler);
-        }
+        getRootHeaderFrom(this).ifPresent(rootHeader -> {
+            for (final TableColumnHeader columnHeader : rootHeader.getColumnHeaders()) {
+                EventHandler<MouseEvent> mouseEventHandler = (MouseEvent mouseEvent) -> {
+                    if (mouseEvent.isPrimaryButtonDown()) {
+                        headerClicked((TableColumn) columnHeader.getTableColumn(), mouseEvent);
+                    }
+                };
+                columnHeader.getChildrenUnmodifiable().get(0).setOnMousePressed(mouseEventHandler);
+            }
+        });
     }
     /**
      * If a header is clicked, we must select the whole column. If Control key of
@@ -290,9 +295,11 @@ public class HorizontalHeader extends TableHeaderRow {
      * @param i
      */
     private void removeStyleHeader(Integer i) {
-        if (getRootHeader().getColumnHeaders().size() > i) {
-            getRootHeader().getColumnHeaders().get(i).getStyleClass().removeAll("fixed"); //$NON-NLS-1$
-        }
+        getRootHeaderFrom(this).ifPresent(rootHeader -> {
+            if (rootHeader.getColumnHeaders().size() > i) {
+                rootHeader.getColumnHeaders().get(i).getStyleClass().removeAll("fixed"); //$NON-NLS-1$
+            }
+        });
     }
 
     /**
@@ -301,9 +308,11 @@ public class HorizontalHeader extends TableHeaderRow {
      * @param i
      */
     private void addStyleHeader(Integer i) {
-        if (getRootHeader().getColumnHeaders().size() > i) {
-            getRootHeader().getColumnHeaders().get(i).getStyleClass().addAll("fixed"); //$NON-NLS-1$
-        }
+        getRootHeaderFrom(this).ifPresent(rootHeader -> {
+            if (rootHeader.getColumnHeaders().size() > i) {
+                rootHeader.getColumnHeaders().get(i).getStyleClass().addAll("fixed"); //$NON-NLS-1$
+            }
+        });
     }
 
     /**
@@ -320,18 +329,19 @@ public class HorizontalHeader extends TableHeaderRow {
      * Highlight the header Label when selection change.
      */
     private void updateHighlightSelection() {
-        for (final TableColumnHeader i : getRootHeader().getColumnHeaders()) {
-            i.getStyleClass().removeAll("selected"); //$NON-NLS-1$
+        getRootHeaderFrom(this).ifPresent(rootHeader -> {
+            for (final TableColumnHeader i : rootHeader.getColumnHeaders()) {
+                i.getStyleClass().removeAll("selected"); //$NON-NLS-1$
 
-        }
-        final List<Integer> selectedColumns = gridViewSkin.getSelectedColumns();
-        for (final Integer i : selectedColumns) {
-            if (getRootHeader().getColumnHeaders().size() > i) {
-                getRootHeader().getColumnHeaders().get(i).getStyleClass()
-                        .addAll("selected"); //$NON-NLS-1$
             }
-        }
-
+            final List<Integer> selectedColumns = gridViewSkin.getSelectedColumns();
+            for (final Integer i : selectedColumns) {
+                if (rootHeader.getColumnHeaders().size() > i) {
+                    rootHeader.getColumnHeaders().get(i).getStyleClass()
+                            .addAll("selected"); //$NON-NLS-1$
+                }
+            }
+        });
     }
 
     private void updateHorizontalHeaderVisibility(boolean visible) {
@@ -342,7 +352,9 @@ public class HorizontalHeader extends TableHeaderRow {
         } else {
             getStyleClass().remove("invisible"); //$NON-NLS-1$
             requestLayout();
-            getRootHeader().layoutFixedColumns();
+            // FIXME: JDK-9
+            // Method layoutFixedColumns() doesn't exist
+            //getRootHeader().layoutFixedColumns();
             updateHighlightSelection();
         }
     }

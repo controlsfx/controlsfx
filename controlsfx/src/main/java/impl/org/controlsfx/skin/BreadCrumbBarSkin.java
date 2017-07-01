@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import impl.org.controlsfx.ReflectionUtils;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -122,8 +123,7 @@ public class BreadCrumbBarSkin<T> extends SkinBase<BreadCrumbBar<T>> {
             }
         });
         engine.setOverriddenFocusTraversability(false);
-        getSkinnable().setImpl_traversalEngine(engine);
-
+        ReflectionUtils.setTraversalEngine(getSkinnable(), engine);
     }
 
     private final ChangeListener<TreeItem<T>> selectedPathChangeListener =

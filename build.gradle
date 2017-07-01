@@ -48,6 +48,29 @@ subprojects {
 
     compileJava {  
         options.encoding = "UTF-8"
+        options.compilerArgs += [
+             // For various usages of TraversalEngine
+             "--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=ALL-UNNAMED",
+             // For various behaviors across controls
+             "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED",
+             // For ReadOnlyUnbackedObservableList across files
+             "--add-exports=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED",
+             // For InputMap used in behavior classes
+             "--add-exports=javafx.controls/com.sun.javafx.scene.control.inputmap=ALL-UNNAMED",
+             // For EventHandlerManager across files
+             "--add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED",
+             // For MappingChange, NonIterableChange across files
+             "--add-exports=javafx.base/com.sun.javafx.collections=ALL-UNNAMED",
+             // For VersionInfo in VersionChecker
+             "--add-exports=javafx.base/com.sun.javafx.runtime=ALL-UNNAMED",
+             // For WebPage in SVGLoader
+             "--add-exports=javafx.web/com.sun.webkit=ALL-UNNAMED"
+        ]
+    }
+
+    // Currently Javadoc creation fails because of exported packages not visible to javadoc task
+    javadoc {
+        enabled = false
     }
 
     task sourceJar(type: Jar) {

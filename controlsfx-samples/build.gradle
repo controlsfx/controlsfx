@@ -1,4 +1,3 @@
-import org.apache.tools.ant.filters.*
 apply plugin: 'application'
 
 applicationName = 'FXSampler'
@@ -39,3 +38,9 @@ jar {
     from sourceSets.main.allJava
 }
 
+applicationDefaultJvmArgs = [
+    // For accessing VirtualFlow field from the base class in GridViewSkin
+    "--add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED",
+    // For accessing InputMap used in RangeSliderBehavior
+    "--add-exports=javafx.controls/com.sun.javafx.scene.control.inputmap=ALL-UNNAMED"
+]

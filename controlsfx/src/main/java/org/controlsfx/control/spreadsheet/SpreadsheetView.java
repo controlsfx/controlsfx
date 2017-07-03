@@ -784,10 +784,10 @@ public class SpreadsheetView extends Control{
         int columnCount = getGrid().getColumnCount();
         columnMap = new HashMap<>(columnCount);
 
-        final int columnSize = getColumns().size();
         //Toggling visibility can cause NotOnFxThread Exception.
         CellView.getValue(() -> {
             //Column count can have changed..
+            final int columnSize = getColumns().size();
             int totalColumn = getGrid().getColumnCount();
             int visibleColumn = 0;
             for (int i = 0; i < totalColumn; ++i) {

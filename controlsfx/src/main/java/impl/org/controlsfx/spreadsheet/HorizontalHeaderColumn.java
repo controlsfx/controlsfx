@@ -109,7 +109,6 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
 
     /**
      * We want ColumnHeader to be fixed when we freeze some columns
-     *
      */
     public void layoutFixedColumns() {
         SpreadsheetHandle handle = ((GridViewSkin) (Object) getTableViewSkin()).handle;
@@ -124,6 +123,7 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
         double x = snappedLeftInset();
         int max = getColumnHeaders().size();
         max = max > handle.getGridView().getVisibleLeafColumns().size() ? handle.getGridView().getVisibleLeafColumns().size() : max;
+        max = max > spreadsheetView.getColumns().size() ? spreadsheetView.getColumns().size() : max;
         for (int j = 0; j < max; j++) {
             final TableColumnHeader n = getColumnHeaders().get(j);
             final double prefWidth = snapSize(n.prefWidth(-1));

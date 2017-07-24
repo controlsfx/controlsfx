@@ -47,11 +47,7 @@ import javafx.scene.transform.Scale;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     
@@ -167,7 +163,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         spv.getFixedRows().addListener((Observable observable) -> {
             List<T> toRemove = new ArrayList<>();
             for (T cell : myFixedCells) {
-                if (!spv.getFixedRows().contains(cell.getIndex())) {
+                if (!spv.getFixedRows().contains(spreadSheetView.getFilteredSourceIndex(cell.getIndex()))) {
                     cell.setManaged(false);
                     cell.setVisible(false);
                     toRemove.add(cell);
@@ -189,7 +185,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     @Override
     public void scrollTo(int index) {
         //If we have some fixedRows, we check if the selected row is not below them
-        if (!getCells().isEmpty() && spreadSheetView.getFixedRows().size() > 0) {
+        if (!getCells().isEmpty() && !VerticalHeader.isFixedRowEmpty(spreadSheetView)) {
             double offset = gridViewSkin.getFixedRowHeight();
 
             while (offset >= 0 && index > 0) {
@@ -233,7 +229,16 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      */
     GridRow getTopRow() {
         if (!sheetChildren.isEmpty()) {
-            return (GridRow) sheetChildren.get(sheetChildren.size() - 1);
+            /**
+             * When scrolling with mouse wheel, some row are present but will
+             * not be lay out. Thus we only consider the row with children as
+             * really available.
+             */
+            int i = sheetChildren.size() - 1;
+            while (((GridRow) sheetChildren.get(i)).getChildrenUnmodifiable().isEmpty() && i > 0) {
+                --i;
+            }
+            return (GridRow) sheetChildren.get(i);
         }
         return null;
     }
@@ -318,26 +323,47 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
      */
     protected void layoutTotal() {
         sortRows();
-        
-        /**
-         * When we layout, we also remove the cell that have been deported into
-         * other rows in order not to have some TableCell hanging out.
-         */
-        for(GridRow row : gridViewSkin.deportedCells.keySet()){
-            for(CellView cell: gridViewSkin.deportedCells.get(row)){
-                row.removeCell(cell);
-            }
-        }
-        gridViewSkin.deportedCells.clear();
+        removeDeportedCells();
+
         // When scrolling fast with fixed Rows, cells is empty and not recreated..
         if (getCells().isEmpty()) {
             ReflectionUtils.reconfigureCells(this);
         }
-        
+
         for (GridRow cell : (List<GridRow>)getCells()) {
             if (cell != null && cell.getIndex() >= 0 && (!gridViewSkin.hBarValue.get(cell.getIndex()) || gridViewSkin.rowToLayout.get(cell.getIndex()))) {
                 cell.requestLayout();
             }
+        }
+    }
+
+    private void removeDeportedCells() {
+        /**
+         * When we layout, we also remove the cell that have been deported into
+         * other rows in order not to have some TableCell hanging out.
+         *
+         * When scrolling with mouse wheel, we will request the layout of all
+         * rows, but only one row will be really called. Thus by wiping entirely
+         * the deportedCell, all cells in fixedColumns are gone. So we must be
+         * smarter.
+         */
+        ArrayList<GridRow> rowToRemove = new ArrayList<>();
+        for (Map.Entry<GridRow, Set<CellView>> entry : gridViewSkin.deportedCells.entrySet()) {
+            ArrayList<CellView> toRemove = new ArrayList<>();
+            for (CellView cell : entry.getValue()) {
+                //If we're not editing and the TableRow of the cell is not contained anymore, we remove.
+                if (!cell.isEditing() && !getCells().contains(cell.getTableRow())) {
+                    entry.getKey().removeCell(cell);
+                    toRemove.add(cell);
+                }
+            }
+            entry.getValue().removeAll(toRemove);
+            if (entry.getValue().isEmpty()) {
+                rowToRemove.add(entry.getKey());
+            }
+        }
+        for (GridRow row : rowToRemove) {
+            gridViewSkin.deportedCells.remove(row);
         }
     }
 
@@ -400,7 +426,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
 		//We must have a cell in ViewPort because otherwise
         //we short-circuit the VirtualFlow.
-        if (spreadSheetView.getFixedRows().size() > 0 && ReflectionUtils.getCellWithinViewPort(this, "getFirstVisibleCellWithinViewPort").isPresent()) {
+        if (!VerticalHeader.isFixedRowEmpty(spreadSheetView) && ReflectionUtils.getCellWithinViewPort(this, "getFirstVisibleCellWithinViewPort").isPresent()) {
             sortRows();
             /**
              * What I do is just going after the VirtualFlow in order to ADD
@@ -416,6 +442,11 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
             rows:
             for (int i = spreadSheetView.getFixedRows().size() - 1; i >= 0; i--) {
                 fixedRowIndex = spreadSheetView.getFixedRows().get(i);
+                if(spreadSheetView.isRowHidden(i)){
+                    continue;
+                }
+                //Changing the index to viewRow.
+                fixedRowIndex = spreadSheetView.getFilteredRow(fixedRowIndex);
                 Optional<T> lastCell = (Optional<T>) ReflectionUtils.getCellWithinViewPort(this, "getLastVisibleCellWithinViewPort");
                 // If the fixed row is out of bounds
                 if(lastCell.isPresent() && fixedRowIndex > lastCell.get().getIndex()) {
@@ -488,15 +519,17 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
     /**
      * Verify if the row has been added to myFixedCell
+     *
      * @param i
      * @return
      */
-    private T containsRows(int i){
-    	for(T cell:myFixedCells){
-    		if(cell.getIndex() == i)
-    			return cell;
-    	}
-    	return null;
+    private T containsRows(int i) {
+        for (T cell : myFixedCells) {
+            if (cell.getIndex() == i) {
+                return cell;
+            }
+        }
+        return null;
     }
     /**
      * Sort the rows so that they stay in order for layout

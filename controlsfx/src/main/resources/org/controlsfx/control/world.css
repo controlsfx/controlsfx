@@ -1,0 +1,54 @@
+.world-map {
+    -fx-background-color: #0b99c9;
+}
+
+.world-map .country {
+    -fx-fill: lightgreen;
+    -fx-stroke: green;
+    -fx-stroke-width: .1;
+}
+
+.world-map .country:hover {
+    -fx-fill: green;
+}
+
+.world-map .country:pressed {
+    -fx-fill: darkgreen;
+}
+
+.world-map .country:selected {
+    -fx-fill: red;
+}
+
+.world-map .country:selected:hover {
+    -fx-fill: orangered;
+}
+
+.world-map .country:selected:pressed {
+    -fx-fill: darkred;
+}
+
+.world-map .location {
+    -fx-fill: white;
+    -fx-stroke: black;
+}
+
+.world-map .location:hover {
+    -fx-fill: darkorange;
+}
+
+.world-map .location:pressed {
+    -fx-fill: darkred;
+}
+
+.world-map .location:selected {
+    -fx-fill: red;
+}
+
+.world-map .location:selected:hover {
+    -fx-fill: red;
+}
+
+.location:selected:pressed {
+    -fx-fill: darkred;
+}

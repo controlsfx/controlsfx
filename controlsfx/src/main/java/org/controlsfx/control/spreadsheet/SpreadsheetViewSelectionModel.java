@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015 ControlsFX
+ * Copyright (c) 2015, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,15 +26,15 @@
  */
 package org.controlsfx.control.spreadsheet;
 
-import impl.org.controlsfx.spreadsheet.FocusModelListener;
 import impl.org.controlsfx.spreadsheet.TableViewSpanSelectionModel;
-import java.util.Arrays;
-import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.util.Pair;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -53,64 +53,81 @@ public class SpreadsheetViewSelectionModel {
         this.spv = spv;
         this.selectionModel = selectionModel;
     }
-    
+
     /**
-     * Clears all selection, and then selects the cell at the given row/column intersection.
+     * Clears all selection, and then selects the cell at the given row/column
+     * intersection.
+     *
      * @param row
-     * @param column 
+     * @param column
      */
     public final void clearAndSelect(int row, SpreadsheetColumn column) {
+        selectionModel.clearAndSelect(spv.getFilteredRow(row), column.column);
+    }
+
+    /**
+     * Private method for inner selection when we already have the ViewRow.
+     *
+     * @param row
+     * @param column
+     */
+    private final void clearAndSelectView(int row, SpreadsheetColumn column) {
         selectionModel.clearAndSelect(row, column.column);
     }
-    
+
     /**
      * Selects the cell at the given row/column intersection.
+     *
      * @param row
-     * @param column 
+     * @param column
      */
     public final void select(int row, SpreadsheetColumn column) {
-        selectionModel.select(row,column.column);
+        selectionModel.select(spv.getFilteredRow(row), column.column);
     }
-    
+
     /**
      * Clears the selection model of all selected indices.
      */
     public final void clearSelection() {
         selectionModel.clearSelection();
     }
-    
+
     /**
-     * A read-only ObservableList representing the currently selected cells in this SpreadsheetView. 
+     * A read-only ObservableList representing the currently selected cells in
+     * this SpreadsheetView.
+     *
      * @return A read-only ObservableList.
      */
     public final ObservableList<TablePosition> getSelectedCells() {
         return selectionModel.getSelectedCells();
     }
-    
+
     /**
      * Select all the possible cells.
      */
     public final void selectAll() {
         selectionModel.selectAll();
     }
-    
+
     /**
-     * Return the position of the cell that has current focus. 
-     * @return the position of the cell that has current focus. 
+     * Return the position of the cell that has current focus.
+     *
+     * @return the position of the cell that has current focus.
      */
-    public final TablePosition getFocusedCell(){
+    public final TablePosition getFocusedCell() {
         return selectionModel.getTableView().getFocusModel().getFocusedCell();
     }
-    
+
     /**
      * Causes the cell at the given index to receive the focus.
+     *
      * @param row The row index of the item to give focus to.
      * @param column The column of the item to give focus to. Can be null.
      */
-    public final void focus(int row, SpreadsheetColumn column){
+    public final void focus(int row, SpreadsheetColumn column) {
         selectionModel.getTableView().getFocusModel().focus(row, column.column);
     }
-    
+
     /**
      * Specifies the selection mode to use in this selection model. The
      * selection mode specifies how many items in the underlying data model can
@@ -122,7 +139,7 @@ public class SpreadsheetViewSelectionModel {
     public final void setSelectionMode(SelectionMode value) {
         selectionModel.setSelectionMode(value);
     }
-    
+
     /**
      * Return the selectionMode currently used.
      *
@@ -131,8 +148,7 @@ public class SpreadsheetViewSelectionModel {
     public SelectionMode getSelectionMode() {
         return selectionModel.getSelectionMode();
     }
-    
-    
+
     /**
      * Use this method to select discontinuous cells.
      *
@@ -146,7 +162,7 @@ public class SpreadsheetViewSelectionModel {
     public void selectCells(List<Pair<Integer, Integer>> selectedCells) {
         selectionModel.verifySelectedCells(selectedCells);
     }
-    
+
     /**
      * Use this method to select discontinuous cells.
      *
@@ -154,23 +170,26 @@ public class SpreadsheetViewSelectionModel {
      * as value. This is useful when you want to select a great amount of cell
      * because it will be more efficient than calling
      * {@link #select(int, org.controlsfx.control.spreadsheet.SpreadsheetColumn) }.
+     *
      * @param selectedCells
      */
     public void selectCells(Pair<Integer, Integer>... selectedCells) {
         selectionModel.verifySelectedCells(Arrays.asList(selectedCells));
     }
-    
+
     /**
-     * Selects the cells in the range (minRow, minColumn) to (maxRow, maxColumn), inclusive.
+     * Selects the cells in the range (minRow, minColumn) to (maxRow,
+     * maxColumn), inclusive.
+     *
      * @param minRow
      * @param minColumn
      * @param maxRow
-     * @param maxColumn 
+     * @param maxColumn
      */
     public void selectRange(int minRow, SpreadsheetColumn minColumn, int maxRow, SpreadsheetColumn maxColumn) {
-        selectionModel.selectRange(minRow, minColumn.column, maxRow, maxColumn.column);
+        selectionModel.selectRange(spv.getFilteredRow(minRow), minColumn.column, spv.getFilteredRow(maxRow), maxColumn.column);
     }
-    
+
     /**
      * Clear the current selection and select the cell on the left of the
      * current focused cell. If the cell is the first one on a row, the last
@@ -185,11 +204,14 @@ public class SpreadsheetViewSelectionModel {
             if (row == 0) {
                 column++;
             } else {
-                column = spv.getGrid().getColumnCount() - 1;
+                column = selectionModel.getTableView().getVisibleLeafColumns().size() - 1;
                 row--;
+                selectionModel.direction = new Pair<>(-1, -1);
             }
+            clearAndSelectView(row, spv.getColumns().get(spv.getModelColumn(column)));
+        } else {
+            spv.getCellsViewSkin().getBehavior().selectCell(0, -1);
         }
-        clearAndSelect(row, spv.getColumns().get(column));
     }
 
     /**
@@ -202,36 +224,39 @@ public class SpreadsheetViewSelectionModel {
         int row = position.getRow();
         int column = position.getColumn();
         column += 1;
-        if (column >= spv.getColumns().size()) {
+        if (column >= selectionModel.getTableView().getVisibleLeafColumns().size()) {
             if (row == spv.getGrid().getRowCount() - 1) {
                 column--;
             } else {
+                selectionModel.direction = new Pair<>(1, 1);
                 column = 0;
                 row++;
             }
-        }
-        clearAndSelect(row, spv.getColumns().get(column));
-    }
-
-    /**
-     * Clear the current selection and select the cell on the previous row.
-     */
-    public void clearAndSelectPreviousCell() {
-        TablePosition<ObservableList<SpreadsheetCell>, ?> position = getFocusedCell();
-        int nextRow = FocusModelListener.getPreviousRowNumber(position, selectionModel.getTableView());
-        if (nextRow >= 0) {
-            clearAndSelect(nextRow, spv.getColumns().get(position.getColumn()));
+            clearAndSelectView(row, spv.getColumns().get(spv.getModelColumn(column)));
+        } else {
+            spv.getCellsViewSkin().getBehavior().selectCell(0, 1);
         }
     }
 
-    /**
-     * Clear the current selection and select the cell on the next row.
-     */
-    public void clearAndSelectNextCell() {
-        TablePosition<ObservableList<SpreadsheetCell>, ?> position = getFocusedCell();
-        int nextRow = FocusModelListener.getNextRowNumber(position, selectionModel.getTableView());
-        if (nextRow < spv.getGrid().getRowCount()) {
-            clearAndSelect(nextRow, spv.getColumns().get(position.getColumn()));
-        }
-    }
+//    /**
+//     * Clear the current selection and select the cell on the previous row.
+//     */
+//    public void clearAndSelectPreviousCell() {
+//        TablePosition<ObservableList<SpreadsheetCell>, ?> position = getFocusedCell();
+//        int nextRow = FocusModelListener.getPreviousRowNumber(position, selectionModel.getTableView(), spv);
+//        if (nextRow >= 0) {
+//            clearAndSelectView(nextRow, spv.getColumns().get(spv.getModelColumn(position.getColumn())));
+//        }
+//    }
+//
+//    /**
+//     * Clear the current selection and select the cell on the next row.
+//     */
+//    public void clearAndSelectNextCell() {
+//        TablePosition<ObservableList<SpreadsheetCell>, ?> position = getFocusedCell();
+//        int nextRow = FocusModelListener.getNextRowNumber(position, selectionModel.getTableView(), spv);
+//        if (nextRow < spv.getGrid().getRowCount()) {
+//            clearAndSelectView(nextRow, spv.getColumns().get(spv.getModelColumn(position.getColumn())));
+//        }
+//    }
 }

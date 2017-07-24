@@ -42,12 +42,9 @@ subprojects {
        }
     }
 
-    task wrapper(type: Wrapper) {
-        gradleVersion = '2.11'
-    }
-
     compileJava {  
         options.encoding = "UTF-8"
+        options.incremental = true
         options.compilerArgs += [
              // For various usages of TraversalEngine
              "--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=ALL-UNNAMED",

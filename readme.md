@@ -26,4 +26,4 @@ If you think you have a feature you can contribute, a bug you want to fix please
 
 Thanks to 
 
-[![IntelliJ Idea](http://resources.jetbrains.com/assets/media/open-graph/intellij-idea_250x250.png)](https://www.jetbrains.com/idea)
+[![IntelliJ Idea](https://upload.wikimedia.org/wikipedia/commons/d/d5/IntelliJ_IDEA_Logo.svg)](https://www.jetbrains.com/idea)

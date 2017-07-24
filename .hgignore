@@ -7,15 +7,16 @@ gradle.properties
 
 # IntelliJ IDEA
 .idea/
-bin/
+out/
 *.iml
 
 # Netbeans
-.nb-gradle/*
+.nb-gradle/
 .nb-gradle-properties
 
 # Eclipse
-.settings/*
+.settings/
+bin/
 
 # MacOS
 .DS_Store

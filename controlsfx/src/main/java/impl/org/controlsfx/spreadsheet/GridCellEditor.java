@@ -135,14 +135,14 @@ public class GridCellEditor {
 
                 //We select the cell below if "enter" was typed.
                 if (KeyCode.ENTER.equals(lastKeyPressed)) {
-                    handle.getView().getSelectionModel().clearAndSelectNextCell();
+                    handle.getCellsViewSkin().getBehavior().selectCell(1, 0);
                 } else if (KeyCode.TAB.equals(lastKeyPressed)) {
                     handle.getView().getSelectionModel().clearAndSelectRightCell();
                     ReflectionUtils.callMethod(handle.getCellsViewSkin(), "scrollHorizontally");
                 }
             }
         }
-        
+
         if (editing) {
             editing = false;
             if(viewCell != null){

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013,2014 ControlsFX
+ * Copyright (c) 2013, 2017 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -699,7 +699,7 @@ public class FontAwesome extends GlyphFont {
      * Note: Do not remove this public constructor since it is used by the service loader!
      */
     public FontAwesome() {
-        this("http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/fonts/fontawesome-webfont.ttf"); //$NON-NLS-1$
+        this(FontAwesome.class.getResourceAsStream("fontawesome-webfont.ttf")); //$NON-NLS-1$
     }
 
     /**

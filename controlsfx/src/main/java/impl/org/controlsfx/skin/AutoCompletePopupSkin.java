@@ -78,6 +78,7 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
 
         suggestionList.setOnKeyPressed(ke -> {
             switch (ke.getCode()) {
+                case TAB:
                 case ENTER:
                     onSuggestionChoosen(suggestionList.getSelectionModel().getSelectedItem());
                     break;

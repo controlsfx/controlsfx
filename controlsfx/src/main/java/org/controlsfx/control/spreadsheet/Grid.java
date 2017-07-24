@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015, ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,10 @@
 package org.controlsfx.control.spreadsheet;
 
 import java.util.Collection;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
-import org.controlsfx.control.spreadsheet.SpreadsheetView.SpanType;
 
 /**
  * That class holds some {@link SpreadsheetCell} in order
@@ -109,15 +109,6 @@ public interface Grid {
     public void setCellValue(int row, int column, Object value);
     
     /**
-     * Return the {@link SpanType} for a given cell row/column intersection.
-     * @param spv
-     * @param row
-     * @param column
-     * @return the {@link SpanType} for a given cell row/column intersection.
-     */
-    public SpanType getSpanType(final SpreadsheetView spv, final int row, final int column);
-    
-    /**
      * Return the height of a row. {@link #AUTOFIT } can be returned in order to
      * let the system compute the best row height.
      *
@@ -173,6 +164,54 @@ public interface Grid {
      */
     public void setRows(Collection<ObservableList<SpreadsheetCell>> rows);
     
+    /**
+     * Return true if the selection (black rectangle) is displayed on the Grid.
+     * Cells may override this property with {@link #setCellDisplaySelection(int, int, boolean)
+     * }.
+     *
+     * @return true if the selection (black rectangle) is displayed on the Grid.
+     */
+    public boolean isDisplaySelection();
+
+    /**
+     * If set to true, the selection (black rectangle) will be displayed on the
+     * Grid. Cells may override this property with {@link #setCellDisplaySelection(int, int, boolean)
+     * }.
+     *
+     * @param value
+     */
+    public void setDisplaySelection(boolean value);
+
+    /**
+     * Return the Boolean property associated with the displayed selection of the
+     * Grid.
+     *
+     * @return the Boolean property associated with the displayed selecion of the
+     * Grid.
+     */
+    public BooleanProperty displaySelectionProperty();
+
+    /**
+     * This method overrides the value defined by {@link #isDisplaySelection() }
+     * so that no matter what is defined on the grid, the given cell will always
+     * have its selection set to the displaySelection parameter.
+     *
+     * @param row
+     * @param column
+     * @param displaySelection
+     */
+    public void setCellDisplaySelection(int row, int column, boolean displaySelection);
+
+    /**
+     * Return true if the given cell will display a selection rectangle when
+     * selected. If nothing is defined for this cell, 
+     * {@link #isDisplaySelection() } is returned.
+     *
+     * @param row
+     * @param column
+     * @return true if the given cell will display a selection rectangle.
+     */
+    public boolean isCellDisplaySelection(int row, int column);
     /**
      * Registers an event handler to this Grid. The Grid class allows 
      * registration of listeners which will be notified as a {@link SpreadsheetCell}'s value 

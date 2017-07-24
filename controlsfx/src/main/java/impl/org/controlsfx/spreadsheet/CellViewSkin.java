@@ -32,12 +32,17 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.event.WeakEventHandler;
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.control.TableCell;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.skin.TableCellSkin;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
+import org.controlsfx.control.spreadsheet.Filter;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell.CornerPosition;
 
@@ -50,6 +55,12 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell.CornerPosition;
  *
  */
 public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>, SpreadsheetCell> {
+
+    /**
+     * This EventType can be used with an {@link EventHandler} in order to catch
+     * when a SpreadsheetCell filter is activated/deactivated on this column.
+     */
+    public static final EventType FILTER_EVENT_TYPE = new EventType("FilterEventType"); //$NON-NLS-1$
 
     private final static String TOP_LEFT_CLASS = "top-left"; //$NON-NLS-1$
     private final static String TOP_RIGHT_CLASS = "top-right"; //$NON-NLS-1$
@@ -67,10 +78,13 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
     private Region topRightRegion = null;
     private Region bottomRightRegion = null;
     private Region bottomLeftRegion = null;
+    private MenuButton filterButton = null;
 
-    public CellViewSkin(TableCell<ObservableList<SpreadsheetCell>, SpreadsheetCell> tableCell) {
+    public CellViewSkin(CellView tableCell) {
         super(tableCell);
         tableCell.itemProperty().addListener(weakItemChangeListener);
+        tableCell.tableColumnProperty().addListener(weakColumnChangeListener);
+        tableCell.getTableColumn().addEventHandler(FILTER_EVENT_TYPE, weakTriangleEventHandler);
         if (tableCell.getItem() != null) {
             tableCell.getItem().addEventHandler(SpreadsheetCell.CORNER_EVENT_TYPE, weakTriangleEventHandler);
         }
@@ -94,24 +108,47 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         }
         return super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
     }
-    
+
     @Override
     protected void layoutChildren(double x, final double y, final double w, final double h) {
         super.layoutChildren(x, y, w, h);
         if (getSkinnable().getItem() != null) {
             layoutTriangle();
+            handleFilter(x, y, w, h);
         }
     }
 
     private void layoutTriangle() {
         SpreadsheetCell cell = getSkinnable().getItem();
-        
+
         handleTopLeft(cell);
         handleTopRight(cell);
         handleBottomLeft(cell);
         handleBottomRight(cell);
 
         getSkinnable().requestLayout();
+    }
+
+    private void handleFilter(double x, final double y, final double w, final double h) {
+        Filter filter = ((CellView) getSkinnable()).getFilter();
+        if (filter != null) {
+            //We first remove it.
+            removeMenuButton();
+            filterButton = filter.getMenuButton();
+            if (!getChildren().contains(filterButton)) {
+                getChildren().add(filterButton);
+            }
+            layoutInArea(filterButton, x, y, w, h, 0, HPos.RIGHT, VPos.BOTTOM);
+        } else if (filterButton != null) {
+            removeMenuButton();
+        }
+    }
+
+    private void removeMenuButton() {
+        if (filterButton != null && getChildren().contains(filterButton)) {
+            getChildren().remove(filterButton);
+            filterButton = null;
+        }
     }
 
     private void handleTopLeft(SpreadsheetCell cell) {
@@ -122,7 +159,8 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
             if (!getChildren().contains(topLeftRegion)) {
                 getChildren().add(topLeftRegion);
             }
-            topLeftRegion.relocate(0, snappedTopInset() - 1);
+            //We do not wants snappedTopInset because it takes the padding in consideration!
+            topLeftRegion.relocate(0, 0);
         } else if (topLeftRegion != null) {
             getChildren().remove(topLeftRegion);
             topLeftRegion = null;
@@ -137,7 +175,8 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
             if (!getChildren().contains(topRightRegion)) {
                 getChildren().add(topRightRegion);
             }
-            topRightRegion.relocate(getSkinnable().getWidth() - TRIANGLE_SIZE, snappedTopInset() - 1);
+            //We do not wants snappedTopInset because it takes the padding in consideration!
+            topRightRegion.relocate(getSkinnable().getWidth() - TRIANGLE_SIZE, 0);
         } else if (topRightRegion != null) {
             getChildren().remove(topRightRegion);
             topRightRegion = null;
@@ -158,6 +197,7 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
             bottomRightRegion = null;
         }
     }
+
     private void handleBottomLeft(SpreadsheetCell cell) {
         if (cell.isCornerActivated(CornerPosition.BOTTOM_LEFT)) {
             if (bottomLeftRegion == null) {
@@ -195,7 +235,7 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
 
         return region;
     }
-    
+
     private final EventHandler<Event> triangleEventHandler = new EventHandler<Event>() {
 
         @Override
@@ -221,4 +261,18 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         }
     };
     private final WeakChangeListener<SpreadsheetCell> weakItemChangeListener = new WeakChangeListener<>(itemChangeListener);
+
+    private final ChangeListener<TableColumn> columnChangeListener = new ChangeListener<TableColumn>() {
+        @Override
+        public void changed(ObservableValue<? extends TableColumn> arg0, TableColumn oldCell,
+                TableColumn newCell) {
+            if (oldCell != null) {
+                oldCell.removeEventHandler(FILTER_EVENT_TYPE, weakTriangleEventHandler);
+            }
+            if (newCell != null) {
+                newCell.addEventHandler(FILTER_EVENT_TYPE, weakTriangleEventHandler);
+            }
+        }
+    };
+    private final WeakChangeListener<TableColumn> weakColumnChangeListener = new WeakChangeListener<>(columnChangeListener);
 }

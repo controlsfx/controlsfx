@@ -49,8 +49,10 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import java.util.BitSet;
 import java.util.List;
+import java.util.Optional;
 
 import static impl.org.controlsfx.ReflectionUtils.getRootHeaderFrom;
+import static impl.org.controlsfx.spreadsheet.GridViewSkin.DEFAULT_CELL_HEIGHT;
 
 /**
  * The set of horizontal (column) headers.
@@ -203,7 +205,7 @@ public class HorizontalHeader extends TableHeaderRow {
      */
     private void headerClicked(TableColumn column, MouseEvent event) {
         TableViewSelectionModel<ObservableList<SpreadsheetCell>> sm = gridViewSkin.handle.getGridView().getSelectionModel();
-        int lastRow = gridViewSkin.spreadsheetView.getGrid().getRowCount() - 1;
+        int lastRow = gridViewSkin.getItemCount() - 1;
         int indexColumn = column.getTableView().getColumns().indexOf(column);
         TablePosition focusedPosition = sm.getTableView().getFocusModel().getFocusedCell();
         if (event.isShortcutDown()) {
@@ -277,7 +279,7 @@ public class HorizontalHeader extends TableHeaderRow {
      * @param column
      */
     private void fixColumn(SpreadsheetColumn column) {
-        addStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(column));
+        addStyleHeader(gridViewSkin.spreadsheetView.getViewColumn(gridViewSkin.spreadsheetView.getColumns().indexOf(column)));
     }
 
     /**
@@ -286,7 +288,7 @@ public class HorizontalHeader extends TableHeaderRow {
      * @param column
      */
     private void unfixColumn(SpreadsheetColumn column) {
-        removeStyleHeader(gridViewSkin.spreadsheetView.getColumns().indexOf(column));
+        removeStyleHeader(gridViewSkin.spreadsheetView.getViewColumn(gridViewSkin.spreadsheetView.getColumns().indexOf(column)));
     }
 
     /**
@@ -357,5 +359,31 @@ public class HorizontalHeader extends TableHeaderRow {
             //getRootHeader().layoutFixedColumns();
             updateHighlightSelection();
         }
+    }
+   
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected double computePrefHeight(double width) {
+        /**
+         * We have a weird situation where the headerRow is 22.0 when no cells
+         * is clicked in the Grid..
+         */
+        //If it's not showing, height is 0!
+        if (!gridViewSkin.handle.getView().isShowColumnHeader()) {
+            return 0.0;
+        }
+        // we hardcode 24.0 here to avoid RT-37616, where the
+        // entire header row would disappear when all columns were hidden.
+        double headerPrefHeight = 0.0;
+        Optional<NestedTableColumnHeader> rootHeader = getRootHeaderFrom(this);
+        if (rootHeader.isPresent()) {
+            headerPrefHeight = rootHeader.get().prefHeight(width);
+            headerPrefHeight = headerPrefHeight == 0.0 ? 24.0 : headerPrefHeight;
+        }
+        double height = snappedTopInset() + headerPrefHeight + snappedBottomInset();
+        height = height < DEFAULT_CELL_HEIGHT ? DEFAULT_CELL_HEIGHT : height;
+        return height;
     }
 }

@@ -196,6 +196,16 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         return topInset + Math.max(thumb.prefHeight(-1), label.prefHeight(-1)) + bottomInset;
     }
 
+    @Override
+    protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return getSkinnable().prefWidth(height);
+    }
+
+    @Override
+    protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        return getSkinnable().prefHeight(width);
+    }
+    
     private static final CssMetaData<ToggleSwitch, Number> THUMB_MOVE_ANIMATION_TIME =
             new CssMetaData<ToggleSwitch, Number>("-thumb-move-animation-time",
                     SizeConverter.getInstance(), 200) {

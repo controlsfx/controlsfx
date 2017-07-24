@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -154,6 +154,36 @@ public class StatusBar extends ControlsFXControl {
         graphicProperty().set(node);
     }
 
+    private final StringProperty styleTextProperty = new SimpleStringProperty();
+    /**
+     * A string representation of the CSS style associated with this Text.{@link Node#setStyle(java.lang.String)
+     * }
+     *
+     * @param style
+     */
+    public void setStyleText(String style) {
+        styleTextProperty.set(style);
+    }
+
+    /**
+     * A string representation of the CSS style associated with this Text. {@link Node#getStyle()
+     * }
+     *
+     * @return the style applied on the text.
+     */
+    public String getStyleText() {
+        return styleTextProperty.get();
+    }
+
+    /**
+     * Return the BooleanProperty associated with the style applied to the text.
+     *
+     * @return the BooleanProperty associated with the style applied to the text.
+     */
+    public final StringProperty styleTextProperty() {
+        return styleTextProperty;
+    }
+    
     private final ObservableList<Node> leftItems = FXCollections
             .observableArrayList();
 

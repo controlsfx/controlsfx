@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014 - 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,14 +28,12 @@ package org.controlsfx.samples;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.MasterDetailPane;
 
@@ -100,7 +98,46 @@ public class HelloMasterDetailPane extends ControlsFXSample {
         positionBox.setValue(masterDetailPane.getDetailSide());
         masterDetailPane.detailSideProperty().bind(positionBox.valueProperty());
 
+        // detail node
+        Label lblDetailNode = new Label("Detail Node: ");
+        lblDetailNode.getStyleClass().add("property");
+        grid.add(lblDetailNode, 0, row);
+        ComboBox<DetailType> detailNodeBox = new ComboBox<>();
+        detailNodeBox.getItems().addAll(DetailType.values());
+        grid.add(detailNodeBox, 1, row++);
+        detailNodeBox.valueProperty().addListener(it -> {
+            switch (detailNodeBox.getValue()) {
+                case LABEL:
+                    final Label label = new Label("Detail");
+                    label.setMaxWidth(Double.MAX_VALUE);
+                    label.setAlignment(Pos.CENTER);
+                    label.setStyle("-fx-background-color: lightcoral;");
+                    masterDetailPane.setDetailNode(label);
+                    break;
+                case NONE:
+                    masterDetailPane.setDetailNode(null);
+                    break;
+                case LIST_VIEW:
+                    final ListView<String> listView = new ListView<>();
+                    listView.getItems().addAll("Katja", "Dirk", "Philip", "Jule", "Armin");
+                    listView.setPrefSize(150,150);
+                    masterDetailPane.setDetailNode(listView);
+                    break;
+            }
+        });
+
+        // reset position
+        Button resetButton = new Button("Reset Divider");
+        resetButton.setOnAction(evt -> masterDetailPane.resetDividerPosition());
+        grid.add(resetButton, 1, row++);
+
         return grid;
+    }
+
+    public enum DetailType {
+        NONE,
+        LABEL,
+        LIST_VIEW
     }
 
     @Override

@@ -88,6 +88,8 @@ public class HelloPopOver extends ControlsFXSample {
 
     private CheckBox animated;
 
+    private CheckBox closeButtonEnabled;
+
     private Circle circle;
 
     private Line line1;
@@ -313,6 +315,11 @@ public class HelloPopOver extends ControlsFXSample {
         controls.add(animated, 0, 8);
         GridPane.setColumnSpan(animated, 2);
 
+        closeButtonEnabled = new CheckBox("Close button enabled");
+        closeButtonEnabled.setSelected(true);
+        controls.add(closeButtonEnabled, 0, 9);
+        GridPane.setColumnSpan(closeButtonEnabled, 2);
+
         circle.visibleProperty().bind(
                 Bindings.not(autoPosition.selectedProperty()));
         line1.visibleProperty().bind(
@@ -333,6 +340,7 @@ public class HelloPopOver extends ControlsFXSample {
         popOver.cornerRadiusProperty().bind(masterCornerRadius);
         popOver.headerAlwaysVisibleProperty().bind(masterHeaderAlwaysVisible);
         popOver.setAnimated(animated.isSelected());
+        popOver.closeButtonEnabledProperty().bind(closeButtonEnabled.selectedProperty());
         return popOver;
     }
 

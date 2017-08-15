@@ -2,7 +2,7 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Dockerhub as your build environment.
-image: cogniteev/oracle-java:java8
+image: cogniteev/oracle-java:java9
 
 pipelines:
   default:

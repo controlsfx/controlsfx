@@ -1,5 +1,3 @@
-import org.apache.tools.ant.filters.EscapeUnicode
-
 dependencies {
     try {
         jdk files(jfxrtJar)
@@ -124,13 +122,11 @@ jar {
 }
 
 task native2ascii(type:Copy) {
-    // Files are downloaded with extension utf8.
-    // Here they are unicode escaped then renamed .properties...
+    // Files are downloaded with extension utf8, then renamed .properties...
     from ("$buildDir/resources/main") {
         include('**/controlsfx_*.utf8') 
         filesMatching("controlsfx_*.utf8") {
             println "  native2ascii: $name"
-            filter(EscapeUnicode)
             name = name[0..-6] + '.properties'
         } 
     } into "$buildDir/resources/main"
@@ -142,6 +138,3 @@ task deleteUtf8Files(type: Delete) {
 
 downloadTranslations.finalizedBy(native2ascii)
 native2ascii.finalizedBy(deleteUtf8Files)
-
-//jar.dependsOn(native2ascii)
-//jar.dependsOn(deleteUtf8Files)

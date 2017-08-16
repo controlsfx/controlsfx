@@ -26,16 +26,15 @@
  */
 package impl.build.transifex;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -86,21 +85,22 @@ public class Transifex {
     }
     
     private String transifexRequest(String request, Object... args) {
-        Function<InputStream, String> consumer = inputStream -> {
-            StringBuilder response = new StringBuilder(); 
-            try(BufferedReader rd = new BufferedReader(new InputStreamReader(inputStream)) ) {
-                String line;
-                while((line = rd.readLine()) != null) {
-                    response.append(line);
-                    response.append(NEW_LINE);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } 
+        return performTransifexTask(this::parseInputStream, request, args);
+    }
 
-            return response.toString();
-        };
-        return performTransifexTask(consumer, request, args);
+    private String parseInputStream(InputStream inputStream) {
+        StringBuilder response = new StringBuilder();
+        try(BufferedReader rd = new BufferedReader(new InputStreamReader(inputStream, CHARSET)) ) {
+            String line;
+            while((line = rd.readLine()) != null) {
+                response.append(line);
+                response.append(NEW_LINE);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return response.toString();
     }
     
     private static <T> T performTransifexTask(Function<InputStream, T> consumer, String request, Object... args) {
@@ -162,13 +162,11 @@ public class Transifex {
     private void downloadTranslation(String languageCode) {
         // Now we download the translations of the completed languages
         System.out.println("\tDownloading translation file..."); //$NON-NLS-1$
-        
+
         Function<InputStream, Void> consumer = inputStream -> {
             final String outputFile = "build/resources/main/" + String.format(FILE_NAME, languageCode); //$NON-NLS-1$
-            
-            ReadableByteChannel rbc = Channels.newChannel(inputStream);
-            try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-                fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+            try (BufferedWriter writer = new BufferedWriter(new PrintWriter(outputFile, CHARSET))) {
+                writer.write(parseInputStream(inputStream));
             } catch (Exception e) {
                 e.printStackTrace();
             }

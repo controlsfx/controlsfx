@@ -4,3 +4,8 @@
 	-fx-background-color: lightgray, -fx-body-color;
 	-fx-background-insets: 0, 1
 }
+
+.status-bar > .left-items,
+.status-bar > .right-items {
+	-fx-alignment: center;
+}

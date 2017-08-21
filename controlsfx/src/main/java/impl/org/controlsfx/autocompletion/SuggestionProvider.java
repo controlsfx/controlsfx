@@ -49,7 +49,7 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
     private final Object possibleSuggestionsLock = new Object();
 
     /**
-     * Tell the provider to show all suggestions if empty text in request
+     * Tell the provider to show all suggestions if empty text given
      *
      * @defaultValue false
      */
@@ -60,7 +60,7 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
      *
      * @return the property
      */
-    public BooleanProperty showAllIfEmptyProperty() {
+    public final BooleanProperty showAllIfEmptyProperty() {
         return showAllIfEmptyProperty;
     }
 
@@ -69,7 +69,7 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
      *
      * @return the value of the property
      */
-    public boolean isShowAllIfEmpty() {
+    public final boolean isShowAllIfEmpty() {
         return showAllIfEmptyProperty.get();
     }
 
@@ -79,7 +79,7 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
      * @param showAllIfEmpty if true, the provider will show all suggestions if
      * empty text given
      */
-    public void setShowAllIfEmpty(boolean showAllIfEmpty) {
+    public final void setShowAllIfEmpty(boolean showAllIfEmpty) {
         showAllIfEmptyProperty.set(showAllIfEmpty);
     }
 

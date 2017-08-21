@@ -30,8 +30,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -119,13 +121,29 @@ public class HelloPrefixSelection extends ControlsFXSample {
         cb2.selectedProperty().bindBidirectional(combo2.editableProperty());
         grid.add(cb2, 2, 4);
         
+        grid.add(new Button("Press Tab"), 0, 5);
+        PrefixSelectionComboBox<String> combo3 = new PrefixSelectionComboBox<>();
+        combo3.setDisplayOnFocusedEnabled(true);
+        combo3.setNumberOfDigits(2);
+        combo3.setTypingDelay(1000);
+        combo3.setBackSpaceAllowed(true);
+        combo3.setItems(FXCollections.observableArrayList(
+            "17 ACURA", "19 AUDI", "64 BENTLEY", "98 BLUE BIRD", "21 BMW", "02 BUICK", "03 CADILLAC", 
+                "05 CHEVROLET", "90 CHEVY-MEDIUM DUTY", "06 CHRYSLER", "23 DAEWOO", "07 DODGE", 
+                "72 FERRARI", "08 FORD", "92 FORD-MEDIUM DUTY", "09 GCM TRUCK", "93 GCM-MEDIUM DUTY", 
+                "94 HINO", "27 HONDA"));
+        
+        combo3.setMaxWidth(Double.MAX_VALUE);
+        grid.add(combo3, 1, 5);
+        grid.add(new TextField(), 2, 5);
+        
         return grid;
     }
     
     @Override public String getSampleDescription() {
         return "This utility class can be used to customize a ChoiceBox or ComboBox"
                 + " and enable the prefix selection feature. This will enable the user to type letters or"
-                + " digits on the keyboard and die ChoiceBox or ComboBox will attempt to"
+                + " digits on the keyboard and the ChoiceBox or ComboBox will attempt to"
                 + " select the first item it can find with a matching prefix.";
     }
     

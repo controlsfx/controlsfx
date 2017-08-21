@@ -26,10 +26,14 @@
  */
 package impl.org.controlsfx.tools;
 
+import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import javafx.animation.PauseTransition;
 
 import org.controlsfx.control.PrefixSelectionChoiceBox;
 import org.controlsfx.control.PrefixSelectionComboBox;
@@ -39,8 +43,10 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 /**
@@ -91,12 +97,20 @@ import javafx.util.StringConverter;
  * @see PrefixSelectionComboBox
  */
 public class PrefixSelectionCustomizer {
+    public static final int DEFAULT_NUMBER_OF_DIGITS = 0;
+    public static final int DEFAULT_TYPING_DELAY = 500;
+    public static final int DEFAULT_HIDING_DELAY = 200;
+    
     private static final String SELECTION_PREFIX_STRING = "selectionPrefixString";
     private static final Object SELECTION_PREFIX_TASK = "selectionPrefixTask";
 
     private static EventHandler<KeyEvent> handler = new EventHandler<KeyEvent>() {
         private ScheduledExecutorService executorService = null;
-
+        private PrefixSelectionComboBox prefixSelectionComboBox;
+        private String firstLetter;
+        private int numberOfDigits;
+        private int typingDelay;
+    
         @Override
         public void handle(KeyEvent event) {
             keyPressed(event);
@@ -104,13 +118,21 @@ public class PrefixSelectionCustomizer {
 
         private <T> void keyPressed(KeyEvent event) {
             KeyCode code = event.getCode();
-            if (code.isLetterKey() || code.isDigitKey() || code == KeyCode.SPACE) {
+            if (code.isLetterKey() || code.isDigitKey() || code == KeyCode.SPACE || code == KeyCode.BACK_SPACE) {
+                if (event.getSource() instanceof PrefixSelectionComboBox) {
+                    if (code == KeyCode.BACK_SPACE && ! ((PrefixSelectionComboBox) event.getSource()).isBackSpaceAllowed()) {
+                        return;
+                    }
+                }
                 String letter = code.impl_getChar();
                 if (event.getSource() instanceof ComboBox) {
                     ComboBox<T> comboBox = (ComboBox<T>) event.getSource();
                     T item = getEntryWithKey(letter, comboBox.getConverter(), comboBox.getItems(), comboBox);
                     if (item != null) {
                         comboBox.setValue(item);
+                        // scroll to selection
+                        ComboBoxListViewSkin<?> skin = (ComboBoxListViewSkin<?>) comboBox.getSkin(); 
+                        ((ListView<T>) skin.getPopupContent()).scrollTo(item); 
                     }
                 } else if (event.getSource() instanceof ChoiceBox) {
                     ChoiceBox<T> choiceBox = (ChoiceBox<T>) event.getSource();
@@ -124,7 +146,11 @@ public class PrefixSelectionCustomizer {
 
         private <T> T getEntryWithKey(String letter, StringConverter<T> converter, ObservableList<T> items, Control control) {
             T result = null;
-
+            numberOfDigits = DEFAULT_NUMBER_OF_DIGITS;
+            typingDelay = DEFAULT_TYPING_DELAY;
+            firstLetter = "";
+            prefixSelectionComboBox = (control instanceof PrefixSelectionComboBox) ? (PrefixSelectionComboBox) control : null;
+            
             // The converter is null by default for the ChoiceBox. The ComboBox has a default converter
             if (converter == null) {
                 converter = new StringConverter<T>() {
@@ -140,19 +166,58 @@ public class PrefixSelectionCustomizer {
                 };
             }
 
-            String selectionPrefixString = (String) control.getProperties().get(SELECTION_PREFIX_STRING);
-            if (selectionPrefixString == null) {
-                selectionPrefixString = letter.toUpperCase();
-            } else {
-                selectionPrefixString += letter.toUpperCase();
-            }
+            String selectionPrefixString = processInput((String) control.getProperties().get(SELECTION_PREFIX_STRING), letter);
             control.getProperties().put(SELECTION_PREFIX_STRING, selectionPrefixString);
 
+            int numberOfOccurrences = -1, numberOfItems = -1;
+            if (prefixSelectionComboBox != null) {
+                numberOfDigits = prefixSelectionComboBox.getNumberOfDigits();
+                typingDelay = prefixSelectionComboBox.getTypingDelay();
+                if (! selectionPrefixString.isEmpty()) {
+                    firstLetter = selectionPrefixString.substring(0, 1);
+                    numberOfOccurrences = selectionPrefixString.replaceFirst(".*?(" + firstLetter + "+).*", "$1").length();
+                    if (numberOfOccurrences > 0) {
+                        numberOfItems = (int) items.stream()
+                                .map(converter::toString)
+                                .filter(s -> s != null && s.length() >= numberOfDigits + 2)
+                                .map(s -> s.substring(numberOfDigits + 1, numberOfDigits + 2).toUpperCase(Locale.ROOT))
+                                .filter(s -> s.equals(firstLetter))
+                                .count();
+                    }
+                }
+            }
+            int index = 0;
             for (T item : items) {
                 String string = converter.toString(item);
-                if (string != null && string.toUpperCase().startsWith(selectionPrefixString)) {
-                    result = item;
-                    break;
+                if (string == null || string.isEmpty() || selectionPrefixString.isEmpty()) {
+                    continue;
+                }
+                string = string.toUpperCase(Locale.ROOT);
+                if (numberOfDigits > 0) {
+                    if (isValidNumber(selectionPrefixString) && string.startsWith(selectionPrefixString)) {
+                        // digits: select that line and tab to the next field
+                        // reset selection
+                        control.getProperties().put(SELECTION_PREFIX_STRING, "");
+                        commitSelection();
+                        return item;
+                    } else if (string.substring(numberOfDigits + 1).startsWith(selectionPrefixString)) {
+                        // alpha characters: highlight closest (first) match
+                        result = item;
+                        break;
+                    } else if (numberOfItems > 0 && numberOfOccurrences > 1 && 
+                            string.substring(numberOfDigits + 1, numberOfDigits + 2).equals(firstLetter)) {
+                        // repeated alpha characters: highlight match based on order
+                        if (index == (numberOfOccurrences - 1) % numberOfItems) {
+                            result = item;
+                            break;
+                        }
+                        index += 1;
+                    }  
+                } else { // regular ComboBox, ChoiceBox or PrefixSelectionComboBox with numberOfDigits = 0
+                    if (string != null && string.startsWith(selectionPrefixString)) {
+                        result = item;
+                        break;
+                    }
                 }
             }
 
@@ -161,7 +226,7 @@ public class PrefixSelectionCustomizer {
                 task.cancel(false);
             }
             task = getExecutorService().schedule(
-                    () -> control.getProperties().put(SELECTION_PREFIX_STRING, ""), 500, TimeUnit.MILLISECONDS); 
+                    () -> control.getProperties().put(SELECTION_PREFIX_STRING, ""), typingDelay, TimeUnit.MILLISECONDS); 
             control.getProperties().put(SELECTION_PREFIX_TASK, task);
 
             return result;
@@ -177,6 +242,49 @@ public class PrefixSelectionCustomizer {
                         });
             }
             return executorService;
+        }
+        
+        private String processInput(String initialText, String letter) {
+            if (initialText == null) {
+                initialText = "";
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (char c : initialText.concat(letter.toUpperCase(Locale.ROOT)).toCharArray()) {
+                if (c == '\b') { // back space
+                    if (sb.length() > 0) {
+                        sb.deleteCharAt(sb.length() - 1);
+                    }
+                } else {
+                    sb.append(c);
+                }
+            }
+            return sb.toString();
+        }
+
+        private boolean isValidNumber(String prefix) {
+            if (prefix == null || prefixSelectionComboBox == null || 
+                    prefix.length() != prefixSelectionComboBox.getNumberOfDigits()) {
+                return false;
+            }
+            try {
+                Integer.parseInt(prefix);
+                return true;
+            } catch (NumberFormatException nfe) {
+                return false;
+            }
+        }
+
+        private void commitSelection() {
+            if (prefixSelectionComboBox == null) {
+                return;
+            }
+            PauseTransition pause = new PauseTransition(Duration.millis(prefixSelectionComboBox.getHidingDelay()));
+            pause.setOnFinished(f -> {
+                prefixSelectionComboBox.hide();
+                prefixSelectionComboBox.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.TAB, false, false, false, false));
+            });
+            pause.playFromStart();
         }
 
     };

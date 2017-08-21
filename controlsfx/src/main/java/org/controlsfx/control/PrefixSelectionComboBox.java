@@ -27,12 +27,20 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.tools.PrefixSelectionCustomizer;
+import static impl.org.controlsfx.tools.PrefixSelectionCustomizer.DEFAULT_HIDING_DELAY;
+import static impl.org.controlsfx.tools.PrefixSelectionCustomizer.DEFAULT_NUMBER_OF_DIGITS;
+import static impl.org.controlsfx.tools.PrefixSelectionCustomizer.DEFAULT_TYPING_DELAY;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.scene.control.ComboBox;
 
 /**
  * A simple extension of the {@link ComboBox} which selects an entry of
  * its item list based on keyboard input. The user can  type letters or 
- * digits on the keyboard and die ChoiceBox will attempt to
+ * digits on the keyboard and the control will attempt to
  * select the first item it can find with a matching prefix.
  * 
  * This will only be enabled, when the {@link ComboBox} is not editable, so
@@ -41,7 +49,7 @@ import javafx.scene.control.ComboBox;
  * <p>This feature is available natively on the Windows combo box control, so many
  * users have asked for it. There is a feature request to include this feature
  * into JavaFX (<a href="https://javafx-jira.kenai.com/browse/RT-18064">Issue RT-18064</a>). 
- * The class is published as part of ContorlsFX to allow testing and feedback.
+ * The class is published as part of ControlsFX to allow testing and feedback.
  * 
  * <h3>Example</h3>
  * 
@@ -68,7 +76,13 @@ import javafx.scene.control.ComboBox;
  * @see PrefixSelectionCustomizer
  */
 public class PrefixSelectionComboBox<T> extends ComboBox<T> {
-
+    
+    private final ChangeListener<Boolean> focusedListener = (obs, ov, nv) -> {
+            if (nv) {
+                show();
+            }
+        };
+    
     /**
      * Create a non editable {@link ComboBox} with the "prefix selection"
      * feature installed.
@@ -77,5 +91,77 @@ public class PrefixSelectionComboBox<T> extends ComboBox<T> {
         setEditable(false);
         PrefixSelectionCustomizer.customize(this);
     }
+    
+    /***************************************************************************
+     *                                                                         *
+     * Properties                                                              *
+     *                                                                         *
+     **************************************************************************/
+    
+    // --- displayOnFocusedEnabled
+    /**
+     * When enabled, the {@link ComboBox} will display its popup upon focus gained.
+     * Default is false
+     */
+    private final BooleanProperty displayOnFocusedEnabled = new SimpleBooleanProperty(this, "displayOnFocusedEnabled", false) {
+        @Override
+        protected void invalidated() {
+            if (get()) {
+                focusedProperty().addListener(focusedListener);
+            } else {
+                focusedProperty().removeListener(focusedListener);
+            }
+        }
+    };
+    public final boolean isDisplayOnFocusedEnabled() { return displayOnFocusedEnabled.get(); }
+    public final void setDisplayOnFocusedEnabled(boolean value) { displayOnFocusedEnabled.set(value); }
+    public final BooleanProperty displayOnFocusedEnabledProperty() { return displayOnFocusedEnabled; }
+    
+    // --- backSpaceAllowed
+    /**
+     * When allowed, the user can press on the back space to remove the last 
+     * character of the current selection.
+     * Default is false
+     */
+    private final BooleanProperty backSpaceAllowed = new SimpleBooleanProperty(this, "backSpaceAllowed", false);
+    public final boolean isBackSpaceAllowed() { return backSpaceAllowed.get(); }
+    public final void setBackSpaceAllowed(boolean value) { backSpaceAllowed.set(value); }
+    public final BooleanProperty backSpaceAllowedProperty() { return backSpaceAllowed; }
+    
+    // --- numberOfDigits
+    /**
+     * Allows setting a numeric String of the given number of digits, followed
+     * by an space, as a prefix for each item of the {@link ComboBox}.
+     * 
+     * The user will be able to select an item either based on the prefix digits 
+     * or on the alphanumeric string. 
+     * 
+     * In case digits are typed, the first occurrence will select the item, close
+     * the popup and move the focus to the next Node.
+     */
+    private final IntegerProperty numberOfDigits = new SimpleIntegerProperty(this, "numberOfDigits", DEFAULT_NUMBER_OF_DIGITS);
+    public final int getNumberOfDigits() { return numberOfDigits.get(); }
+    public final void setNumberOfDigits(int value) { numberOfDigits.set(value); }
+    public final IntegerProperty numberOfDigitsProperty() { return numberOfDigits; }
+    
+    // --- typingDelay
+    /**
+     * Allows setting the delay until the current selection is reset, in ms. 
+     * Default is 500 ms
+     */
+    private final IntegerProperty typingDelay = new SimpleIntegerProperty(this, "typingDelay", DEFAULT_TYPING_DELAY);
+    public final int getTypingDelay() { return typingDelay.get(); }
+    public final void setTypingDelay(int value) { typingDelay.set(value); }
+    public final IntegerProperty typingDelayProperty() { return typingDelay; }
+    
+    // --- hidingDelay
+    /**
+     * Allows setting the delay to hide the popup once an item has been selected, 
+     * in ms. Default is 200 ms
+     */
+    private final IntegerProperty hidingDelay = new SimpleIntegerProperty(this, "hidingDelay", DEFAULT_HIDING_DELAY);
+    public final int getHidingDelay() { return hidingDelay.get(); }
+    public final void setHidingDelay(int value) { hidingDelay.set(value); }
+    public final IntegerProperty hidingDelayProperty() { return hidingDelay; }
     
 }

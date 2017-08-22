@@ -128,8 +128,8 @@ public class HelloPrefixSelection extends ControlsFXSample {
         combo3.setTypingDelay(1000);
         combo3.setBackSpaceAllowed(true);
         combo3.setItems(FXCollections.observableArrayList(
-            "00 Aaa", "01 Abb", "02 Acc", "10 Baa", "11 Bbb", "12 Bcc", "13 Bdd", 
-                "20 Caa", "21 Cbb", "22 Ccc", "23 Cdd", "24 Cee", "30 Daa"));
+            "00 Abb", "01 Acc", "02 Add", "10 Baa", "11 Bcc", "12 Bdd", "13 Bee", 
+                "20 Caa", "21 Cbb", "22 Cdd", "23 Cee", "24 Cff", "30 Daa"));
         
         combo3.setMaxWidth(Double.MAX_VALUE);
         grid.add(combo3, 1, 5);

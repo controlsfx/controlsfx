@@ -251,9 +251,10 @@ public class PrefixSelectionCustomizer {
 
             StringBuilder sb = new StringBuilder();
             for (char c : initialText.concat(letter.toUpperCase(Locale.ROOT)).toCharArray()) {
-                if (c == '\b') { // back space
+                if (c == '\b') { // back space, remove all
                     if (sb.length() > 0) {
-                        sb.deleteCharAt(sb.length() - 1);
+                        sb.delete(0, sb.length());
+                        break;
                     }
                 } else {
                     sb.append(c);

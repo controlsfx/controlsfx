@@ -191,7 +191,6 @@ public class PrefixSelectionCustomizer {
             String selectionPrefixString = processInput((String) control.getProperties().get(SELECTION_PREFIX_STRING), letter);
             control.getProperties().put(SELECTION_PREFIX_STRING, selectionPrefixString);
 
-            System.out.println("SEL " + selectionPrefixString);
             if (prefixSelectionComboBox != null) {
                 typingDelay = prefixSelectionComboBox.getTypingDelay();
                 final BiFunction<ComboBox, String, Optional> lookup = prefixSelectionComboBox.getLookup();

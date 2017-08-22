@@ -128,10 +128,8 @@ public class HelloPrefixSelection extends ControlsFXSample {
         combo3.setTypingDelay(1000);
         combo3.setBackSpaceAllowed(true);
         combo3.setItems(FXCollections.observableArrayList(
-            "17 ACURA", "19 AUDI", "64 BENTLEY", "98 BLUE BIRD", "21 BMW", "02 BUICK", "03 CADILLAC", 
-                "05 CHEVROLET", "90 CHEVY-MEDIUM DUTY", "06 CHRYSLER", "23 DAEWOO", "07 DODGE", 
-                "72 FERRARI", "08 FORD", "92 FORD-MEDIUM DUTY", "09 GCM TRUCK", "93 GCM-MEDIUM DUTY", 
-                "94 HINO", "27 HONDA"));
+            "00 Aaa", "01 Abb", "02 Acc", "10 Baa", "11 Bbb", "12 Bcc", "13 Bdd", 
+                "20 Caa", "21 Cbb", "22 Ccc", "23 Cdd", "24 Cee", "30 Daa"));
         
         combo3.setMaxWidth(Double.MAX_VALUE);
         grid.add(combo3, 1, 5);

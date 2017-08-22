@@ -119,8 +119,8 @@ public class PrefixSelectionComboBox<T> extends ComboBox<T> {
     
     // --- backSpaceAllowed
     /**
-     * When allowed, the user can press on the back space to remove the last 
-     * character of the current selection.
+     * When allowed, the user can press on the back space to clear the current 
+     * selection.
      * Default is false
      */
     private final BooleanProperty backSpaceAllowed = new SimpleBooleanProperty(this, "backSpaceAllowed", false);

@@ -33,6 +33,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.util.Callback;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest;
@@ -123,7 +125,7 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
             }
             Collections.sort(suggestions, getComparator());
         } else {
-            if (showAllIfEmpty) {
+            if (isShowAllIfEmpty()) {
                 synchronized (possibleSuggestionsLock) {
                     suggestions.addAll(possibleSuggestions);
                 }

@@ -26,22 +26,35 @@
  */
 package org.controlsfx.samples;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import java.util.stream.Collectors;
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import javafx.util.StringConverter;
 
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.PrefixSelectionChoiceBox;
 import org.controlsfx.control.PrefixSelectionComboBox;
 
 public class HelloPrefixSelection extends ControlsFXSample {
+    
+    private final int hidingDelay = 200;
     
     public static void main(String[] args) {
         launch(args);
@@ -122,18 +135,93 @@ public class HelloPrefixSelection extends ControlsFXSample {
         grid.add(cb2, 2, 4);
         
         grid.add(new Button("Press Tab"), 0, 5);
-        PrefixSelectionComboBox<String> combo3 = new PrefixSelectionComboBox<>();
-        combo3.setDisplayOnFocusedEnabled(true);
-        combo3.setNumberOfDigits(2);
-        combo3.setTypingDelay(1000);
-        combo3.setBackSpaceAllowed(true);
-        combo3.setItems(FXCollections.observableArrayList(
+        PrefixSelectionComboBox<String> customLookupCombo = new PrefixSelectionComboBox<>();
+        customLookupCombo.setDisplayOnFocusedEnabled(true);
+        customLookupCombo.setTypingDelay(1000);
+        customLookupCombo.setBackSpaceAllowed(true);
+        customLookupCombo.setItems(FXCollections.observableArrayList(
             "00 Abb", "01 Acc", "02 Add", "10 Baa", "11 Bcc", "12 Bdd", "13 Bee", 
                 "20 Caa", "21 Cbb", "22 Cdd", "23 Cee", "24 Cff", "30 Daa"));
-        
-        combo3.setMaxWidth(Double.MAX_VALUE);
-        grid.add(combo3, 1, 5);
+        customLookupCombo.setLookup((combo, u) -> combo.getItems().stream()
+                .filter(item -> {
+                    String s = combo.getConverter().toString(item);
+                    if (s != null && ! s.isEmpty() && ! u.isEmpty()) {
+                        s = s.toUpperCase(Locale.ROOT);
+                        String firstLetter = u.substring(0, 1).toUpperCase(Locale.ROOT);
+                        int numberOfDigits = 2;
+                        final int numberOfOccurrences = u.toUpperCase(Locale.ROOT).replaceFirst(".*?(" + firstLetter + "+).*", "$1").length();
+                        if (isValidNumber(u, numberOfDigits) && s.startsWith(u)) {
+                            // two digits: select that line and tab to the next field
+                            commitSelection(combo);
+                            return true;
+                        } else if (s.substring(numberOfDigits + 1).startsWith(u.toUpperCase(Locale.ROOT))) {
+                            // alpha characters: highlight closest (first) match
+                            return true;
+                        } else if (numberOfOccurrences > 1 && 
+                            s.substring(numberOfDigits + 1, numberOfDigits + 2).equals(firstLetter)) {
+                            final int numberOfItems = getItemsByLetter(combo, firstLetter, numberOfDigits).size();
+                            final int index = getItemsByLetter(combo, firstLetter, numberOfDigits).indexOf(item);
+                            // repeated alpha characters: highlight match based on order
+                            if (index == (numberOfOccurrences - 1) % numberOfItems) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                })
+                .findFirst());
+        customLookupCombo.setMaxWidth(Double.MAX_VALUE);
+        grid.add(customLookupCombo, 1, 5);
         grid.add(new TextField(), 2, 5);
+        
+        grid.add(new Button("Press Tab"), 0, 6);
+        PrefixSelectionComboBox<Person> combo4 = new PrefixSelectionComboBox<>();
+        combo4.setConverter(new StringConverter<Person>() {
+            @Override
+            public String toString(Person object) {
+                return String.format("%02d ", personList.indexOf(object)) + object.toString();
+            }
+
+            @Override
+            public Person fromString(String string) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+        combo4.setItems(personList);
+        combo4.setBackSpaceAllowed(true);
+        combo4.setDisplayOnFocusedEnabled(true);
+        combo4.setTypingDelay(1000);
+        combo4.setLookup((combo, u) -> combo.getItems().stream()
+                .filter(item -> {
+                    String s = combo.getConverter().toString(item);
+                    if (s != null && ! s.isEmpty() && ! u.isEmpty()) {
+                        s = s.toUpperCase(Locale.ROOT);
+                        String firstLetter = u.substring(0, 1).toUpperCase(Locale.ROOT);
+                        final int numberOfOccurrences = u.toUpperCase(Locale.ROOT).replaceFirst(".*?(" + firstLetter + "+).*", "$1").length();
+                        int numberOfDigits = 2;
+                        if (isValidNumber(u, numberOfDigits) && s.startsWith(u)) {
+                            // two digits: select that line and tab to the next field
+                            commitSelection(combo);
+                            return true;
+                        } else if (s.substring(numberOfDigits + 1).startsWith(u.toUpperCase(Locale.ROOT))) {
+                            // alpha characters: highlight closest (first) match
+                            return true;
+                        } else if (numberOfOccurrences > 1 && 
+                            s.substring(numberOfDigits + 1, numberOfDigits + 2).equals(firstLetter)) {
+                            final int numberOfItems = getItemsByLetter(combo, firstLetter, numberOfDigits).size();
+                            final int index = getItemsByLetter(combo, firstLetter, numberOfDigits).indexOf(item);
+                            // repeated alpha characters: highlight match based on order
+                            if (index == (numberOfOccurrences - 1) % numberOfItems) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                })
+                .findFirst());
+        combo4.setMaxWidth(Double.MAX_VALUE);
+        grid.add(combo4, 1, 6);
+        grid.add(new TextField(), 2, 6);
         
         return grid;
     }
@@ -154,5 +242,42 @@ public class HelloPrefixSelection extends ControlsFXSample {
         public String toString() {
             return name;
         }
+    }
+    
+    private boolean isValidNumber(String prefix, int numberOfDigits) {
+        if (prefix == null || prefix.length() != numberOfDigits) {
+            return false;
+        }
+        try {
+            Integer.parseInt(prefix);
+            return true;
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+    }
+    
+    private <T> void commitSelection(ComboBox<T> combo) {
+        if (combo == null) {
+            return;
+        }
+        PauseTransition pause = new PauseTransition(Duration.millis(hidingDelay));
+        pause.setOnFinished(f -> {
+            combo.hide();
+            combo.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.TAB, false, false, false, false));
+        });
+        pause.playFromStart();
+    }
+    
+    private <T> List<T> getItemsByLetter(ComboBox<T> combo, String firstLetter, int numberOfDigits) {
+        if (combo == null) {
+            return new ArrayList<>();
+        }
+        return combo.getItems().stream()
+            .filter(item -> {
+                String s = combo.getConverter().toString(item);
+                return (s != null && ! s.isEmpty() && s.length() >= numberOfDigits + 2 && 
+                    s.substring(numberOfDigits + 1, numberOfDigits + 2).toUpperCase(Locale.ROOT).equals(firstLetter));
+            })
+            .collect(Collectors.toList());
     }
 }

@@ -27,13 +27,16 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.tools.PrefixSelectionCustomizer;
-import static impl.org.controlsfx.tools.PrefixSelectionCustomizer.DEFAULT_HIDING_DELAY;
-import static impl.org.controlsfx.tools.PrefixSelectionCustomizer.DEFAULT_NUMBER_OF_DIGITS;
+import static impl.org.controlsfx.tools.PrefixSelectionCustomizer.DEFAULT_LOOKUP_COMBOBOX;
 import static impl.org.controlsfx.tools.PrefixSelectionCustomizer.DEFAULT_TYPING_DELAY;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.ComboBox;
 
@@ -128,22 +131,6 @@ public class PrefixSelectionComboBox<T> extends ComboBox<T> {
     public final void setBackSpaceAllowed(boolean value) { backSpaceAllowed.set(value); }
     public final BooleanProperty backSpaceAllowedProperty() { return backSpaceAllowed; }
     
-    // --- numberOfDigits
-    /**
-     * Allows setting a numeric String of the given number of digits, followed
-     * by an space, as a prefix for each item of the {@link ComboBox}.
-     * 
-     * The user will be able to select an item either based on the prefix digits 
-     * or on the alphanumeric string. 
-     * 
-     * In case digits are typed, the first occurrence will select the item, close
-     * the popup and move the focus to the next Node.
-     */
-    private final IntegerProperty numberOfDigits = new SimpleIntegerProperty(this, "numberOfDigits", DEFAULT_NUMBER_OF_DIGITS);
-    public final int getNumberOfDigits() { return numberOfDigits.get(); }
-    public final void setNumberOfDigits(int value) { numberOfDigits.set(value); }
-    public final IntegerProperty numberOfDigitsProperty() { return numberOfDigits; }
-    
     // --- typingDelay
     /**
      * Allows setting the delay until the current selection is reset, in ms. 
@@ -154,14 +141,16 @@ public class PrefixSelectionComboBox<T> extends ComboBox<T> {
     public final void setTypingDelay(int value) { typingDelay.set(value); }
     public final IntegerProperty typingDelayProperty() { return typingDelay; }
     
-    // --- hidingDelay
+    // --- lookup
     /**
-     * Allows setting the delay to hide the popup once an item has been selected, 
-     * in ms. Default is 200 ms
+     * Allows setting a custom search criteria, based on the control and the typed 
+     * selection.
+     * The default criteria searchs for the first matching item that starts with 
+     * the typed selection, being case insenstitive.
      */
-    private final IntegerProperty hidingDelay = new SimpleIntegerProperty(this, "hidingDelay", DEFAULT_HIDING_DELAY);
-    public final int getHidingDelay() { return hidingDelay.get(); }
-    public final void setHidingDelay(int value) { hidingDelay.set(value); }
-    public final IntegerProperty hidingDelayProperty() { return hidingDelay; }
+    private final ObjectProperty<BiFunction<ComboBox, String, Optional>> lookup = new SimpleObjectProperty<>(this, "lookup", DEFAULT_LOOKUP_COMBOBOX);
+    public final BiFunction<ComboBox, String, Optional> getLookup() { return lookup.get(); }
+    public final void setLookup(BiFunction<ComboBox, String, Optional> value) { lookup.set(value); }
+    public final ObjectProperty<BiFunction<ComboBox, String, Optional>> lookupProperty() { return lookup; }
     
 }

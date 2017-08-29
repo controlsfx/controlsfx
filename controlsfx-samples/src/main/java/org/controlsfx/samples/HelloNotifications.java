@@ -73,7 +73,7 @@ public class HelloNotifications extends ControlsFXSample {
     private CheckBox showCloseButtonChkBox;
     private CheckBox darkStyleChkBox;
     private CheckBox ownerChkBox;
-    private Slider fadeDelaySlider;
+    private Slider fadeDelaySlider, thresholdSlider;
     protected String graphicMode = "";
     
     public static void main(String[] args) {
@@ -288,8 +288,21 @@ public class HelloNotifications extends ControlsFXSample {
         fadeDelaySlider.setMaxWidth(Double.MAX_VALUE);
         GridPane.setHgrow(fadeDelaySlider, Priority.ALWAYS);
         grid.add(fadeDelaySlider, 1, row++);
-        
-        
+
+        // threshold slider
+        final Label thresholdLabel = new Label("Threshold: ");
+        thresholdLabel.getStyleClass().add("property");
+        grid.add(thresholdLabel, 0, row);
+        thresholdSlider = new Slider(0, 10, 0);
+        thresholdSlider.setMajorTickUnit(1);
+        thresholdSlider.setMinorTickCount(0);
+        thresholdSlider.setShowTickMarks(true);
+        thresholdSlider.setShowTickLabels(true);
+        thresholdSlider.setSnapToTicks(true);
+        thresholdSlider.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(thresholdSlider, Priority.ALWAYS);
+        grid.add(thresholdSlider, 1, row++);
+
         return grid;
     }
     
@@ -320,17 +333,15 @@ public class HelloNotifications extends ControlsFXSample {
                 .graphic(graphic)
                 .hideAfter(Duration.seconds(fadeDelaySlider.getValue()))
                 .position(pos)
-                .onAction(new EventHandler<ActionEvent>() {
-                    @Override public void handle(ActionEvent arg0) {
-                        System.out.println("Notification clicked on!");
-                    }
-                });
-        
-        if(ownerChkBox.isSelected()){
+                .onAction(e -> System.out.println("Notification clicked on!"))
+                .threshold((int) thresholdSlider.getValue(),
+                        Notifications.create().title("Threshold Notification"));
+
+        if (ownerChkBox.isSelected()) {
             notificationBuilder.owner(stage);
         }
-        
-        if (! showCloseButtonChkBox.isSelected()) {
+
+        if (!showCloseButtonChkBox.isSelected()) {
             notificationBuilder.hideCloseButton();
         }
         

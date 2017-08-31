@@ -121,7 +121,7 @@ public class GridCellEditor {
     public void endEdit(boolean commitValue) {
         if (commitValue && editing) {
             final SpreadsheetView view = handle.getView();
-            boolean match = modelCell.getCellType().match(spreadsheetCellEditor.getControlValue());
+            boolean match = modelCell.getCellType().match(spreadsheetCellEditor.getControlValue(), modelCell.getOptionsForEditor());
 
             if (match && viewCell != null) {
                 Object value = modelCell.getCellType().convertValue(spreadsheetCellEditor.getControlValue());
@@ -194,7 +194,7 @@ public class GridCellEditor {
             editor.setPrefWidth(viewCell.getWidth());
         }
 
-        spreadsheetCellEditor.startEdit(value, modelCell.getFormat());
+        spreadsheetCellEditor.startEdit(value, modelCell.getFormat(), modelCell.getOptionsForEditor());
         
         if (editor != null) {
             focusProperty = getFocusProperty(editor);

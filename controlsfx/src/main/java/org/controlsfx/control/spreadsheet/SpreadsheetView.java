@@ -1868,7 +1868,7 @@ public class SpreadsheetView extends Control{
         final SpanType type = getSpanType(row, column);
         if (type == SpanType.NORMAL_CELL || type == SpanType.ROW_VISIBLE) {
             SpreadsheetCell cell = getGrid().getRows().get(row).get(column);
-            boolean succeed = cell.getCellType().match(value);
+            boolean succeed = cell.getCellType().match(value, cell.getOptionsForEditor());
             if (succeed) {
                 getGrid().setCellValue(cell.getRow(), cell.getColumn(),
                         cell.getCellType().convertValue(value));

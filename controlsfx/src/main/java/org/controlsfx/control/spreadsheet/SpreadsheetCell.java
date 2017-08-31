@@ -46,7 +46,7 @@ import javafx.scene.control.MenuItem;
  * See {@link SpreadsheetCellBase} for a complete and detailed documentation.
  * @see SpreadsheetCellBase
  */
-public interface SpreadsheetCell {
+public interface SpreadsheetCell  {
     /**
      * This EventType can be used with an {@link EventHandler} in order to catch
      * when the editable state of a SpreadsheetCell is changed.
@@ -132,7 +132,8 @@ public interface SpreadsheetCell {
      * @return the value of wrapText property.
      */
     public boolean isWrapText();
-
+    
+    
     /**
      * If a run of text exceeds the width of the Labeled, then this variable
      * indicates whether the text should wrap onto another line.
@@ -140,6 +141,15 @@ public interface SpreadsheetCell {
      */
     public void setWrapText(boolean wrapText);
 
+    /**
+     * If some options cannot be factorized in a {@link SpreadsheetCellType} and
+     * are specific to a cell, you can return them here and the
+     * {@link SpreadsheetCellEditor} will receive them.
+     *
+     * @return a List of options for the {@link SpreadsheetCellEditor}.
+     */
+    public List<Object> getOptionsForEditor();
+    
     /**
      * Return true if this cell needs to display a popup when clicked in order
      * to show some {@link MenuItem} like a {@link MenuButton}.
@@ -230,7 +240,7 @@ public interface SpreadsheetCell {
      * has been specified.
      */
     public String getFormat();
-
+    
     /**
      * Set a new format for this Cell. You can specify how to represent the
      * value in the cell.

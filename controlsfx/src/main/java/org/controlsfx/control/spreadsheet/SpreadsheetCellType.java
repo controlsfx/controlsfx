@@ -29,6 +29,7 @@ package org.controlsfx.control.spreadsheet;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 
 import javafx.util.StringConverter;
@@ -234,12 +235,24 @@ public abstract class SpreadsheetCellType<T> {
      * the first level of verification to prevent affecting a text to a double
      * or a double to a date. For closer verification, use
      * {@link #isError(Object)}.
-     * 
-     * @param value
-     *            the value to test
+     *
+     * @param value the value to test
      * @return true if it matches.
      */
-    public abstract boolean match(Object value);
+    public boolean match(Object value) {
+        return match(value, Collections.emptyList());
+    }
+
+    /**
+     * Verify that the upcoming value can be set to the current cell.This is the
+     * first level of verification to prevent affecting a text to a double or a
+     * double to a date. For closer verification, use {@link #isError(Object)}.
+     * 
+     * @param value the value to test
+     * @param options the options given by {@link SpreadsheetCell#getOptionsForEditor() }
+     * @return true if it matches.
+     */
+    public abstract boolean match(Object value, Object... options);
 
     /**
      * Returns true if the value is an error regarding the specification of its
@@ -307,7 +320,7 @@ public abstract class SpreadsheetCellType<T> {
         }
 
         @Override
-        public boolean match(Object value) {
+        public boolean match(Object value, Object... options) {
             return true;
         }
 
@@ -375,7 +388,7 @@ public abstract class SpreadsheetCellType<T> {
         }
 
         @Override
-        public boolean match(Object value) {
+        public boolean match(Object value, Object... options) {
             return true;
         }
 
@@ -503,7 +516,7 @@ public abstract class SpreadsheetCellType<T> {
         }
 
         @Override
-        public boolean match(Object value) {
+        public boolean match(Object value, Object... options) {
             if (value instanceof Double)
                 return true;
             else {
@@ -617,7 +630,7 @@ public abstract class SpreadsheetCellType<T> {
         }
 
         @Override
-        public boolean match(Object value) {
+        public boolean match(Object value, Object... options) {
             if (value instanceof Integer)
                 return true;
             else {
@@ -721,7 +734,7 @@ public abstract class SpreadsheetCellType<T> {
         }
 
         @Override
-        public boolean match(Object value) {
+        public boolean match(Object value, Object... options) {
             if (value instanceof String && items.contains(value.toString()))
                 return true;
             else
@@ -819,7 +832,7 @@ public abstract class SpreadsheetCellType<T> {
         }
 
         @Override
-        public boolean match(Object value) {
+        public boolean match(Object value, Object... options) {
             if (value instanceof LocalDate)
                 return true;
             else {

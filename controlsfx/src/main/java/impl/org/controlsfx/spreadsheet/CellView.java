@@ -482,7 +482,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                     Dragboard db = event.getDragboard();
                     boolean success = false;
                     if (db.hasFiles() && db.getFiles().size() == 1) {
-                        if (getItem().getCellType().match(db.getFiles().get(0))) {
+                        if (getItem().getCellType().match(db.getFiles().get(0), getItem().getOptionsForEditor())) {
                             handle.getView().getGrid().setCellValue(getItem().getRow(), getItem().getColumn(),
                                     getItem().getCellType().convertValue(db.getFiles().get(0)));
                             success = true;

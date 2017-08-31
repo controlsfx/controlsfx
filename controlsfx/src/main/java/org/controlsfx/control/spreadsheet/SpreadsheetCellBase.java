@@ -28,6 +28,7 @@ package org.controlsfx.control.spreadsheet;
 
 import com.sun.javafx.event.EventHandlerManager;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -298,7 +299,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     /** {@inheritDoc} */
     @Override
     public boolean match(SpreadsheetCell cell) {
-        return type.match(cell);
+        return type.match(cell, getOptionsForEditor());
     }
 
     // --- item
@@ -354,6 +355,12 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
         if (setMask(wrapText, WRAP_BIT_POSITION)) {
             Event.fireEvent(this, new Event(WRAP_EVENT_TYPE));
         }
+    }
+    
+     /** {@inheritDoc} */
+    @Override
+    public List<Object> getOptionsForEditor(){
+        return Collections.emptyList();
     }
     
     /** {@inheritDoc} */

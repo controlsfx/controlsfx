@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, ControlsFX
+ * Copyright (c) 2016, 2017 ControlsFX
  * All rights reserved.
  * <p>
  * Redistribution and use in source and binary forms, with or without
@@ -32,18 +32,26 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.effect.InnerShadow;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.SegmentedBar;
 
 public class HelloSegmentedBar extends ControlsFXSample {
 
-    private VBox vbox = new VBox(10);
+    private VBox vbox = new VBox(40);
 
-    private HBox hbox = new HBox(10);
+    private HBox hbox = new HBox(40);
 
     private SegmentedBar<TypeSegment> innerShadowBar = new SegmentedBar<>();
 
@@ -58,11 +66,9 @@ public class HelloSegmentedBar extends ControlsFXSample {
     private StackPane contentPane = new StackPane();
 
     public HelloSegmentedBar() {
-        vbox.setSpacing(40);
         vbox.setFillWidth(true);
         vbox.setPadding(new Insets(20));
-
-        hbox.setSpacing(40);
+        
         hbox.setFillHeight(true);
         hbox.setPadding(new Insets(20));
 
@@ -79,7 +85,7 @@ public class HelloSegmentedBar extends ControlsFXSample {
         // A bar used for visualizing the number of issues (e.g. JIRA) based on
         // their status.
         issueStatusBar.orientationProperty().bind(orientation);
-        issueStatusBar.setSegmentViewFactory(segment -> new IssueStatusSegmentView(segment));
+        issueStatusBar.setSegmentViewFactory(IssueStatusSegmentView::new);
         issueStatusBar.setInfoNodeFactory(segment -> new InfoLabel(segment.getStatus() + ": " + segment.getValue() + " Issues"));
         issueStatusBar.getSegments().addAll(
                 new IssueStatusSegment(3, IssueStatus.TODO),
@@ -89,7 +95,7 @@ public class HelloSegmentedBar extends ControlsFXSample {
 
         // A bar used to visualize the disk space used by various media types (e.g. iTunes).
         typesBar.orientationProperty().bind(orientation);
-        typesBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
+        typesBar.setSegmentViewFactory(TypeSegmentView::new);
         typesBar.setInfoNodeFactory(segment -> new InfoLabel(segment.getText() + " " + segment.getValue() + " GB"));
         typesBar.getSegments().addAll(
                 new TypeSegment(14, MediaType.PHOTOS),
@@ -103,7 +109,7 @@ public class HelloSegmentedBar extends ControlsFXSample {
 
         // A bar like above but with an inner shadow
         innerShadowBar.orientationProperty().bind(orientation);
-        innerShadowBar.setSegmentViewFactory(segment -> new TypeSegmentView(segment));
+        innerShadowBar.setSegmentViewFactory(TypeSegmentView::new);
         innerShadowBar.setInfoNodeFactory(segment -> new InfoLabel(segment.getText() + " " + segment.getValue() + " GB"));
         innerShadowBar.getSegments().addAll(new TypeSegment(14, MediaType.PHOTOS),
                 new TypeSegment(32, MediaType.VIDEO),
@@ -164,23 +170,22 @@ public class HelloSegmentedBar extends ControlsFXSample {
     }
 
     private void updateParentPane() {
-        Pane pane = vbox;
-
-        pane.getChildren().clear();
 
         if (orientation.get().equals(Orientation.HORIZONTAL)) {
-            pane.getChildren().add(new WrapperPane("Simple Bar", simpleBar));
-            pane.getChildren().add(new WrapperPane("Issue Status (Hover for PopOver)", issueStatusBar));
-            pane.getChildren().add(new WrapperPane("Disk Usage (Hover for PopOver)", typesBar));
-            pane.getChildren().add(new WrapperPane("Inner Shadow (Hover for PopOver)", innerShadowBar, innerShadowPane));
+            vbox.getChildren().clear();
+            vbox.getChildren().add(new WrapperPane("Simple Bar", simpleBar));
+            vbox.getChildren().add(new WrapperPane("Issue Status (Hover for PopOver)", issueStatusBar));
+            vbox.getChildren().add(new WrapperPane("Disk Usage (Hover for PopOver)", typesBar));
+            vbox.getChildren().add(new WrapperPane("Inner Shadow (Hover for PopOver)", innerShadowBar, innerShadowPane));
+            contentPane.getChildren().setAll(vbox);
         } else {
-            pane.getChildren().add(simpleBar);
-            pane.getChildren().add(issueStatusBar);
-            pane.getChildren().add(typesBar);
-            pane.getChildren().add(innerShadowPane);
+            hbox.getChildren().clear();
+            hbox.getChildren().add(simpleBar);
+            hbox.getChildren().add(issueStatusBar);
+            hbox.getChildren().add(typesBar);
+            hbox.getChildren().add(innerShadowPane);
+            contentPane.getChildren().setAll(hbox);
         }
-
-        contentPane.getChildren().setAll(pane);
     }
 
     private class WrapperPane extends VBox {

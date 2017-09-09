@@ -89,9 +89,9 @@ public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<S
     }
 
     @Override
-    protected double computePrefWidth(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
         if (getSkinnable().getOrientation().equals(Orientation.VERTICAL)) {
-            OptionalDouble maxWidth = getChildren().stream().mapToDouble(node -> node.prefWidth(-1)).max();
+            OptionalDouble maxWidth = getChildren().stream().mapToDouble(node -> node.prefWidth(height)).max();
             if (maxWidth.isPresent()) {
                 return maxWidth.getAsDouble();
             }
@@ -128,9 +128,9 @@ public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<S
     }
 
     @Override
-    protected double computeMaxWidth(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+    protected double computeMaxWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
         if (getSkinnable().getOrientation().equals(Orientation.VERTICAL)) {
-            return computePrefWidth(width, topInset, rightInset, bottomInset, leftInset);
+            return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
         }
 
         return Double.MAX_VALUE;

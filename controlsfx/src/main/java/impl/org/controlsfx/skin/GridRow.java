@@ -35,7 +35,7 @@ import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Skin;
 
 /**
- * A GridRow is a container for {@link GridCell}, and represents a single
+ * A GridRow is a container for {@link org.controlsfx.control.GridCell}, and represents a single
  * row inside a {@link GridView}.
  */
 class GridRow<T> extends IndexedCell<T>{

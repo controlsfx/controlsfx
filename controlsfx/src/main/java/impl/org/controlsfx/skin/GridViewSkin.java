@@ -39,7 +39,7 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
     private VirtualFlow<GridRow<T>> flow;
 
     private final ListChangeListener<T> gridViewItemsListener = change -> {
-        updateRowCount();
+        updateItemCount();
         getSkinnable().requestLayout();
     };
 
@@ -56,15 +56,10 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
         flow.setPannable(false);
         flow.setVertical(true);
         flow.setFocusTraversable(getSkinnable().isFocusTraversable());
-        // FIXME: JDK-9
-        /*flow.setCreateCell(new Callback<VirtualFlow, GridRow<T>>() {
-            @Override public GridRow<T> call(VirtualFlow flow) {
-                return GridViewSkin.this.createCell();
-            }
-        });*/
+        flow.setCellFactory(param -> createCell());
         getChildren().add(flow);
 
-        updateRowCount();
+        updateItemCount();
 
         // Register listeners
         registerChangeListener(control.itemsProperty(), e -> updateGridViewItems());
@@ -76,16 +71,16 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
         });
         registerChangeListener(control.cellHeightProperty(), e -> ReflectionUtils.recreateCells(flow));
         registerChangeListener(control.cellWidthProperty(), e -> {
-            updateRowCount();
+            updateItemCount();
             ReflectionUtils.recreateCells(flow);
         });
         registerChangeListener(control.horizontalCellSpacingProperty(), e -> {
-            updateRowCount();
+            updateItemCount();
             ReflectionUtils.recreateCells(flow);
         });
         registerChangeListener(control.verticalCellSpacingProperty(), e -> ReflectionUtils.recreateCells(flow));
-        registerChangeListener(control.widthProperty(), e ->  updateRowCount());
-        registerChangeListener(control.heightProperty(), e ->  updateRowCount());
+        registerChangeListener(control.widthProperty(), e ->  updateItemCount());
+        registerChangeListener(control.heightProperty(), e ->  updateItemCount());
     }
 
     public void updateGridViewItems() {
@@ -97,29 +92,9 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
             getSkinnable().getItems().addListener(weakGridViewItemsListener);
         }
 
-        updateRowCount();
+        updateItemCount();
         ReflectionUtils.recreateCells(flow);
         getSkinnable().requestLayout();
-    }
-
-    // FIXME: JDK-9
-    /*@Override protected void updateRowCount() {
-        if (flow == null)
-            return;
-
-        int oldCount = flow.getCellCount();
-        int newCount = getItemCount();
-
-        if (newCount != oldCount) {
-            flow.setCellCount(newCount);
-            flow.rebuildCells();
-        } else {
-            flow.reconfigureCells();
-        }
-        updateRows(newCount);
-    }*/
-    void updateRowCount() {
-        // FIXME: JDK-9
     }
 
     @Override protected void layoutChildren(double x, double y, double w, double h) {
@@ -130,13 +105,6 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
 
         flow.resizeRelocate(x1, y1, w1, h1);
     }
-
-    // FIXME: JDK-9
-    /*@Override public GridRow<T> createCell() {
-        GridRow<T> row = new GridRow<>();
-        row.updateGridView(getSkinnable());
-        return row;
-    }*/
 
     /**
      *  Returns the number of row needed to display the whole set of cells
@@ -152,9 +120,19 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
 
     @Override
     protected void updateItemCount() {
+        if (flow == null)
+            return;
+
+        int oldCount = flow.getCellCount();
         int newCount = getItemCount();
-        ReflectionUtils.rebuildCells(flow);
-        flow.setCellCount(newCount);
+
+        if (newCount != oldCount) {
+            flow.setCellCount(newCount);
+            ReflectionUtils.rebuildCells(flow);
+        } else {
+            ReflectionUtils.reconfigureCells(flow);
+        }
+        updateRows(newCount);
         getSkinnable().requestLayout();
     }
 
@@ -199,21 +177,14 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
         }
     }
 
-    protected boolean areRowsVisible() {
-        if (flow == null)
-            return false;
-
-        if (flow.getFirstVisibleCell() == null)
-            return false;
-
-        if (flow.getLastVisibleCell() == null)
-            return false;
-
-        return true;
-    }
-    
     @Override protected double computeMinHeight(double height, double topInset, double rightInset, double bottomInset,
             double leftInset) {
         return 0;
+    }
+
+    private GridRow<T> createCell() {
+        GridRow<T> row = new GridRow<>();
+        row.updateGridView(getSkinnable());
+        return row;
     }
 }

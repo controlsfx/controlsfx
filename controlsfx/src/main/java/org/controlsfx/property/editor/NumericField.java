@@ -26,16 +26,14 @@
  */
 package org.controlsfx.property.editor;
 
-import java.math.BigInteger;
-
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.binding.NumberExpression;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextField;
+
+import java.math.BigInteger;
 
 /*
  * TODO replace this with proper API when it becomes available:
@@ -55,12 +53,11 @@ class NumericField extends TextField {
     		value = new DoubleValidator(this);
     	}
     	
-        textProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable arg0) {
-                value.setValue(value.toNumber(getText()));
-            }
-        });
-        
+        focusedProperty().addListener((observable, oldValue, newValue) -> {
+			if (!newValue) {
+				value.setValue(value.toNumber(getText()));
+			}
+		});
     }
     
     public final ObservableValue<Number> valueProperty() {
@@ -92,7 +89,7 @@ class NumericField extends TextField {
     }
     
     
-    private static abstract interface NumericValidator<T extends Number> extends NumberExpression {
+    private interface NumericValidator<T extends Number> extends NumberExpression {
     	void setValue(Number num);
     	T toNumber(String s);
     	
@@ -129,7 +126,7 @@ class NumericField extends TextField {
     	private NumericField field;
     	
     	public LongValidator(NumericField field) {
-    		super(field, "value", 0l); //$NON-NLS-1$
+    		super(field, "value", 0L); //$NON-NLS-1$
     		this.field = field;
 		}
     	
@@ -139,10 +136,10 @@ class NumericField extends TextField {
 
 		@Override
 		public Long toNumber(String s) {
-			if ( s == null || s.trim().isEmpty() ) return 0l;
+			if ( s == null || s.trim().isEmpty() ) return 0L;
 	    	String d = s.trim();
 	    	return new Long(d);
-		};
+		}
 		
     }    
     

@@ -88,7 +88,7 @@ public class CheckComboBox<T> extends ControlsFXControl {
     
     private final ObservableList<T> items;
     private final Map<T, BooleanProperty> itemBooleanMap;
-    
+    private String title = null;
 
     
     /**************************************************************************
@@ -118,7 +118,18 @@ public class CheckComboBox<T> extends ControlsFXControl {
         setCheckModel(new CheckComboBoxBitSetCheckModel<>(this.items, itemBooleanMap));
     }
     
+    /**************************************************************************
+     * 
+     * Getters and Setters
+     * 
+     **************************************************************************/    
+    public String getTitle() {
+        return title;
+    }
     
+    public void setTitle(String title) {
+        this.title = title;
+    }
     
     /**************************************************************************
      * 

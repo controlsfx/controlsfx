@@ -28,6 +28,7 @@ package org.controlsfx.control.table;
 
 import impl.org.controlsfx.table.ColumnFilter;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -77,12 +78,26 @@ public final class TableFilter<T> {
         sortedControlList.comparatorProperty().bind(tableView.comparatorProperty());
         tableView.setItems(sortedControlList);
 
-        applyForAllColumns(isLazy);
+        applyForAllColumns();
         tableView.getStylesheets().add("/impl/org/controlsfx/table/tablefilter.css");
 
         if (!isLazy) {
             columnFilters.forEach(ColumnFilter::initialize);
         }
+
+        // handle column additions/removals
+        tableView.getColumns().addListener((ListChangeListener<TableColumn<T, ?>>) lc -> {
+            while (lc.next()) {
+                columnFilters.addAll(lc.getAddedSubList().stream()
+                        .flatMap(this::extractNestedColumns)
+                        .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
+
+                columnFilters.removeAll(lc.getRemoved().stream()
+                        .flatMap(this::extractNestedColumns)
+                        .flatMap(c -> columnFilters.stream().filter(cf -> cf.getTableColumn() == c))
+                        .collect(Collectors.toList()));
+            };
+        });
     }
 
     /**
@@ -114,7 +129,7 @@ public final class TableFilter<T> {
     /** 
      * @treatAsPrivate
      */
-    private void applyForAllColumns(boolean isLazy) {
+    private void applyForAllColumns() {
         columnFilters.setAll(tableView.getColumns().stream().flatMap(this::extractNestedColumns)
                 .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
@@ -158,10 +173,9 @@ public final class TableFilter<T> {
                 .forEach(ColumnFilter::unSelectAllValues);
     }
     public void executeFilter() {
-        if (columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent()) {
-            filteredList.setPredicate(item -> !columnFilters.stream()
-                    .filter(cf -> !cf.evaluate(item))
-                    .findAny().isPresent());
+        if (columnFilters.stream().anyMatch(ColumnFilter::isFiltered)) {
+            filteredList.setPredicate(item -> columnFilters.stream()
+                    .allMatch(cf -> cf.evaluate(item)));
         }
         else {
             resetFilter();
@@ -189,7 +203,7 @@ public final class TableFilter<T> {
         return columnFilters.stream().filter(f -> f.getTableColumn().equals(tableColumn)).findAny();
     }
     public boolean isDirty() {
-        return columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent();
+        return columnFilters.stream().anyMatch(ColumnFilter::isFiltered);
     }
 
     /**

@@ -58,7 +58,7 @@ public final class ColumnFilter<T,R> {
     
     private boolean lastFilter = false;
     private boolean isDirty = false;
-    private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
+    private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.toLowerCase().contains(inputString.toLowerCase());
     private volatile FilterPanel filterPanel;
 
     private boolean initialized = false;
@@ -66,11 +66,11 @@ public final class ColumnFilter<T,R> {
     private final ListChangeListener<T> backingListListener = lc -> {
         while (lc.next()) {
             if (lc.wasAdded()) {
-                lc.getAddedSubList().stream()
+                lc.getAddedSubList()
                         .forEach(t -> addBackingItem(t, getTableColumn().getCellObservableValue(t)));
             }
             if (lc.wasRemoved()) {
-                lc.getRemoved().stream()
+                lc.getRemoved()
                         .forEach(t -> removeBackingItem(t, getTableColumn().getCellObservableValue(t)));
             }
         }

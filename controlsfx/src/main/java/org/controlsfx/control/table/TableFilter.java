@@ -190,18 +190,17 @@ public final class TableFilter<T> {
     public TableView<T> getTableView() {
         return tableView;
     }
-    /** 
-     * @treatAsPrivate
-     */
+
     public ObservableList<ColumnFilter<T,?>> getColumnFilters() {
         return columnFilters;
     }
-    /** 
-     * @treatAsPrivate
-     */
+
     public Optional<ColumnFilter<T,?>> getColumnFilter(TableColumn<T,?> tableColumn) {
-        return columnFilters.stream().filter(f -> f.getTableColumn().equals(tableColumn)).findAny();
+        Optional<ColumnFilter<T,?>> result = columnFilters.stream().filter(f -> f.getTableColumn().equals(tableColumn)).findAny();
+        result.ifPresent(ColumnFilter::initialize);
+        return result;
     }
+
     public boolean isDirty() {
         return columnFilters.stream().anyMatch(ColumnFilter::isFiltered);
     }

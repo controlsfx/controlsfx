@@ -31,7 +31,10 @@ import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import static impl.org.controlsfx.spreadsheet.GridViewSkin.DEFAULT_CELL_HEIGHT;
 import java.util.BitSet;
+import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -282,7 +285,12 @@ public class HorizontalHeader extends TableHeaderRow {
      * @param column
      */
     private void unfixColumn(SpreadsheetColumn column) {
-        removeStyleHeader(gridViewSkin.spreadsheetView.getViewColumn(gridViewSkin.spreadsheetView.getColumns().indexOf(column)));
+         try{
+            removeStyleHeader(gridViewSkin.spreadsheetView.getViewColumn(gridViewSkin.spreadsheetView.getColumns().indexOf(column)));
+        } catch (ConcurrentModificationException ex) {
+            //It may happen...
+            Logger.getLogger("root").log(Level.WARNING, "", ex);
+        }
     }
 
     /**

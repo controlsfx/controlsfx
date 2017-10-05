@@ -183,6 +183,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         CellView lastCell = null;
         boolean needToBeShifted;
         boolean rowHeightChange = false;
+        boolean isFixed;
         for (int indexColumn = 0; indexColumn < columns.size(); indexColumn++) {
             //FIXME Problem qwith column span
             if(!skin.getSkinnable().getColumns().get(indexColumn).isVisible()){
@@ -196,8 +197,8 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             final SpreadsheetCell spreadsheetCell = row.get(indexColumn);
             final int columnSpan = spreadsheetView.getColumnSpan(spreadsheetCell);
             boolean isVisible = !isInvisible(x, width, hbarValue, headerWidth, columnSpan);
-
-            if (columns.get(indexColumn).isFixed()) {
+            isFixed = columns.get(indexColumn).isFixed();
+            if (isFixed) {
                 isVisible = true;
             }
 
@@ -233,7 +234,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             final int viewColumn =spreadsheetView.getViewColumn(spreadsheetCell.getColumn()); 
             //Virtualization of column
             // We translate that column by the Hbar Value if it's fixed
-            if (columns.get(indexColumn).isFixed()) {
+            if (isFixed) {
                 /**
                  * Here we verify if our cell must be shifted. The second
                  * condition is to determine that we are dealing with the very

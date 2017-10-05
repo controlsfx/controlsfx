@@ -33,6 +33,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.Observable;
 import javafx.beans.binding.When;
 import javafx.beans.value.ChangeListener;
@@ -225,11 +227,17 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
              * not be lay out. Thus we only consider the row with children as
              * really available.
              */
-            int i = sheetChildren.size() - 1;
-            while (((GridRow) sheetChildren.get(i)).getChildrenUnmodifiable().isEmpty() && i > 0) {
-                --i;
+            try {
+                int i = sheetChildren.size() - 1;
+                while (((GridRow) sheetChildren.get(i)).getChildrenUnmodifiable().isEmpty() && i > 0) {
+                    --i;
+                }
+                return (GridRow) sheetChildren.get(i);
+                //We may have some IndexOutOfBoundsException sometimes...
+            } catch (Exception ex) {
+                Logger.getLogger("root").log(Level.WARNING, "", ex);
+                return null;
             }
-            return (GridRow) sheetChildren.get(i);
         }
         return null;
     }

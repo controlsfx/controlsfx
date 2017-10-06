@@ -27,12 +27,20 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.tools.PrefixSelectionCustomizer;
+import javafx.beans.property.*;
+import javafx.beans.value.ChangeListener;
 import javafx.scene.control.ComboBox;
+
+import java.util.Optional;
+import java.util.function.BiFunction;
+
+import static impl.org.controlsfx.tools.PrefixSelectionCustomizer.DEFAULT_LOOKUP_COMBOBOX;
+import static impl.org.controlsfx.tools.PrefixSelectionCustomizer.DEFAULT_TYPING_DELAY;
 
 /**
  * A simple extension of the {@link ComboBox} which selects an entry of
  * its item list based on keyboard input. The user can  type letters or 
- * digits on the keyboard and die ChoiceBox will attempt to
+ * digits on the keyboard and the control will attempt to
  * select the first item it can find with a matching prefix.
  * 
  * This will only be enabled, when the {@link ComboBox} is not editable, so
@@ -41,7 +49,7 @@ import javafx.scene.control.ComboBox;
  * <p>This feature is available natively on the Windows combo box control, so many
  * users have asked for it. There is a feature request to include this feature
  * into JavaFX (<a href="https://javafx-jira.kenai.com/browse/RT-18064">Issue RT-18064</a>). 
- * The class is published as part of ContorlsFX to allow testing and feedback.
+ * The class is published as part of ControlsFX to allow testing and feedback.
  * 
  * <h3>Example</h3>
  * 
@@ -68,7 +76,13 @@ import javafx.scene.control.ComboBox;
  * @see PrefixSelectionCustomizer
  */
 public class PrefixSelectionComboBox<T> extends ComboBox<T> {
-
+    
+    private final ChangeListener<Boolean> focusedListener = (obs, ov, nv) -> {
+            if (nv) {
+                show();
+            }
+        };
+    
     /**
      * Create a non editable {@link ComboBox} with the "prefix selection"
      * feature installed.
@@ -77,5 +91,63 @@ public class PrefixSelectionComboBox<T> extends ComboBox<T> {
         setEditable(false);
         PrefixSelectionCustomizer.customize(this);
     }
+    
+    /***************************************************************************
+     *                                                                         *
+     * Properties                                                              *
+     *                                                                         *
+     **************************************************************************/
+    
+    // --- displayOnFocusedEnabled
+    /**
+     * When enabled, the {@link ComboBox} will display its popup upon focus gained.
+     * Default is false
+     */
+    private final BooleanProperty displayOnFocusedEnabled = new SimpleBooleanProperty(this, "displayOnFocusedEnabled", false) {
+        @Override
+        protected void invalidated() {
+            if (get()) {
+                focusedProperty().addListener(focusedListener);
+            } else {
+                focusedProperty().removeListener(focusedListener);
+            }
+        }
+    };
+    public final boolean isDisplayOnFocusedEnabled() { return displayOnFocusedEnabled.get(); }
+    public final void setDisplayOnFocusedEnabled(boolean value) { displayOnFocusedEnabled.set(value); }
+    public final BooleanProperty displayOnFocusedEnabledProperty() { return displayOnFocusedEnabled; }
+    
+    // --- backSpaceAllowed
+    /**
+     * When allowed, the user can press on the back space to clear the current 
+     * selection.
+     * Default is false
+     */
+    private final BooleanProperty backSpaceAllowed = new SimpleBooleanProperty(this, "backSpaceAllowed", false);
+    public final boolean isBackSpaceAllowed() { return backSpaceAllowed.get(); }
+    public final void setBackSpaceAllowed(boolean value) { backSpaceAllowed.set(value); }
+    public final BooleanProperty backSpaceAllowedProperty() { return backSpaceAllowed; }
+    
+    // --- typingDelay
+    /**
+     * Allows setting the delay until the current selection is reset, in ms. 
+     * Default is 500 ms
+     */
+    private final IntegerProperty typingDelay = new SimpleIntegerProperty(this, "typingDelay", DEFAULT_TYPING_DELAY);
+    public final int getTypingDelay() { return typingDelay.get(); }
+    public final void setTypingDelay(int value) { typingDelay.set(value); }
+    public final IntegerProperty typingDelayProperty() { return typingDelay; }
+    
+    // --- lookup
+    /**
+     * Allows setting a custom search criteria, based on the control and the typed 
+     * selection.
+     * The default criteria searchs for the first matching item that starts with 
+     * the typed selection, being case insenstitive.
+     */
+    private final ObjectProperty<BiFunction<ComboBox, String, Optional>> lookup = new SimpleObjectProperty<>(this, "lookup", DEFAULT_LOOKUP_COMBOBOX);
+    public final BiFunction<ComboBox, String, Optional> getLookup() { return lookup.get(); }
+    public final void setLookup(BiFunction<ComboBox, String, Optional> value) { lookup.set(value); }
+    public final ObjectProperty<BiFunction<ComboBox, String, Optional>> lookupProperty() { return lookup; }
     
 }

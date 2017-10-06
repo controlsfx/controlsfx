@@ -26,28 +26,33 @@
  */
 package impl.org.controlsfx.tools;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
-import org.controlsfx.control.PrefixSelectionChoiceBox;
-import org.controlsfx.control.PrefixSelectionComboBox;
-
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.ListView;
+import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.util.StringConverter;
+import org.controlsfx.control.PrefixSelectionChoiceBox;
+import org.controlsfx.control.PrefixSelectionComboBox;
+
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
 
 /**
  * <p>This utility class can be used to customize a {@link ChoiceBox} or
  * {@link ComboBox} and enable the "prefix selection" feature. This will enable
  * the user to type letters or digits on the keyboard while the {@link ChoiceBox}
- * or {@link ComboBox} has the focus. The {@link ChoiceBox} or {@link ComboBox} 
+ * or {@link ComboBox} has the focus. 
+ * 
+ * By default, the {@link ChoiceBox} or {@link ComboBox} 
  * will attempt to select the first item it can find with a matching prefix ignoring 
  * case.
  * 
@@ -87,16 +92,63 @@ import javafx.util.StringConverter;
  * {@link PrefixSelectionChoiceBox} and {@link PrefixSelectionComboBox} as a
  * substitute for {@link ChoiceBox} and {@link ComboBox}.
  * 
+ * In this case, {@link PrefixSelectionComboBox} includes some properties that will
+ * allow modifying the elapsed time before the selection is clear, listen to back
+ * space to clear the selection, show the popup when the control gains the focus, 
+ * or set a different lookup criteria.
+ * 
  * @see PrefixSelectionChoiceBox
  * @see PrefixSelectionComboBox
  */
 public class PrefixSelectionCustomizer {
+    
+    public static final int DEFAULT_TYPING_DELAY = 500;
+    
     private static final String SELECTION_PREFIX_STRING = "selectionPrefixString";
     private static final Object SELECTION_PREFIX_TASK = "selectionPrefixTask";
 
+    public static final BiFunction<ComboBox, String, Optional> DEFAULT_LOOKUP_COMBOBOX = 
+            (comboBox, selection) -> {
+                if (comboBox == null || selection == null || selection.isEmpty()) {
+                    return Optional.empty();
+                }
+                
+                return comboBox.getItems().stream()
+                        .filter(Objects::nonNull)
+                        .filter(item -> {
+                            String s = comboBox.getConverter() == null ? item.toString() : comboBox.getConverter().toString(item);
+                            if (s != null && ! s.isEmpty()) {
+                                return s.toUpperCase(Locale.ROOT).startsWith(selection);
+                            }
+                            return false;
+                        })
+                        .findFirst();
+    };
+    
+    public static final BiFunction<ChoiceBox, String, Optional> DEFAULT_LOOKUP_CHOICEBOX = 
+            (choiceBox, selection) -> {
+                if (choiceBox == null || selection == null || selection.isEmpty()) {
+                    return Optional.empty();
+                }
+                
+                return choiceBox.getItems().stream()
+                        .filter(Objects::nonNull)
+                        .filter(item -> {
+                            String s = choiceBox.getConverter() == null ? item.toString() : choiceBox.getConverter().toString(item);
+                            if (s != null && ! s.isEmpty()) {
+                                return s.toUpperCase(Locale.ROOT).startsWith(selection);
+                            }
+                            return false;
+                        })
+                        .findFirst();
+    };
+
     private static EventHandler<KeyEvent> handler = new EventHandler<KeyEvent>() {
         private ScheduledExecutorService executorService = null;
-
+        private PrefixSelectionComboBox prefixSelectionComboBox;
+        private int typingDelay;
+        private Object result;
+        
         @Override
         public void handle(KeyEvent event) {
             keyPressed(event);
@@ -104,17 +156,25 @@ public class PrefixSelectionCustomizer {
 
         private <T> void keyPressed(KeyEvent event) {
             KeyCode code = event.getCode();
-            if (code.isLetterKey() || code.isDigitKey() || code == KeyCode.SPACE) {
+            if (code.isLetterKey() || code.isDigitKey() || code == KeyCode.SPACE || code == KeyCode.BACK_SPACE) {
+                if (event.getSource() instanceof PrefixSelectionComboBox) {
+                    if (code == KeyCode.BACK_SPACE && ! ((PrefixSelectionComboBox) event.getSource()).isBackSpaceAllowed()) {
+                        return;
+                    }
+                }
                 String letter = code.getChar();
                 if (event.getSource() instanceof ComboBox) {
                     ComboBox<T> comboBox = (ComboBox<T>) event.getSource();
-                    T item = getEntryWithKey(letter, comboBox.getConverter(), comboBox.getItems(), comboBox);
+                    T item = getEntryWithKey(letter, comboBox);
                     if (item != null) {
                         comboBox.setValue(item);
+                        // scroll to selection
+                        ComboBoxListViewSkin<?> skin = (ComboBoxListViewSkin<?>) comboBox.getSkin(); 
+                        ((ListView<T>) skin.getPopupContent()).scrollTo(item); 
                     }
                 } else if (event.getSource() instanceof ChoiceBox) {
                     ChoiceBox<T> choiceBox = (ChoiceBox<T>) event.getSource();
-                    T item = getEntryWithKey(letter, choiceBox.getConverter(), choiceBox.getItems(), choiceBox);
+                    T item = getEntryWithKey(letter, choiceBox);
                     if (item != null) {
                         choiceBox.setValue(item);
                     }
@@ -122,49 +182,35 @@ public class PrefixSelectionCustomizer {
             }
         }
 
-        private <T> T getEntryWithKey(String letter, StringConverter<T> converter, ObservableList<T> items, Control control) {
-            T result = null;
-
-            // The converter is null by default for the ChoiceBox. The ComboBox has a default converter
-            if (converter == null) {
-                converter = new StringConverter<T>() {
-                    @Override
-                    public String toString(T t) {
-                        return t == null ? null : t.toString();
-                    }
-
-                    @Override
-                    public T fromString(String string) {
-                        return null;
-                    }
-                };
-            }
-
-            String selectionPrefixString = (String) control.getProperties().get(SELECTION_PREFIX_STRING);
-            if (selectionPrefixString == null) {
-                selectionPrefixString = letter.toUpperCase();
-            } else {
-                selectionPrefixString += letter.toUpperCase();
-            }
+        private <T> T getEntryWithKey(String letter, Control control) {
+            result = null;
+            typingDelay = DEFAULT_TYPING_DELAY;
+            prefixSelectionComboBox = (control instanceof PrefixSelectionComboBox) ? (PrefixSelectionComboBox) control : null;
+            
+            String selectionPrefixString = processInput((String) control.getProperties().get(SELECTION_PREFIX_STRING), letter);
             control.getProperties().put(SELECTION_PREFIX_STRING, selectionPrefixString);
 
-            for (T item : items) {
-                String string = converter.toString(item);
-                if (string != null && string.toUpperCase().startsWith(selectionPrefixString)) {
-                    result = item;
-                    break;
+            if (prefixSelectionComboBox != null) {
+                typingDelay = prefixSelectionComboBox.getTypingDelay();
+                final BiFunction<ComboBox, String, Optional> lookup = prefixSelectionComboBox.getLookup();
+                if (lookup != null) {
+                    lookup.apply(prefixSelectionComboBox, selectionPrefixString).ifPresent(t -> result = t);
                 }
+            } else if (control instanceof ComboBox) {
+                DEFAULT_LOOKUP_COMBOBOX.apply((ComboBox) control, selectionPrefixString).ifPresent(t -> result = t);
+            } else if (control instanceof ChoiceBox) {
+                DEFAULT_LOOKUP_CHOICEBOX.apply((ChoiceBox) control, selectionPrefixString).ifPresent(t -> result = t);
             }
-
+            
             ScheduledFuture<?> task = (ScheduledFuture<?>) control.getProperties().get(SELECTION_PREFIX_TASK);
             if (task != null) {
                 task.cancel(false);
             }
             task = getExecutorService().schedule(
-                    () -> control.getProperties().put(SELECTION_PREFIX_STRING, ""), 500, TimeUnit.MILLISECONDS); 
+                    () -> control.getProperties().put(SELECTION_PREFIX_STRING, ""), typingDelay, TimeUnit.MILLISECONDS); 
             control.getProperties().put(SELECTION_PREFIX_TASK, task);
 
-            return result;
+            return (T) result;
         }
 
         private ScheduledExecutorService getExecutorService() {
@@ -177,6 +223,25 @@ public class PrefixSelectionCustomizer {
                         });
             }
             return executorService;
+        }
+        
+        private String processInput(String initialText, String letter) {
+            if (initialText == null) {
+                initialText = "";
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (char c : initialText.concat(letter).toCharArray()) {
+                if (c == '\b') { // back space, remove all
+                    if (sb.length() > 0) {
+                        sb.delete(0, sb.length());
+                        break;
+                    }
+                } else {
+                    sb.append(c);
+                }
+            }
+            return sb.toString();
         }
 
     };

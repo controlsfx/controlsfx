@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015, ControlsFX
+ * Copyright (c) 2013, 2017, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,6 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.CheckComboBoxSkin;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -40,6 +36,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Skin;
 import javafx.util.StringConverter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple UI control that makes it possible to select zero or more items within
@@ -69,7 +68,7 @@ import javafx.util.StringConverter;
  * 
  * // and listen to the relevant events (e.g. when the selected indices or 
  * // selected items change).
- * checkComboBox.getCheckModel().getSelectedItems().addListener(new ListChangeListener<String>() {
+ * checkComboBox.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
  *     public void onChanged(ListChangeListener.Change<? extends String> c) {
  *         System.out.println(checkComboBox.getCheckModel().getSelectedItems());
  *     }

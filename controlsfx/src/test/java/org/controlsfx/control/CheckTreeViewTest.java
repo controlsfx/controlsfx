@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2017 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@ package org.controlsfx.control;
 
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.SelectionMode;
-import org.controlsfx.control.spreadsheet.JavaFXThreadingRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,7 +49,7 @@ public class CheckTreeViewTest {
     
     @Before
     public void setUp() {
-        CheckBoxTreeItem<String> root = new CheckBoxTreeItem<String>("Root");
+        CheckBoxTreeItem<String> root = new CheckBoxTreeItem<>("Root");
         root.setExpanded(true);
         root.getChildren().addAll(
                 treeItem_Jonathan,

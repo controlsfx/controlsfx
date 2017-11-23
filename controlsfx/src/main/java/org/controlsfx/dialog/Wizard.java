@@ -154,9 +154,17 @@ public class Wizard {
         actionEvent.consume();
         currentPage.ifPresent(page->pageHistory.push(page));
         Optional<WizardPane> nextPage = getFlow().advance(currentPage.orElse(null));
-        updatePage(dialog,nextPage, true);
+        updatePage(dialog, nextPage, true);
     };
-    
+
+    private final EventHandler<ActionEvent> BUTTON_FINISH_ACTION_HANDLER = actionEvent -> {
+        updatePage(dialog, Optional.empty(), true);
+    };
+
+    private final EventHandler<ActionEvent> BUTTON_CANCEL_ACTION_HANDLER = actionEvent -> {
+        updatePage(dialog, Optional.empty(), false);
+    };
+
     private final StringProperty titleProperty = new SimpleStringProperty(); 
     
     
@@ -480,20 +488,11 @@ public class Wizard {
         currentPage = nextPage;
         currentPage.ifPresent(currentPage -> {
             // put in default actions
-            List<ButtonType> buttons = currentPage.getButtonTypes();
-            if (! buttons.contains(BUTTON_PREVIOUS)) {
-                buttons.add(BUTTON_PREVIOUS);
-                Button button = (Button)currentPage.lookupButton(BUTTON_PREVIOUS);
-                button.addEventFilter(ActionEvent.ACTION, BUTTON_PREVIOUS_ACTION_HANDLER);
-            }
-            if (! buttons.contains(BUTTON_NEXT)) {
-                buttons.add(BUTTON_NEXT);
-                Button button = (Button)currentPage.lookupButton(BUTTON_NEXT);
-                button.addEventFilter(ActionEvent.ACTION, BUTTON_NEXT_ACTION_HANDLER);
-            }
-            if (! buttons.contains(ButtonType.FINISH)) buttons.add(ButtonType.FINISH);
-            if (! buttons.contains(ButtonType.CANCEL)) buttons.add(ButtonType.CANCEL);
-                
+            addButtonIfMissing(currentPage, BUTTON_PREVIOUS, BUTTON_PREVIOUS_ACTION_HANDLER);
+            addButtonIfMissing(currentPage, BUTTON_NEXT, BUTTON_NEXT_ACTION_HANDLER);
+            addButtonIfMissing(currentPage, ButtonType.FINISH, BUTTON_FINISH_ACTION_HANDLER);
+            addButtonIfMissing(currentPage, ButtonType.CANCEL, BUTTON_CANCEL_ACTION_HANDLER);
+
             // then give user a chance to modify the default actions
             currentPage.onEnteringPage(this);
             
@@ -549,7 +548,16 @@ public class Wizard {
         
         validateActionState();
     }
-    
+
+    private static void addButtonIfMissing(WizardPane page, ButtonType buttonType, EventHandler<ActionEvent> actionHandler) {
+        List<ButtonType> buttons = page.getButtonTypes();
+        if (! buttons.contains(buttonType)) {
+            buttons.add(buttonType);
+            Button button = (Button)page.lookupButton(buttonType);
+            button.addEventFilter(ActionEvent.ACTION, actionHandler);
+        }
+    }
+
     private void validateActionState() {
         final List<ButtonType> currentPaneButtons = dialog.getDialogPane().getButtonTypes();
         

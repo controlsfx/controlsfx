@@ -145,16 +145,16 @@ public class Wizard {
     private final ButtonType BUTTON_PREVIOUS = new ButtonType(localize(asKey("wizard.previous.button")), ButtonData.BACK_PREVIOUS); //$NON-NLS-1$
     private final EventHandler<ActionEvent> BUTTON_PREVIOUS_ACTION_HANDLER = actionEvent -> {
         actionEvent.consume();
-        currentPage = Optional.ofNullable( pageHistory.isEmpty()? null: pageHistory.pop() );
-        updatePage(dialog,false);
+        Optional<WizardPane> nextPage = Optional.ofNullable( pageHistory.isEmpty()? null: pageHistory.pop() );
+        updatePage(dialog, nextPage, false);
     };
     
     private final ButtonType BUTTON_NEXT = new ButtonType(localize(asKey("wizard.next.button")), ButtonData.NEXT_FORWARD); //$NON-NLS-1$
     private final EventHandler<ActionEvent> BUTTON_NEXT_ACTION_HANDLER = actionEvent -> {
         actionEvent.consume();
         currentPage.ifPresent(page->pageHistory.push(page));
-        currentPage = getFlow().advance(currentPage.orElse(null));
-        updatePage(dialog,true);
+        Optional<WizardPane> nextPage = getFlow().advance(currentPage.orElse(null));
+        updatePage(dialog,nextPage, true);
     };
     
     private final StringProperty titleProperty = new SimpleStringProperty(); 
@@ -289,15 +289,15 @@ public class Wizard {
      */
     private ObjectProperty<Flow> flow = new SimpleObjectProperty<Flow>(new LinearFlow()) {
         @Override protected void invalidated() {
-            updatePage(dialog,false);
+            updatePage(dialog, Optional.empty(), false);
         }
         
         @Override public void set(Flow flow) {
         	super.set(flow);
         	pageHistory.clear();
         	if ( flow != null ) {
-        		currentPage = flow.advance(currentPage.orElse(null));
-        		updatePage(dialog,true);
+        		Optional<WizardPane> nextPage = flow.advance(currentPage.orElse(null));
+        		updatePage(dialog, nextPage, true);
         	}
         };
     };
@@ -456,13 +456,13 @@ public class Wizard {
      * 
      **************************************************************************/
     
-    private void updatePage(Dialog<ButtonType> dialog, boolean advancing) {
+    private void updatePage(Dialog<ButtonType> dialog, Optional<WizardPane> nextPage, boolean advancing) {
         Flow flow = getFlow();
         if (flow == null) {
             return;
         }
         
-        Optional<WizardPane> prevPage = Optional.ofNullable( pageHistory.isEmpty()? null: pageHistory.peek()); 
+        Optional<WizardPane> prevPage = currentPage;
         prevPage.ifPresent( page -> {
 	        // if we are going forward in the wizard, we read in the settings 
 	        // from the page and store them in the settings map.
@@ -476,7 +476,8 @@ public class Wizard {
 	        // based on the settings it has received
 	        page.onExitingPage(this);
         });
-        
+
+        currentPage = nextPage;
         currentPage.ifPresent(currentPage -> {
             // put in default actions
             List<ButtonType> buttons = currentPage.getButtonTypes();

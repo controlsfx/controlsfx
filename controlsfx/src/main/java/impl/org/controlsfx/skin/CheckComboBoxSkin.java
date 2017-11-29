@@ -170,7 +170,7 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
     protected String getTextString() {
         
         if (control.getTitle() != null) {
-            //it a title has been set, we use it...
+            //if a title has been set, we use it...
             return control.getTitle();
         } else {            
             //...otherwise we generate a string concatenating the items

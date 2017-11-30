@@ -227,7 +227,7 @@ public class CheckComboBox<T> extends ControlsFXControl {
     }
     
     // --- title
-    public StringProperty title = new SimpleStringProperty(null);
+    private StringProperty title = new SimpleStringProperty(null);
     
     /**
      * The title to use for this control. If a non null value is explicitly 
@@ -243,7 +243,7 @@ public class CheckComboBox<T> extends ControlsFXControl {
      * otherwise title will be constructed by the skin
      * @param value the string to use as title
      */
-    public void setTitle(String value) {
+    public final void setTitle(String value) {
         title.setValue(value);
     }
     
@@ -251,7 +251,7 @@ public class CheckComboBox<T> extends ControlsFXControl {
      * The title set for this control, if it has been set explicitly by the client.
      * @return the title if it has been set, null otherwise
      */
-    public String getTitle() {
+    public final String getTitle() {
         return title.getValue();
     }      
     

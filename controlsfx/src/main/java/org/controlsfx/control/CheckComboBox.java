@@ -33,6 +33,7 @@ import java.util.Map;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -254,6 +255,37 @@ public class CheckComboBox<T> extends ControlsFXControl {
     public final String getTitle() {
         return title.getValue();
     }      
+    
+    // --- show how many items are checked over total
+    private BooleanProperty showCheckedCount = new SimpleBooleanProperty(false);
+    
+    /**
+     * A boolean to decide if the information of how many items are checked 
+     * should be shown beside the fixed title. 
+     * If a {@link #titleProperty()} has been set and this property is set to true
+     * then a string like (3 of 10) would be shown when 3 items out of 10 are
+     * checked
+     * @return if the count should be shown
+     */
+    public final BooleanProperty showCheckedCountProperty() {
+        return showCheckedCount;
+    }
+    
+    /**
+     * Sets the value to use to decide whether the checked items count should be
+     * shown or not
+     * @param value the value to set
+     */
+    public final void setShowCheckedCount(boolean value) {
+        showCheckedCount.setValue(value);
+    }
+    
+    /**
+     * @return whether the checked items count is set to be shown beside a fixed title
+     */
+    public final boolean getShowCheckedCount() {
+        return showCheckedCount.getValue();
+    }
     
     
     /**************************************************************************

@@ -103,6 +103,15 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
         comboBox.setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
             @Override public ListCell<T> call(ListView<T> listView) {
                 CheckBoxListCell<T> result = new CheckBoxListCell<>(item -> control.getItemBooleanProperty(item));
+                //clicking on the label checks/unchecks the item
+                result.setOnMouseClicked(e -> {
+                    T item = result.getItem();
+                    if (control.getCheckModel().isChecked(item)) {                        
+                        control.getCheckModel().clearCheck(item);
+                    } else {
+                        control.getCheckModel().check(item);                        
+                    }                    
+                });                
                 result.converterProperty().bind(control.converterProperty());
                 return result;
             };

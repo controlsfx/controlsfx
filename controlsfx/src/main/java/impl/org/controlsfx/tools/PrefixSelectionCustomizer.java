@@ -163,7 +163,7 @@ public class PrefixSelectionCustomizer {
                         return;
                     }
                 }
-                String letter = code.impl_getChar();
+                String letter = event.getText();
                 if (event.getSource() instanceof ComboBox) {
                     ComboBox<T> comboBox = (ComboBox<T>) event.getSource();
                     T item = getEntryWithKey(letter, comboBox);

@@ -365,7 +365,7 @@ public class Notifications {
                 ownerWindow = ((PopupWindow) ownerWindow).getOwnerWindow();
             }
             // need to install our CSS
-            Scene ownerScene = ownerWindow.getScene();
+            Scene ownerScene = ownerWindow == null ? null : ownerWindow.getScene();
             if (ownerScene != null) {
                 String stylesheetUrl = Notifications.class.getResource("notificationpopup.css").toExternalForm(); //$NON-NLS-1$
                 if (!ownerScene.getStylesheets().contains(stylesheetUrl)) {

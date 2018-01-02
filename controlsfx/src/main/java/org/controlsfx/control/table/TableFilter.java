@@ -26,7 +26,6 @@
  */
 package org.controlsfx.control.table;
 
-import impl.org.controlsfx.table.ColumnFilter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -158,10 +157,9 @@ public final class TableFilter<T> {
                 .forEach(ColumnFilter::unSelectAllValues);
     }
     public void executeFilter() {
-        if (columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent()) {
-            filteredList.setPredicate(item -> !columnFilters.stream()
-                    .filter(cf -> !cf.evaluate(item))
-                    .findAny().isPresent());
+        if (columnFilters.stream().anyMatch(ColumnFilter::isFiltered)) {
+            filteredList.setPredicate(item -> columnFilters.stream()
+                    .allMatch(cf -> cf.evaluate(item)));
         }
         else {
             resetFilter();
@@ -189,7 +187,7 @@ public final class TableFilter<T> {
         return columnFilters.stream().filter(f -> f.getTableColumn().equals(tableColumn)).findAny();
     }
     public boolean isDirty() {
-        return columnFilters.stream().filter(ColumnFilter::isFiltered).findAny().isPresent();
+        return columnFilters.stream().anyMatch(ColumnFilter::isFiltered);
     }
 
     /**

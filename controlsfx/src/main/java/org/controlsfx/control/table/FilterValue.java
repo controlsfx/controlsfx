@@ -1,4 +1,4 @@
-package impl.org.controlsfx.table;
+package org.controlsfx.control.table;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -12,7 +12,7 @@ import javafx.scene.paint.Color;
 
 import java.util.Optional;
 
-final class FilterValue<T,R> extends HBox implements Comparable<FilterValue<T,R>> {
+public final class FilterValue<T,R> extends HBox implements Comparable<FilterValue<T,R>> {
 
     private final R value;
     private final BooleanProperty isSelected = new SimpleBooleanProperty(true);
@@ -34,18 +34,28 @@ final class FilterValue<T,R> extends HBox implements Comparable<FilterValue<T,R>
         getChildren().addAll(checkBox,label);
     }
 
+    /**
+     * Returns the R value for this given FilterValue
+     */
     public R getValue() {
         return value;
     }
 
+    /**
+     * Property indicating whether this value is selected or not.
+     */
     public BooleanProperty selectedProperty() {
         return isSelected;
     }
+
+    /**
+     * Property indicating whether this value is in scope.
+     */
     public BooleanProperty getInScopeProperty() {
         return inScope;
     }
 
-    public void refreshScope() {
+    void refreshScope() {
         inScope.setValue(columnFilter.wasLastFiltered() || columnFilter.valueIsVisible(value));
     }
 

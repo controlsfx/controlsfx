@@ -27,6 +27,7 @@
 package org.controlsfx.control.table;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -76,12 +77,26 @@ public final class TableFilter<T> {
         sortedControlList.comparatorProperty().bind(tableView.comparatorProperty());
         tableView.setItems(sortedControlList);
 
-        applyForAllColumns(isLazy);
+        applyForAllColumns();
         tableView.getStylesheets().add("/impl/org/controlsfx/table/tablefilter.css");
 
         if (!isLazy) {
             columnFilters.forEach(ColumnFilter::initialize);
         }
+
+        // handle column additions/removals
+        tableView.getColumns().addListener((ListChangeListener<TableColumn<T, ?>>) lc -> {
+            while (lc.next()) {
+                columnFilters.addAll(lc.getAddedSubList().stream()
+                        .flatMap(this::extractNestedColumns)
+                        .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
+
+                columnFilters.removeAll(lc.getRemoved().stream()
+                        .flatMap(this::extractNestedColumns)
+                        .flatMap(c -> columnFilters.stream().filter(cf -> cf.getTableColumn() == c))
+                        .collect(Collectors.toList()));
+            };
+        });
     }
 
     /**
@@ -113,7 +128,7 @@ public final class TableFilter<T> {
     /** 
      * @treatAsPrivate
      */
-    private void applyForAllColumns(boolean isLazy) {
+    private void applyForAllColumns() {
         columnFilters.setAll(tableView.getColumns().stream().flatMap(this::extractNestedColumns)
                 .map(c -> new ColumnFilter<>(this, c)).collect(Collectors.toList()));
     }
@@ -174,18 +189,17 @@ public final class TableFilter<T> {
     public TableView<T> getTableView() {
         return tableView;
     }
-    /** 
-     * @treatAsPrivate
-     */
+
     public ObservableList<ColumnFilter<T,?>> getColumnFilters() {
         return columnFilters;
     }
-    /** 
-     * @treatAsPrivate
-     */
+
     public Optional<ColumnFilter<T,?>> getColumnFilter(TableColumn<T,?> tableColumn) {
-        return columnFilters.stream().filter(f -> f.getTableColumn().equals(tableColumn)).findAny();
+        Optional<ColumnFilter<T,?>> result = columnFilters.stream().filter(f -> f.getTableColumn().equals(tableColumn)).findAny();
+        result.ifPresent(ColumnFilter::initialize);
+        return result;
     }
+
     public boolean isDirty() {
         return columnFilters.stream().anyMatch(ColumnFilter::isFiltered);
     }

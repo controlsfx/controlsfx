@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2017 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,9 +29,8 @@ package org.controlsfx.control.decoration;
 import impl.org.controlsfx.ImplUtils;
 
 import java.util.List;
+import java.util.Optional;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -54,6 +53,11 @@ public class GraphicDecoration extends Decoration {
     private final Pos pos;
     private final double xOffset;
     private final double yOffset;
+    /**
+     * Because {@link #decorationNode} is unmanaged, we need this listener
+     * to detect when its Parent lays out so that we can lay out {@code decorationNode}.
+     */
+    private final ChangeListener<Boolean> targetNeedsLayoutListener;
 
     /**
      * Constructs a new GraphicDecoration with the given decoration node to be 
@@ -102,15 +106,19 @@ public class GraphicDecoration extends Decoration {
         this.pos = position;
         this.xOffset = xOffset;
         this.yOffset = yOffset;
+        targetNeedsLayoutListener = ( __, ___, ____ ) ->
+                Optional.ofNullable( decorationNode.getParent() ).ifPresent( this::layoutGraphic );
     }
     
     /** {@inheritDoc} */
     @Override public Node applyDecoration(Node targetNode) {
         List<Node> targetNodeChildren = ImplUtils.getChildren((Parent)targetNode, true);
-        updateGraphicPosition(targetNode);
+        layoutGraphic(targetNode);
         if (!targetNodeChildren.contains(decorationNode)) {
             targetNodeChildren.add(decorationNode);
         }
+        ((Parent) targetNode).needsLayoutProperty().removeListener(targetNeedsLayoutListener); // In case already added.
+        ((Parent) targetNode).needsLayoutProperty().addListener(targetNeedsLayoutListener);
         return null;
     }
     
@@ -121,12 +129,17 @@ public class GraphicDecoration extends Decoration {
         if (targetNodeChildren.contains(decorationNode)) {
             targetNodeChildren.remove(decorationNode);
         }
+        ((Parent) targetNode).needsLayoutProperty().removeListener(targetNeedsLayoutListener);
     }
-    
-    private void updateGraphicPosition(Node targetNode) {
-        final double decorationNodeWidth = decorationNode.prefWidth(-1);
-        final double decorationNodeHeight = decorationNode.prefHeight(-1);
-        
+
+    private void layoutGraphic(Node targetNode) {
+        // Because we made decorationNode unmanaged, we are responsible for sizing it:
+        decorationNode.autosize();
+        // Now get decorationNode's layout Bounds and use for its position computations: 
+        final Bounds decorationNodeLayoutBounds = decorationNode.getLayoutBounds();
+        final double decorationNodeWidth = decorationNodeLayoutBounds.getWidth();
+        final double decorationNodeHeight = decorationNodeLayoutBounds.getHeight();
+
         Bounds targetBounds = targetNode.getLayoutBounds();
         double x = targetBounds.getMinX();
         double y = targetBounds.getMinY();
@@ -141,23 +154,6 @@ public class GraphicDecoration extends Decoration {
             targetHeight = targetNode.prefHeight(-1);
         }
 
-        /**
-         * If both targetWidth and targetHeight are equal to 0, this means the
-         * targetNode has not been laid out so we can put a listener in order to
-         * catch when the layout will be updated, and then we will place our
-         * decorationNode to the proper position.
-         */
-        if (targetWidth <= 0 && targetHeight <= 0) {
-            targetNode.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
-
-                @Override
-                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-                    targetNode.layoutBoundsProperty().removeListener(this);
-                    updateGraphicPosition(targetNode);
-                }
-            });
-        }
-        
         // x
         switch (pos.getHpos()) {
         	case CENTER: 

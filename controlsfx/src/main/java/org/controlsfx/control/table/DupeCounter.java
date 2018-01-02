@@ -1,7 +1,8 @@
-package impl.org.controlsfx.table;
+package org.controlsfx.control.table;
 
 import java.util.HashMap;
 import java.util.Optional;
+
 
 final class DupeCounter<T> {
 

@@ -89,7 +89,7 @@ public class GraphicValidationDecoration extends AbstractValidationDecoration {
         return new ImageView(WARNING_IMAGE);
     }
 
-    private Node createDecorationNode(ValidationMessage message) {
+    protected Node createDecorationNode(ValidationMessage message) {
         Node graphic = Severity.ERROR == message.getSeverity() ? createErrorNode() : createWarningNode();
         graphic.setStyle(SHADOW_EFFECT);
         Label label = new Label();

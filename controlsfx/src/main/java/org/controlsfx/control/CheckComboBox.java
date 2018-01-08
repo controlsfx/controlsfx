@@ -263,8 +263,17 @@ public class CheckComboBox<T> extends ControlsFXControl {
      * A boolean to decide if the information of how many items are checked 
      * should be shown beside the fixed title. 
      * If a {@link #titleProperty()} has been set and this property is set to true
-     * then a string like (3 of 10) would be shown when 3 items out of 10 are
-     * checked
+     * then a string like (3/10) would be shown when 3 items out of 10 are
+     * checked.
+     * See this image as an example:
+     * 
+     * <br>
+     * <img src="checkComboBoxWithCheckedItemCount.png" alt="Screenshot of CheckComboBox with checked item count">
+     * <br>
+     * 
+     * This property has effect only if a fixed title has been set (see {@link #titleProperty()}), 
+     * otherwise the title is constructed with a concatenation of the selected items.
+     * 
      * @return if the count should be shown
      */
     public final BooleanProperty showCheckedCountProperty() {

@@ -283,7 +283,7 @@ public class CheckComboBox<T> extends ControlsFXControl {
     /**
      * @return whether the checked items count is set to be shown beside a fixed title
      */
-    public final boolean getShowCheckedCount() {
+    public final boolean isShowCheckedCount() {
         return showCheckedCount.getValue();
     }
     

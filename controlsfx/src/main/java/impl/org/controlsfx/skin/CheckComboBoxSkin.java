@@ -172,7 +172,7 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
         if (control.getTitle() != null) {
             //if a title has been set, we use it...
             String vResult = control.getTitle();
-            if (control.getShowCheckedCount()) {
+            if (control.isShowCheckedCount()) {
                 //...adding also the count of how many are selected, if so configured
                 vResult = String.format("%s (%d/%d)", vResult, selectedItems.size(), items.size());
             }             

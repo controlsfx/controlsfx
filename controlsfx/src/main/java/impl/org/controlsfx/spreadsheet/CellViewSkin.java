@@ -27,6 +27,7 @@
 package impl.org.controlsfx.spreadsheet;
 
 import com.sun.javafx.scene.control.skin.TableCellSkin;
+import java.util.UUID;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
@@ -60,7 +61,8 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
      * This EventType can be used with an {@link EventHandler} in order to catch
      * when a SpreadsheetCell filter is activated/deactivated on this column.
      */
-    public static final EventType FILTER_EVENT_TYPE = new EventType("FilterEventType"); //$NON-NLS-1$
+    public static final EventType<Event> FILTER_EVENT_TYPE 
+            = new EventType<>("FilterEventType" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
     private final static String TOP_LEFT_CLASS = "top-left"; //$NON-NLS-1$
     private final static String TOP_RIGHT_CLASS = "top-right"; //$NON-NLS-1$

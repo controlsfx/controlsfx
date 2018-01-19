@@ -28,6 +28,7 @@ package impl.org.controlsfx.skin;
 
 
 import com.sun.javafx.event.EventHandlerManager;
+import java.util.UUID;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
@@ -79,8 +80,8 @@ public class AutoCompletePopup<T> extends PopupControl{
      */
     @SuppressWarnings("serial")
     public static class SuggestionEvent<TE> extends Event {
-        @SuppressWarnings("rawtypes")
-        public static final EventType<SuggestionEvent> SUGGESTION = new EventType<>("SUGGESTION"); //$NON-NLS-1$
+        public static final EventType<SuggestionEvent<?>> SUGGESTION 
+                = new EventType<>("SUGGESTION" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
         private final TE suggestion;
 

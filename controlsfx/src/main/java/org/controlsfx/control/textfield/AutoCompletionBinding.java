@@ -41,6 +41,7 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import java.util.Collection;
+import java.util.UUID;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 
@@ -451,8 +452,8 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
          * The event type that should be listened to by people interested in 
          * knowing when an auto completion has been performed.
          */
-        @SuppressWarnings("rawtypes")
-        public static final EventType<AutoCompletionEvent> AUTO_COMPLETED = new EventType<>("AUTO_COMPLETED"); //$NON-NLS-1$
+        public static final EventType<AutoCompletionEvent<?>> AUTO_COMPLETED 
+                = new EventType<>("AUTO_COMPLETED" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
         private final TE completion;
 

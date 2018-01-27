@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,14 +26,14 @@
  */
 package org.controlsfx.control;
 
-import static impl.org.controlsfx.i18n.Localization.asKey;
-import static impl.org.controlsfx.i18n.Localization.localize;
-
 import impl.org.controlsfx.skin.ListSelectionViewSkin;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Cell;
@@ -41,15 +41,29 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
+import javafx.scene.input.KeyCombination;
 import javafx.util.Callback;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.glyphfont.Glyph;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import static impl.org.controlsfx.i18n.Localization.asKey;
+import static impl.org.controlsfx.i18n.Localization.localize;
+import static javafx.geometry.Orientation.HORIZONTAL;
+import static org.controlsfx.glyphfont.FontAwesome.Glyph.*;
 
 /**
  * A control used to perform a multi-selection via the help of two list views.
  * Items can be moved from one list (source) to the other (target). This can be
  * done by either double clicking on the list items or by using one of the
- * "move" buttons between the two lists. Each list can be decorated with a
- * header and a footer node. The default header nodes are simply two labels
- * ("Available", "Selected").
+ * "move" buttons between the two lists. Buttons can be added or removed by
+ * altering the {@link #getActions() list of actions}.
+ * Each list can be decorated with a header and a footer node.
+ * The default header nodes are simply two labels ("Available", "Selected").
  *
  * <h3>Screenshot</h3>
  *
@@ -305,7 +319,7 @@ public class ListSelectionView<T> extends ControlsFXControl {
 
     // --- Orientation
     private final ObjectProperty<Orientation> orientation = new SimpleObjectProperty<>(
-            this, "orientation", Orientation.HORIZONTAL); //$NON-NLS-1$;
+            this, "orientation", HORIZONTAL); //$NON-NLS-1$;
 
     /**
      * The {@link Orientation} of the {@code ListSelectionView} - this can
@@ -366,5 +380,184 @@ public class ListSelectionView<T> extends ControlsFXControl {
             cellFactory = new SimpleObjectProperty<>(this, "cellFactory");
         }
         return cellFactory;
+    }
+
+    // -- actions
+    private ObservableList<ListSelectionAction> actions = FXCollections.observableArrayList(new MoveToTarget(), new MoveToTargetAll(), new MoveToSource(), new MoveToSourceAll());
+
+    /**
+     * The list of actions which are shown as buttons in between the two list views.
+     * By default, the list has 4 actions - {@link MoveToTarget}, {@link MoveToTargetAll},
+     * {@link MoveToSource} and {@link MoveToSourceAll}. A user may choose to add on top of
+     * these actions or replace them depending on their use case.
+     *
+     * @return An ObservableList of actions.
+     */
+    public ObservableList<ListSelectionAction> getActions() {
+        return actions;
+    }
+
+
+    /**
+     * Actions to be accepted by ListSelectionView. A user can add a custom action to the
+     * control by extending this class and adding its instance to the actions list.
+     */
+    public abstract class ListSelectionAction extends Action {
+
+        /**
+         * Creates a new instance of ListSelectionAction without text.
+         */
+        public ListSelectionAction() {
+            this("");
+        }
+
+        /**
+         * Creates a new instance of ListSelectionAction with the provided text.
+         * @param text The text for the Action.
+         */
+        public ListSelectionAction(String text) {
+            super(text);
+            if (getScene() != null) {
+                ListSelectionViewSkin<T> skin = (ListSelectionViewSkin<T>) getSkin();
+                if (skin != null && skin.getSourceListView() != null && skin.getTargetListView() != null) {
+                    initialize(skin.getSourceListView(), skin.getTargetListView());
+                }
+            }
+            sceneProperty().addListener((ob, ov, nv) -> {
+                if (nv != null) {
+                    Platform.runLater(() -> {
+                        ListSelectionViewSkin<T> skin = (ListSelectionViewSkin<T>) getSkin();
+                        if (skin != null && skin.getSourceListView() != null && skin.getTargetListView() != null) {
+                            initialize(skin.getSourceListView(), skin.getTargetListView());
+                        }
+                    });
+                }
+            });
+        }
+
+        @Override
+        protected final void setEventHandler(Consumer<ActionEvent> eventHandler) {
+            super.setEventHandler(eventHandler);
+        }
+
+        /**
+         * Can be used to define properties or bindings for actions which are directly dependent
+         * on the list views.
+         * @param sourceListView The source list view
+         * @param targetListView The target list view
+         */
+        public abstract void initialize(ListView<T> sourceListView, ListView<T> targetListView);
+    }
+
+    /**
+     * Action use to move the selected items from the
+     * source list view to the target list view.
+     */
+    public class MoveToTarget extends ListSelectionAction {
+
+        public MoveToTarget() {
+            getStyleClass().add("move-to-target-button");
+            setAccelerator(KeyCombination.keyCombination("CTRL+RIGHT"));
+            graphicProperty().bind(Bindings.createObjectBinding(() -> (getOrientation() == HORIZONTAL ? getGlyph(ANGLE_RIGHT) : getGlyph(ANGLE_DOWN)), orientationProperty()));
+
+        }
+
+        @Override
+        public void initialize(ListView<T> sourceListView, ListView<T> targetListView) {
+            disabledProperty().bind(Bindings.isEmpty(sourceListView.getSelectionModel().getSelectedItems()));
+            setEventHandler(ae -> moveToTarget(sourceListView, targetListView));
+        }
+    }
+
+
+    /**
+     * Action use to move all the items from the
+     * source list view to the target list view.
+     */
+    public class MoveToTargetAll extends ListSelectionAction {
+        public MoveToTargetAll() {
+            getStyleClass().add("move-to-target-all-button");
+            graphicProperty().bind(Bindings.createObjectBinding(() -> (getOrientation() == HORIZONTAL ? getGlyph(ANGLE_DOUBLE_RIGHT) : getGlyph(ANGLE_DOUBLE_DOWN)), orientationProperty()));
+            setAccelerator(KeyCombination.keyCombination("CTRL+SHIFT+RIGHT"));
+        }
+
+        @Override
+        public void initialize(ListView<T> sourceListView, ListView<T> targetListView) {
+            disabledProperty().bind(Bindings.isEmpty(sourceListView.getItems()));
+            setEventHandler(ae -> moveToTargetAll(sourceListView, targetListView));
+        }
+    }
+
+
+    /**
+     * Action use to move the selected items from the
+     * target list view to the source list view.
+     */
+    public class MoveToSource extends ListSelectionAction {
+
+        public MoveToSource() {
+            getStyleClass().add("move-to-source-button");
+            graphicProperty().bind(Bindings.createObjectBinding(() -> (getOrientation() == HORIZONTAL ? getGlyph(ANGLE_LEFT) : getGlyph(ANGLE_UP)), orientationProperty()));
+            setAccelerator(KeyCombination.keyCombination("CTRL+LEFT"));
+        }
+
+        @Override
+        public void initialize(ListView<T> sourceListView, ListView<T> targetListView) {
+            disabledProperty().bind(Bindings.isEmpty(targetListView.getSelectionModel().getSelectedItems()));
+            setEventHandler(ae -> moveToSource(sourceListView, targetListView));
+        }
+    }
+
+
+    /**
+     * Action use to all the items from the
+     * target list view to the source list view.
+     */
+    public class MoveToSourceAll extends ListSelectionAction {
+        public MoveToSourceAll() {
+            getStyleClass().add("move-to-source-all-button");
+            graphicProperty().bind(Bindings.createObjectBinding(() -> (getOrientation() == HORIZONTAL ? getGlyph(ANGLE_DOUBLE_LEFT) : getGlyph(ANGLE_DOUBLE_UP)), orientationProperty()));
+            setAccelerator(KeyCombination.keyCombination("CTRL+SHIFT+LEFT"));
+        }
+
+        @Override
+        public void initialize(ListView<T> sourceListView, ListView<T> targetListView) {
+            disabledProperty().bind(Bindings.isEmpty(targetListView.getItems()));
+            setEventHandler(ae -> moveToSourceAll(sourceListView, targetListView));
+        }
+    }
+
+    private static Glyph getGlyph(FontAwesome.Glyph angleDoubleDown) {
+        return new FontAwesome().create(angleDoubleDown);
+    }
+
+    private void moveToTarget(ListView<T> sourceListView, ListView<T> targetListView) {
+        move(sourceListView, targetListView);
+        sourceListView.getSelectionModel().clearSelection();
+    }
+
+    private void moveToTargetAll(ListView<T> sourceListView, ListView<T> targetListView) {
+        move(sourceListView, targetListView, new ArrayList<>(sourceListView.getItems()));
+        sourceListView.getSelectionModel().clearSelection();
+    }
+
+    private void moveToSource(ListView<T> sourceListView, ListView<T> targetListView) {
+        move(targetListView, sourceListView);
+        targetListView.getSelectionModel().clearSelection();
+    }
+
+    private void moveToSourceAll(ListView<T> sourceListView, ListView<T> targetListView) {
+        move(targetListView, sourceListView, new ArrayList<>(targetListView.getItems()));
+        targetListView.getSelectionModel().clearSelection();
+    }
+
+    private void move(ListView<T> viewA, ListView<T> viewB) {
+        List<T> selectedItems = new ArrayList<>(viewA.getSelectionModel().getSelectedItems());
+        move(viewA, viewB, selectedItems);
+    }
+
+    private void move(ListView<T> viewA, ListView<T> viewB, List<T> items) {
+        viewA.getItems().removeAll(items);
+        viewB.getItems().addAll(items);
     }
 }

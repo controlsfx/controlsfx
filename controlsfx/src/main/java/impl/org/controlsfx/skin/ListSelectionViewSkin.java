@@ -27,6 +27,7 @@
 package impl.org.controlsfx.skin;
 
 import javafx.beans.InvalidationListener;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toCollection;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
 
@@ -200,10 +202,7 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         VBox box = new VBox(5);
         box.setFillWidth(true);
         ObservableList<ListSelectionView<T>.ListSelectionAction> actions = getSkinnable().getActions();
-        actions.forEach(listSelectionAction -> {
-            Button button = createActionButton(listSelectionAction);
-            box.getChildren().add(button);
-        });
+        box.getChildren().addAll(createButtonsFrom(actions));
         return box;
     }
 
@@ -211,12 +210,8 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     private HBox createHorizontalButtonBox() {
         HBox box = new HBox(5);
         box.setFillHeight(true);
-
         ObservableList<ListSelectionView<T>.ListSelectionAction> actions = getSkinnable().getActions();
-        actions.forEach(listSelectionAction -> {
-            Button button = createActionButton(listSelectionAction);
-            box.getChildren().add(button);
-        });
+        box.getChildren().addAll(createButtonsFrom(actions));
         return box;
     }
 
@@ -316,6 +311,12 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     private void move(ListView<T> viewA, ListView<T> viewB, List<T> items) {
         viewA.getItems().removeAll(items);
         viewB.getItems().addAll(items);
+    }
+
+    private ObservableList<Node> createButtonsFrom(ObservableList<ListSelectionView<T>.ListSelectionAction> actions) {
+        return actions.stream()
+                .map(this::createActionButton)
+                .collect(toCollection(FXCollections::observableArrayList));
     }
 
     private Button createActionButton(ListSelectionView<T>.ListSelectionAction action) {

@@ -418,26 +418,13 @@ public class ListSelectionView<T> extends ControlsFXControl {
         public ListSelectionAction(String text) {
             super(text);
             if (getScene() != null) {
-                ListSelectionViewSkin<T> skin = (ListSelectionViewSkin<T>) getSkin();
-                if (skin != null && skin.getSourceListView() != null && skin.getTargetListView() != null) {
-                    initialize(skin.getSourceListView(), skin.getTargetListView());
-                }
+                init();
             }
             sceneProperty().addListener((ob, ov, nv) -> {
                 if (nv != null) {
-                    Platform.runLater(() -> {
-                        ListSelectionViewSkin<T> skin = (ListSelectionViewSkin<T>) getSkin();
-                        if (skin != null && skin.getSourceListView() != null && skin.getTargetListView() != null) {
-                            initialize(skin.getSourceListView(), skin.getTargetListView());
-                        }
-                    });
+                    Platform.runLater(this::init);
                 }
             });
-        }
-
-        @Override
-        protected final void setEventHandler(Consumer<ActionEvent> eventHandler) {
-            super.setEventHandler(eventHandler);
         }
 
         /**
@@ -447,6 +434,18 @@ public class ListSelectionView<T> extends ControlsFXControl {
          * @param targetListView The target list view
          */
         public abstract void initialize(ListView<T> sourceListView, ListView<T> targetListView);
+
+        @Override
+        protected final void setEventHandler(Consumer<ActionEvent> eventHandler) {
+            super.setEventHandler(eventHandler);
+        }
+
+        private void init() {
+            ListSelectionViewSkin<T> skin = (ListSelectionViewSkin<T>) getSkin();
+            if (skin != null && skin.getSourceListView() != null && skin.getTargetListView() != null) {
+                initialize(skin.getSourceListView(), skin.getTargetListView());
+            }
+        }
     }
 
     /**
@@ -531,33 +530,33 @@ public class ListSelectionView<T> extends ControlsFXControl {
         return new FontAwesome().create(angleDoubleDown);
     }
 
-    private void moveToTarget(ListView<T> sourceListView, ListView<T> targetListView) {
+    private static <T> void moveToTarget(ListView<T> sourceListView, ListView<T> targetListView) {
         move(sourceListView, targetListView);
         sourceListView.getSelectionModel().clearSelection();
     }
 
-    private void moveToTargetAll(ListView<T> sourceListView, ListView<T> targetListView) {
+    private static <T> void moveToTargetAll(ListView<T> sourceListView, ListView<T> targetListView) {
         move(sourceListView, targetListView, new ArrayList<>(sourceListView.getItems()));
         sourceListView.getSelectionModel().clearSelection();
     }
 
-    private void moveToSource(ListView<T> sourceListView, ListView<T> targetListView) {
+    private static <T> void moveToSource(ListView<T> sourceListView, ListView<T> targetListView) {
         move(targetListView, sourceListView);
         targetListView.getSelectionModel().clearSelection();
     }
 
-    private void moveToSourceAll(ListView<T> sourceListView, ListView<T> targetListView) {
+    private static <T> void moveToSourceAll(ListView<T> sourceListView, ListView<T> targetListView) {
         move(targetListView, sourceListView, new ArrayList<>(targetListView.getItems()));
         targetListView.getSelectionModel().clearSelection();
     }
 
-    private void move(ListView<T> viewA, ListView<T> viewB) {
-        List<T> selectedItems = new ArrayList<>(viewA.getSelectionModel().getSelectedItems());
-        move(viewA, viewB, selectedItems);
+    private static <T> void move(ListView<T> source, ListView<T> target) {
+        List<T> selectedItems = new ArrayList<>(source.getSelectionModel().getSelectedItems());
+        move(source, target, selectedItems);
     }
 
-    private void move(ListView<T> viewA, ListView<T> viewB, List<T> items) {
-        viewA.getItems().removeAll(items);
-        viewB.getItems().addAll(items);
+    private static <T> void move(ListView<T> source, ListView<T> target, List<T> items) {
+        source.getItems().removeAll(items);
+        target.getItems().addAll(items);
     }
 }

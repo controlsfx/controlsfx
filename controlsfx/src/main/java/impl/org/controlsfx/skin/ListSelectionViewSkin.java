@@ -201,8 +201,7 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     private VBox createVerticalButtonBox() {
         VBox box = new VBox(5);
         box.setFillWidth(true);
-        ObservableList<ListSelectionView<T>.ListSelectionAction> actions = getSkinnable().getActions();
-        box.getChildren().addAll(createButtonsFrom(actions));
+        box.getChildren().addAll(createButtonsFromActions());
         return box;
     }
 
@@ -210,8 +209,7 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     private HBox createHorizontalButtonBox() {
         HBox box = new HBox(5);
         box.setFillHeight(true);
-        ObservableList<ListSelectionView<T>.ListSelectionAction> actions = getSkinnable().getActions();
-        box.getChildren().addAll(createButtonsFrom(actions));
+        box.getChildren().addAll(createButtonsFromActions());
         return box;
     }
 
@@ -313,8 +311,8 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         viewB.getItems().addAll(items);
     }
 
-    private ObservableList<Node> createButtonsFrom(ObservableList<ListSelectionView<T>.ListSelectionAction> actions) {
-        return actions.stream()
+    private ObservableList<Node> createButtonsFromActions() {
+        return getSkinnable().getActions().stream()
                 .map(this::createActionButton)
                 .collect(toCollection(FXCollections::observableArrayList));
     }

@@ -55,6 +55,17 @@ public final class FlightTable extends Application {
         table.setItems(sortedList);
         sortedList.comparatorProperty().bind(table.comparatorProperty());
 
+
+        TableFilter<Flight> tableFilter = TableFilter.forTableView(table).lazy(true).apply();
+
+        tableFilter.setSearchStrategy((input,target) -> {
+            try {
+                return target.matches(input);
+            } catch (Exception e) {
+                return false;
+            }
+        });
+
         table.setEditable(true);
         TableColumn<Flight, Integer> flightNumCol = new TableColumn<>("FLIGHT NUM");
         flightNumCol.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getFlightNumber()));
@@ -90,16 +101,6 @@ public final class FlightTable extends Application {
         gateNumber.setEditable(true);
         table.getColumns().add(gateNumber);
 
-        TableFilter<Flight> tableFilter = TableFilter.forTableView(table).lazy(true).apply();
-
-        table.setEditable(true);
-        tableFilter.setSearchStrategy((input,target) -> {
-            try {
-                return target.matches(input);
-            } catch (Exception e) {
-                return false;
-            }
-        });
 
         tableFilter.unSelectAllValues(origCol);
         tableFilter.selectValue(origCol,"ABQ");

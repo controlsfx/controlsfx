@@ -43,6 +43,7 @@ import javafx.scene.control.TreeItem;
 import javafx.util.Callback;
 
 import com.sun.javafx.event.EventHandlerManager;
+import java.util.UUID;
 
 /**
  * Represents a bread crumb bar. This control is useful to visualize and navigate 
@@ -71,8 +72,8 @@ public class BreadCrumbBar<T> extends ControlsFXControl {
          * knowing when the {@link BreadCrumbBar#selectedCrumbProperty() selected crumb}
          * has changed.
          */
-        @SuppressWarnings("rawtypes")
-        public static final EventType<BreadCrumbActionEvent> CRUMB_ACTION = new EventType<>("CRUMB_ACTION"); //$NON-NLS-1$
+        public static final EventType<BreadCrumbActionEvent<?>> CRUMB_ACTION 
+                = new EventType<>("CRUMB_ACTION" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
         private final TreeItem<TE> selectedCrumb;
 

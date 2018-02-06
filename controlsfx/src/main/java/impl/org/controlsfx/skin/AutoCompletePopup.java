@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2017, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@ package impl.org.controlsfx.skin;
 
 
 import com.sun.javafx.event.EventHandlerManager;
+import java.util.UUID;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
@@ -56,7 +57,6 @@ public class AutoCompletePopup<T> extends PopupControl{
      *                                                                         *
      **************************************************************************/
 
-    private final static int TITLE_HEIGHT = 28; // HACK: Hard-coded title-bar height
     private final ObservableList<T> suggestions = FXCollections.observableArrayList();
     private StringConverter<T> converter;
     /**
@@ -80,8 +80,8 @@ public class AutoCompletePopup<T> extends PopupControl{
      */
     @SuppressWarnings("serial")
     public static class SuggestionEvent<TE> extends Event {
-        @SuppressWarnings("rawtypes")
-        public static final EventType<SuggestionEvent> SUGGESTION = new EventType<>("SUGGESTION"); //$NON-NLS-1$
+        public static final EventType<SuggestionEvent<?>> SUGGESTION 
+                = new EventType<>("SUGGESTION" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
         private final TE suggestion;
 
@@ -152,7 +152,7 @@ public class AutoCompletePopup<T> extends PopupControl{
                 parent.getX() + node.localToScene(0, 0).getX() +
                 node.getScene().getX(),
                 parent.getY() + node.localToScene(0, 0).getY() +
-                node.getScene().getY() + TITLE_HEIGHT);
+                node.getScene().getY() + node.getBoundsInParent().getHeight());
 
     }
 

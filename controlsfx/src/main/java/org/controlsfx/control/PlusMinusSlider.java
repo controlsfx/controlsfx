@@ -51,6 +51,7 @@ import javafx.scene.control.Skin;
 import javafx.scene.input.InputEvent;
 
 import com.sun.javafx.css.converters.EnumConverter;
+import java.util.UUID;
 
 /**
  * A plus minus slider allows the user to continously fire an event carrying a
@@ -301,14 +302,14 @@ public class PlusMinusSlider extends ControlsFXControl {
 		private static final long serialVersionUID = 2881004583512990781L;
 
 		public static final EventType<PlusMinusEvent> ANY = new EventType<>(
-				InputEvent.ANY, "ANY"); //$NON-NLS-1$
+				InputEvent.ANY, "ANY" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
 		/**
 		 * An event type used when the value property (
 		 * {@link PlusMinusSlider#valueProperty()}) changes.
 		 */
 		public static final EventType<PlusMinusEvent> VALUE_CHANGED = new EventType<>(
-				PlusMinusEvent.ANY, "VALUE_CHANGED"); //$NON-NLS-1$
+				PlusMinusEvent.ANY, "VALUE_CHANGED" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
 		private double value;
 

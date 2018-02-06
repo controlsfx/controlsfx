@@ -48,6 +48,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.function.Predicate;
@@ -2527,7 +2528,8 @@ public class SpreadsheetView extends Control{
         /**
          * This is the event used by {@link RowHeightEvent}.
          */
-        public static final EventType<RowHeightEvent> ROW_HEIGHT_CHANGE = new EventType<>(Event.ANY, "RowHeightChange"); //$NON-NLS-1$
+        public static final EventType<RowHeightEvent> ROW_HEIGHT_CHANGE 
+                = new EventType<>(Event.ANY, "RowHeightChange" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
         private final int modelRow;
         private final double height;
@@ -2564,7 +2566,8 @@ public class SpreadsheetView extends Control{
         /**
          * This is the event used by {@link ColumnWidthEvent}.
          */
-        public static final EventType<ColumnWidthEvent> COLUMN_WIDTH_CHANGE = new EventType<>(Event.ANY, "ColumnWidthChange"); //$NON-NLS-1$
+        public static final EventType<ColumnWidthEvent> COLUMN_WIDTH_CHANGE 
+                = new EventType<>(Event.ANY, "ColumnWidthChange" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
         private final int column;
         private final double width;

@@ -28,6 +28,7 @@ package org.controlsfx.control.spreadsheet;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.StringProperty;
@@ -51,19 +52,22 @@ public interface SpreadsheetCell  {
      * This EventType can be used with an {@link EventHandler} in order to catch
      * when the editable state of a SpreadsheetCell is changed.
      */
-    public static final EventType EDITABLE_EVENT_TYPE = new EventType("EditableEventType"); //$NON-NLS-1$
+    public static final EventType<Event> EDITABLE_EVENT_TYPE 
+            = new EventType<>("EditableEventType" + UUID.randomUUID().toString()); //$NON-NLS-1$
     
     /**
      * This EventType can be used with an {@link EventHandler} in order to catch
      * when the wrap text state of a SpreadsheetCell is changed.
      */
-    public static final EventType WRAP_EVENT_TYPE = new EventType("WrapTextEventType"); //$NON-NLS-1$
+    public static final EventType<Event> WRAP_EVENT_TYPE 
+            = new EventType<>("WrapTextEventType" + UUID.randomUUID().toString()); //$NON-NLS-1$
     
     /**
      * This EventType can be used with an {@link EventHandler} in order to catch
      * when a corner state of a SpreadsheetCell is changed.
      */
-    public static final EventType CORNER_EVENT_TYPE = new EventType("CornerEventType"); //$NON-NLS-1$
+    public static final EventType<Event> CORNER_EVENT_TYPE 
+            = new EventType<>("CornerEventType" + UUID.randomUUID().toString()); //$NON-NLS-1$
     
     /**
      * This enum states the four different corner available for positioning 

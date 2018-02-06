@@ -27,6 +27,7 @@
 package org.controlsfx.control.spreadsheet;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import javafx.event.Event;
 import javafx.event.EventType;
@@ -42,7 +43,8 @@ public class GridChange extends Event implements Serializable {
     /**
      * This is the event used by {@link GridChange}.
      */
-    public static final EventType<GridChange> GRID_CHANGE_EVENT = new EventType<>(Event.ANY, "GridChange"); //$NON-NLS-1$
+    public static final EventType<GridChange> GRID_CHANGE_EVENT 
+            = new EventType<>(Event.ANY, "GridChange" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
     /**
      * *************************************************************************

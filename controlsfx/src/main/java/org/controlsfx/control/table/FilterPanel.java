@@ -24,12 +24,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package impl.org.controlsfx.table;
+package org.controlsfx.control.table;
 
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
-import static impl.org.controlsfx.i18n.Localization.getString;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
@@ -51,6 +50,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import static impl.org.controlsfx.i18n.Localization.getString;
 
 
 public final class FilterPanel<T,R> extends VBox {
@@ -87,11 +89,11 @@ public final class FilterPanel<T,R> extends VBox {
     };
 
     void selectAllValues() {
-        checkListView.getItems().stream()
+        checkListView.getItems()
                 .forEach(item -> item.selectedProperty().set(true));
     }
     void unSelectAllValues() {
-        checkListView.getItems().stream()
+        checkListView.getItems()
                 .forEach(item -> item.selectedProperty().set(false));
     }
     void selectValue(Object value) {
@@ -129,15 +131,6 @@ public final class FilterPanel<T,R> extends VBox {
         HBox.setHgrow(applyBttn, Priority.ALWAYS);
 
         applyBttn.setOnAction(e -> {
-                    if (searchMode) {
-                        filterList.forEach(v -> v.selectedProperty().setValue(true));
-
-                        columnFilter.getFilterValues().stream()
-                                .filter(v -> !filterList.stream().filter(fl -> fl.equals(v)).findAny().isPresent())
-                                .forEach(v -> v.selectedProperty().setValue(false));
-
-                        resetSearchFilter();
-                    }
                     if (columnFilter.getTableFilter().isDirty()) {
                         columnFilter.applyFilter();
                         columnFilter.getTableFilter().getColumnFilters().stream().map(ColumnFilter::getFilterPanel)
@@ -180,7 +173,7 @@ public final class FilterPanel<T,R> extends VBox {
 
         clearAllButton.setOnAction(e -> {
             columnFilter.resetAllFilters();
-            columnFilter.getTableFilter().getColumnFilters().stream().forEach(cf -> cf.getTableColumn().setGraphic(null));
+            columnFilter.getTableFilter().getColumnFilters().forEach(cf -> cf.getTableColumn().setGraphic(null));
             contextMenu.hide();
         });
         buttonBox.getChildren().add(clearAllButton);
@@ -213,8 +206,20 @@ public final class FilterPanel<T,R> extends VBox {
     private void initializeListeners() {
         searchBox.textProperty().addListener(l -> {
             searchMode = !searchBox.getText().isEmpty();
+
+            //filter scope based on search text
             filterList.setPredicate(val -> searchBox.getText().isEmpty() ||
                     columnFilter.getSearchStrategy().test(searchBox.getText(), Optional.ofNullable(val.getValue()).map(Object::toString).orElse("")));
+
+            //unselect items out of scope
+            columnFilter.getFilterValues().stream()
+                    .filter(s -> !columnFilter.getSearchStrategy().test(searchBox.getText(), Optional.ofNullable(s.getValue()).map(Object::toString).orElse("")))
+                    .collect(Collectors.toList()).forEach(s -> s.selectedProperty().set(false));
+
+            //select items in scope
+            columnFilter.getFilterValues().stream()
+                    .filter(s -> columnFilter.getSearchStrategy().test(searchBox.getText(), Optional.ofNullable(s.getValue()).map(Object::toString).orElse("")))
+                    .collect(Collectors.toList()).forEach(s -> s.selectedProperty().set(true));
         });
     }
 

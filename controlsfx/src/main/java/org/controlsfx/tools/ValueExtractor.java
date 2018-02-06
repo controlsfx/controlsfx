@@ -73,7 +73,7 @@ public class ValueExtractor {
      * @param extract extraction of observable value
      */
     public static void addObservableValueExtractor( Predicate<Control> test, Callback<Control, ObservableValue<?>> extract ) {
-        extractors.add( new ObservableValueExtractor(test, extract));
+        extractors.add(0, new ObservableValueExtractor(test, extract));
     }
 
     static {
@@ -149,7 +149,7 @@ public class ValueExtractor {
     }
     
     public static void addValueExtractor(Predicate<Node> test, Callback<Node, Object> extractor) {
-        valueExtractors.add(new NodeValueExtractor(test, extractor));
+        valueExtractors.add(0, new NodeValueExtractor(test, extractor));
     }
     
     /**

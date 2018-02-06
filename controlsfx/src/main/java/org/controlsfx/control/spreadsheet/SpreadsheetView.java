@@ -115,9 +115,9 @@ import org.controlsfx.tools.Utils;
  * <h3>Features</h3>
  * <ul>
  * <li>Cells can span in row and in column.</li>
- * <li>Rows can be fixed to the top of the {@link SpreadsheetView} so that they
+ * <li>Rows can be frozen to the top of the {@link SpreadsheetView} so that they
  * are always visible on screen.</li>
- * <li>Columns can be fixed to the left of the {@link SpreadsheetView} so that
+ * <li>Columns can be frozen to the left of the {@link SpreadsheetView} so that
  * they are always visible on screen.</li>
  * <li>A row header can be switched on in order to display the row number.</li>
  * <li>Rows can be resized just like columns with click &amp; drag.</li>
@@ -134,29 +134,29 @@ import org.controlsfx.tools.Utils;
  * 
  * <br>
  * 
- * <h3>Fixing Rows and Columns</h3> 
+ * <h3>Freezing Rows and Columns</h3> 
  * <br>
- * You can fix some rows and some columns by right-clicking on their header. A
- * context menu will appear if it's possible to fix them. When fixed, the label
+ * You can freeze some rows and some columns by right-clicking on their header. A
+ * context menu will appear if it's possible to freeze them. When frozen, the label
  * header will then be in italic and the background will turn to dark grey.
  * <br>
- * You have also the possibility to fix them manually by adding and removing
+ * You have also the possibility to freeze them manually by adding and removing
  * items from {@link #getFixedRows()} and {@link #getFixedColumns()}. But you
  * are strongly advised to check if it's possible to do so with
- * {@link SpreadsheetColumn#isColumnFixable()} for the fixed columns and with
- * {@link #isRowFixable(int)} for the fixed rows.
+ * {@link SpreadsheetColumn#isColumnFixable()} for the frozen columns and with
+ * {@link #isRowFixable(int)} for the frozen rows.
  * <br>
  *
- * A set of rows cannot be fixed if any cell inside these rows has a row span
- * superior to the number of fixed rows. Likewise, a set of columns cannot be
- * fixed if any cell inside these columns has a column span superior to the
- * number of fixed columns.
+ * A set of rows cannot be frozen if any cell inside these rows has a row span
+ * superior to the number of frozen rows. Likewise, a set of columns cannot be
+ * frozen if any cell inside these columns has a column span superior to the
+ * number of frozen columns.
  * 
  * <br><br>
- * If you want to fix several rows or columns together, and they have a span
+ * If you want to freeze several rows or columns together, and they have a span
  * inside, you can call {@link #areRowsFixable(java.util.List) } or  {@link #areSpreadsheetColumnsFixable(java.util.List)
  * }
- * to verify if you can fix them. Be sure to add them all in once otherwise the
+ * to verify if you can freeze them. Be sure to add them all in once otherwise the
  * system will detect that a span is going out of bounds and will throw an
  * exception.
  *
@@ -164,7 +164,7 @@ import org.controlsfx.tools.Utils;
  * every move will ensure that no exception will be thrown.
  * <br><br>
  * You have also the possibility to deactivate these possibilities. For example,
- * you force some row/column to be fixed and then the user cannot change the 
+ * you force some row/column to be frozen and then the user cannot change the 
  * settings. 
  * <br>
  * 
@@ -1094,7 +1094,7 @@ public class SpreadsheetView extends Control{
      * Set a new Grid for the SpreadsheetView. This will be called by default by
      * {@link #SpreadsheetView(Grid)}. So this is useful when you want to
      * refresh your SpreadsheetView with a new model. This will keep the state
-     * of your SpreadsheetView (position of the bar, number of fixedRows etc).
+     * of your SpreadsheetView (position of the bar, number of frozen rows etc).
      * 
      * @param grid the new Grid
      */
@@ -1268,38 +1268,38 @@ public class SpreadsheetView extends Control{
     }
 
     /**
-     * You can fix or unfix a row by modifying this list. Call
-     * {@link #isRowFixable(int)} before trying to fix a row. See
+     * You can freeze or unfreeze a row by modifying this list. Call
+     * {@link #isRowFixable(int)} before trying to freeze a row. See
      * {@link SpreadsheetView} description for information.
      *
-     * @return an ObservableList of integer representing the fixedRows.
+     * @return an ObservableList of integer representing the frozen rows.
      */
     public ObservableList<Integer> getFixedRows() {
         return fixedRows;
     }
 
     /**
-     * Indicate whether a row can be fixed or not. Call that method before
+     * Indicate whether a row can be frozen or not. Call that method before
      * adding an item with {@link #getFixedRows()} .
      *
-     * A row cannot be fixed alone if any cell inside the row has a row span
+     * A row cannot be frozen alone if any cell inside the row has a row span
      * superior to one.
      *
      * @param row
-     * @return true if the row can be fixed.
+     * @return true if the row can be frozen.
      */
     public boolean isRowFixable(int row) {
         return row >= 0 && row < rowFix.size() && isFixingRowsAllowed() ? rowFix.get(row) : false;
     }
     
     /**
-     * Indicates whether a List of rows can be fixed or not.
+     * Indicates whether a List of rows can be frozen or not.
      *
-     * A set of rows cannot be fixed if any cell inside these rows has a row
-     * span superior to the number of fixed rows.
+     * A set of rows cannot be frozen if any cell inside these rows has a row
+     * span superior to the number of frozen rows.
      *
      * @param list
-     * @return true if the List of row can be fixed together.
+     * @return true if the List of row can be frozen together.
      */
     public boolean areRowsFixable(List<? extends Integer> list) {
         if(list == null || list.isEmpty() || !isFixingRowsAllowed()){
@@ -1339,16 +1339,16 @@ public class SpreadsheetView extends Control{
     }
 
     /**
-     * Return whether change to Fixed rows are allowed.
+     * Return whether change to frozen rows are allowed.
      *
-     * @return whether change to Fixed rows are allowed.
+     * @return whether change to frozen rows are allowed.
      */
     public boolean isFixingRowsAllowed() {
         return fixingRowsAllowedProperty.get();
     }
 
     /**
-     * If set to true, user will be allowed to fix and unfix the rows.
+     * If set to true, user will be allowed to freeze and unfreeze the rows.
      *
      * @param b
      */
@@ -1357,35 +1357,35 @@ public class SpreadsheetView extends Control{
     }
 
     /**
-     * Return the Boolean property associated with the allowance of fixing or
-     * unfixing some rows.
+     * Return the Boolean property associated with the allowance of freezing or
+     * unfreezing some rows.
      *
-     * @return the Boolean property associated with the allowance of fixing or
-     * unfixing some rows.
+     * @return the Boolean property associated with the allowance of freezing or
+     * unfreezing some rows.
      */
     public ReadOnlyBooleanProperty fixingRowsAllowedProperty() {
         return fixingRowsAllowedProperty;
     }
 
     /**
-     * You can fix or unfix a column by modifying this list. Call
+     * You can freeze or unfreeze a column by modifying this list. Call
      * {@link SpreadsheetColumn#isColumnFixable()} on the column before adding
      * an item.
      *
-     * @return an ObservableList of the fixed columns.
+     * @return an ObservableList of the frozen columns.
      */
     public ObservableList<SpreadsheetColumn> getFixedColumns() {
         return fixedColumns;
     }
 
     /**
-     * Indicate whether this column can be fixed or not. If you have a
+     * Indicate whether this column can be frozen or not. If you have a
      * {@link SpreadsheetColumn}, call
      * {@link SpreadsheetColumn#isColumnFixable()} on it directly. Call that
      * method before adding an item with {@link #getFixedColumns()} .
      *
      * @param columnIndex
-     * @return true if the column if fixable
+     * @return true if the column if freezable 
      */
     public boolean isColumnFixable(int columnIndex) {
         return columnIndex >= 0 && columnIndex < getColumns().size() && isFixingColumnsAllowed()
@@ -1396,11 +1396,11 @@ public class SpreadsheetView extends Control{
      * Indicates whether a List of {@link SpreadsheetColumn} can be fixed or
      * not.
      *
-     * A set of columns cannot be fixed if any cell inside these columns has a
-     * column span superior to the number of fixed columns.
+     * A set of columns cannot be frozen if any cell inside these columns has a
+     * column span superior to the number of frozen columns.
      *
      * @param list
-     * @return true if the List of columns can be fixed together.
+     * @return true if the List of columns can be frozen together.
      */
     public boolean areSpreadsheetColumnsFixable(List<? extends SpreadsheetColumn> list) {
         List<Integer> newList = new ArrayList<>();
@@ -1416,11 +1416,11 @@ public class SpreadsheetView extends Control{
      * This method is the same as {@link #areSpreadsheetColumnsFixable(java.util.List)
      * } but is using a List of {@link SpreadsheetColumn} indexes.
      *
-     * A set of columns cannot be fixed if any cell inside these columns has a
-     * column span superior to the number of fixed columns.
+     * A set of columns cannot be frozen if any cell inside these columns has a
+     * column span superior to the number of frozen columns.
      *
      * @param list
-     * @return true if the List of columns can be fixed together.
+     * @return true if the List of columns can be frozen together.
      */
     public boolean areColumnsFixable(List<? extends Integer> list) {
         if (list == null || list.isEmpty() || !isFixingRowsAllowed()) {
@@ -1461,16 +1461,16 @@ public class SpreadsheetView extends Control{
     }
     
     /**
-     * Return whether change to Fixed columns are allowed.
+     * Return whether change to frozen columns are allowed.
      *
-     * @return whether change to Fixed columns are allowed.
+     * @return whether change to frozen columns are allowed.
      */
     public boolean isFixingColumnsAllowed() {
         return fixingColumnsAllowedProperty.get();
     }
 
     /**
-     * If set to true, user will be allowed to fix and unfix the columns.
+     * If set to true, user will be allowed to freeze and unfreeze the columns.
      *
      * @param b
      */
@@ -1479,11 +1479,11 @@ public class SpreadsheetView extends Control{
     }
 
     /**
-     * Return the Boolean property associated with the allowance of fixing or
-     * unfixing some columns.
+     * Return the Boolean property associated with the allowance of freezing or
+     * unfreezing some columns.
      *
-     * @return the Boolean property associated with the allowance of fixing or
-     * unfixing some columns.
+     * @return the Boolean property associated with the allowance of freezing or
+     * unfreezing some columns.
      */
     public ReadOnlyBooleanProperty fixingColumnsAllowedProperty() {
         return fixingColumnsAllowedProperty;
@@ -2340,7 +2340,7 @@ public class SpreadsheetView extends Control{
     };
 
         private String computeReason(List<? extends Integer> list) {
-        String reason = "\n A row cannot be fixed. \n"; //$NON-NLS-1$
+        String reason = "\n A row cannot be frozen. \n"; //$NON-NLS-1$
 
         for (Integer row : list) {
             //If this row is not fixable, we need to identify the maximum span
@@ -2350,7 +2350,7 @@ public class SpreadsheetView extends Control{
                 List<SpreadsheetCell> gridRow = getGrid().getRows().get(row);
                 for (SpreadsheetCell cell : gridRow) {
                     if(!list.contains(cell.getRow())){
-                        reason += "The row " + row + " is inside a row span and the starting row " + cell.getRow() + " is not fixed.\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        reason += "The row " + row + " is inside a row span and the starting row " + cell.getRow() + " is not frozen.\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     }
                     //We only want to consider the original cell.
                     if (cell.getRowSpan() > maxSpan && cell.getRow() == row) {
@@ -2362,7 +2362,7 @@ public class SpreadsheetView extends Control{
                 for (int index = row + 1; index < count; ++index) {
                     if (!list.contains(index)) {
                         reason += "One cell on the row " + row + " has a row span of " + maxSpan + ". " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                                + "But the row " + index + " contained within that span is not fixed.\n"; //$NON-NLS-1$ //$NON-NLS-2$
+                                + "But the row " + index + " contained within that span is not frozen.\n"; //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 }
             }
@@ -2391,7 +2391,7 @@ public class SpreadsheetView extends Control{
 
         private String computeReason(List<Integer> list) {
 
-            String reason = "\n This column cannot be fixed."; //$NON-NLS-1$
+            String reason = "\n This column cannot be frozen."; //$NON-NLS-1$
             final ObservableList<ObservableList<SpreadsheetCell>> rows = getGrid().getRows();
             for (Integer columnIndex : list) {
                 //If this row is not fixable, we need to identify the maximum span
@@ -2402,7 +2402,7 @@ public class SpreadsheetView extends Control{
                         cell = row.get(columnIndex);
                         //If the original column is not within this range, there is not need to look deeper.
                         if (!list.contains(cell.getColumn())) {
-                            reason += "The column " + columnIndex + " is inside a column span and the starting column " + cell.getColumn() + " is not fixed.\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                            reason += "The column " + columnIndex + " is inside a column span and the starting column " + cell.getColumn() + " is not frozen.\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         }
                         //We only want to consider the original cell.
                         if (cell.getColumnSpan() > maxSpan && cell.getColumn() == columnIndex) {
@@ -2414,7 +2414,7 @@ public class SpreadsheetView extends Control{
                     for (int index = columnIndex + 1; index < count; ++index) {
                         if (!list.contains(index)) {
                             reason += "One cell on the column " + columnIndex + " has a column span of " + maxSpan + ". " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                                    + "But the column " + index + " contained within that span is not fixed.\n"; //$NON-NLS-1$ //$NON-NLS-2$
+                                    + "But the column " + index + " contained within that span is not frozen.\n"; //$NON-NLS-1$ //$NON-NLS-2$
                         }
                     }
                 }

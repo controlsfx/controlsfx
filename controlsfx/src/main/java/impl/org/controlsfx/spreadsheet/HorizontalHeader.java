@@ -249,7 +249,7 @@ public class HorizontalHeader extends TableHeaderRow {
     };
 
     /**
-     * When we fix/unfix some columns, we change the style of the Label header
+     * When we freeze/unfreeze some columns, we change the style of the Label header
      * text
      */
     private final ListChangeListener<SpreadsheetColumn> fixedColumnsListener = new ListChangeListener<SpreadsheetColumn>() {
@@ -261,7 +261,7 @@ public class HorizontalHeader extends TableHeaderRow {
                for (SpreadsheetColumn remitem : change.getRemoved()) {
                    unfixColumn(remitem);
                }
-               //If we fix one
+               //If we freeze one
                for (SpreadsheetColumn additem : change.getAddedSubList()) {
                    fixColumn(additem);
                }
@@ -294,7 +294,7 @@ public class HorizontalHeader extends TableHeaderRow {
     }
 
     /**
-     * Add the fix style of the header Label of the specified column
+     * Add the freeze style of the header Label of the specified column
      *
      * @param i
      */
@@ -305,7 +305,7 @@ public class HorizontalHeader extends TableHeaderRow {
     }
 
     /**
-     * Remove the fix style of the header Label of the specified column
+     * Remove the freeze style of the header Label of the specified column
      *
      * @param i
      */

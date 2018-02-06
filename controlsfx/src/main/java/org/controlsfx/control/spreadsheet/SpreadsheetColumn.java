@@ -66,20 +66,20 @@ import org.controlsfx.tools.Utils;
  * {@link #setResizable(boolean) resizability} of the column.
  * 
  * <p>
- * You have the ability to fix this column at the left of the SpreadsheetView by
+ * You have the ability to freeze this column at the left of the SpreadsheetView by
  * calling {@link #setFixed(boolean)}. But you are strongly advised to check if
  * it is possible with {@link #isColumnFixable()} before calling
  * {@link #setFixed(boolean)}. Take a look at the {@link SpreadsheetView}
- * description to understand the fixing constraints.
+ * description to understand the freezing constraints.
  * 
  * <p>
- * If the column can be fixed, a {@link ContextMenu} will appear if the user right-clicks on it. 
- * If not, nothing will appear and the user will not have the possibility to fix it.
+ * If the column can be frozen, a {@link ContextMenu} will appear if the user right-clicks on it. 
+ * If not, nothing will appear and the user will not have the possibility to freeze it.
  * 
  * <h3>Screenshot</h3>
- * The column <b>A</b> is fixed and is covering column <b>B</b> and partially
+ * The column <b>A</b> is frozen and is covering column <b>B</b> and partially
  * column <b>C</b>. The context menu is being shown and offers the possibility
- * to unfix the column.
+ * to unfreeze the column.
  * 
  * <br>
  * <br>
@@ -181,19 +181,19 @@ public final class SpreadsheetColumn {
      **************************************************************************/
 
     /**
-     * Return whether this column is fixed or not.
+     * Return whether this column is frozen or not.
      * 
-     * @return true if this column is fixed.
+     * @return true if this column is frozen.
      */
     public boolean isFixed() {
         return spreadsheetView.getFixedColumns().contains(this);
     }
 
     /**
-     * Fix this column to the left if possible, although it is recommended that
-     * you call {@link #isColumnFixable()} before trying to fix a column.
+     * Freeze this column to the left if possible, although it is recommended that
+     * you call {@link #isColumnFixable()} before trying to freeze a column.
      *
-     * If you want to fix several columns (because of a span for example), add
+     * If you want to freeze several columns (because of a span for example), add
      * all the columns directly in {@link SpreadsheetView#getFixedColumns() }.
      * Always use {@link SpreadsheetView#areSpreadsheetColumnsFixable(java.util.List)
      * } before.
@@ -318,14 +318,14 @@ public final class SpreadsheetColumn {
     }
 
     /**
-     * Indicate whether this column can be fixed or not. Call that method before
+     * Indicate whether this column can be frozen or not. Call that method before
      * calling {@link #setFixed(boolean)} or adding an item to
      * {@link SpreadsheetView#getFixedColumns()}.
      *
-     * A column cannot be fixed alone if any cell inside the column has a column
+     * A column cannot be frozen alone if any cell inside the column has a column
      * span superior to one.
      *
-     * @return true if this column is fixable.
+     * @return true if this column is freezable.
      */
     public boolean isColumnFixable() {
         return canFix && spreadsheetView.isFixingColumnsAllowed();
@@ -354,7 +354,7 @@ public final class SpreadsheetColumn {
     }
 
     /**
-     * Generate a context Menu in order to fix/unfix some column It is shown
+     * Generate a context Menu in order to freeze/unfreeze some column It is shown
      * when right-clicking on the column header
      * 
      * @return a context menu.
@@ -395,9 +395,9 @@ public final class SpreadsheetColumn {
     }
 
     /**
-     * Verify that you can fix this column. 
+     * Verify that you can freeze this column. 
      * 
-     * @return if it's fixable.
+     * @return if it's freezable.
      */
     private boolean initCanFix(Grid grid) {
         for (ObservableList<SpreadsheetCell> row : grid.getRows()) {

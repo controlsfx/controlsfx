@@ -1,0 +1,23 @@
+.list-action-view > * > .buttons {
+    -fx-border-color: -fx-box-border;
+}
+
+.list-action-view > * > .list-view {
+    -fx-pref-height: 200px;
+}
+
+.list-action-view:top > * > .buttons {
+    -fx-border-width: 1 1 0 1;
+}
+
+.list-action-view:right > * > .buttons {
+    -fx-border-width: 1 1 1 0;
+}
+
+.list-action-view:bottom > * > .buttons {
+    -fx-border-width: 0 1 1 1;
+}
+
+.list-action-view:left > * > .buttons {
+    -fx-border-width: 1 0 1 1;
+}

@@ -33,6 +33,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.Cell;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -191,18 +192,21 @@ public class ListActionView<T> extends ControlsFXControl {
     public static abstract class ListAction<T> extends Action {
 
         /**
-         * Creates a new instance of ListAction without text.
+         * Creates a new instance of ListAction with the graphic node.
+         * @param graphic Graphic to be shown in relation to this action.
          */
-        public ListAction() {
-            this("");
+        public ListAction(Node graphic) {
+            this(graphic, "");
         }
 
         /**
-         * Creates a new instance of ListAction with the provided text.
+         * Creates a new instance of ListAction with the provided graphic and text.
+         * @param graphic Graphic to be shown in relation to this action.
          * @param text The text for the Action.
          */
-        public ListAction(String text) {
+        public ListAction(Node graphic, String text) {
             super(text);
+            setGraphic(graphic);
         }
 
         /**
@@ -215,6 +219,22 @@ public class ListActionView<T> extends ControlsFXControl {
         @Override
         protected final void setEventHandler(Consumer<ActionEvent> eventHandler) {
             super.setEventHandler(eventHandler);
+        }
+    }
+
+    /**
+     * ListAction represented as a Separator node on the control.
+     * Setting a text, graphic or event handler to this list action will have no effect.
+     */
+    public static final class Separator extends ListAction {
+
+        public Separator() {
+            super(null);
+        }
+
+        @Override
+        public void initialize(ListView listView) {
+            // do-nothing
         }
     }
 }

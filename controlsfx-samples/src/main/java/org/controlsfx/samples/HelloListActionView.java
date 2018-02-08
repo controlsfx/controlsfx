@@ -139,19 +139,14 @@ public class HelloListActionView extends ControlsFXSample {
     }
 
     private ObservableList<ListActionView.ListAction<String>> createActions() {
-        ListActionView.ListAction<String> moveUp = new ListActionView.ListAction<String>() {
-            {
-                setGraphic(new FontAwesome().create(FontAwesome.Glyph.ANGLE_UP));
-            }
+        ListActionView.ListAction<String> moveUp = new ListActionView.ListAction<String>(
+                new FontAwesome().create(FontAwesome.Glyph.ANGLE_UP)) {
             @Override
             public void initialize(ListView<String> listView) {
                 setEventHandler(e -> moveSelectedItemsUp(listView));
             }
         };
-        ListActionView.ListAction<String> moveDown = new ListActionView.ListAction<String>() {
-            {
-                setGraphic(new FontAwesome().create(FontAwesome.Glyph.ANGLE_DOWN));
-            }
+        ListActionView.ListAction<String> moveDown = new ListActionView.ListAction<String>(new FontAwesome().create(FontAwesome.Glyph.ANGLE_DOWN)) {
             @Override
             public void initialize(ListView<String> listView) {
                 setEventHandler(e -> moveSelectedItemsDown(listView));

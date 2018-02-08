@@ -30,27 +30,24 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.css.PseudoClass;
+import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Separator;
 import javafx.scene.control.SkinBase;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import org.controlsfx.control.ListActionView;
 import org.controlsfx.control.action.ActionUtils;
 
 import static java.util.stream.Collectors.toCollection;
+import static javafx.geometry.Orientation.HORIZONTAL;
+import static javafx.geometry.Orientation.VERTICAL;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 
 public class ListActionViewSkin<T> extends SkinBase<ListActionView<T>> {
-
-    private static final PseudoClass PSEUDO_CLASS_TOP = PseudoClass.getPseudoClass("top");
-    private static final PseudoClass PSEUDO_CLASS_RIGHT = PseudoClass.getPseudoClass("right");
-    private static final PseudoClass PSEUDO_CLASS_BOTTOM = PseudoClass.getPseudoClass("bottom");
-    private static final PseudoClass PSEUDO_CLASS_LEFT = PseudoClass.getPseudoClass("left");
 
     private BorderPane borderPane;
     private ListView<T> listView;
@@ -74,52 +71,46 @@ public class ListActionViewSkin<T> extends SkinBase<ListActionView<T>> {
     private void update() {
         borderPane.getChildren().clear();
         borderPane.setCenter(listView);
-        clearPseudoStates();
 
         if (!getSkinnable().getActions().isEmpty()) {
             Side side = getSkinnable().getSide();
             switch (side) {
                 case TOP:
-                    borderPane.setTop(createHorizontalButtonBox());
-                    pseudoClassStateChanged(PSEUDO_CLASS_TOP, true);
+                    borderPane.setTop(createButtonBar(HORIZONTAL));
                     break;
                 case RIGHT:
-                    borderPane.setRight(createVerticalButtonBox());
-                    pseudoClassStateChanged(PSEUDO_CLASS_RIGHT, true);
+                    borderPane.setRight(createButtonBar(VERTICAL, "right"));
                     break;
                 case BOTTOM:
-                    borderPane.setBottom(createHorizontalButtonBox());
-                    pseudoClassStateChanged(PSEUDO_CLASS_BOTTOM, true);
+                    borderPane.setBottom(createButtonBar(HORIZONTAL, "bottom"));
                     break;
                 case LEFT:
-                    borderPane.setLeft(createVerticalButtonBox());
-                    pseudoClassStateChanged(PSEUDO_CLASS_LEFT, true);
+                    borderPane.setLeft(createButtonBar(VERTICAL));
                     break;
             }
         }
     }
 
-    private VBox createVerticalButtonBox() {
-        VBox box = new VBox();
-        box.getStyleClass().add("buttons");
-        box.setFillWidth(true);
-        box.getChildren().addAll(createButtonsFromActions());
-        return box;
-    }
-
-    private HBox createHorizontalButtonBox() {
-        HBox box = new HBox();
-        box.getStyleClass().add("buttons");
-        box.setFillHeight(true);
-        box.getChildren().addAll(createButtonsFromActions());
+    private ToolBar createButtonBar(Orientation orientation, String...styleClass) {
+        ToolBar box = new ToolBar();
+        box.setOrientation(orientation);
+        box.getStyleClass().addAll(styleClass);
+        box.getItems().addAll(createButtonsFromActions());
         return box;
     }
 
     private ObservableList<Node> createButtonsFromActions() {
         return getSkinnable().getActions().stream()
                 .peek(listAction -> listAction.initialize(listView))
-                .map(this::createActionButton)
+                .map(this::createActionNode)
                 .collect(toCollection(FXCollections::observableArrayList));
+    }
+
+    private Node createActionNode(ListActionView.ListAction<T> action) {
+        if (action instanceof ListActionView.Separator) {
+            return new Separator();
+        }
+        return createActionButton(action);
     }
 
     private Button createActionButton(ListActionView.ListAction<T> action) {
@@ -129,13 +120,6 @@ public class ListActionViewSkin<T> extends SkinBase<ListActionView<T>> {
             getSkinnable().getScene().getAccelerators().put(action.getAccelerator(), button::fire);
         }
         return button;
-    }
-
-    private void clearPseudoStates() {
-        pseudoClassStateChanged(PSEUDO_CLASS_TOP, false);
-        pseudoClassStateChanged(PSEUDO_CLASS_RIGHT, false);
-        pseudoClassStateChanged(PSEUDO_CLASS_BOTTOM, false);
-        pseudoClassStateChanged(PSEUDO_CLASS_LEFT, false);
     }
 
     /**

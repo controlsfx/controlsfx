@@ -39,7 +39,13 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import org.controlsfx.control.ListActionView;
+import org.controlsfx.control.ListActionView.ListAction;
+import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 
 import static java.util.stream.Collectors.toCollection;
@@ -101,19 +107,30 @@ public class ListActionViewSkin<T> extends SkinBase<ListActionView<T>> {
 
     private ObservableList<Node> createButtonsFromActions() {
         return getSkinnable().getActions().stream()
-                .peek(listAction -> listAction.initialize(listView))
+                .peek(this::initializeListAction)
                 .map(this::createActionNode)
                 .collect(toCollection(FXCollections::observableArrayList));
     }
 
-    private Node createActionNode(ListActionView.ListAction<T> action) {
-        if (action instanceof ListActionView.Separator) {
-            return new Separator();
+    private void initializeListAction(Action action) {
+        if (action instanceof ListAction) {
+            ((ListAction<T>) action).initialize(listView);
+        }
+    }
+
+    private Node createActionNode(Action action) {
+        if (action == ActionUtils.ACTION_SEPARATOR) {
+           return new Separator();
+        } else if (action == ActionUtils.ACTION_SPAN) {
+            Pane span = new Pane();
+            HBox.setHgrow(span, Priority.ALWAYS);
+            VBox.setVgrow(span, Priority.ALWAYS);
+            return span;
         }
         return createActionButton(action);
     }
 
-    private Button createActionButton(ListActionView.ListAction<T> action) {
+    private Button createActionButton(Action action) {
         Button button = ActionUtils.createButton(action);
         button.setMaxWidth(Double.MAX_VALUE);
         if (action.getAccelerator() != null) {

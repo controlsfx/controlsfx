@@ -41,6 +41,8 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.ListActionView;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.glyphfont.FontAwesome;
 
 import java.util.List;
@@ -138,7 +140,7 @@ public class HelloListActionView extends ControlsFXSample {
         launch(args);
     }
 
-    private ObservableList<ListActionView.ListAction<String>> createActions() {
+    private ObservableList<Action> createActions() {
         ListActionView.ListAction<String> moveUp = new ListActionView.ListAction<String>(
                 new FontAwesome().create(FontAwesome.Glyph.ANGLE_UP)) {
             @Override
@@ -152,7 +154,7 @@ public class HelloListActionView extends ControlsFXSample {
                 setEventHandler(e -> moveSelectedItemsDown(listView));
             }
         };
-        return FXCollections.observableArrayList(moveUp, moveDown);
+        return FXCollections.observableArrayList(moveUp, ActionUtils.ACTION_SEPARATOR, moveDown);
     }
 
     private void moveSelectedItemsUp(ListView<String> listView) {

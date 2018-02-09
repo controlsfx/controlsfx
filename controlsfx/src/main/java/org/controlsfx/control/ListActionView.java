@@ -68,6 +68,7 @@ import java.util.function.Consumer;
  *             setEventHandler(e -> System.out.println("Action fired!"));
  *         }
  *     });
+ *     view.getActions().add(ActionUtils.ACTION_SEPARATOR);
  * </pre>
  *
  * @param <T> Type of ListActionView.
@@ -93,14 +94,19 @@ public class ListActionView<T> extends ControlsFXControl {
     }
 
     // -- actions
-    private final ObservableList<ListAction<T>> actions = FXCollections.observableArrayList();
+    private final ObservableList<Action> actions = FXCollections.observableArrayList();
 
     /**
-     * The list of actions which are shown as buttons on one of the sides of the ListView.
+     * The list of actions shown on one of the sides of the ListView.
+     * All actions except, {@link org.controlsfx.control.action.ActionUtils#ACTION_SEPARATOR}
+     * and {@link org.controlsfx.control.action.ActionUtils#ACTION_SPAN}, are represented as buttons.
+     *
+     * <p>For actions dependent on the internal ListView, an instance of {@link ListAction} should
+     * be used.</p>
      *
      * @return An ObservableList of actions.
      */
-    public final ObservableList<ListAction<T>> getActions() {
+    public final ObservableList<Action> getActions() {
         return actions;
     }
 
@@ -184,7 +190,7 @@ public class ListActionView<T> extends ControlsFXControl {
     }
 
     /**
-     * Actions that can be accepted by a ListActionView. A user can add a custom action to the
+     * Specialized actions for ListActionView which get access to the internal ListView. A user can add a custom action to the
      * control by extending this class and adding its instance to the {@link ListActionView#getActions() action list}.
      *
      * @param <T> Type of ListActionView to which this ListAction will be added.
@@ -219,22 +225,6 @@ public class ListActionView<T> extends ControlsFXControl {
         @Override
         protected final void setEventHandler(Consumer<ActionEvent> eventHandler) {
             super.setEventHandler(eventHandler);
-        }
-    }
-
-    /**
-     * ListAction represented as a Separator node on the control.
-     * Setting a text, graphic or event handler to this list action will have no effect.
-     */
-    public static final class Separator extends ListAction {
-
-        public Separator() {
-            super(null);
-        }
-
-        @Override
-        public void initialize(ListView listView) {
-            // do-nothing
         }
     }
 }

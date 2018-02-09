@@ -119,7 +119,7 @@ public class PrefixSelectionCustomizer {
                         .filter(item -> {
                             String s = comboBox.getConverter() == null ? item.toString() : comboBox.getConverter().toString(item);
                             if (s != null && ! s.isEmpty()) {
-                                return s.toUpperCase(Locale.ROOT).startsWith(selection);
+                                return s.toUpperCase(Locale.ROOT).startsWith(selection.toUpperCase(Locale.ROOT));
                             }
                             return false;
                         })
@@ -137,7 +137,7 @@ public class PrefixSelectionCustomizer {
                         .filter(item -> {
                             String s = choiceBox.getConverter() == null ? item.toString() : choiceBox.getConverter().toString(item);
                             if (s != null && ! s.isEmpty()) {
-                                return s.toUpperCase(Locale.ROOT).startsWith(selection);
+                                return s.toUpperCase(Locale.ROOT).startsWith(selection.toUpperCase(Locale.ROOT));
                             }
                             return false;
                         })

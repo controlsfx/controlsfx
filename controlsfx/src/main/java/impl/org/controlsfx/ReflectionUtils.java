@@ -168,9 +168,9 @@ public class ReflectionUtils {
      *
      ****************************************************************************************************/
 
-    public static Optional<TableHeaderRow> getTableHeaderRowFrom(TableViewSkinBase<?, ?, ?, ?, ?> skin) {
+    public static Optional<TableHeaderRow> getTableHeaderRowFrom(TableViewSkin<?> skin) {
         try {
-            Method method = skin.getClass().getDeclaredMethod("getTableHeaderRow");
+            Method method = skin.getClass().getSuperclass().getDeclaredMethod("getTableHeaderRow");
             method.setAccessible(true);
             return Optional.of((TableHeaderRow) method.invoke(skin));
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {

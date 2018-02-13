@@ -62,6 +62,7 @@ public class ListActionViewSkin<T> extends SkinBase<ListActionView<T>> {
         super(control);
 
         borderPane = new BorderPane();
+        borderPane.getStyleClass().add("container");
 
         this.listView = createListView();
         this.listView.cellFactoryProperty().bind(getSkinnable().cellFactoryProperty());

@@ -1,4 +1,4 @@
-.list-action-view > * > .list-view {
+.list-action-view > .container > .list-view {
     -fx-pref-height: 200px;
 }
 

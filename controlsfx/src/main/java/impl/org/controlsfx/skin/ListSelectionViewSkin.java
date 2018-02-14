@@ -27,23 +27,29 @@
 package impl.org.controlsfx.skin;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Separator;
 import javafx.scene.control.SkinBase;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.controlsfx.control.ListActionView;
 import org.controlsfx.control.ListSelectionView;
+import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 
 import java.util.ArrayList;
@@ -59,22 +65,26 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     private GridPane gridPane;
     private ListView<T> sourceListView;
     private ListView<T> targetListView;
+    private ListActionView<T> sourceListActionView;
+    private ListActionView<T> targetListActionView;
 
     public ListSelectionViewSkin(ListSelectionView<T> view) {
         super(view);
 
-        sourceListView = requireNonNull(createSourceListView(),
-                "source list view can not be null");
+        sourceListView = requireNonNull(createSourceListView(), "source list view can not be null");
         sourceListView.setId("source-list-view");
-        sourceListView.setItems(view.getSourceItems());
+        sourceListActionView = createListActionView(sourceListView);
+        Bindings.bindContent(sourceListActionView.getItems(), view.getSourceItems());
+        Bindings.bindContent(sourceListActionView.getActions(), view.getSourceActions());
 
-        targetListView = requireNonNull(createTargetListView(),
-                "target list view can not be null");
+        targetListView = requireNonNull(createTargetListView(), "target list view can not be null");
         targetListView.setId("target-list-view");
-        targetListView.setItems(view.getTargetItems());
+        targetListActionView = createListActionView(targetListView);
+        Bindings.bindContent(targetListActionView.getItems(), view.getTargetItems());
+        Bindings.bindContent(targetListActionView.getActions(), view.getTargetActions());
 
-        sourceListView.cellFactoryProperty().bind(view.cellFactoryProperty());
-        targetListView.cellFactoryProperty().bind(view.cellFactoryProperty());
+        sourceListActionView.cellFactoryProperty().bind(view.cellFactoryProperty());
+        targetListActionView.cellFactoryProperty().bind(view.cellFactoryProperty());
 
         gridPane = createGridPane();
         getChildren().add(gridPane);
@@ -221,9 +231,6 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         Node sourceFooter = getSkinnable().getSourceFooter();
         Node targetFooter = getSkinnable().getTargetFooter();
 
-        ListView<T> sourceList = getSourceListView();
-        ListView<T> targetList = getTargetListView();
-
         StackPane stackPane = new StackPane();
         stackPane.setAlignment(Pos.CENTER);
 
@@ -240,12 +247,14 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
                 gridPane.add(targetHeader, 2, 0);
             }
 
-            if (sourceList != null) {
-                gridPane.add(sourceList, 0, 1);
+            if (sourceListActionView != null) {
+                sourceListActionView.setSide(Side.LEFT);
+                gridPane.add(sourceListActionView, 0, 1);
             }
 
-            if (targetList != null) {
-                gridPane.add(targetList, 2, 1);
+            if (targetListActionView != null) {
+                targetListActionView.setSide(Side.RIGHT);
+                gridPane.add(targetListActionView, 2, 1);
             }
 
             if (sourceFooter != null) {
@@ -269,12 +278,14 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
                 gridPane.add(targetHeader, 0, 4);
             }
 
-            if (sourceList != null) {
-                gridPane.add(sourceList, 0, 1);
+            if (sourceListActionView != null) {
+                sourceListActionView.setSide(Side.RIGHT);
+                gridPane.add(sourceListActionView, 0, 1);
             }
 
-            if (targetList != null) {
-                gridPane.add(targetList, 0, 5);
+            if (targetListActionView != null) {
+                targetListActionView.setSide(Side.RIGHT);
+                gridPane.add(targetListActionView, 0, 5);
             }
 
             if (sourceFooter != null) {
@@ -313,11 +324,30 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
 
     private ObservableList<Node> createButtonsFromActions() {
         return getSkinnable().getActions().stream()
-                .map(this::createActionButton)
+                .peek(this::initializeListSelectionAction)
+                .map(this::createActionNode)
                 .collect(toCollection(FXCollections::observableArrayList));
     }
 
-    private Button createActionButton(ListSelectionView<T>.ListSelectionAction action) {
+    private void initializeListSelectionAction(Action action) {
+        if (action instanceof ListSelectionView.ListSelectionAction) {
+            ((ListSelectionView.ListSelectionAction<T>) action).initialize(sourceListView, targetListView);
+        }
+    }
+
+    private Node createActionNode(Action action) {
+        if (action == ActionUtils.ACTION_SEPARATOR) {
+            return new Separator();
+        } else if (action == ActionUtils.ACTION_SPAN) {
+            Pane span = new Pane();
+            HBox.setHgrow(span, Priority.ALWAYS);
+            VBox.setVgrow(span, Priority.ALWAYS);
+            return span;
+        }
+        return createActionButton(action);
+    }
+
+    private Button createActionButton(Action action) {
         Button button = ActionUtils.createButton(action);
         button.setMaxWidth(Double.MAX_VALUE);
         if (action.getAccelerator() != null) {
@@ -371,4 +401,16 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         view.getSelectionModel().setSelectionMode(MULTIPLE);
         return view;
     }
+
+    private ListActionView<T> createListActionView(ListView<T> listView) {
+        ListActionView<T> listActionView = new ListActionView<>();
+        listActionView.setSkin(new ListActionViewSkin<T>(listActionView) {
+            @Override
+            public ListView<T> createListView() {
+                return listView;
+            }
+        } );
+        return listActionView;
+    }
+
 }

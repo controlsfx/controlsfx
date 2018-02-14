@@ -27,7 +27,6 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.ListSelectionViewSkin;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -383,48 +382,83 @@ public class ListSelectionView<T> extends ControlsFXControl {
     }
 
     // -- actions
-    private ObservableList<ListSelectionAction> actions = FXCollections.observableArrayList(new MoveToTarget(), new MoveToTargetAll(), new MoveToSource(), new MoveToSourceAll());
+    private ObservableList<Action> actions = FXCollections.observableArrayList(new MoveToTarget(), new MoveToTargetAll(), new MoveToSource(), new MoveToSourceAll());
 
     /**
-     * The list of actions which are shown as buttons in between the two list views.
-     * By default, the list has 4 actions - {@link MoveToTarget}, {@link MoveToTargetAll},
+     * The list of actions to be shown in between the two list views.
+     * All actions except, {@link org.controlsfx.control.action.ActionUtils#ACTION_SEPARATOR}
+     * and {@link org.controlsfx.control.action.ActionUtils#ACTION_SPAN}, are represented as buttons.
+     *
+     * <p>For actions dependent on both the internal list views, an instance of {@link ListSelectionAction} should
+     * be used.</p>
+     *
+     * <p>By default, the list has 4 actions - {@link MoveToTarget}, {@link MoveToTargetAll},
      * {@link MoveToSource} and {@link MoveToSourceAll}. A user may choose to add on top of
-     * these actions or replace them depending on their use case.
+     * these actions or replace them depending on their use case.</p>
      *
      * @return An ObservableList of actions.
      */
-    public ObservableList<ListSelectionAction> getActions() {
+    public ObservableList<Action> getActions() {
         return actions;
+    }
+
+    // -- source actions
+    private ObservableList<Action> sourceActions = FXCollections.observableArrayList();
+
+
+    /**
+     * These actions are shown beside the source list view. An instance of
+     * {@link ListActionView.ListAction} should be used where actions are
+     * dependent on the source ListView.
+     *
+     * @return An ObservableList of actions.
+     * @see ListActionView.ListAction
+     */
+    public ObservableList<Action> getSourceActions() {
+        return sourceActions;
+    }
+
+    // -- target actions
+    private ObservableList<Action> targetActions = FXCollections.observableArrayList();
+
+    /**
+     * These actions are shown beside the target list view. An instance of
+     * {@link ListActionView.ListAction} should be used where actions are
+     * dependent on the target ListView.
+     *
+     * @return An ObservableList of actions.
+     * @see ListActionView.ListAction
+     */
+    public ObservableList<Action> getTargetActions() {
+        return targetActions;
     }
 
 
     /**
-     * Actions to be accepted by ListSelectionView. A user can add a custom action to the
-     * control by extending this class and adding its instance to the actions list.
+     * Specialized actions for ListSelectionView which get access to both the internal list views.
+     * A user can add a custom action to the control by extending this class and adding its instance
+     * to the {@link ListSelectionView#getActions() action list}.
+     *
+     * @param <T> Type of ListSelectionView to which this ListSelectionAction will be added.
      */
-    public abstract class ListSelectionAction extends Action {
+    public static abstract class ListSelectionAction<T> extends Action {
 
         /**
-         * Creates a new instance of ListSelectionAction without text.
+         * Creates a new instance of ListSelectionAction with the graphic node.
+         * @param graphic Graphic to be shown in relation to this action.
          */
-        public ListSelectionAction() {
-            this("");
+        public ListSelectionAction(Node graphic) {
+            this(graphic, "");
         }
 
         /**
-         * Creates a new instance of ListSelectionAction with the provided text.
+         * Creates a new instance of ListSelectionAction with the provided graphic and text.
+         * @param graphic Graphic to be shown in relation to this action.
          * @param text The text for the Action.
          */
-        public ListSelectionAction(String text) {
+        public ListSelectionAction(Node graphic, String text) {
             super(text);
-            if (getScene() != null) {
-                init();
-            }
-            sceneProperty().addListener((ob, ov, nv) -> {
-                if (nv != null) {
-                    Platform.runLater(this::init);
-                }
-            });
+            setGraphic(graphic);
         }
 
         /**
@@ -439,22 +473,16 @@ public class ListSelectionView<T> extends ControlsFXControl {
         protected final void setEventHandler(Consumer<ActionEvent> eventHandler) {
             super.setEventHandler(eventHandler);
         }
-
-        private void init() {
-            ListSelectionViewSkin<T> skin = (ListSelectionViewSkin<T>) getSkin();
-            if (skin != null && skin.getSourceListView() != null && skin.getTargetListView() != null) {
-                initialize(skin.getSourceListView(), skin.getTargetListView());
-            }
-        }
     }
 
     /**
      * Action use to move the selected items from the
      * source list view to the target list view.
      */
-    public class MoveToTarget extends ListSelectionAction {
+    public class MoveToTarget extends ListSelectionAction<T> {
 
         public MoveToTarget() {
+            super(getGlyph(ANGLE_RIGHT));
             getStyleClass().add("move-to-target-button");
             setAccelerator(KeyCombination.keyCombination("CTRL+RIGHT"));
             graphicProperty().bind(Bindings.createObjectBinding(() -> (getOrientation() == HORIZONTAL ? getGlyph(ANGLE_RIGHT) : getGlyph(ANGLE_DOWN)), orientationProperty()));
@@ -473,8 +501,9 @@ public class ListSelectionView<T> extends ControlsFXControl {
      * Action use to move all the items from the
      * source list view to the target list view.
      */
-    public class MoveToTargetAll extends ListSelectionAction {
+    public class MoveToTargetAll extends ListSelectionAction<T> {
         public MoveToTargetAll() {
+            super(getGlyph(ANGLE_DOUBLE_RIGHT));
             getStyleClass().add("move-to-target-all-button");
             graphicProperty().bind(Bindings.createObjectBinding(() -> (getOrientation() == HORIZONTAL ? getGlyph(ANGLE_DOUBLE_RIGHT) : getGlyph(ANGLE_DOUBLE_DOWN)), orientationProperty()));
             setAccelerator(KeyCombination.keyCombination("CTRL+SHIFT+RIGHT"));
@@ -492,9 +521,10 @@ public class ListSelectionView<T> extends ControlsFXControl {
      * Action use to move the selected items from the
      * target list view to the source list view.
      */
-    public class MoveToSource extends ListSelectionAction {
+    public class MoveToSource extends ListSelectionAction<T> {
 
         public MoveToSource() {
+            super(getGlyph(ANGLE_LEFT));
             getStyleClass().add("move-to-source-button");
             graphicProperty().bind(Bindings.createObjectBinding(() -> (getOrientation() == HORIZONTAL ? getGlyph(ANGLE_LEFT) : getGlyph(ANGLE_UP)), orientationProperty()));
             setAccelerator(KeyCombination.keyCombination("CTRL+LEFT"));
@@ -512,8 +542,9 @@ public class ListSelectionView<T> extends ControlsFXControl {
      * Action use to all the items from the
      * target list view to the source list view.
      */
-    public class MoveToSourceAll extends ListSelectionAction {
+    public class MoveToSourceAll extends ListSelectionAction<T> {
         public MoveToSourceAll() {
+            super(getGlyph(ANGLE_DOUBLE_LEFT));
             getStyleClass().add("move-to-source-all-button");
             graphicProperty().bind(Bindings.createObjectBinding(() -> (getOrientation() == HORIZONTAL ? getGlyph(ANGLE_DOUBLE_LEFT) : getGlyph(ANGLE_DOUBLE_UP)), orientationProperty()));
             setAccelerator(KeyCombination.keyCombination("CTRL+SHIFT+LEFT"));

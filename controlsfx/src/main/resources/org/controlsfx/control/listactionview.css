@@ -1,0 +1,27 @@
+.list-action-view > .container > .list-view {
+    -fx-pref-height: 200px;
+}
+
+/** top **/
+.tool-bar {
+     -fx-background-color: -fx-box-border, linear-gradient(to top, TOP-COLOR 2%, derive(-fx-base,-2.1%) 95%);
+    -fx-background-insets: 0, 1 1 0 1;
+}
+
+/** bottom **/
+.tool-bar.bottom {
+    -fx-background-color: -fx-box-border, linear-gradient(to bottom, TOP-COLOR 2%, derive(-fx-base,-2.1%) 95%);
+    -fx-background-insets: 0, 0 1 1 1;
+}
+
+/** left **/
+.tool-bar:vertical {
+    -fx-background-color: -fx-box-border, linear-gradient(to left, TOP-COLOR 2%, derive(-fx-base,-2.1%) 95%);
+    -fx-background-insets: 0, 1 0 1 1;
+}
+
+/** right **/
+.tool-bar:vertical.right {
+    -fx-background-color: -fx-box-border, linear-gradient(to right, TOP-COLOR 2%, derive(-fx-base,-2.1%) 95%);
+    -fx-background-insets: 0, 1 1 1 0;
+}

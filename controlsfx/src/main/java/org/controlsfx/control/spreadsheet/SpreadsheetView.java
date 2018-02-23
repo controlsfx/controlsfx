@@ -44,10 +44,12 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -1825,21 +1827,26 @@ public class SpreadsheetView extends Control{
         final ArrayList<GridChange> list = new ArrayList<>();
         final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
 
+        Set<SpreadsheetCell> treatedCells = new HashSet<>();
         for (final TablePosition<?, ?> p : posList) {
             SpreadsheetCell cell = getGrid().getRows().get(getModelRow(p.getRow())).get(getModelColumn(p.getColumn()));
-            // Using SpreadsheetCell change to stock the information
-            // FIXME a dedicated class should be used
-            /**
-             * We need to add every cell contained in a span otherwise the
-             * rectangles computed when pasting will be wrong.
-             */
-            for (int row = 0; row < getRowSpan(cell, p.getRow()); ++row) {
-                for (int col = 0; col < getColumnSpan(cell); ++col) {
-                    try {
-                        new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(cell.getItem());
-                        list.add(new GridChange(p.getRow() + row, p.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem()));
-                    } catch (IOException exception) {
-                        list.add(new GridChange(p.getRow() + row, p.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem().toString()));
+            if (!treatedCells.contains(cell)) {
+                treatedCells.add(cell);
+
+                // Using SpreadsheetCell change to stock the information
+                // FIXME a dedicated class should be used
+                /**
+                 * We need to add every cell contained in a span otherwise the
+                 * rectangles computed when pasting will be wrong.
+                 */
+                for (int row = 0; row < getRowSpan(cell, p.getRow()); ++row) {
+                    for (int col = 0; col < getColumnSpan(cell); ++col) {
+                        try {
+                            new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(cell.getItem());
+                            list.add(new GridChange(p.getRow() + row, p.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem()));
+                        } catch (IOException exception) {
+                            list.add(new GridChange(p.getRow() + row, p.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem().toString()));
+                        }
                     }
                 }
             }

@@ -49,11 +49,23 @@ import javafx.util.StringConverter;
  * a ComboBox-like control. Each row item shows a {@link CheckBox}, and the state
  * of each row can be queried via the {@link #checkModelProperty() check model}.
  * 
- * <h3>Screenshot</h3>
+ * <br>
+ * The title shown in the combobox is, by default, a concatenation of the selected items
+ * but this behaviour can be changed and it is possible to set a fixed title 
+ * (see {@link #titleProperty() } property), with or without an indication of 
+ * how many items have been checked  (see {@link #showCheckedCountProperty() } property).
+ * 
+ * <h3>Screenshots</h3>
  * <p>The following screenshot shows the CheckComboBox with some sample data:
  * 
  * <br>
  * <img src="checkComboBox.png" alt="Screenshot of CheckComboBox">
+ * <br>
+ * <p>The following screenshot shows the CheckComboBox with a fixed title and the
+ * indication of how many items have been checked:
+ * 
+ * <br>
+ * <img src="checkComboBoxWithCheckedItemCount.png" alt="Screenshot of CheckComboBox with number of checked items">
  * 
  * <h3>Code Example:</h3>
  * <p>To create the CheckComboBox shown in the screenshot, simply do the 
@@ -264,13 +276,7 @@ public class CheckComboBox<T> extends ControlsFXControl {
      * should be shown beside the fixed title. 
      * If a {@link #titleProperty()} has been set and this property is set to true
      * then a string like (3/10) would be shown when 3 items out of 10 are
-     * checked.
-     * See this image as an example:
-     * 
-     * <br>
-     * <img src="checkComboBoxWithCheckedItemCount.png" alt="Screenshot of CheckComboBox with checked item count">
-     * <br>
-     * 
+     * checked.<br>
      * This property has effect only if a fixed title has been set (see {@link #titleProperty()}), 
      * otherwise the title is constructed with a concatenation of the selected items.
      * 

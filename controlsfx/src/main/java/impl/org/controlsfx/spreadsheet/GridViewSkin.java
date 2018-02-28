@@ -417,13 +417,16 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     public final boolean containsRow(int index) {
         /**
          * When scrolling with mouse wheel, some row are present but will not be
-         * lay out. Thus we only consider the row with children as really
-         * available.
+         * lay out. We used to consider row with children but that is not
+         * accurate. Instead, we simply look if the row layoutY is greater than
+         * 0. Since this method is used when checking the row before the current
+         * one, it should be a good indicator.
          */
         for (Object obj : getFlow().getCells()) {
-            if (((GridRow) obj).getIndex() == index && !((GridRow) obj).getChildrenUnmodifiable().isEmpty())
+            if (((GridRow) obj).getIndex() == index && ((GridRow) obj).getLayoutY() >= 0) {
                 return true;
             }
+        }
         return false;
     }
 

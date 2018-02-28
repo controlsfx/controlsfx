@@ -99,6 +99,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
+import javafx.scene.input.KeyCharacterCombination;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -389,6 +390,14 @@ public class SpreadsheetView extends Control{
     private ObservableList<SpreadsheetColumn> columns = FXCollections.observableArrayList();
     private Map<SpreadsheetCellType<?>, SpreadsheetCellEditor> editors = new IdentityHashMap<>();
     private final SpreadsheetViewSelectionModel selectionModel;
+    // KeyCombination used for zooming.
+    private final KeyCombination zoomOutChar = new KeyCharacterCombination("-", KeyCombination.SHORTCUT_DOWN);
+    private final KeyCombination zoomOutKeypad = new KeyCodeCombination(KeyCode.SUBTRACT, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCombination zoomInChar = new KeyCharacterCombination("+", KeyCombination.SHORTCUT_DOWN);
+    private final KeyCombination zoomInCharShift = new KeyCharacterCombination("+", KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
+    private final KeyCombination zoomInKeypadAdd = new KeyCodeCombination(KeyCode.ADD, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCombination zoomNormalKeypad = new KeyCodeCombination(KeyCode.NUMPAD0, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCombination zoomNormal = new KeyCodeCombination(KeyCode.DIGIT0, KeyCombination.SHORTCUT_DOWN);
 
     /**
      * The vertical header width, just for the Label, not the Pickers.
@@ -2491,16 +2500,14 @@ public class SpreadsheetView extends Control{
         } else if (KeyCode.DELETE.equals(keyEvent.getCode())) {
             deleteSelectedCells();
 
-        } 
-        else if (isEditionKey(keyEvent)) {
+        } else if (isEditionKey(keyEvent)) {
             getCellsView().edit(position.getRow(), position.getTableColumn());
-        } else if (keyEvent.isShortcutDown() && (KeyCode.NUMPAD0.equals(keyEvent.getCode())
-                || KeyCode.DIGIT0.equals(keyEvent.getCode()))) {
+        } else if (zoomNormalKeypad.match(keyEvent) || zoomNormal.match(keyEvent)) {
             //Reset zoom to zero.
             setZoomFactor(1.0);
-        } else if (keyEvent.isShortcutDown() && KeyCode.ADD.equals(keyEvent.getCode())) {
+        } else if (zoomInChar.match(keyEvent) || zoomInKeypadAdd.match(keyEvent) || zoomInCharShift.match(keyEvent)) {
             incrementZoom();
-        } else if (keyEvent.isShortcutDown() && KeyCode.SUBTRACT.equals(keyEvent.getCode())) {
+        } else if (zoomOutChar.match(keyEvent) || zoomOutKeypad.match(keyEvent)) {
             decrementZoom();
         }
     };

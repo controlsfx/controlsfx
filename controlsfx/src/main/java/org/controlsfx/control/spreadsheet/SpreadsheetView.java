@@ -398,6 +398,7 @@ public class SpreadsheetView extends Control{
     private final KeyCombination zoomInKeypadAdd = new KeyCodeCombination(KeyCode.ADD, KeyCombination.SHORTCUT_DOWN);
     private final KeyCombination zoomNormalKeypad = new KeyCodeCombination(KeyCode.NUMPAD0, KeyCombination.SHORTCUT_DOWN);
     private final KeyCombination zoomNormal = new KeyCodeCombination(KeyCode.DIGIT0, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCombination zoomNormalShift = new KeyCodeCombination(KeyCode.DIGIT0, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
     /**
      * The vertical header width, just for the Label, not the Pickers.
@@ -2502,7 +2503,7 @@ public class SpreadsheetView extends Control{
 
         } else if (isEditionKey(keyEvent)) {
             getCellsView().edit(position.getRow(), position.getTableColumn());
-        } else if (zoomNormalKeypad.match(keyEvent) || zoomNormal.match(keyEvent)) {
+        } else if (zoomNormalKeypad.match(keyEvent) || zoomNormal.match(keyEvent) || zoomNormalShift.match(keyEvent)) {
             //Reset zoom to zero.
             setZoomFactor(1.0);
         } else if (zoomInChar.match(keyEvent) || zoomInKeypadAdd.match(keyEvent) || zoomInCharShift.match(keyEvent)) {

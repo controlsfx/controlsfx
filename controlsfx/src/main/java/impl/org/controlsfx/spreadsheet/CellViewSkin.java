@@ -113,37 +113,68 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
 
     @Override
     protected void layoutChildren(double x, final double y, final double w, final double h) {
-        super.layoutChildren(x, y, w, h);
-        if (getSkinnable().getItem() != null) {
-            layoutTriangle();
-            handleFilter(x, y, w, h);
+        double width = w;
+        Filter filter = ((CellView) getSkinnable()).getFilter();
+        boolean change = handleFilter(x, y, w, h, filter);
+
+        //We don't want the filter icon to overlap the cell text.
+        if (filter != null && getSkinnable().getItem() != null) {
+            width = width - filter.getMenuButton().getWidth();
         }
+        /**
+         * If a filter change has been done, we want to set the invalidText of
+         * LabeledSkinBase to true. If this is not done, the text width is not
+         * recomputed.
+         */
+        if(change){
+            handleControlPropertyChanged("WIDTH");
+        }
+        super.layoutChildren(x, y, width, h);
+        layoutTriangle();
     }
 
     private void layoutTriangle() {
         SpreadsheetCell cell = getSkinnable().getItem();
+        if (cell != null) {
+            handleTopLeft(cell);
+            handleTopRight(cell);
+            handleBottomLeft(cell);
+            handleBottomRight(cell);
 
-        handleTopLeft(cell);
-        handleTopRight(cell);
-        handleBottomLeft(cell);
-        handleBottomRight(cell);
-
-        getSkinnable().requestLayout();
+            getSkinnable().requestLayout();
+        }
     }
 
-    private void handleFilter(double x, final double y, final double w, final double h) {
-        Filter filter = ((CellView) getSkinnable()).getFilter();
+    /**
+     * Return true if a change in the filters has been operated (new filter,
+     * removed filter).
+     *
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     * @param filter
+     * @return
+     */
+    private boolean handleFilter(double x, final double y, final double w, final double h, Filter filter) {
+        if (getSkinnable().getItem() == null) {
+            return false;
+        }
         if (filter != null) {
             //We first remove it.
+            MenuButton previousButton = filterButton;
             removeMenuButton();
             filterButton = filter.getMenuButton();
             if (!getChildren().contains(filterButton)) {
                 getChildren().add(filterButton);
             }
             layoutInArea(filterButton, x, y, w, h, 0, HPos.RIGHT, VPos.BOTTOM);
+            return previousButton != filterButton;
         } else if (filterButton != null) {
             removeMenuButton();
+            return true;
         }
+        return false;
     }
 
     private void removeMenuButton() {

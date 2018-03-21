@@ -27,6 +27,7 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.NotificationPaneSkin;
+import java.util.UUID;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -155,28 +156,31 @@ public class NotificationPane extends ControlsFXControl {
     /**
      * Called when the NotificationPane <b>will</b> be shown.
      */
-    public static final EventType<Event> ON_SHOWING =
-            new EventType<>(Event.ANY, "NOTIFICATION_PANE_ON_SHOWING"); //$NON-NLS-1$
+    public static final EventType<Event> ON_SHOWING = newEventType("NOTIFICATION_PANE_ON_SHOWING"); //$NON-NLS-1$
 
     /**
      * Called when the NotificationPane shows.
      */
-    public static final EventType<Event> ON_SHOWN =
-            new EventType<>(Event.ANY, "NOTIFICATION_PANE_ON_SHOWN"); //$NON-NLS-1$
+    public static final EventType<Event> ON_SHOWN = newEventType("NOTIFICATION_PANE_ON_SHOWN"); //$NON-NLS-1$
 
     /**
      * Called when the NotificationPane <b>will</b> be hidden.
      */
-    public static final EventType<Event> ON_HIDING =
-            new EventType<>(Event.ANY, "NOTIFICATION_PANE_ON_HIDING"); //$NON-NLS-1$
+    public static final EventType<Event> ON_HIDING = newEventType("NOTIFICATION_PANE_ON_HIDING"); //$NON-NLS-1$
 
     /**
      * Called when the NotificationPane is hidden.
      */
-    public static final EventType<Event> ON_HIDDEN =
-            new EventType<>(Event.ANY, "NOTIFICATION_PANE_ON_HIDDEN"); //$NON-NLS-1$
+    public static final EventType<Event> ON_HIDDEN = newEventType("NOTIFICATION_PANE_ON_HIDDEN"); //$NON-NLS-1$
     
-    
+    /**
+     * Static factory method for NotificationPane EventTypes.
+     * @param name the name of the new EventType to create
+     * @return the new EventType instance
+     */
+    private static EventType<Event> newEventType(String name) {
+        return new EventType<>(Event.ANY, name + UUID.randomUUID().toString());
+    }
     
     /***************************************************************************
      * 

@@ -31,6 +31,7 @@ import impl.org.controlsfx.skin.PlusMinusSliderSkin;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
@@ -300,14 +301,14 @@ public class PlusMinusSlider extends ControlsFXControl {
 		private static final long serialVersionUID = 2881004583512990781L;
 
 		public static final EventType<PlusMinusEvent> ANY = new EventType<>(
-				InputEvent.ANY, "ANY"); //$NON-NLS-1$
+				InputEvent.ANY, "ANY" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
 		/**
 		 * An event type used when the value property (
 		 * {@link PlusMinusSlider#valueProperty()}) changes.
 		 */
 		public static final EventType<PlusMinusEvent> VALUE_CHANGED = new EventType<>(
-				PlusMinusEvent.ANY, "VALUE_CHANGED"); //$NON-NLS-1$
+				PlusMinusEvent.ANY, "VALUE_CHANGED" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
 		private double value;
 

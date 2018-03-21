@@ -99,6 +99,15 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
         comboBox.setCellFactory(new Callback<ListView<T>, ListCell<T>>() {
             @Override public ListCell<T> call(ListView<T> listView) {
                 CheckBoxListCell<T> result = new CheckBoxListCell<>(item -> control.getItemBooleanProperty(item));
+                //clicking on the label checks/unchecks the item
+                result.setOnMouseClicked(e -> {
+                    T item = result.getItem();
+                    if (control.getCheckModel().isChecked(item)) {                        
+                        control.getCheckModel().clearCheck(item);
+                    } else {
+                        control.getCheckModel().check(item);                        
+                    }                    
+                });                
                 result.converterProperty().bind(control.converterProperty());
                 return result;
             };
@@ -111,11 +120,11 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
                 // we ignore whatever item is selected, instead choosing
                 // to display the selected item text using commas to separate
                 // each item
-                setText(buildString());
+                setText(getTextString());
             }
         };
         comboBox.setButtonCell(buttonCell);
-        comboBox.setValue((T)buildString());
+        comboBox.setValue((T)getTextString());
         
         // The zero is a dummy value - it just has to be legally within the bounds of the
         // item count for the CheckComboBox items list.
@@ -163,7 +172,19 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
      * 
      **************************************************************************/
     
-    protected String buildString() {
+    protected String getTextString() {
+        
+        if (control.getTitle() != null) {
+            //if a title has been set, we use it...
+            return control.getTitle();
+        } else {            
+            //...otherwise we generate a string concatenating the items
+            return buildString();
+        }
+        
+    }
+    
+    private String buildString() {
         final StringBuilder sb = new StringBuilder();
         for (int i = 0, max = selectedItems.size(); i < max; i++) {
             T item = selectedItems.get(i);
@@ -185,5 +206,7 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
      * Support classes / enums
      * 
      **************************************************************************/
+
+
     
 }

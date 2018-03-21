@@ -30,6 +30,8 @@ import impl.org.controlsfx.skin.CheckComboBoxSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -87,7 +89,6 @@ public class CheckComboBox<T> extends ControlsFXControl {
     
     private final ObservableList<T> items;
     private final Map<T, BooleanProperty> itemBooleanMap;
-    
 
     
     /**************************************************************************
@@ -116,8 +117,7 @@ public class CheckComboBox<T> extends ControlsFXControl {
         this.items = items == null ? FXCollections.<T>observableArrayList() : items;
         setCheckModel(new CheckComboBoxBitSetCheckModel<>(this.items, itemBooleanMap));
     }
-    
-    
+
     
     /**************************************************************************
      * 
@@ -225,15 +225,34 @@ public class CheckComboBox<T> extends ControlsFXControl {
         return converterProperty().get(); 
     }
     
+    // --- title
+    private StringProperty title = new SimpleStringProperty(null);
     
+    /**
+     * The title to use for this control. If a non null value is explicitly 
+     * set by the client, then that string will be used, otherwise a title 
+     * will be constructed concatenating the selected items
+     */
+    public final StringProperty titleProperty() {
+        return title;
+    }
     
-    /**************************************************************************
-     * 
-     * Implementation
-     * 
-     **************************************************************************/
+    /**
+     * Sets the title to use. If it is not null it will be used as title,
+     * otherwise title will be constructed by the skin
+     * @param value the string to use as title
+     */
+    public final void setTitle(String value) {
+        title.setValue(value);
+    }
     
-    
+    /**
+     * The title set for this control, if it has been set explicitly by the client.
+     * @return the title if it has been set, null otherwise
+     */
+    public final String getTitle() {
+        return title.getValue();
+    }      
     
     
     /**************************************************************************

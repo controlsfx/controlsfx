@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package impl.org.controlsfx.table;
+package org.controlsfx.control.table;
 
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
@@ -37,7 +37,6 @@ import javafx.collections.WeakListChangeListener;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.TableColumn;
-import org.controlsfx.control.table.TableFilter;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,7 +57,7 @@ public final class ColumnFilter<T,R> {
     
     private boolean lastFilter = false;
     private boolean isDirty = false;
-    private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.contains(inputString);
+    private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.toLowerCase().contains(inputString.toLowerCase());
     private volatile FilterPanel filterPanel;
 
     private boolean initialized = false;
@@ -66,11 +65,11 @@ public final class ColumnFilter<T,R> {
     private final ListChangeListener<T> backingListListener = lc -> {
         while (lc.next()) {
             if (lc.wasAdded()) {
-                lc.getAddedSubList().stream()
+                lc.getAddedSubList()
                         .forEach(t -> addBackingItem(t, getTableColumn().getCellObservableValue(t)));
             }
             if (lc.wasRemoved()) {
-                lc.getRemoved().stream()
+                lc.getRemoved()
                         .forEach(t -> removeBackingItem(t, getTableColumn().getCellObservableValue(t)));
             }
         }
@@ -122,7 +121,7 @@ public final class ColumnFilter<T,R> {
         }
     };
 
-    public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,R> tableColumn) {
+    ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,R> tableColumn) {
         this.tableFilter = tableFilter;
         this.tableColumn = tableColumn;
 
@@ -135,6 +134,10 @@ public final class ColumnFilter<T,R> {
     FilterPanel getFilterPanel() {
         return filterPanel;
     }
+
+    /**
+     * Initializes this ColumnFilter, particularly if it was set up in a lazy context
+     */
     public void initialize() {
         if (!initialized) {
             initializeListeners();
@@ -142,40 +145,79 @@ public final class ColumnFilter<T,R> {
             initialized = true;
         }
     }
+
+    /**
+     * Returns boolean indicating whether this ColumnFilter was initialized
+     */
     public boolean isInitialized() {
         return initialized;
     }
 
+    /**
+     * Allows selecting a given value programmatically for this ColumnFilter
+     */
     public void selectValue(Object value) {
         filterPanel.selectValue(value);
     }
+
+    /**
+     * Allows unselecting a given value programmatically for this ColumnFilter
+     */
     public void unselectValue(Object value) {
         filterPanel.unSelectValue(value);
     }
+
+    /**
+     * Selects all values for this given ColumnFilter
+     */
     public void selectAllValues() {
         filterPanel.selectAllValues();
     }
+    /**
+     * Unselects all values for this given ColumnFilter
+     */
     public void unSelectAllValues() {
         filterPanel.unSelectAllValues();
     }
-    public boolean wasLastFiltered() {
+
+    boolean wasLastFiltered() {
         return lastFilter;
     }
-    public boolean hasUnselections() {
+    boolean hasUnselections() {
         return unselectedValues.size() != 0;
     }
+
+    /**
+     * Sets a search implementation for this BiPredicate for this given ColumnFilter.
+     */
     public void setSearchStrategy(BiPredicate<String,String> searchStrategy) {
         this.searchStrategy = searchStrategy;
     }
+
+    /**
+     * Returns the search implementation for this given ColumnFilter.
+     */
     public BiPredicate<String,String> getSearchStrategy() {
         return searchStrategy;
     }
+
+    /**
+     * Indicates whether a filter is active on this ColumnFilter
+     */
     public boolean isFiltered() {
         return isDirty || unselectedValues.size() > 0;
     }
+
+    /**
+     * Indicates whether a given value is currently visible for this ColumnFilter
+     */
     public boolean valueIsVisible(R value) {
         return visibleValuesDupeCounter.get(value) > 0;
     }
+
+    /**
+     * Re-executes filter based on selections for this given ColumnFilter
+     */
     public void applyFilter() {
     	tableFilter.executeFilter();
     	lastFilter = true;
@@ -184,25 +226,37 @@ public final class ColumnFilter<T,R> {
         isDirty = false;
     }
 
-    public void resetAllFilters() { 
-    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.selectedProperty().set(true));
-    	tableFilter.resetFilter();
-    	tableFilter.getColumnFilters().stream().forEach(c -> c.lastFilter = false);
-    	tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(FilterValue::refreshScope);
-        isDirty = false;
-    }
-
+    /**
+     * Gets the FilterValues for this given ColumnFilter
+     */
     public ObservableList<FilterValue<T,R>> getFilterValues() {
         return filterValues;
     }
 
+    /**
+     * Returns the TableColumn attached to this given ColumnFilter
+     */
     public TableColumn<T,R> getTableColumn() {
         return tableColumn;
     }
+
+
+    /**
+     * Returns the entire TableFilter this ColumnFilter belongs to
+     */
     public TableFilter<T> getTableFilter() { 
         return tableFilter;
     }
-    public boolean evaluate(T item) {
+
+    void resetAllFilters() {
+        tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(fv -> fv.selectedProperty().set(true));
+        tableFilter.resetFilter();
+        tableFilter.getColumnFilters().forEach(c -> c.lastFilter = false);
+        tableFilter.getColumnFilters().stream().flatMap(c -> c.filterValues.stream()).forEach(FilterValue::refreshScope);
+        isDirty = false;
+    }
+
+    boolean evaluate(T item) {
         ObservableValue<R> value = tableColumn.getCellObservableValue(item);
 
         return unselectedValues.size() == 0
@@ -210,7 +264,7 @@ public final class ColumnFilter<T,R> {
     }
 
     private void initializeValues() {
-        tableFilter.getBackingList().stream()
+        tableFilter.getBackingList()
                 .forEach(t -> addBackingItem(t, tableColumn.getCellObservableValue(t)));
         tableFilter.getTableView().getItems().stream()
                 .map(tableColumn::getCellObservableValue).forEach(this::addVisibleItem);
@@ -250,8 +304,7 @@ public final class ColumnFilter<T,R> {
             Optional<FilterValue<T,R>> existingFilterValue = getFilterValues().stream()
                     .filter(fv -> Objects.equals(fv.getValue(), value)).findAny();
 
-            if (existingFilterValue.isPresent())
-                getFilterValues().remove(existingFilterValue.get());
+            existingFilterValue.ifPresent(trFilterValue -> getFilterValues().remove(trFilterValue));
         }
     }
     private void addVisibleItem(ObservableValue<R>  cellValue) {

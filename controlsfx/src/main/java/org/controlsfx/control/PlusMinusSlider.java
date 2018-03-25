@@ -65,289 +65,286 @@ import java.util.UUID;
  */
 public class PlusMinusSlider extends ControlsFXControl {
 
-	private static final String DEFAULT_STYLE_CLASS = "plus-minus-slider"; //$NON-NLS-1$
+    private static final String DEFAULT_STYLE_CLASS = "plus-minus-slider"; //$NON-NLS-1$
 
-	private static final PseudoClass VERTICAL_PSEUDOCLASS_STATE = PseudoClass
-			.getPseudoClass("vertical"); //$NON-NLS-1$
+    private static final PseudoClass VERTICAL_PSEUDOCLASS_STATE = PseudoClass.getPseudoClass("vertical"); //$NON-NLS-1$
+    private static final PseudoClass HORIZONTAL_PSEUDOCLASS_STATE = PseudoClass.getPseudoClass("horizontal"); //$NON-NLS-1$
 
-	private static final PseudoClass HORIZONTAL_PSEUDOCLASS_STATE = PseudoClass
-			.getPseudoClass("horizontal"); //$NON-NLS-1$
+    /**
+     * Constructs a new adjuster control with a default horizontal orientation.
+     */
+    public PlusMinusSlider() {
+        getStyleClass().add(DEFAULT_STYLE_CLASS);
 
-	/**
-	 * Constructs a new adjuster control with a default horizontal orientation.
-	 */
-	public PlusMinusSlider() {
-		getStyleClass().add(DEFAULT_STYLE_CLASS);
+        setOrientation(Orientation.HORIZONTAL);
 
-		setOrientation(Orientation.HORIZONTAL);
-
-		/*
-		 * We are "abusing" the properties map to pass the new value of the
-		 * slider from the skin to the control. It has to be done this way
-		 * because the value property of this control is "read-only".
-		 */
-		getProperties().addListener(new MapChangeListener<Object, Object>() {
-			@Override
+        /*
+         * We are "abusing" the properties map to pass the new value of the
+         * slider from the skin to the control. It has to be done this way
+         * because the value property of this control is "read-only".
+         */
+        getProperties().addListener(new MapChangeListener<Object, Object>() {
+            @Override
             public void onChanged(MapChangeListener.Change<? extends Object, ? extends Object> change) {
-				if (change.getKey().equals("plusminusslidervalue")) { //$NON-NLS-1$
-					if (change.getValueAdded() != null) {
-						Double valueAdded = (Double) change.getValueAdded();
-						value.set(valueAdded);
-						change.getMap().remove("plusminusslidervalue"); //$NON-NLS-1$
-					}
-				}
-			};
-		});
-	}
+                if (change.getKey().equals("plusminusslidervalue")) { //$NON-NLS-1$
+                    if (change.getValueAdded() != null) {
+                        Double valueAdded = (Double) change.getValueAdded();
+                        value.set(valueAdded);
+                        change.getMap().remove("plusminusslidervalue"); //$NON-NLS-1$
+                    }
+                }
+            };
+        });
+    }
 
     /** {@inheritDoc} */
     @Override public String getUserAgentStylesheet() {
         return getUserAgentStylesheet(PlusMinusSlider.class, "plusminusslider.css");
     }
 
-	@Override
-	protected Skin<?> createDefaultSkin() {
-		return new PlusMinusSliderSkin(this);
-	}
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new PlusMinusSliderSkin(this);
+    }
 
-	private ReadOnlyDoubleWrapper value = new ReadOnlyDoubleWrapper(this,
-			"value", 0); //$NON-NLS-1$
+    private ReadOnlyDoubleWrapper value = new ReadOnlyDoubleWrapper(this,
+            "value", 0); //$NON-NLS-1$
 
-	/**
-	 * Returns the value property of the adjuster. The value is always between
-	 * -1 and +1.
-	 * 
-	 * @return the value of the adjuster
-	 */
-	public final ReadOnlyDoubleProperty valueProperty() {
-		return value.getReadOnlyProperty();
-	}
+    /**
+     * Returns the value property of the adjuster. The value is always between
+     * -1 and +1.
+     * 
+     * @return the value of the adjuster
+     */
+    public final ReadOnlyDoubleProperty valueProperty() {
+        return value.getReadOnlyProperty();
+    }
 
-	/**
-	 * Returns the value of the value property.
-	 * 
-	 * @return the value of the adjuster [-1, +1]
-	 * 
-	 * @see #valueProperty()
-	 */
-	public final double getValue() {
-		return valueProperty().get();
-	}
+    /**
+     * Returns the value of the value property.
+     * 
+     * @return the value of the adjuster [-1, +1]
+     * 
+     * @see #valueProperty()
+     */
+    public final double getValue() {
+        return valueProperty().get();
+    }
 
-	// orientation
+    // orientation
 
-	private ObjectProperty<Orientation> orientation;
+    private ObjectProperty<Orientation> orientation;
 
-	/**
-	 * Sets the value of the orientation property.
-	 * 
-	 * @param value
-	 *            the new orientation (horizontal, vertical).
-	 * @see #orientationProperty()
-	 */
-	public final void setOrientation(Orientation value) {
-		orientationProperty().set(value);
-	}
+    /**
+     * Sets the value of the orientation property.
+     * 
+     * @param value
+     *            the new orientation (horizontal, vertical).
+     * @see #orientationProperty()
+     */
+    public final void setOrientation(Orientation value) {
+        orientationProperty().set(value);
+    }
 
-	/**
-	 * Returns the value of the orientation property.
-	 * 
-	 * @return the current orientation of the control
-	 * @see #orientationProperty()
-	 */
-	public final Orientation getOrientation() {
-		return orientation == null ? Orientation.HORIZONTAL : orientation.get();
-	}
+    /**
+     * Returns the value of the orientation property.
+     * 
+     * @return the current orientation of the control
+     * @see #orientationProperty()
+     */
+    public final Orientation getOrientation() {
+        return orientation == null ? Orientation.HORIZONTAL : orientation.get();
+    }
 
-	/**
-	 * Returns the stylable object property used for storing the orientation of
-	 * the adjuster control. The CSS property "-fx-orientation" can be used to
-	 * initialize this value.
-	 * 
-	 * @return the orientation property
-	 */
-	public final ObjectProperty<Orientation> orientationProperty() {
-		if (orientation == null) {
-			orientation = new StyleableObjectProperty<Orientation>(null) {
-				@Override
-				protected void invalidated() {
-					final boolean vertical = (get() == Orientation.VERTICAL);
-					pseudoClassStateChanged(VERTICAL_PSEUDOCLASS_STATE,
-							vertical);
-					pseudoClassStateChanged(HORIZONTAL_PSEUDOCLASS_STATE,
-							!vertical);
-				}
+    /**
+     * Returns the stylable object property used for storing the orientation of
+     * the adjuster control. The CSS property "-fx-orientation" can be used to
+     * initialize this value.
+     * 
+     * @return the orientation property
+     */
+    public final ObjectProperty<Orientation> orientationProperty() {
+        if (orientation == null) {
+            orientation = new StyleableObjectProperty<Orientation>(null) {
+                @Override
+                protected void invalidated() {
+                    final boolean vertical = (get() == Orientation.VERTICAL);
+                    pseudoClassStateChanged(VERTICAL_PSEUDOCLASS_STATE,
+                            vertical);
+                    pseudoClassStateChanged(HORIZONTAL_PSEUDOCLASS_STATE,
+                            !vertical);
+                }
 
-				@Override
-				public CssMetaData<PlusMinusSlider, Orientation> getCssMetaData() {
-					return StyleableProperties.ORIENTATION;
-				}
+                @Override
+                public CssMetaData<PlusMinusSlider, Orientation> getCssMetaData() {
+                    return StyleableProperties.ORIENTATION;
+                }
 
-				@Override
-				public Object getBean() {
-					return PlusMinusSlider.this;
-				}
+                @Override
+                public Object getBean() {
+                    return PlusMinusSlider.this;
+                }
 
-				@Override
-				public String getName() {
-					return "orientation"; //$NON-NLS-1$
-				}
-			};
-		}
-		return orientation;
-	}
+                @Override
+                public String getName() {
+                    return "orientation"; //$NON-NLS-1$
+                }
+            };
+        }
+        return orientation;
+    }
 
-	// event support
+    // event support
 
-	/**
-	 * Stores the event handler that will be informed when the adjuster's value
-	 * changes.
-	 * 
-	 * @return the value change event handler property
-	 */
-	public final ObjectProperty<EventHandler<PlusMinusEvent>> onValueChangedProperty() {
-		return onValueChanged;
-	}
+    /**
+     * Stores the event handler that will be informed when the adjuster's value
+     * changes.
+     * 
+     * @return the value change event handler property
+     */
+    public final ObjectProperty<EventHandler<PlusMinusEvent>> onValueChangedProperty() {
+        return onValueChanged;
+    }
 
-	/**
-	 * Sets an event handler that will receive plus minus events when the user
-	 * moves the adjuster's thumb.
-	 * 
-	 * @param value
-	 *            the event handler
-	 * 
-	 * @see #onValueChangedProperty()
-	 */
-	public final void setOnValueChanged(EventHandler<PlusMinusEvent> value) {
-		onValueChangedProperty().set(value);
-	}
+    /**
+     * Sets an event handler that will receive plus minus events when the user
+     * moves the adjuster's thumb.
+     * 
+     * @param value
+     *            the event handler
+     * 
+     * @see #onValueChangedProperty()
+     */
+    public final void setOnValueChanged(EventHandler<PlusMinusEvent> value) {
+        onValueChangedProperty().set(value);
+    }
 
-	/**
-	 * Returns the event handler that will be notified when the adjuster's value
-	 * changes.
-	 * 
-	 * @return An EventHandler.
-	 */
-	public final EventHandler<PlusMinusEvent> getOnValueChanged() {
-		return onValueChangedProperty().get();
-	}
+    /**
+     * Returns the event handler that will be notified when the adjuster's value
+     * changes.
+     * 
+     * @return An EventHandler.
+     */
+    public final EventHandler<PlusMinusEvent> getOnValueChanged() {
+        return onValueChangedProperty().get();
+    }
 
-	private ObjectProperty<EventHandler<PlusMinusEvent>> onValueChanged = new ObjectPropertyBase<EventHandler<PlusMinusEvent>>() {
+    private ObjectProperty<EventHandler<PlusMinusEvent>> onValueChanged = new ObjectPropertyBase<EventHandler<PlusMinusEvent>>() {
 
-		@Override
-		protected void invalidated() {
-			setEventHandler(PlusMinusEvent.VALUE_CHANGED, get());
-		}
+        @Override
+        protected void invalidated() {
+            setEventHandler(PlusMinusEvent.VALUE_CHANGED, get());
+        }
 
-		@Override
-		public Object getBean() {
-			return PlusMinusSlider.this;
-		}
+        @Override
+        public Object getBean() {
+            return PlusMinusSlider.this;
+        }
 
-		@Override
-		public String getName() {
-			return "onValueChanged"; //$NON-NLS-1$
-		}
-	};
+        @Override
+        public String getName() {
+            return "onValueChanged"; //$NON-NLS-1$
+        }
+    };
 
-	private static class StyleableProperties {
+    private static class StyleableProperties {
 
-		private static final CssMetaData<PlusMinusSlider, Orientation> ORIENTATION = new CssMetaData<PlusMinusSlider, Orientation>(
-				"-fx-orientation", new EnumConverter<>( //$NON-NLS-1$
-						Orientation.class), Orientation.VERTICAL) {
+        private static final CssMetaData<PlusMinusSlider, Orientation> ORIENTATION = new CssMetaData<PlusMinusSlider, Orientation>(
+                "-fx-orientation", new EnumConverter<>( //$NON-NLS-1$
+                        Orientation.class), Orientation.VERTICAL) {
 
-			@Override
-			public Orientation getInitialValue(PlusMinusSlider node) {
-				// A vertical Slider should remain vertical
-				return node.getOrientation();
-			}
+            @Override
+            public Orientation getInitialValue(PlusMinusSlider node) {
+                // A vertical Slider should remain vertical
+                return node.getOrientation();
+            }
 
-			@Override
-			public boolean isSettable(PlusMinusSlider n) {
-				return n.orientation == null || !n.orientation.isBound();
-			}
+            @Override
+            public boolean isSettable(PlusMinusSlider n) {
+                return n.orientation == null || !n.orientation.isBound();
+            }
 
-			@SuppressWarnings("unchecked")
-			@Override
-			public StyleableProperty<Orientation> getStyleableProperty(
-					PlusMinusSlider n) {
-				return (StyleableProperty<Orientation>) n.orientationProperty();
-			}
-		};
+            @SuppressWarnings("unchecked")
+            @Override
+            public StyleableProperty<Orientation> getStyleableProperty(
+                    PlusMinusSlider n) {
+                return (StyleableProperty<Orientation>) n.orientationProperty();
+            }
+        };
 
-		private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
-		static {
-			final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
-			styleables.add(ORIENTATION);
+        private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+        static {
+            final List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Control.getClassCssMetaData());
+            styleables.add(ORIENTATION);
 
-			STYLEABLES = Collections.unmodifiableList(styleables);
-		}
-	}
+            STYLEABLES = Collections.unmodifiableList(styleables);
+        }
+    }
 
-	/**
-	 * @return The CssMetaData associated with this class, which may include the
-	 *         CssMetaData of its super classes.
-	 */
-	public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
-		return StyleableProperties.STYLEABLES;
-	}
+    /**
+     * @return The CssMetaData associated with this class, which may include the
+     *         CssMetaData of its super classes.
+     */
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
-		return getClassCssMetaData();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
 
-	/**
-	 * An event class used by the {@link PlusMinusSlider} to inform event
-	 * handlers about changes.
-	 */
-	public static class PlusMinusEvent extends InputEvent {
+    /**
+     * An event class used by the {@link PlusMinusSlider} to inform event
+     * handlers about changes.
+     */
+    public static class PlusMinusEvent extends InputEvent {
 
-		private static final long serialVersionUID = 2881004583512990781L;
+        private static final long serialVersionUID = 2881004583512990781L;
 
-		public static final EventType<PlusMinusEvent> ANY = new EventType<>(
-				InputEvent.ANY, "ANY" + UUID.randomUUID().toString()); //$NON-NLS-1$
+        public static final EventType<PlusMinusEvent> ANY = new EventType<>(
+                InputEvent.ANY, "ANY" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
-		/**
-		 * An event type used when the value property (
-		 * {@link PlusMinusSlider#valueProperty()}) changes.
-		 */
-		public static final EventType<PlusMinusEvent> VALUE_CHANGED = new EventType<>(
-				PlusMinusEvent.ANY, "VALUE_CHANGED" + UUID.randomUUID().toString()); //$NON-NLS-1$
+        /**
+         * An event type used when the value property (
+         * {@link PlusMinusSlider#valueProperty()}) changes.
+         */
+        public static final EventType<PlusMinusEvent> VALUE_CHANGED = new EventType<>(
+                PlusMinusEvent.ANY, "VALUE_CHANGED" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
-		private double value;
+        private double value;
 
-		/**
-		 * Constructs a new event object.
-		 * 
-		 * @param source
-		 *            the source of the event (always the
-		 *            {@link PlusMinusSlider})
-		 * @param target
-		 *            the target of the event (always the
-		 *            {@link PlusMinusSlider})
-		 * @param eventType
-		 *            the type of the event (e.g. {@link #VALUE_CHANGED})
-		 * @param value
-		 *            the actual current value of the adjuster
-		 */
-		public PlusMinusEvent(Object source, EventTarget target,
-				EventType<? extends InputEvent> eventType, double value) {
-			super(source, target, eventType);
+        /**
+         * Constructs a new event object.
+         * 
+         * @param source
+         *            the source of the event (always the
+         *            {@link PlusMinusSlider})
+         * @param target
+         *            the target of the event (always the
+         *            {@link PlusMinusSlider})
+         * @param eventType
+         *            the type of the event (e.g. {@link #VALUE_CHANGED})
+         * @param value
+         *            the actual current value of the adjuster
+         */
+        public PlusMinusEvent(Object source, EventTarget target,
+                EventType<? extends InputEvent> eventType, double value) {
+            super(source, target, eventType);
 
-			this.value = value;
-		}
+            this.value = value;
+        }
 
-		/**
-		 * The value of the {@link PlusMinusSlider}.
-		 * 
-		 * @return the value
-		 */
-		public double getValue() {
-			return value;
-		}
-	}
+        /**
+         * The value of the {@link PlusMinusSlider}.
+         * 
+         * @return the value
+         */
+        public double getValue() {
+            return value;
+        }
+    }
 }

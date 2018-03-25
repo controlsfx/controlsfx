@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -287,10 +287,17 @@ public class PlusMinusSlider extends ControlsFXControl {
 	/**
 	 * @return The CssMetaData associated with this class, which may include the
 	 *         CssMetaData of its super classes.
-	 * @since JavaFX 8.0
 	 */
 	public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
 		return StyleableProperties.STYLEABLES;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+		return getClassCssMetaData();
 	}
 
 	/**

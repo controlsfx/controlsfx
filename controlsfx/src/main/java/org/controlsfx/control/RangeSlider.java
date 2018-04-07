@@ -1094,7 +1094,7 @@ public class RangeSlider extends ControlsFXControl {
         return StyleableProperties.STYLEABLES;
     }
 
-`    /**
+    /**
      * {@inheritDoc}
      */
     @Override

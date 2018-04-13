@@ -632,19 +632,24 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if(maxRows == 30 && handle.isColumnWidthSet(indexColumn)){
             return;
         }
-        
-        // set this property to tell the TableCell we want to know its actual
-        // preferred width, not the width of the associated TableColumnBase
-        cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE); //$NON-NLS-1$
-        
-        // determine cell padding
-        double padding = 10;
+
+        /**
+         * We add a default 10 padding in order not to have a compacted column.
+         * But when we have a filter, an extra space will be already added so no
+         * need to force this padding.
+         */
+        double padding = spreadsheetView.getColumns().get(indexColumn).getFilter() != null ? 0 : 10;
         Node n = cell.getSkin() == null ? null : cell.getSkin().getNode();
         if (n instanceof Region) {
             Region r = (Region) n;
             padding = r.snappedLeftInset() + r.snappedRightInset();
         }
 
+        
+        // set this property to tell the TableCell we want to know its actual
+        // preferred width, not the width of the associated TableColumnBase
+        cell.getProperties().put("deferToParentPrefWidth", Boolean.TRUE); //$NON-NLS-1$
+        
         ObservableList<ObservableList<SpreadsheetCell>> gridRows = spreadsheetView.getGrid().getRows();//.get(row)
         
         /**
@@ -663,10 +668,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if (cell.getSkin() == null) {
             cell.setSkin(new CellViewSkin((CellView) cell));
         }
-         SpreadsheetColumn column = spreadsheetView.getColumns().get(indexColumn);
-        //We add the size of the menuButton of the filter if necessary.
-        double cellFilterWidth = 0;
-        
+
         for (int row = 0; row < rows; row++) {
             cell.updateIndex(row);
             
@@ -677,10 +679,12 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                     datePresent = true;
                 }
                 cell.impl_processCSS(false);
+                /**
+                 * The cell will automatically add the filter width if
+                 * necessary. The padding is also directly computed.
+                 */
                 double width = cell.prefWidth(-1);
-                if(row == spreadsheetView.getFilteredRow()){
-                    cellFilterWidth = width;
-                }
+               
                 /**
                  * If the cell is spanning in column, we need to take the other
                  * columns into account in the calculation of the width. So we
@@ -716,11 +720,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         if (datePresent && widthMax < DATE_CELL_MIN_WIDTH) {
             widthMax = DATE_CELL_MIN_WIDTH;
         }
-        if (column.getFilter() != null) {
-            //We get the maximum between our widthMax and the cell with a filter.
-            cellFilterWidth += column.getFilter().getMenuButton().getWidth() <= 0 ? 24.0 : column.getFilter().getMenuButton().getWidth();
-            widthMax = Math.max(widthMax, cellFilterWidth);
-        }
+
         /**
          * This method is called by the system at initialisation and later by
          * some methods that check wether the specified column is resizable. So

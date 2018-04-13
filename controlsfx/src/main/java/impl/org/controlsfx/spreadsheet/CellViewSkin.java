@@ -37,6 +37,8 @@ import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.event.WeakEventHandler;
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.MenuButton;
@@ -61,7 +63,7 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
      * This EventType can be used with an {@link EventHandler} in order to catch
      * when a SpreadsheetCell filter is activated/deactivated on this column.
      */
-    public static final EventType<Event> FILTER_EVENT_TYPE 
+    public static final EventType<Event> FILTER_EVENT_TYPE
             = new EventType<>("FilterEventType" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
     private final static String TOP_LEFT_CLASS = "top-left"; //$NON-NLS-1$
@@ -112,69 +114,79 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
     }
 
     @Override
-    protected void layoutChildren(double x, final double y, final double w, final double h) {
-        double width = w;
-        Filter filter = ((CellView) getSkinnable()).getFilter();
-        boolean change = handleFilter(x, y, w, h, filter);
-
-        //We don't want the filter icon to overlap the cell text.
-        if (filter != null && getSkinnable().getItem() != null) {
-            width = width - filter.getMenuButton().getWidth();
-        }
+    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
         /**
-         * If a filter change has been done, we want to set the invalidText of
-         * LabeledSkinBase to true. If this is not done, the text width is not
-         * recomputed.
+         * We integrate the filter width into the total width for autosize. We
+         * do just like Excel.
          */
-        if(change){
-            handleControlPropertyChanged("WIDTH");
+        Filter filter = ((CellView) getSkinnable()).getFilter();
+        double cellWidth = super.computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
+        if (filter != null) {
+            double filterWidth = filter.getMenuButton().getWidth();
+            filterWidth = filterWidth == 0 ? 23.0 : filterWidth;
+            Pos alignement = getSkinnable().getAlignment();
+            switch (alignement) {
+                case BASELINE_LEFT:
+                case BOTTOM_LEFT:
+                case CENTER_LEFT:
+                case TOP_LEFT:
+                    //Simply add the filter width.
+                    return cellWidth + filterWidth;
+                case BASELINE_CENTER:
+                case BOTTOM_CENTER:
+                case TOP_CENTER:
+                case CENTER:
+                    //Add twice the filter width in order to be well centered so the
+                    //text is not hovered by the filter.
+                    return cellWidth + (2 * filterWidth);
+            }
         }
-        super.layoutChildren(x, y, width, h);
-        layoutTriangle();
+        return cellWidth;
+    }
+
+    @Override
+    protected void layoutChildren(double x, final double y, final double w, final double h) {
+        super.layoutChildren(x, y, w, h);
+        if (getSkinnable().getItem() != null) {
+            layoutTriangle();
+            handleFilter(x, y, w, h);
+        }
     }
 
     private void layoutTriangle() {
         SpreadsheetCell cell = getSkinnable().getItem();
-        if (cell != null) {
-            handleTopLeft(cell);
-            handleTopRight(cell);
-            handleBottomLeft(cell);
-            handleBottomRight(cell);
 
-            getSkinnable().requestLayout();
-        }
+        handleTopLeft(cell);
+        handleTopRight(cell);
+        handleBottomLeft(cell);
+        handleBottomRight(cell);
+
+        getSkinnable().requestLayout();
     }
 
-    /**
-     * Return true if a change in the filters has been operated (new filter,
-     * removed filter).
-     *
-     * @param x
-     * @param y
-     * @param w
-     * @param h
-     * @param filter
-     * @return
-     */
-    private boolean handleFilter(double x, final double y, final double w, final double h, Filter filter) {
-        if (getSkinnable().getItem() == null) {
-            return false;
-        }
+    private void handleFilter(double x, final double y, final double w, final double h) {
+        Filter filter = ((CellView) getSkinnable()).getFilter();
         if (filter != null) {
             //We first remove it.
-            MenuButton previousButton = filterButton;
             removeMenuButton();
             filterButton = filter.getMenuButton();
             if (!getChildren().contains(filterButton)) {
                 getChildren().add(filterButton);
             }
-            layoutInArea(filterButton, x, y, w, h, 0, HPos.RIGHT, VPos.BOTTOM);
-            return previousButton != filterButton;
+
+            layoutInArea(filterButton, x, y, w, h, 0, new Insets(0), HPos.RIGHT, VPos.BOTTOM);
+            /**
+             * The right padding is applied to our filter, but we want it to
+             * always be in the bottom-right corner.
+             */
+            if (getSkinnable().getPadding().getRight() != 0) {
+                filterButton.setTranslateX(getSkinnable().getPadding().getRight());
+            } else {
+                filterButton.setTranslateX(0);
+            }
         } else if (filterButton != null) {
             removeMenuButton();
-            return true;
         }
-        return false;
     }
 
     private void removeMenuButton() {

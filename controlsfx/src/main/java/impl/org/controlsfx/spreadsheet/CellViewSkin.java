@@ -139,6 +139,8 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
                     //Add twice the filter width in order to be well centered so the
                     //text is not hovered by the filter.
                     return cellWidth + (2 * filterWidth);
+                default:
+                    return cellWidth + 10;
             }
         }
         return cellWidth;
@@ -173,17 +175,9 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
             if (!getChildren().contains(filterButton)) {
                 getChildren().add(filterButton);
             }
-
-            layoutInArea(filterButton, x, y, w, h, 0, new Insets(0), HPos.RIGHT, VPos.BOTTOM);
-            /**
-             * The right padding is applied to our filter, but we want it to
-             * always be in the bottom-right corner.
-             */
-            if (getSkinnable().getPadding().getRight() != 0) {
-                filterButton.setTranslateX(getSkinnable().getPadding().getRight());
-            } else {
-                filterButton.setTranslateX(0);
-            }
+            
+            //We add the insets to really stick to the bottom-right even with padding.
+            layoutInArea(filterButton, x + snappedRightInset(), y + snappedBottomInset(), w, h, 0, new Insets(0), HPos.RIGHT, VPos.BOTTOM);
         } else if (filterButton != null) {
             removeMenuButton();
         }

@@ -53,8 +53,8 @@ public class Transifex {
     private static final String GET_TRANSLATION     = BASE_URI + "project/controlsfx/resource/controlsfx-core/translation/%1s?file"; // gets a translation for one language //$NON-NLS-1$
     private static final String TRANSLATION_STATS   = BASE_URI + "project/controlsfx/resource/controlsfx-core/stats/%1s/"; // gets a translation for one language //$NON-NLS-1$
 
-    private static final String USERNAME            = System.getProperty("transifex.username"); //$NON-NLS-1$
-    private static final String PASSWORD            = System.getProperty("transifex.password"); //$NON-NLS-1$
+    private static final String USERNAME            = System.getProperty("transifex_username"); //$NON-NLS-1$
+    private static final String PASSWORD            = System.getProperty("transifex_password"); //$NON-NLS-1$
     private static final boolean FILTER_INCOMPLETE_TRANSLATIONS = Boolean.parseBoolean(System.getProperty("transifex.filterIncompleteTranslations", "false"));
 
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {

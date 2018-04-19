@@ -3,6 +3,8 @@ image: cogniteev/oracle-java:java8
 pipelines:
   default:
     - step:
+        caches:
+          - gradle
         script:
           - chmod +x gradlew
           - ./gradlew clean assemble

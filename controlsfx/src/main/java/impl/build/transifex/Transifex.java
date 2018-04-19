@@ -55,7 +55,7 @@ public class Transifex {
 
     private static final String USERNAME            = System.getProperty("transifex.username"); //$NON-NLS-1$
     private static final String PASSWORD            = System.getProperty("transifex.password"); //$NON-NLS-1$
-    private static final boolean FILTER_INCOMPLETE_TRANSLATIONS = Boolean.parseBoolean(System.getProperty("transifex.filterIncompleteTranslations", "true"));
+    private static final boolean FILTER_INCOMPLETE_TRANSLATIONS = Boolean.parseBoolean(System.getProperty("transifex.filterIncompleteTranslations", "false"));
 
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
         new Transifex().doTransifexCheck();

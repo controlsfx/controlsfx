@@ -456,10 +456,10 @@ public class HelloFilteredTableView extends ControlsFXSample {
             final CheckMenuItem miAge = new CheckMenuItem("Filter " + age.getText());
             age.predicateProperty().addListener(o -> miAge.setSelected(age.getPredicate() != null));
             miAge.setOnAction(e ->
-                    age.setPredicate(miAge.isSelected() ? p -> p == 2 : null));
+                    age.setPredicate(miAge.isSelected() ? p -> p > 50 : null));
 
             final Menu menuAge = new Menu("Filter");
-            menuAge.getItems().addAll(miLastName);
+            menuAge.getItems().addAll(miAge);
             cm.getItems().addAll(menuAge);
             age.setContextMenu(cm);
 

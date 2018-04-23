@@ -96,7 +96,7 @@ final class TableView2VirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<
     public void init() {
         /**
          * The idea is to work-around
-         * https://javafx-jira.kenai.com/browse/RT-36396 in order to have the
+         * https://bugs.openjdk.java.net/browse/JDK-8090224 in order to have the
          * same behavior between the vertical scrollBar and the horizontal
          * scrollBar.
          */
@@ -181,9 +181,7 @@ final class TableView2VirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<
          * resize the window during edition, if we block layout, the view will
          * be in a wrong state.
          */
-        if (tableView != null
-                /*&& (tableView.getEditingCell() == null || tableView
-                        .getEditingCell().getRow() == -1)*/) {
+        if (tableView != null) {
             sortRows();
             super.layoutChildren();
             layoutTotal();
@@ -345,16 +343,7 @@ final class TableView2VirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<
                             row.getProperties().put("fixed", false);
                             sheetChildren.remove(row);
                         }
-                        /**
-                         * OLD COMMENT : We must push to Front only if the row
-                         * is at the very top and has a risk to be recovered.
-                         * This is happening only if this row is translated.
-                         *
-                         * NEW COMMENT: I'm not sure about this.. Since the
-                         * fixedColumn are not in the special top row, we don't
-                         * care if the row is pushed to front.. need
-                         * investigation
-                         */
+                        
                         virtualFlowCells.toFront();
                         continue rows;
                     }
@@ -374,11 +363,6 @@ final class TableView2VirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<
                     myFixedCells.add(row);
                 }
                 
-                /**
-                 * Sometime, when we set a new Grid on a TableView2 without recreating it,
-                 * we can end up with some rows not being added to the ViewPort.
-                 * So we must be sure it's in and add it ourself otherwise.
-                 */
                 if (! sheetChildren.contains(row)) {
                     sheetChildren.add(row);
                 }

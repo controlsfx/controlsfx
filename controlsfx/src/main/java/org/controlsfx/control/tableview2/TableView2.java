@@ -747,7 +747,7 @@ public class TableView2<S> extends TableView<S> {
     /** {@inheritDoc} */
     @Override public String getUserAgentStylesheet() {
         /*
-         * For more information please see RT-40658
+         * For more information please see JDK-8088253
          */
         if (stylesheet == null) {
             stylesheet = TableView2.class.getResource("tableview2.css") //$NON-NLS-1$

@@ -214,7 +214,7 @@ public class TableHeaderRow2 extends TableHeaderRow {
     /** {@inheritDoc} */
     @Override protected void updateTableWidth() {
         super.updateTableWidth();
-        // snapping added for RT-19428
+        // snapping added for JDK-8127930
         double padding = 0;
 
         if (working && skin != null
@@ -491,7 +491,7 @@ public class TableHeaderRow2 extends TableHeaderRow {
         if (! skin.isColumnHeaderVisible()) {
             return 0.0;
         }
-        // we hardcode 24.0 here to avoid RT-37616, where the
+        // we hardcode 24.0 here to avoid JDK-8095994, where the
         // entire header row would disappear when all columns were hidden.
         double headerPrefHeight = getRootHeader().prefHeight(width);
         headerPrefHeight = headerPrefHeight == 0.0 ? 24.0 : headerPrefHeight;

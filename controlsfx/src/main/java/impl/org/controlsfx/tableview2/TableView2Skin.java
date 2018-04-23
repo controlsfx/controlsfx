@@ -89,8 +89,8 @@ import org.controlsfx.control.tableview2.TableView2;
 /**
  * This skin for the TableView2 control
  *
- * We need to extends directly from TableViewSkinBase in order to work-around
- * https://javafx-jira.kenai.com/browse/RT-34753 if we want to set a custom
+ * We need to extend directly from TableViewSkinBase in order to work-around
+ * https://bugs.openjdk.java.net/browse/JDK-8090674 if we want to set a custom
  * TableViewBehavior.
  *
  * @param <S> The type of the objects contained within the {@link TableView2} items list.
@@ -246,7 +246,7 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S,TableView<S>,TableV
         
         
         EventHandler<MouseEvent> ml = (MouseEvent event) -> {
-            // RT-15127: cancel editing on scroll. This is a bit extreme
+            // JDK-8114594: cancel editing on scroll. This is a bit extreme
             // (we are cancelling editing on touching the scrollbars).
             // This can be improved at a later date.
             if (tableView.getEditingCell() != null) {
@@ -511,14 +511,14 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S,TableView<S>,TableV
             }
         }
 
-        // dispose of the cell to prevent it retaining listeners (see RT-31015)
+        // dispose of the cell to prevent it retaining listeners (see JDK-8122968)
         cell.updateIndex(-1);
 
-        // RT-36855 - take into account the column header text / graphic widths.
+        // JDK-8096512 - take into account the column header text / graphic widths.
         double headerWidth = computeHeaderWidth(getTableHeaderRow().getColumnHeaderFor(tc));
         maxWidth = Math.max(maxWidth, headerWidth);
 
-        // RT-23486
+        // JDK-8126253
         double widthMax = maxWidth + padding;
         if (tableView.getColumnResizePolicy() == TableView.CONSTRAINED_RESIZE_POLICY) {
             widthMax = Math.max(widthMax, col.getWidth());
@@ -853,18 +853,6 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S,TableView<S>,TableV
         for (int row = 0; row < rowCount; ++row) {
             if (tableView.isRowFixingEnabled() && tableView.getFixedRows().contains(row)) {
                 bitSet.set(row);
-                continue;
-            }
-            for (TableColumn column : tableView.getColumns()) {
-                /**
-                 * No matter what the sort will do, we want to be behave with
-                 * caution here, and take the rowSpan even if the cell is
-                 * splitted afterwards.
-                 */
-//                if (tableView.getRowSpanFilter(new TablePosition<>(tableView, row, column)) > 1 /*|| cell.getColumnSpan() >1*/) {
-//                    bitSet.set(row);
-//                    break;
-//                }
             }
         }
         return bitSet;
@@ -891,16 +879,6 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S,TableView<S>,TableV
                 } else {
                     for (Integer unfixedRow : c.getRemoved()) {
                         rowToLayout.set(unfixedRow, false);
-                        //If the grid permits it, we check the spanning in order not
-                        //to remove a row that might need layout.
-                        if (getItemCount() > unfixedRow) {
-                            for (TableColumn column : tableView.getColumns()) {
-//                                if (tableView.getRowSpanFilter(new TablePosition<>(tableView, unfixedRow, column)) > 1 /*|| tableView.getColumnSpan(cell) > 1*/) {
-//                                    rowToLayout.set(unfixedRow, true);
-//                                    break;
-//                                }
-                            }
-                        }
                     }
 
                     //We check for the newly fixedRow

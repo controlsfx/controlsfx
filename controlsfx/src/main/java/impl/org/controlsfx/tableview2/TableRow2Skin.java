@@ -91,7 +91,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>, CellBehaviorBase
         super.handleControlPropertyChanged(p);
 
         if ("INDEX".equals(p)) {
-            // Fix for RT-36661, where empty table cells were showing content, as they
+            // Fix for JDK-8095357, where empty table cells were showing content, as they
             // had incorrect table cell indices (but the table row index was correct).
             // Note that we only do the update on empty cells to avoid the issue
             // noted below in requestCellUpdate().
@@ -106,11 +106,11 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>, CellBehaviorBase
     private void requestCellUpdate() {
         getSkinnable().requestLayout();
 
-        // update the index of all children cells (RT-29849).
+        // update the index of all children cells (JDK-8119094).
         // Note that we do this after the TableRow item has been updated,
         // rather than when the TableRow index has changed (as this will be
         // before the row has updated its item). This will result in the
-        // issue highlighted in RT-33602, where the table cell had the correct
+        // issue highlighted in JDK-8115269, where the table cell had the correct
         // item whilst the row had the old item.
         final int newIndex = getSkinnable().getIndex();
         /**
@@ -415,7 +415,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>, CellBehaviorBase
                 tableCell.relocate(x + tableCellX + (needToBeShifted? -1 : 0), snappedTopInset()
                         - spaceBetweenTopAndMe + control.verticalShift.get());
 
-                // Request layout is here as (partial) fix for RT-28684
+                // Request layout is here as (partial) fix for JDK-8118040
 //                 tableCell.requestLayout();
             } else {
                 getChildren().remove(tableCell);

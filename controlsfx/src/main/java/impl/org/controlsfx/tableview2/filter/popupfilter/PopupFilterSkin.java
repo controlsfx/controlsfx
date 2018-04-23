@@ -149,18 +149,18 @@ public class PopupFilterSkin<S, T> implements Skin<PopupFilter<S, T>> {
         }
     }
 
-    @Override
-    public PopupFilter<S, T> getSkinnable() {
+    /** {@inheritDoc} */
+    @Override public PopupFilter<S, T> getSkinnable() {
         return popupFilter;
     }
 
-    @Override
-    public Node getNode() {
+    /** {@inheritDoc} */
+    @Override public Node getNode() {
         return container;
     }
 
-    @Override
-    public void dispose() {
+    /** {@inheritDoc} */
+    @Override public void dispose() {
 
     }
 

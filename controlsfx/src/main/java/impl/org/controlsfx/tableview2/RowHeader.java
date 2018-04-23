@@ -275,8 +275,8 @@ public class RowHeader<S> extends StackPane {
         return tableView;
     }
     
-    @Override
-    protected void layoutChildren() {
+    /** {@inheritDoc} */
+    @Override protected void layoutChildren() {
         if (tableView.isRowHeaderVisible()) {
             double x = snappedLeftInset();
             innerRowHeaderWidth.setValue(tableView.getRowHeaderWidth());

@@ -54,8 +54,8 @@ public class FocusModelListener<S> implements ChangeListener<TablePosition<S, ?>
         this.tableView = tableView;
     }
 
-    @Override
-    public void changed(ObservableValue<? extends TablePosition<S, ?>> ov,
+    /** {@inheritDoc} */
+    @Override public void changed(ObservableValue<? extends TablePosition<S, ?>> ov,
             final TablePosition<S, ?> oldPosition,
             final TablePosition<S, ?> newPosition) {
         int columnIndex = -1;
@@ -137,7 +137,4 @@ public class FocusModelListener<S> implements ChangeListener<TablePosition<S, ?>
         return tableView.getRowSpan(pos, pos.getRow()) + pos.getRow();
     }
 
-//    public static int getPreviousRowNumber(final TablePosition<?, ?> pos, TableView<S> tableView, GridViewSkin skin) {
-//        return skin.getFirstRow(tableView.getItems().get(pos.getRow()).get(tableView.getColumns().indexOf(pos.getTableColumn())), pos.getRow()) - 1;
-//    }
 }

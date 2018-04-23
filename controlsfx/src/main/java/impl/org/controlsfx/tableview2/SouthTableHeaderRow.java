@@ -114,8 +114,8 @@ public class SouthTableHeaderRow extends Region {
      * Protected methods                                                       *
      **************************************************************************/
 
-    @Override
-    protected void layoutChildren() {
+    /** {@inheritDoc} */
+    @Override protected void layoutChildren() {
         super.layoutChildren();
         double x = snappedLeftInset();
         double h = getHeight() - snappedTopInset() - snappedBottomInset();
@@ -170,8 +170,8 @@ public class SouthTableHeaderRow extends Region {
         }
     }
     
-    @Override
-    protected double computePrefHeight(double width) {
+    /** {@inheritDoc} */
+    @Override protected double computePrefHeight(double width) {
         double height = getSouthColumnHeaders().stream()
                 .map(f -> f.prefHeight(-1))
                 .max(Double::compare)

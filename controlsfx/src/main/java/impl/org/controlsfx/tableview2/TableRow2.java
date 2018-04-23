@@ -122,18 +122,18 @@ public class TableRow2<S> extends TableRow<S> {
         getChildren().remove(gc);
     }
     
-    @Override
-    protected double computePrefHeight(double width) {
+    /** {@inheritDoc} */
+    @Override protected double computePrefHeight(double width) {
         return skin.getRowHeight(getIndex());
     }
     
-    @Override
-    protected double computeMinHeight(double width) {
+    /** {@inheritDoc} */
+    @Override protected double computeMinHeight(double width) {
         return skin.getRowHeight(getIndex());
     }
     
-    @Override
-    protected Skin<?> createDefaultSkin() {
+    /** {@inheritDoc} */
+    @Override protected Skin<?> createDefaultSkin() {
         return new TableRow2Skin<>(tableView, this);
     }
     

@@ -206,8 +206,8 @@ public class FilterEditor<S, T> extends ComboBox<T> {
         setValue(null);
     }
     
-    @Override
-    protected double computeMaxWidth(double height) {
+    /** {@inheritDoc} */
+    @Override protected double computeMaxWidth(double height) {
         return Double.MAX_VALUE;
     }
     

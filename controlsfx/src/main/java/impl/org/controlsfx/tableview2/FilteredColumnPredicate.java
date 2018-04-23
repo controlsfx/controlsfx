@@ -54,8 +54,8 @@ public class FilteredColumnPredicate<S, T> implements Predicate<S> {
         this.columns = Collections.unmodifiableList(columns);
     }
 
-    @Override
-    public boolean test(S s) {
+    /** {@inheritDoc} */
+    @Override public boolean test(S s) {
         for (TableColumnBase<S,T> tc : columns) {
             if (tc instanceof FilteredTableColumn) {
                 FilteredTableColumn<S, T> ftc = (FilteredTableColumn) tc;
@@ -74,12 +74,14 @@ public class FilteredColumnPredicate<S, T> implements Predicate<S> {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override public int hashCode() {
         int hash = 7;
         hash = 59 * hash + (this.columns != null ? this.columns.hashCode() : 0);
         return hash;
     }
 
+    /** {@inheritDoc} */
     @Override public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -99,8 +101,8 @@ public class FilteredColumnPredicate<S, T> implements Predicate<S> {
         return p == null || p.test(value);
     }
     
-    @Override 
-    public String toString() {
+    /** {@inheritDoc} */
+    @Override public String toString() {
         return "FilteredColumnsPredicate [ columns: " + columns + "] ";
     }
 

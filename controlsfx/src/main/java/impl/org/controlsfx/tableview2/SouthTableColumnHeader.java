@@ -129,8 +129,8 @@ public class SouthTableColumnHeader extends Region {
         }
     }
     
-    @Override
-    protected void layoutChildren() {
+    /** {@inheritDoc} */
+    @Override protected void layoutChildren() {
         resize(column.getWidth(), getHeight());
         if (! getChildren().isEmpty()) {
             Node n = getChildren().get(0);
@@ -138,13 +138,13 @@ public class SouthTableColumnHeader extends Region {
         }
     }
     
-    @Override
-    protected double computePrefWidth(double height) {
+    /** {@inheritDoc} */
+    @Override protected double computePrefWidth(double height) {
         return column.getWidth();
     }
     
-    @Override
-    protected double computePrefHeight(double width) {
+    /** {@inheritDoc} */
+    @Override protected double computePrefHeight(double width) {
         if (column == null || getChildren().isEmpty()) {
             return 0d;
         }

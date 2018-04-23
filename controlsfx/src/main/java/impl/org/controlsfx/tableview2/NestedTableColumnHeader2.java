@@ -70,8 +70,8 @@ public class NestedTableColumnHeader2 extends NestedTableColumnHeader {
     }
 
     
-    @Override
-    protected TableColumnHeader createTableColumnHeader(final TableColumnBase col) {
+    /** {@inheritDoc} */
+    @Override protected TableColumnHeader createTableColumnHeader(final TableColumnBase col) {
         TableViewSkinBase<?,?,?,?,?,TableColumnBase<?,?>> tableViewSkin = getTableViewSkin();
         if (col.getColumns().isEmpty()) {
             final TableColumnHeader tableColumnHeader = new TableColumnHeader(tableViewSkin, col);
@@ -96,8 +96,8 @@ public class NestedTableColumnHeader2 extends NestedTableColumnHeader {
         }
     }
 
-    @Override
-    protected void layoutChildren() {
+    /** {@inheritDoc} */
+    @Override protected void layoutChildren() {
         super.layoutChildren();
         layoutFixedColumns();
         updateDragRectangles();

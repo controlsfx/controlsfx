@@ -281,8 +281,8 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S,TableView<S>,TableV
         registerChangeListener(tableView.columnFixingEnabledProperty(), "FIXING");
     }
 
-    @Override
-    protected void handleControlPropertyChanged(String p) {
+    /** {@inheritDoc} */
+    @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
 
         if ("FIXING".equals(p)) {
@@ -618,8 +618,8 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S,TableView<S>,TableV
     private final IntegerProperty size = new SimpleIntegerProperty();
     public final IntegerProperty sizeProperty() { return size; }
     
-    @Override
-    protected void layoutChildren(double x, double y, double w, final double h) {
+    /** {@inheritDoc} */
+    @Override protected void layoutChildren(double x, double y, double w, final double h) {
         if (tableView == null) {
             return;
         }
@@ -669,13 +669,13 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S,TableView<S>,TableV
                .count();
     }
 
-    @Override
-    protected void onFocusPreviousCell() {
+    /** {@inheritDoc} */
+    @Override protected void onFocusPreviousCell() {
         focusScroll();
     }
 
-    @Override
-    protected void onFocusNextCell() {
+    /** {@inheritDoc} */
+    @Override protected void onFocusNextCell() {
         focusScroll();
     }
 
@@ -711,20 +711,20 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S,TableView<S>,TableV
          */
     }
     
-    @Override
-    protected void onSelectPreviousCell() {
+    /** {@inheritDoc} */
+    @Override protected void onSelectPreviousCell() {
         super.onSelectPreviousCell();
         scrollHorizontally();
     }
 
-    @Override
-    protected void onSelectNextCell() {
+    /** {@inheritDoc} */
+    @Override protected void onSelectNextCell() {
         super.onSelectNextCell();
         scrollHorizontally();
     }
 
-    @Override
-    protected VirtualFlow<TableRow<S>> createVirtualFlow() {
+    /** {@inheritDoc} */
+    @Override protected VirtualFlow<TableRow<S>> createVirtualFlow() {
         return new TableView2VirtualFlow<>(this);
     }
 
@@ -752,13 +752,13 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S,TableView<S>,TableV
         return tableMenuButtonVisibleProperty();
     }
 
-    @Override
-    public void scrollHorizontally(){
+    /** {@inheritDoc} */
+    @Override public void scrollHorizontally(){
         super.scrollHorizontally();
     }
     
-    @Override
-    protected void scrollHorizontally(TableColumn<S, ?> col) {
+    /** {@inheritDoc} */
+    @Override protected void scrollHorizontally(TableColumn<S, ?> col) {
         if (col == null || !col.isVisible()) {
             return;
         }
@@ -826,8 +826,8 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S,TableView<S>,TableV
          */
     }
 
-    @Override
-    protected void horizontalScroll() {
+    /** {@inheritDoc} */
+    @Override protected void horizontalScroll() {
         super.horizontalScroll();
         getSouthHeader().updateScrollX();
     }
@@ -941,89 +941,87 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S,TableView<S>,TableV
         public void onChanged(Change<? extends TableColumn> c) {
             hBarValue.clear();
             getFlow().requestLayout();
-            // requestLayout() not responding immediately..
-//            getFlow().layoutTotal();
         }
     };
 
-    @Override
-    protected TableSelectionModel<S> getSelectionModel() {
+    /** {@inheritDoc} */
+    @Override protected TableSelectionModel<S> getSelectionModel() {
         return getSkinnable().getSelectionModel();
     }
 
-    @Override
-    protected TableFocusModel<S, TableColumn<S, ?>> getFocusModel() {
+    /** {@inheritDoc} */
+    @Override protected TableFocusModel<S, TableColumn<S, ?>> getFocusModel() {
         return getSkinnable().getFocusModel();
     }
 
-    @Override
-    protected TablePositionBase<? extends TableColumn<S, ?>> getFocusedCell() {
+    /** {@inheritDoc} */
+    @Override protected TablePositionBase<? extends TableColumn<S, ?>> getFocusedCell() {
         return getSkinnable().getFocusModel().getFocusedCell();
     }
 
-    @Override
-    protected ObservableList<? extends TableColumn<S, ?>> getVisibleLeafColumns() {
+    /** {@inheritDoc} */
+    @Override protected ObservableList<? extends TableColumn<S, ?>> getVisibleLeafColumns() {
         return getSkinnable().getVisibleLeafColumns();
     }
 
-    @Override
-    protected int getVisibleLeafIndex(TableColumn<S, ?> tc) {
+    /** {@inheritDoc} */
+    @Override protected int getVisibleLeafIndex(TableColumn<S, ?> tc) {
         return getSkinnable().getVisibleLeafIndex(tc);
     }
 
-    @Override
-    protected TableColumn<S, ?> getVisibleLeafColumn(int col) {
+    /** {@inheritDoc} */
+    @Override protected TableColumn<S, ?> getVisibleLeafColumn(int col) {
         return getSkinnable().getVisibleLeafColumn(col);
     }
 
-    @Override
-    protected ObservableList<TableColumn<S, ?>> getColumns() {
+    /** {@inheritDoc} */
+    @Override protected ObservableList<TableColumn<S, ?>> getColumns() {
         return getSkinnable().getColumns();
     }
 
-    @Override
-    protected ObservableList<TableColumn<S, ?>> getSortOrder() {
+    /** {@inheritDoc} */
+    @Override protected ObservableList<TableColumn<S, ?>> getSortOrder() {
         return getSkinnable().getSortOrder();
     }
 
-    @Override
-    protected ObjectProperty<ObservableList<S>> itemsProperty() {
+    /** {@inheritDoc} */
+    @Override protected ObjectProperty<ObservableList<S>> itemsProperty() {
         return getSkinnable().itemsProperty();
     }
 
-    @Override
-    protected ObjectProperty<Callback<TableView<S>, TableRow<S>>> rowFactoryProperty() {
+    /** {@inheritDoc} */
+    @Override protected ObjectProperty<Callback<TableView<S>, TableRow<S>>> rowFactoryProperty() {
         return getSkinnable().rowFactoryProperty();
     }
 
-    @Override
-    protected ObjectProperty<Node> placeholderProperty() {
+    /** {@inheritDoc} */
+    @Override protected ObjectProperty<Node> placeholderProperty() {
         return getSkinnable().placeholderProperty();
     }
 
-    @Override
-    protected BooleanProperty tableMenuButtonVisibleProperty() {
+    /** {@inheritDoc} */
+    @Override protected BooleanProperty tableMenuButtonVisibleProperty() {
         return getSkinnable().tableMenuButtonVisibleProperty();
     }
 
-    @Override
-    protected ObjectProperty<Callback<ResizeFeaturesBase, Boolean>> columnResizePolicyProperty() {
+    /** {@inheritDoc} */
+    @Override protected ObjectProperty<Callback<ResizeFeaturesBase, Boolean>> columnResizePolicyProperty() {
         return (ObjectProperty<Callback<ResizeFeaturesBase, Boolean>>) (Object)getSkinnable().columnResizePolicyProperty();
     }
 
-    @Override
-    protected boolean resizeColumn(TableColumn<S, ?> tc, double delta) {
+    /** {@inheritDoc} */
+    @Override protected boolean resizeColumn(TableColumn<S, ?> tc, double delta) {
         getTableHeaderRow2().getRootHeader().lastColumnResized = getColumns().indexOf(tc);
         return getSkinnable().resizeColumn(tc, delta);
     }
 
-    @Override
-    protected void edit(int index, TableColumn<S, ?> column) {
+    /** {@inheritDoc} */
+    @Override protected void edit(int index, TableColumn<S, ?> column) {
         getSkinnable().edit(index, column);
     }
 
-    @Override
-    public TableRow<S> createCell() {
+    /** {@inheritDoc} */
+    @Override public TableRow<S> createCell() {
         TableRow<S> cell;
 
         if (getSkinnable().getRowFactory() != null) {
@@ -1036,8 +1034,8 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S,TableView<S>,TableV
         return cell;
     }
 
-    @Override
-    public final int getItemCount() {
+    /** {@inheritDoc} */
+    @Override public final int getItemCount() {
         return getSkinnable().getItems() == null ? 0 : getSkinnable().getItems().size();
     }
 

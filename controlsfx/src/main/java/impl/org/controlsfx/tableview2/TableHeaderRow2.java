@@ -161,8 +161,8 @@ public class TableHeaderRow2 extends TableHeaderRow {
         control.southHeaderBlendedProperty().addListener(o -> updateVisibleLeafStyle());
     }
 
-    @Override
-    public NestedTableColumnHeader2 getRootHeader() {
+    /** {@inheritDoc} */
+    @Override public NestedTableColumnHeader2 getRootHeader() {
         return (NestedTableColumnHeader2) super.getRootHeader();
     }
 
@@ -175,6 +175,7 @@ public class TableHeaderRow2 extends TableHeaderRow {
      * Protected methods
      * 
      **************************************************************************/
+    /** {@inheritDoc} */
     @Override protected void layoutChildren() {
         double x = scrollX;
         double headerWidth = snapSize(header.prefWidth(-1));
@@ -210,8 +211,8 @@ public class TableHeaderRow2 extends TableHeaderRow {
         selectedColumns.clear();
     }
     
-    @Override
-    protected void updateTableWidth() {
+    /** {@inheritDoc} */
+    @Override protected void updateTableWidth() {
         super.updateTableWidth();
         // snapping added for RT-19428
         double padding = 0;
@@ -229,8 +230,8 @@ public class TableHeaderRow2 extends TableHeaderRow {
         clip.setWidth(clip.getWidth() == 0 ? 0 : clip.getWidth() - padding);
     }
 
-    @Override
-    protected void updateScrollX() {
+    /** {@inheritDoc} */
+    @Override protected void updateScrollX() {
         scrollX = skin.getFlow().getHorizontalBar().isVisible() ? -skin.getFlow().getHorizontalBar().getValue() : 0.0F;
         requestLayout();
         layout();
@@ -241,8 +242,8 @@ public class TableHeaderRow2 extends TableHeaderRow {
         }
     }
 
-    @Override
-    protected NestedTableColumnHeader createRootHeader() {
+    /** {@inheritDoc} */
+    @Override protected NestedTableColumnHeader createRootHeader() {
         return new NestedTableColumnHeader2(getTableSkin(), null);
     }
 
@@ -252,13 +253,13 @@ public class TableHeaderRow2 extends TableHeaderRow {
         updateHighlightSelection();
     }
 
-    @Override
-    public TableColumnHeader getReorderingRegion() {
+    /** {@inheritDoc} */
+    @Override public TableColumnHeader getReorderingRegion() {
         return reorderingRegion;
     }
     
-    @Override
-    public void setReorderingRegion(TableColumnHeader reorderingRegion) {
+    /** {@inheritDoc} */
+    @Override public void setReorderingRegion(TableColumnHeader reorderingRegion) {
         this.reorderingRegion = reorderingRegion;
         
         if (reorderingRegion != null) {

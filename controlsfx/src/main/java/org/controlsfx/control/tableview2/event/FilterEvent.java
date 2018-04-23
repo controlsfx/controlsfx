@@ -67,6 +67,7 @@ public class FilterEvent<C> extends Event {
 
     }
 
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override public C getSource() {
         return (C) super.getSource();

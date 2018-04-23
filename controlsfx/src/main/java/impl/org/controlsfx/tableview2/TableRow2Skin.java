@@ -86,8 +86,8 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>, CellBehaviorBase
         }
     }
 
-    @Override
-    protected void handleControlPropertyChanged(String p) {
+    /** {@inheritDoc} */
+    @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
 
         if ("INDEX".equals(p)) {
@@ -123,8 +123,8 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>, CellBehaviorBase
         }
     }
 
-    @Override
-    protected void layoutChildren(double x, final double y, final double w, final double h) {
+    /** {@inheritDoc} */
+    @Override protected void layoutChildren(double x, final double y, final double w, final double h) {
 
         final ObservableList<? extends TableColumnBase<?, ?>> visibleLeafColumns = tableView.getVisibleLeafColumns();
         if (visibleLeafColumns.isEmpty()) {
@@ -302,7 +302,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>, CellBehaviorBase
 
                 /**
                  * Check selection. 
-                 * See SUPMS-45
+                 * Fixes a bug in cell selection after a column is hidden 
                  */
                 if (tableView.getSelectionModel() != null && tableView.getSelectionModel().isCellSelectionEnabled()) {
                     final int ic = indexColumn;
@@ -697,8 +697,8 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>, CellBehaviorBase
         return (x + width < hbarValue && columnSpan == 1) || (x > hbarValue + headerWidth);
     }
 
-    @Override
-    protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+    /** {@inheritDoc} */
+    @Override protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
         double prefWidth = 0.0;
 
         final List<? extends TableColumnBase/*<T,?>*/> visibleLeafColumns = tableView.getVisibleLeafColumns();
@@ -709,24 +709,24 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>, CellBehaviorBase
         return prefWidth;
     }
 
-    @Override
-    protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+    /** {@inheritDoc} */
+    @Override protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         if (parentTableView != null) {
             return skin.getRow(getSkinnable().getIndex()).getPrefHeight();
         }
         return getSkinnable().getPrefHeight();
     }
 
-    @Override
-    protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+    /** {@inheritDoc} */
+    @Override protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         if (parentTableView != null) {
             return skin.getRow(getSkinnable().getIndex()).getPrefHeight();
         }
         return getSkinnable().getPrefHeight();
     }
 
-    @Override
-    protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+    /** {@inheritDoc} */
+    @Override protected double computeMaxHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
         return super.computeMaxHeight(width, topInset, rightInset, bottomInset, leftInset);
     }
 }

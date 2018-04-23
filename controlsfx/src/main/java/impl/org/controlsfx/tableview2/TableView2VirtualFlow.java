@@ -119,15 +119,15 @@ final class TableView2VirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<
         });
     }
 
-    @Override
-    public void show(int index) {
+    /** {@inheritDoc} */
+    @Override public void show(int index) {
         super.show(index);
         layoutTotal();
         layoutFixedRows();
     }
 
-    @Override
-    public void scrollTo(int index) {
+    /** {@inheritDoc} */
+    @Override public void scrollTo(int index) {
         //If we have some fixedRows, we check if the selected row is not below them
         if (! getCells().isEmpty() && ! tableView.getFixedRows().isEmpty()) {
             double offset = skin.getFixedRowHeight();
@@ -143,8 +143,8 @@ final class TableView2VirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<
         layoutFixedRows();
     }
 
-    @Override
-    public double adjustPixels(final double delta) {
+    /** {@inheritDoc} */
+    @Override public double adjustPixels(final double delta) {
         final double returnValue = super.adjustPixels(delta);
         adjusting = true;
         this.adjustedPixels.set(delta);
@@ -174,8 +174,8 @@ final class TableView2VirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<
      * * Protected Methods * *
      **************************************************************************/
 
-    @Override
-    protected void layoutChildren() {
+    /** {@inheritDoc} */
+    @Override protected void layoutChildren() {
         /**
          * In fact, we must do a layout even when editing, because if the user
          * resize the window during edition, if we block layout, the view will
@@ -268,8 +268,8 @@ final class TableView2VirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<
         return getHbar();
     }
 
-    @Override
-    protected List<T> getCells() {
+    /** {@inheritDoc} */
+    @Override protected List<T> getCells() {
         return super.getCells();
     }
 

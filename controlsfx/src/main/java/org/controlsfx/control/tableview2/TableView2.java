@@ -196,8 +196,6 @@ public class TableView2<S> extends TableView<S> {
 
     private BitSet rowFix; // Compute if we can fix the rows or not.
 
-//    private final TableView2SelectionModel selectionModel; // NOT USED
-
     /**
      * The vertical header width, just for the Label.
      */
@@ -224,24 +222,6 @@ public class TableView2<S> extends TableView<S> {
         super(items);
         getStyleClass().add("table-view2"); //$NON-NLS-1$
         
-        /**
-         * Add a listener to the selection model in order to edit the spanned
-         * cells when clicked
-         */
-//        TableViewSpanSelectionModel tableViewSpanSelectionModel = new TableViewSpanSelectionModel(this);
-//        setSelectionModel(tableViewSpanSelectionModel);
-//        tableViewSpanSelectionModel.setCellSelectionEnabled(false);
-//        tableViewSpanSelectionModel.setSelectionMode(SelectionMode.SINGLE);
-//        selectionModel = new TableView2SelectionModel(this, tableViewSpanSelectionModel);
-/**
- * Set the focus model to track keyboard change and redirect focus on
- * spanned cells
- */
-// We add a listener on the focus model in order to catch when we are on
-// a hidden cell
-//        getFocusModel().focusedCellProperty()
-//                .addListener((ChangeListener<TablePosition>) (ChangeListener<?>) new FocusModelListener(this));
-
         // Listeners & handlers
         fixedRows.addListener(fixedRowsListener);
         fixedColumns.addListener(fixedColumnsListener);
@@ -581,15 +561,6 @@ public class TableView2<S> extends TableView<S> {
     public final boolean isSouthHeaderBlended() { return southHeaderBlended.get(); }
     public final BooleanProperty southHeaderBlendedProperty() { return southHeaderBlended; }
    
-//    /**
-//     * Return the selectionModel used by the TableView2. 
-//     * 
-//     * @return {@link TableView2SelectionModel}
-//     */
-//    public TableView2SelectionModel getTableView2SelectionModel() {
-//        return selectionModel;
-//    }
-    
     /**
      * Return the {@link SpanType} of a cell. This is used internally by the
      * TableView2 but some users may find it useful.
@@ -768,13 +739,13 @@ public class TableView2<S> extends TableView<S> {
         }
     };
 
-    @Override
-    protected Skin<?> createDefaultSkin() {
+    /** {@inheritDoc} */
+    @Override protected Skin<?> createDefaultSkin() {
         return new TableView2Skin(this);
     }
     
-    @Override
-    public String getUserAgentStylesheet() {
+    /** {@inheritDoc} */
+    @Override public String getUserAgentStylesheet() {
         /*
          * For more information please see RT-40658
          */
@@ -784,26 +755,6 @@ public class TableView2<S> extends TableView<S> {
         }
 
         return stylesheet;
-    }
-    
-    private void spanRow(int count, int rowIndex, int colIndex) {
-        if (getItems() == null) {
-            return;
-        }
-        if (count <= 0 || count > getItems().size() || rowIndex >= getItems().size() || colIndex >= getColumns().size()) {
-            return;
-        }
-        // TODO: provide impl
-    }
-
-    private void spanColumn(int count, int rowIndex, int colIndex) {
-        if (getItems() == null) {
-            return;
-        }
-        if (count <= 0 || count > getColumns().size() || rowIndex >= getItems().size() || colIndex >= getColumns().size()) {
-            return;
-        }
-        // TODO: provide impl
     }
 
 }

@@ -224,8 +224,8 @@ public class TextField2TableCell<S, T> extends TextFieldTableCell<S, T> {
         });
     }
     
-    @Override
-    public void commitEdit(T item) {
+    /** {@inheritDoc} */
+    @Override public void commitEdit(T item) {
         if (! isEditing() && ! item.equals(getItem())) {
             TableView<S> table = getTableView();
             if (table != null) {

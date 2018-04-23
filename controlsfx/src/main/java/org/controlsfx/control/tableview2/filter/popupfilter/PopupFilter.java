@@ -127,8 +127,8 @@ public abstract class PopupFilter<S, T> extends PopupControl {
         return tableColumn;
     }
 
-    @Override
-    protected Skin<?> createDefaultSkin() {
+    /** {@inheritDoc} */
+    @Override protected Skin<?> createDefaultSkin() {
         return new PopupFilterSkin<>(this);
     }
 

@@ -39,3 +39,6 @@ jar {
     from sourceSets.main.allJava
 }
 
+javadoc {
+    options.encoding = 'UTF-8'
+}

@@ -45,6 +45,19 @@ import static impl.org.controlsfx.i18n.Localization.localize;
  * 
  * This action has to be bound to a CheckMenuItem node.
  * 
+ * <h3>Sample</h3>
+ * 
+ * <p>The following code snippet creates a column with a ContextMenu that contains
+ * the fix action for the column:
+ * 
+ * <pre>
+ * {@code
+ * TableColumn2<Person,String> firstNameCol = new TableColumn2<>("First Name");
+ * firstNameCol.setCellValueFactory(p -> p.getValue().firstNameProperty());
+ * ContextMenu cm = ActionUtils.createContextMenu(Arrays.asList(new ColumnFixAction(firstNameColumn)));
+ * firstNameColumn.setContextMenu(cm);
+ * }</pre>
+ * 
  * @see ActionUtils#createContextMenu(java.util.Collection) 
  */
 @ActionCheck
@@ -52,14 +65,50 @@ public class ColumnFixAction extends Action {
 
     private InvalidationListener fixedColumnsListener;
 
+    /**
+     * Creates a fix action for a given column. When fired, the action will fix 
+     * the column if is allowed and the column wasn't fixed yet, or unfix a fixed
+     * column.
+     * 
+     * The action can be attached for instance to the {@link javafx.scene.control.ContextMenu}
+     * of the column.
+     * 
+     * @param column The TableColumn to which the action is applied to
+     */
     public ColumnFixAction(TableColumn column) {
         this(column, localize(asKey("tableview2.column.menu.fixed")));
     }
 
+    /**
+     * Creates a fix action for a given column. When fired, the action will fix 
+     * the column if is allowed and the column wasn't fixed yet, or unfix a fixed
+     * column.
+     * 
+     * The action can be attached for instance to the {@link javafx.scene.control.ContextMenu}
+     * of the column.
+     * 
+     * @param column The TableColumn to which the action is applied to
+     * @param name the string to display in the text property of controls such
+     *      as {@link javafx.scene.control.CheckMenuItem#textProperty() MenuItem}.
+     */
     public ColumnFixAction(TableColumn column, String name) {
         this(column, name, null);
     }
 
+    /**
+     * Creates a fix action for a given column. When fired, the action will fix 
+     * the column if is allowed and the column wasn't fixed yet, or unfix a fixed
+     * column.
+     * 
+     * The action can be attached for instance to the {@link javafx.scene.control.ContextMenu}
+     * of the column.
+     * 
+     * @param column The TableColumn to which the action is applied to
+     * @param name the string to display in the text property of controls such
+     *      as {@link javafx.scene.control.CheckMenuItem#textProperty() MenuItem}.
+     * @param image the node to display in the graphic property of controls such
+     *      as {@link javafx.scene.control.CheckMenuItem#textProperty() CheckMenuItem}.
+     */
     public ColumnFixAction(TableColumn column, String name, Node image) {
         super(name);
         
@@ -83,8 +132,8 @@ public class ColumnFixAction extends Action {
         }
     }
 
-    @Override 
-    public String toString() {
+    /** {@inheritDoc} */
+    @Override public String toString() {
         return getText();
     }
 

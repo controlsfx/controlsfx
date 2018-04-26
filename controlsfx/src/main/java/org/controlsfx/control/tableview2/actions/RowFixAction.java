@@ -40,21 +40,73 @@ import static impl.org.controlsfx.i18n.Localization.localize;
  * A custom action that can be added to the ContextMenu of any row in the 
  * row header, allowing the user to fix or unfix the row.
  * 
- * This action has to be bound to a CheckMenuItem node.
+ * This action has to be bound to a {@link javafx.scene.control.CheckMenuItem} node.
+ * 
+ * <h3>Sample</h3>
+ * 
+ * <p>The following code snippet provides a ContextMenu that contains
+ * the fix action for each row in the row header:
+ * 
+ * <pre>
+ * {@code
+ * TableView2<Person> table = new TableView2<Person>();
+ * table.setRowHeaderVisible(true);
+ * table.setRowHeaderContextMenuFactory((i, person) -> 
+ *     ActionUtils.createContextMenu(Arrays.asList(new RowFixAction(this, i))));
+ * }</pre>
  * 
  * @see ActionUtils#createContextMenu(java.util.Collection) 
  */
 @ActionCheck
 public class RowFixAction extends Action {
         
+    /**
+     * Creates a fix action for a given column. When fired, the action will fix 
+     * the column if is allowed and the column wasn't fixed yet, or unfix a fixed
+     * column.
+     * 
+     * The action can be attached for instance to the {@link javafx.scene.control.ContextMenu}
+     * of the column.
+     * 
+     * @param tableView The TableView2 to which the action is applied to
+     * @param row The number of row
+     */
     public RowFixAction(TableView2 tableView, Integer row) {
         this(tableView, row, localize(asKey("tableview2.rowheader.menu.fixed")));
     }
 
+    /**
+     * Creates a fix action for a given column. When fired, the action will fix 
+     * the column if is allowed and the column wasn't fixed yet, or unfix a fixed
+     * column.
+     * 
+     * The action can be attached for instance to the {@link javafx.scene.control.ContextMenu}
+     * of the column.
+     * 
+     * @param tableView The TableView2 to which the action is applied to
+     * @param row The number of row
+     * @param name the string to display in the text property of controls such
+     *      as {@link javafx.scene.control.CheckMenuItem#textProperty() MenuItem}.
+     */
     public RowFixAction(TableView2 tableView, Integer row, String name) {
         this(tableView, row, name, null);
     }
 
+    /**
+     * Creates a fix action for a given column. When fired, the action will fix 
+     * the column if is allowed and the column wasn't fixed yet, or unfix a fixed
+     * column.
+     * 
+     * The action can be attached for instance to the {@link javafx.scene.control.ContextMenu}
+     * of the column.
+     * 
+     * @param tableView The TableView2 to which the action is applied to
+     * @param row The number of row
+     * @param name the string to display in the text property of controls such
+     *      as {@link javafx.scene.control.CheckMenuItem#textProperty() MenuItem}.
+     * @param image the node to display in the graphic property of controls such
+     *      as {@link javafx.scene.control.CheckMenuItem#textProperty() CheckMenuItem}.
+     */
     public RowFixAction(TableView2 tableView, Integer row, String name, Node image) {
         super(name);
 
@@ -78,8 +130,8 @@ public class RowFixAction extends Action {
         }
     }
 
-    @Override 
-    public String toString() {
+    /** {@inheritDoc} */
+    @Override public String toString() {
         return getText();
     }
     

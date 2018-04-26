@@ -53,7 +53,7 @@ import org.controlsfx.control.tableview2.filter.popupfilter.PopupFilter;
  * 
  * The table items have to be wrapped with a {@link FilteredList}.
  * 
- * {@link #configureForFiltering(org.controlsfx.control.tableview2.FilteredTableView, javafx.collections.ObservableList) }
+ * {@link #configureForFiltering(org.controlsfx.control.tableview2.FilteredTableView, javafx.collections.ObservableList) configureForFiltering}
  * is a convenient method that can be used for that purpose.
  * 
  * <h3>Features</h3>
@@ -67,6 +67,97 @@ import org.controlsfx.control.tableview2.filter.popupfilter.PopupFilter;
  * 
  * <br>Alternatively, a {@link SouthFilter} control can be placed in the south 
  * header node.
+ * 
+ * <h2>Sample</h2>
+ * 
+ * <p>Let's provide the underlying data model, based on a <code>Person</code> class. 
+ * 
+ * <pre>
+ * {@code
+ * public class Person {
+ *     private StringProperty firstName;
+ *     public void setFirstName(String value) { firstNameProperty().set(value); }
+ *     public String getFirstName() { return firstNameProperty().get(); }
+ *     public StringProperty firstNameProperty() {
+ *         if (firstName == null) firstName = new SimpleStringProperty(this, "firstName");
+ *         return firstName;
+ *     }
+ *
+ *     private StringProperty lastName;
+ *     public void setLastName(String value) { lastNameProperty().set(value); }
+ *     public String getLastName() { return lastNameProperty().get(); }
+ *     public StringProperty lastNameProperty() {
+ *         if (lastName == null) lastName = new SimpleStringProperty(this, "lastName");
+ *         return lastName;
+ *     }
+ * }}</pre>
+ * 
+ * <p>A FilteredTableView can be created, and filled with an observable list of people,
+ * that has to be wrapped with a SortedList and a FilteredList, in order to apply
+ * sorting and filtering:
+ * 
+ * <pre>
+ * {@code
+ * FilteredTableView<Person> table = new FilteredTableView<Person>();
+ * ObservableList<Person> people = getPeople();
+ * FilteredList<Person> filteredPeople = new FilteredList<>(people);
+ * filteredPeople.predicateProperty().bind(table.predicateProperty());
+ * SortedList<Person> sortedPeople = new SortedList<>(filteredPeople);
+ * sortedPeople.comparatorProperty().bind(table.comparatorProperty());
+ * table.setItems(sortedPeople);
+ * }</pre>
+ * 
+ * <p>Alternatively, {@link #configureForFiltering(org.controlsfx.control.tableview2.FilteredTableView, javafx.collections.ObservableList) configureForFiltering}
+ * can be used:
+ * 
+ * <pre>
+ * {@code
+ * FilteredTableView<Person> table = new FilteredTableView<Person>();
+ * ObservableList<Person> people = getPeople();
+ * FilteredTableView.configureForFiltering(table, people);
+ * }</pre>
+ * 
+ * <p>Now we add two {@link FilteredTableColumn columns} to the table:
+ * 
+ * <pre>
+ * {@code
+ * FilteredTableColumn<Person,String> firstNameCol = new FilteredTableColumn<>("First Name");
+ * firstNameCol.setCellValueFactory(p -> p.getValue().firstNameProperty());
+ * FilteredTableColumn<Person,String> lastNameCol = new FilteredTableColumn<>("Last Name");
+ * lastNameCol.setCellValueFactory(p -> p.getValue().lastNameProperty());
+ *
+ * table.getColumns().setAll(firstNameCol, lastNameCol);}</pre>
+ *
+ * <p>A cell factory that allows commit on focus lost can be set:
+ * 
+ * <pre>
+ * {@code
+ * firstName.setCellFactory(TextField2TableCell.forTableColumn());}</pre>
+ *
+ * <p>We can fix some row and columns, and also show the row header:
+ * 
+ * <pre>
+ * {@code
+ * table.getFixedColumns().setAll(firstNameColumn);
+ * table.getFixedRows().setAll(0, 1, 2);
+ *
+ * table.setRowHeaderVisible(true);}</pre>
+ * 
+ * <p>A popup filter editor can be easily added to a column header:
+ * 
+ * <pre>
+ * {@code
+ * PopupFilter<Person, String> popupFirstNameFilter = new PopupStringFilter<>(firstName);
+ * firstName.setOnFilterAction(e -> popupFirstNameFilter.showPopup());}
+ * </pre>
+ *
+ * <p>Alternatively, a south filter editor can be added to the south node:
+ * 
+ * <pre>
+ * {@code
+ * SouthFilter<Person, String> editorFirstNameFilter = new SouthFilter<>(firstName, String.class);
+ * firstName.setSouthNode(editorFirstNameFilter);}
+ * </pre>
  * 
  * @param <S> The type of the objects contained within the FilteredTableView items list.
  */
@@ -180,16 +271,6 @@ public class FilteredTableView<S> extends TableView2<S> {
      **************************************************************************/
 
     /**
-     * Returns the original observable list, before it is wrapped into a 
-     * {@link FilteredList} and a {@link SortedList}.
-     *
-     * @return The original {@link ObservableList} 
-     */
-    public ObservableList<S> getBackingList() {
-        return backingList;
-    }
-
-    /**
      * Sets the original observable list, before it is wrapped into a 
      * {@link FilteredList} and a {@link SortedList}.
      * 
@@ -282,18 +363,18 @@ public class FilteredTableView<S> extends TableView2<S> {
      */
     private ObjectProperty<EventHandler<FilterEvent<TableView<S>>>> onFilter;
 
-    public void setOnFilter(EventHandler<FilterEvent<TableView<S>>> value) {
+    public final void setOnFilter(EventHandler<FilterEvent<TableView<S>>> value) {
         onFilterProperty().set(value);
     }
 
-    public EventHandler<FilterEvent<TableView<S>>> getOnFilter() {
+    public final EventHandler<FilterEvent<TableView<S>>> getOnFilter() {
         if (onFilter != null) {
             return onFilter.get();
         }
         return null;
     }
 
-    public ObjectProperty<EventHandler<FilterEvent<TableView<S>>>> onFilterProperty() {
+    public final ObjectProperty<EventHandler<FilterEvent<TableView<S>>>> onFilterProperty() {
         if (onFilter == null) {
             onFilter = new ObjectPropertyBase<EventHandler<FilterEvent<TableView<S>>>>() {
                 @Override protected void invalidated() {
@@ -320,19 +401,6 @@ public class FilteredTableView<S> extends TableView2<S> {
     public void resetFilter() {
         setPredicate(null);
         resetColumnsFilter();
-    }
-    
-    private void resetColumnsFilter() {
-        getVisibleLeafColumns().stream()
-                .filter(FilteredTableColumn.class::isInstance)
-                .map(FilteredTableColumn.class::cast)
-                .filter(FilteredTableColumn::isFilterable)
-                .peek(c -> c.setPredicate(null))
-                .map(f -> f.getSouthNode())
-                .filter(Objects::nonNull)
-                .filter(SouthFilter.class::isInstance)
-                .map(f -> ((SouthFilter) f).getFilterEditor())
-                .forEach(FilterEditor::cancelFilter);
     }
     
     /**
@@ -374,5 +442,32 @@ public class FilteredTableView<S> extends TableView2<S> {
             setPredicate(oldPredicate);
         }
 
+    }
+    
+    /***************************************************************************
+     * * Protected/Private Methods * *
+     **************************************************************************/
+
+    /**
+     * Returns the original observable list, before it is wrapped into a 
+     * {@link FilteredList} and a {@link SortedList}.
+     *
+     * @return The original {@link ObservableList} 
+     */
+    ObservableList<S> getBackingList() {
+        return backingList;
+    }
+    
+    private void resetColumnsFilter() {
+        getVisibleLeafColumns().stream()
+                .filter(FilteredTableColumn.class::isInstance)
+                .map(FilteredTableColumn.class::cast)
+                .filter(FilteredTableColumn::isFilterable)
+                .peek(c -> c.setPredicate(null))
+                .map(f -> f.getSouthNode())
+                .filter(Objects::nonNull)
+                .filter(SouthFilter.class::isInstance)
+                .map(f -> ((SouthFilter) f).getFilterEditor())
+                .forEach(FilterEditor::cancelFilter);
     }
 }

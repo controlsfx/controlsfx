@@ -34,6 +34,30 @@ import javafx.scene.control.TableColumn;
 /**
  * An extension of {@link TableColumn} that allows adding a South Header Node.
  * 
+ * The south header is an extended region below the regular column header, and where 
+ * a node can be laid out with {@link #setSouthNode(javafx.scene.Node) }.
+ * This node can be used for displaying a filter editor, a column totalizer or 
+ * other purposes.
+ * 
+ * <h3>Sample</h3>
+ * 
+ * <p>The following code snippet creates a column and adds a label as south node 
+ * that will display the occurrences of the text "1" in the column:
+ * 
+ * <pre>
+ * {@code
+ * TableColumn2<Person,String> firstNameCol = new TableColumn2<>("First Name");
+ * firstNameCol.setCellValueFactory(p -> p.getValue().firstNameProperty());
+ * firstName.setCellFactory(TextField2TableCell.forTableColumn());
+ * Label labelFirstName = new Label();
+ * labelFirstName.textProperty().bind(Bindings.createStringBinding(() ->
+ *        "#1: " + table.getItems().stream()
+ *                    .filter(t -> t.getFirstName()
+ *                    .contains("1"))
+ *                    .count(), table.getItems()));
+ * firstName.setSouthNode(labelFirstName);
+ * }</pre>
+ * 
  * @param <S> The type of the objects contained within the TableView items list.
  * @param <T> The type of the content in all cells in this TableColumn
  */
@@ -50,6 +74,11 @@ public class TableColumn2<S, T> extends TableColumn<S, T> {
         super();
     }
     
+    /**
+     * Creates a TableColumn2 control with the text set to the provided string
+     * @param text The string to show when the TableColumn2 is placed within the 
+     * TableView2.
+     */
     public TableColumn2(String text) {
         this();
         setText(text);

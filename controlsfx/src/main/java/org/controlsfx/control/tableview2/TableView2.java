@@ -124,6 +124,65 @@ import org.controlsfx.control.tableview2.cell.TextField2TableCell;
  * <br>
  * Cell spanning is not supported yet. 
  * 
+ * <h2>Sample</h2>
+ * 
+ * <p>Let's provide the underlying data model, based on a <code>Person</code> class. 
+ * 
+ * <pre>
+ * {@code
+ * public class Person {
+ *     private StringProperty firstName;
+ *     public void setFirstName(String value) { firstNameProperty().set(value); }
+ *     public String getFirstName() { return firstNameProperty().get(); }
+ *     public StringProperty firstNameProperty() {
+ *         if (firstName == null) firstName = new SimpleStringProperty(this, "firstName");
+ *         return firstName;
+ *     }
+ *
+ *     private StringProperty lastName;
+ *     public void setLastName(String value) { lastNameProperty().set(value); }
+ *     public String getLastName() { return lastNameProperty().get(); }
+ *     public StringProperty lastNameProperty() {
+ *         if (lastName == null) lastName = new SimpleStringProperty(this, "lastName");
+ *         return lastName;
+ *     }
+ * }}</pre>
+ * 
+ * <p>A TableView2 can be created, and filled with an observable list of people:
+ * 
+ * <pre>
+ * {@code
+ * TableView2<Person> table = new TableView2<Person>();
+ * ObservableList<Person> people = getPeople();
+ * table.setItems(people);
+ * }</pre>
+ * 
+ * <p>Now we add two {@link TableColumn2 columns} to the table:
+ * 
+ * <pre>
+ * {@code
+ * TableColumn2<Person,String> firstNameCol = new TableColumn2<>("First Name");
+ * firstNameCol.setCellValueFactory(p -> p.getValue().firstNameProperty());
+ * TableColumn2<Person,String> lastNameCol = new TableColumn2<>("Last Name");
+ * lastNameCol.setCellValueFactory(p -> p.getValue().lastNameProperty());
+ *
+ * table.getColumns().setAll(firstNameCol, lastNameCol);}</pre>
+ *
+ * <p>A cell factory that allows commit on focus lost can be set:
+ * 
+ * <pre>
+ * {@code
+ * firstName.setCellFactory(TextField2TableCell.forTableColumn());}</pre>
+ *
+ * <p>We can fix some row and columns, and also show the row header:
+ * 
+ * <pre>
+ * {@code
+ * table.getFixedColumns().setAll(firstNameColumn);
+ * table.getFixedRows().setAll(0, 1, 2);
+ *
+ * table.setRowHeaderVisible(true);}</pre>
+ * 
  * @param <S> The type of the objects contained within the TableView2 items list.
  */
 public class TableView2<S> extends TableView<S> {
@@ -211,13 +270,19 @@ public class TableView2<S> extends TableView<S> {
      **************************************************************************/
 
     /**
-     * Creates a TableView2 control.
+     * Creates a TableView2 control with no content.
      *
      */
     public TableView2() {
         this(FXCollections.<S>observableArrayList());
     }
     
+    /**
+     * Creates a TableView2 with the content provided in the items ObservableList.
+     *
+     * @param items The items to insert into the TableView2, and the list to watch
+     *          for changes (to automatically show in the TableView2).
+     */
     public TableView2(ObservableList<S> items) {
         super(items);
         getStyleClass().add("table-view2"); //$NON-NLS-1$

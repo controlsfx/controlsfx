@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,11 +58,13 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -119,7 +121,7 @@ public class HelloTableView2 extends ControlsFXSample {
     
     @Override
     public Node getControlPanel() {
-        return buildCommonControlGrid();
+        return new VBox(10, buildCommonControl(), buildTableView2Control());
     }
 
     @Override
@@ -133,7 +135,7 @@ public class HelloTableView2 extends ControlsFXSample {
      *
      * @return
      */
-    private GridPane buildCommonControlGrid() {
+    private Node buildCommonControl() {
         final GridPane grid = new GridPane();
         grid.setHgap(5);
         grid.setVgap(10);
@@ -141,29 +143,29 @@ public class HelloTableView2 extends ControlsFXSample {
 
         int row = 0;
 
-        CheckBox tableEditionEnabled = new CheckBox("Table Edition Enabled");
-        table.editableProperty().bind(tableEditionEnabled.selectedProperty());
-        tableEditionEnabled.setSelected(true);
-        grid.add(tableEditionEnabled, 0, row++);
+        CheckBox tableEditingEnabled = new CheckBox("Table Editing Enabled");
+        table.editableProperty().bind(tableEditingEnabled.selectedProperty());
+        tableEditingEnabled.setSelected(true);
+        grid.add(tableEditingEnabled, 0, row++);
         
-        CheckBox columnsEditionEnabled = new CheckBox("Columns Edition Enabled");
-        columnsEditionEnabled.selectedProperty().addListener((obs, ov, nv) -> {
+        CheckBox columnsEditingEnabled = new CheckBox("Columns Editing Enabled");
+        columnsEditingEnabled.selectedProperty().addListener((obs, ov, nv) -> {
             table.getVisibleLeafColumns().forEach(column -> column.setEditable(nv));
         });
-        columnsEditionEnabled.setSelected(true);
-        grid.add(columnsEditionEnabled, 0, row++);
+        columnsEditingEnabled.setSelected(true);
+        grid.add(columnsEditingEnabled, 0, row++);
         
         CheckBox cellSelectionEnabled = new CheckBox("Cell Selection Enabled");
         table.getSelectionModel().cellSelectionEnabledProperty().bind(cellSelectionEnabled.selectedProperty());
         grid.add(cellSelectionEnabled, 0, row++);
         
-        CheckBox selectionMultiple = new CheckBox("Selection Multiple");
-        table.getSelectionModel().selectionModeProperty().bind(Bindings.when(selectionMultiple.selectedProperty()).then(SelectionMode.MULTIPLE).otherwise(SelectionMode.SINGLE));
-        grid.add(selectionMultiple, 0, row++);
+        CheckBox multipleSelection = new CheckBox("Multiple Selection");
+        table.getSelectionModel().selectionModeProperty().bind(Bindings.when(multipleSelection.selectedProperty()).then(SelectionMode.MULTIPLE).otherwise(SelectionMode.SINGLE));
+        grid.add(multipleSelection, 0, row++);
         
-        CheckBox columnPolicy = new CheckBox("Column Policy Constrained");
-        table.columnResizePolicyProperty().bind(Bindings.when(columnPolicy.selectedProperty()).then(TableView.CONSTRAINED_RESIZE_POLICY).otherwise(TableView.UNCONSTRAINED_RESIZE_POLICY));
-        grid.add(columnPolicy, 0, row++);
+        CheckBox constrainedColumnPolicy = new CheckBox("Constrained Column Policy");
+        table.columnResizePolicyProperty().bind(Bindings.when(constrainedColumnPolicy.selectedProperty()).then(TableView.CONSTRAINED_RESIZE_POLICY).otherwise(TableView.UNCONSTRAINED_RESIZE_POLICY));
+        grid.add(constrainedColumnPolicy, 0, row++);
         
         CheckBox fixedCellSize = new CheckBox("Set Fixed Cell Size");
         table.fixedCellSizeProperty().bind(Bindings.when(fixedCellSize.selectedProperty()).then(40).otherwise(0));
@@ -193,10 +195,17 @@ public class HelloTableView2 extends ControlsFXSample {
         });
         grid.add(sortedList, 0, row++);
         
-        CheckBox showRowHeader = new CheckBox("Show Row Header");
-        table.rowHeaderVisibleProperty().bind(showRowHeader.selectedProperty());
-        grid.add(showRowHeader, 0, row++);
-        
+        return new TitledPane("TableView Options", grid);
+    }
+     
+    private Node buildTableView2Control() {
+        final GridPane grid = new GridPane();
+        grid.setHgap(5);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(5, 5, 5, 5));
+
+        int row = 0;
+
         CheckBox columnFixing = new CheckBox("Column Fixing Enabled");
         columnFixing.setSelected(true);
         columnFixing.selectedProperty().addListener((obs, ov, nv) -> {
@@ -218,11 +227,17 @@ public class HelloTableView2 extends ControlsFXSample {
         grid.add(southFilter, 0, row++);
         
         CheckBox blendSouthFilter = new CheckBox("Blend SouthNode");
+        blendSouthFilter.disableProperty().bind(southFilter.selectedProperty().not());
         table.southHeaderBlendedProperty().bind(blendSouthFilter.selectedProperty());
         blendSouthFilter.setSelected(true);
         grid.add(blendSouthFilter, 0, row++);
         
+        CheckBox showRowHeader = new CheckBox("Show Row Header");
+        table.rowHeaderVisibleProperty().bind(showRowHeader.selectedProperty());
+        grid.add(showRowHeader, 0, row++);
+        
         CheckBox rowFactory = new CheckBox("Use Row Header Factory");
+        rowFactory.disableProperty().bind(showRowHeader.selectedProperty().not());
         rowFactory.selectedProperty().addListener((obs, ov, nv) -> {
             if (nv) {
                 TableColumn2<Person, Number> tc = new TableColumn2<>();
@@ -271,7 +286,7 @@ public class HelloTableView2 extends ControlsFXSample {
         });
         grid.add(rowFactory, 0, row++);
         
-        return grid;
+        return new TitledPane("TableView2 Options", grid);
     }
     
     private ObservableList<Person> generateData(int numberOfPeople) {

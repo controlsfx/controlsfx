@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -57,15 +57,19 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TitledPane;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
@@ -93,6 +97,7 @@ public class HelloFilteredTableView extends ControlsFXSample {
     private final ObservableList<Person> data = generateData(100);
     private FilteredTableViewSample table;
     private StackPane centerPane;
+    private BooleanProperty southVisible = new SimpleBooleanProperty();
 
     public static void main(String[] args) {
         launch(args);
@@ -105,7 +110,7 @@ public class HelloFilteredTableView extends ControlsFXSample {
 
     @Override
     public String getSampleDescription() {
-        return "The FilteredTableView is a subclass of {@link TableView2},"
+        return "The FilteredTableView is a subclass of TableView2,"
                 + " an advanced JavaFX TableView control that provides extended filtering options. It can"
                 + " be used as drop-in replacement control for the existing TableView, and provides"
                 + " different functionalities and use cases like row and column fixing, row header and"
@@ -126,7 +131,7 @@ public class HelloFilteredTableView extends ControlsFXSample {
     
     @Override
     public Node getControlPanel() {
-        return buildCommonControlGrid();
+        return new VBox(10, buildCommonControl(), buildTableView2Control(), buildFilteredTableViewControl());
     }
 
     @Override
@@ -140,7 +145,7 @@ public class HelloFilteredTableView extends ControlsFXSample {
      *
      * @return
      */
-    private GridPane buildCommonControlGrid() {
+    private Node buildCommonControl() {
         final GridPane grid = new GridPane();
         grid.setHgap(5);
         grid.setVgap(10);
@@ -148,29 +153,29 @@ public class HelloFilteredTableView extends ControlsFXSample {
 
         int row = 0;
 
-        CheckBox tableEditionEnabled = new CheckBox("Table Edition Enabled");
-        table.editableProperty().bind(tableEditionEnabled.selectedProperty());
-        tableEditionEnabled.setSelected(true);
-        grid.add(tableEditionEnabled, 0, row++);
+        CheckBox tableEditingEnabled = new CheckBox("Table Editing Enabled");
+        table.editableProperty().bind(tableEditingEnabled.selectedProperty());
+        tableEditingEnabled.setSelected(true);
+        grid.add(tableEditingEnabled, 0, row++);
         
-        CheckBox columnsEditionEnabled = new CheckBox("Columns Edition Enabled");
-        columnsEditionEnabled.selectedProperty().addListener((obs, ov, nv) -> {
+        CheckBox columnsEditingEnabled = new CheckBox("Columns Editing Enabled");
+        columnsEditingEnabled.selectedProperty().addListener((obs, ov, nv) -> {
             table.getVisibleLeafColumns().forEach(column -> column.setEditable(nv));
         });
-        columnsEditionEnabled.setSelected(true);
-        grid.add(columnsEditionEnabled, 0, row++);
+        columnsEditingEnabled.setSelected(true);
+        grid.add(columnsEditingEnabled, 0, row++);
         
         CheckBox cellSelectionEnabled = new CheckBox("Cell Selection Enabled");
         table.getSelectionModel().cellSelectionEnabledProperty().bind(cellSelectionEnabled.selectedProperty());
         grid.add(cellSelectionEnabled, 0, row++);
         
-        CheckBox selectionMultiple = new CheckBox("Selection Multiple");
-        table.getSelectionModel().selectionModeProperty().bind(Bindings.when(selectionMultiple.selectedProperty()).then(SelectionMode.MULTIPLE).otherwise(SelectionMode.SINGLE));
-        grid.add(selectionMultiple, 0, row++);
+        CheckBox multipleSelection = new CheckBox("Multiple Selection");
+        table.getSelectionModel().selectionModeProperty().bind(Bindings.when(multipleSelection.selectedProperty()).then(SelectionMode.MULTIPLE).otherwise(SelectionMode.SINGLE));
+        grid.add(multipleSelection, 0, row++);
         
-        CheckBox columnPolicy = new CheckBox("Column Policy Constrained");
-        table.columnResizePolicyProperty().bind(Bindings.when(columnPolicy.selectedProperty()).then(TableView.CONSTRAINED_RESIZE_POLICY).otherwise(TableView.UNCONSTRAINED_RESIZE_POLICY));
-        grid.add(columnPolicy, 0, row++);
+        CheckBox constrainedColumnPolicy = new CheckBox("Constrained Column Policy");
+        table.columnResizePolicyProperty().bind(Bindings.when(constrainedColumnPolicy.selectedProperty()).then(TableView.CONSTRAINED_RESIZE_POLICY).otherwise(TableView.UNCONSTRAINED_RESIZE_POLICY));
+        grid.add(constrainedColumnPolicy, 0, row++);
         
         CheckBox fixedCellSize = new CheckBox("Set Fixed Cell Size");
         table.fixedCellSizeProperty().bind(Bindings.when(fixedCellSize.selectedProperty()).then(40).otherwise(0));
@@ -205,10 +210,17 @@ public class HelloFilteredTableView extends ControlsFXSample {
         });
         grid.add(sortedList, 0, row++);
         
-        CheckBox showRowHeader = new CheckBox("Show Row Header");
-        table.rowHeaderVisibleProperty().bind(showRowHeader.selectedProperty());
-        grid.add(showRowHeader, 0, row++);
-        
+        return new TitledPane("TableView Options", grid);
+    }
+     
+    private Node buildTableView2Control() {
+        final GridPane grid = new GridPane();
+        grid.setHgap(5);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(5, 5, 5, 5));
+
+        int row = 0;
+
         CheckBox columnFixing = new CheckBox("Column Fixing Enabled");
         columnFixing.setSelected(true);
         columnFixing.selectedProperty().addListener((obs, ov, nv) -> {
@@ -223,16 +235,18 @@ public class HelloFilteredTableView extends ControlsFXSample {
         });
         grid.add(rowFixing, 0, row++);
         
-        CheckBox southFilter = new CheckBox("Use SouthFilter");
-        southFilter.selectedProperty().addListener((obs, ov, nv) -> table.setupFilter(nv));
-        grid.add(southFilter, 0, row++);
-        
         CheckBox blendSouthFilter = new CheckBox("Blend SouthNode");
+        blendSouthFilter.disableProperty().bind(southVisible.not());
         table.southHeaderBlendedProperty().bind(blendSouthFilter.selectedProperty());
         blendSouthFilter.setSelected(true);
         grid.add(blendSouthFilter, 0, row++);
         
+        CheckBox showRowHeader = new CheckBox("Show Row Header");
+        table.rowHeaderVisibleProperty().bind(showRowHeader.selectedProperty());
+        grid.add(showRowHeader, 0, row++);
+        
         CheckBox rowFactory = new CheckBox("Use Row Header Factory");
+        rowFactory.disableProperty().bind(showRowHeader.selectedProperty().not());
         rowFactory.selectedProperty().addListener((obs, ov, nv) -> {
             if (nv) {
                 FilteredTableColumn<Person, Number> tc = new FilteredTableColumn<>();
@@ -282,7 +296,31 @@ public class HelloFilteredTableView extends ControlsFXSample {
         });
         grid.add(rowFactory, 0, row++);
         
-        return grid;
+        return new TitledPane("TableView2 Options", grid);
+    }
+        
+    private Node buildFilteredTableViewControl() {
+        final GridPane grid = new GridPane();
+        grid.setHgap(5);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(5, 5, 5, 5));
+
+        int row = 0;
+        final Label label = new Label("Select the columns filter editor from the options below");
+        label.setWrapText(true);
+        grid.add(label, 0, row++);
+        
+        ToggleGroup filterGroup = new ToggleGroup();
+        RadioButton popupFilter = new RadioButton("Use PopupFilter");
+        popupFilter.setSelected(true);
+        popupFilter.setToggleGroup(filterGroup);
+        grid.add(popupFilter, 0, row++);
+        RadioButton southFilter = new RadioButton("Use FilterEditor in SouthNode");
+        southFilter.setToggleGroup(filterGroup);
+        grid.add(southFilter, 0, row++);
+        filterGroup.selectedToggleProperty().addListener((obs, ov, nv) -> table.setupFilter(nv == southFilter));
+        
+        return new TitledPane("FilteredTableView Options", grid);
     }
     
     private class FilteredTableViewSample extends FilteredTableView<Person> {
@@ -516,8 +554,8 @@ public class HelloFilteredTableView extends ControlsFXSample {
             
         }
         
-        public void setupFilter(boolean south) {
-            if (south) {
+        public void setupFilter(boolean southFilter) {
+            if (southFilter) {
                 southNodeFilterAction();
                 firstName.setSouthNode(editorFirstName);
                 lastName.setSouthNode(editorLastName);
@@ -530,6 +568,7 @@ public class HelloFilteredTableView extends ControlsFXSample {
                 age.setSouthNode(null);
                 color.setSouthNode(null);
             }
+            southVisible.set(southFilter);
         }
 
         private void southNodeFilterAction() {

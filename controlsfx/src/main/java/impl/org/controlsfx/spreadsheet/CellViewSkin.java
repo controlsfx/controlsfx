@@ -195,9 +195,9 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
             if (topLeftRegion == null) {
                 topLeftRegion = getRegion(CornerPosition.TOP_LEFT);
             }
-            if (!getChildren().contains(topLeftRegion)) {
-                getChildren().add(topLeftRegion);
-            }
+            //It's not always displayed if I don't remove it first.
+            getChildren().remove(topLeftRegion);
+            getChildren().add(topLeftRegion);
             //We do not wants snappedTopInset because it takes the padding in consideration!
             topLeftRegion.relocate(0, 0);
         } else if (topLeftRegion != null) {
@@ -211,9 +211,9 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
             if (topRightRegion == null) {
                 topRightRegion = getRegion(CornerPosition.TOP_RIGHT);
             }
-            if (!getChildren().contains(topRightRegion)) {
-                getChildren().add(topRightRegion);
-            }
+            //It's not always displayed if I don't remove it first.
+            getChildren().remove(topRightRegion);
+            getChildren().add(topRightRegion);
             //We do not wants snappedTopInset because it takes the padding in consideration!
             topRightRegion.relocate(getSkinnable().getWidth() - TRIANGLE_SIZE, 0);
         } else if (topRightRegion != null) {
@@ -227,9 +227,9 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
             if (bottomRightRegion == null) {
                 bottomRightRegion = getRegion(CornerPosition.BOTTOM_RIGHT);
             }
-            if (!getChildren().contains(bottomRightRegion)) {
-                getChildren().add(bottomRightRegion);
-            }
+            //It's not always displayed if I don't remove it first.
+            getChildren().remove(bottomRightRegion);
+            getChildren().add(bottomRightRegion);
             bottomRightRegion.relocate(getSkinnable().getWidth() - TRIANGLE_SIZE, getSkinnable().getHeight() - TRIANGLE_SIZE);
         } else if (bottomRightRegion != null) {
             getChildren().remove(bottomRightRegion);
@@ -242,9 +242,9 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
             if (bottomLeftRegion == null) {
                 bottomLeftRegion = getRegion(CornerPosition.BOTTOM_LEFT);
             }
-            if (!getChildren().contains(bottomLeftRegion)) {
-                getChildren().add(bottomLeftRegion);
-            }
+            //It's not always displayed if I don't remove it first.
+            getChildren().remove(bottomLeftRegion);
+            getChildren().add(bottomLeftRegion);
             bottomLeftRegion.relocate(0, getSkinnable().getHeight() - TRIANGLE_SIZE);
         } else if (bottomLeftRegion != null) {
             getChildren().remove(bottomLeftRegion);

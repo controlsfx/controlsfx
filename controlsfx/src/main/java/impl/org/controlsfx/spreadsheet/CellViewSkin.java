@@ -106,7 +106,12 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
         Node graphic = getSkinnable().getGraphic();
         if (graphic != null && graphic instanceof ImageView) {
             ImageView view = (ImageView) graphic;
-            if (view.getImage() != null) {
+            if (!((CellView) getSkinnable()).isOriginalCell()) {
+                view.setManaged(false);
+                double height = super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset);
+                view.setManaged(true);
+                return height;
+            } else if (view.getImage() != null) {
                 return view.getImage().getHeight();
             }
         }

@@ -342,8 +342,15 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                 int rowSpan = spreadsheetView.getRowSpan(spreadsheetCell, index);
                 if (rowSpan > 1) {
                     height = 0;
-                    final int maxRow = index + rowSpan;
-                    for (int i = index; i < maxRow; ++i) {
+                    /**
+                     * If the cell is displaying an Image with Span, we must
+                     * compute the total height possible otherwise the image
+                     * will be shrinking when scrolling down.
+                     */
+                    int reverseRowSpan = spreadsheetView.getReverseRowSpan(spreadsheetCell, index);
+                    int newIndex = index - reverseRowSpan;
+                    final int maxRow = newIndex + reverseRowSpan + rowSpan;
+                    for (int i = newIndex + 1; i < maxRow; ++i) {
                         height += snapSize(skin.getRowHeight(i));
                     }
                 }
@@ -370,6 +377,17 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                 lastCell = tableCell;
                 // We want to place the layout always at the starting cell.
                 double spaceBetweenTopAndMe = 0;
+                /**
+                 * In case we have a rowSpan and an image, we will shift the
+                 * cell up so that it will always be displayed in full height.
+                 */
+                if (rowSpan > 1) {
+                    int reverseRowSpan = spreadsheetView.getReverseRowSpan(spreadsheetCell, index);
+                    int newIndex = index - reverseRowSpan;
+                    for (int p = newIndex + 1; p < index; ++p) {
+                        spaceBetweenTopAndMe += skin.getRowHeight(p);
+                    }
+                }
 
                 tableCell.relocate(x + tableCellX + (needToBeShifted ? -1 : 0), snappedTopInset()
                         - spaceBetweenTopAndMe + ((GridRow) getSkinnable()).verticalShift.get());

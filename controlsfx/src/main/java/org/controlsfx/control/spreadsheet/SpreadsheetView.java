@@ -964,6 +964,29 @@ public class SpreadsheetView extends Control{
 
         return rowSpan;
     }
+   
+    /**
+     * Return the exact opposite of {@link #getRowSpan(org.controlsfx.control.spreadsheet.SpreadsheetCell, int)
+     * }. If a cell is spanned on rows, and the index given is the last one of
+     * the spanned zone, it's rowSpan will be 1 and its reverse rowspan will be {@link SpreadsheetCell#getRowSpan()
+     * }.
+     *
+     * @param cell
+     * @param index
+     * @return
+     */
+    public int getReverseRowSpan(SpreadsheetCell cell, int index) {
+        /**
+         * We return here the exact rowSpan of the considered index. So if a
+         * cell span on 4 but we give the second index, the rowspan will be 2.
+         */
+        int rowSpan = 0;
+        do {
+            ++rowSpan;
+        } while (--index >= 0 && cell.getColumn() < getGrid().getColumnCount()
+                && sortedList.get(index).get(cell.getColumn()) == cell);
+        return rowSpan;
+    }
 
     /**
      * Return the row span for the given cell without considering the actual

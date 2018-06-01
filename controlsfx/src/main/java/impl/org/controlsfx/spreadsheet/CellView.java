@@ -363,8 +363,24 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         return null;
     }
     
+    /**
+     * Return true if this cell is the original cell (including filters) even
+     * when scrolling.
+     *
+     * @return
+     */
+    public boolean isOriginalCell() {
+        return handle.getView().getReverseRowSpan(getItem(), getIndex()) <= 1;
+    }
+    
+    /**
+     * Set the cell graphic if any. 
+     * 
+     * If we have an Image, we try to make it take its full size (never more) within the cell's space.
+     * If we have some row span, we want to compute the image's size one time and then
+     * @param item 
+     */
     private void setCellGraphic(SpreadsheetCell item) {
-
         if (isEditing()) {
             return;
         }
@@ -376,12 +392,12 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 image.setPreserveRatio(true);
                 image.setSmooth(true);
                 if(image.getImage() != null){
-                image.fitHeightProperty().bind(
-                        new When(heightProperty().greaterThan(image.getImage().getHeight())).then(
-                                image.getImage().getHeight()).otherwise(heightProperty()));
-                image.fitWidthProperty().bind(
-                        new When(widthProperty().greaterThan(image.getImage().getWidth())).then(
-                                image.getImage().getWidth()).otherwise(widthProperty()));
+                        image.fitHeightProperty().bind(
+                                new When(heightProperty().greaterThan(image.getImage().getHeight())).then(
+                                        image.getImage().getHeight()).otherwise(heightProperty()));
+                        image.fitWidthProperty().bind(
+                                new When(widthProperty().greaterThan(image.getImage().getWidth())).then(
+                                        image.getImage().getWidth()).otherwise(widthProperty()));
                 }
                 /**
                  * If we have a Region and no text, we force it to take full

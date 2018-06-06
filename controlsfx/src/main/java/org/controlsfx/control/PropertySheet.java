@@ -28,6 +28,7 @@ package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.PropertySheetSkin;
 
+import java.util.Comparator;
 import java.util.Optional;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -202,7 +203,6 @@ public class PropertySheet extends ControlsFXControl {
      **************************************************************************/
     
     private final ObservableList<Item> items;
-    
     
     
     /**************************************************************************
@@ -439,6 +439,38 @@ public class PropertySheet extends ControlsFXControl {
         titleFilterProperty.set(filter);
     }
     
+    // --- categoryComparatorProperty
+    private final SimpleObjectProperty<Comparator<?>> categoryComparatorProperty = 
+            new SimpleObjectProperty<>(this, "categoryComparator", null); //$NON-NLS-1$
+    
+    /**
+     * Used to represent how the categories should be laid out in
+     * the PropertySheet when using the Category mode (see {@link Mode}).
+     * Thus allowing user to sort categories by other ways than alphabetical
+     * or numerical order.  
+     * @return A SimpleObjectproperty. 
+     */
+    public final SimpleObjectProperty<Comparator<?>> categoryComparatorProperty() {
+    	return categoryComparatorProperty;
+    }
+
+    /**
+     * @see Mode
+     * @return how the categories should be laid out in
+     * the PropertySheet.
+     */
+    public final Comparator<?> getcategoryComparator() {
+        return categoryComparatorProperty.get();
+    }
+
+    /**
+     * Set how the categories should be laid out in
+     * the PropertySheet.
+     * @param mode 
+     */
+    public final void setcategoryComparatorProperty(Comparator<?> categoryComparator) {
+    	categoryComparatorProperty.set(categoryComparator);
+    }
     
     
     /***************************************************************************

@@ -193,7 +193,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         switch( getSkinnable().modeProperty().get() ) {
             case CATEGORY: {
                 // group by category
-                Map<String, List<Item>> categoryMap = new TreeMap(getSkinnable().getcategoryComparator());
+                Map<String, List<Item>> categoryMap = new TreeMap(getSkinnable().getCategoryComparator());
                 for( Item p: getSkinnable().getItems()) {
                     String category = p.getCategory();
                     List<Item> list = categoryMap.get(category);

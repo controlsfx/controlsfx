@@ -440,7 +440,7 @@ public class PropertySheet extends ControlsFXControl {
     }
     
     // --- categoryComparatorProperty
-    private final SimpleObjectProperty<Comparator<?>> categoryComparatorProperty = 
+    private final SimpleObjectProperty<Comparator<String>> categoryComparatorProperty = 
             new SimpleObjectProperty<>(this, "categoryComparator", null); //$NON-NLS-1$
     
     /**
@@ -450,7 +450,7 @@ public class PropertySheet extends ControlsFXControl {
      * or numerical order.  
      * @return A SimpleObjectproperty. 
      */
-    public final SimpleObjectProperty<Comparator<?>> categoryComparatorProperty() {
+    public final SimpleObjectProperty<Comparator<String>> categoryComparatorProperty() {
     	return categoryComparatorProperty;
     }
 
@@ -459,7 +459,7 @@ public class PropertySheet extends ControlsFXControl {
      * @return how the categories should be laid out in
      * the PropertySheet.
      */
-    public final Comparator<?> getcategoryComparator() {
+    public final Comparator<String> getCategoryComparator() {
         return categoryComparatorProperty.get();
     }
 
@@ -468,7 +468,7 @@ public class PropertySheet extends ControlsFXControl {
      * the PropertySheet.
      * @param mode 
      */
-    public final void setcategoryComparatorProperty(Comparator<?> categoryComparator) {
+    public final void setCategoryComparator(Comparator<String> categoryComparator) {
     	categoryComparatorProperty.set(categoryComparator);
     }
     

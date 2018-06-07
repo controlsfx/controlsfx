@@ -339,8 +339,8 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                  * the rows. The height of the current row is ignored and the
                  * whole value is computed.
                  */
-                int rowSpan = spreadsheetView.getRowSpan(spreadsheetCell, index);
-                if (rowSpan > 1) {
+                if (spreadsheetCell.getRowSpan() > 1) {
+                    int rowSpan = spreadsheetView.getRowSpan(spreadsheetCell, index);
                     height = 0;
                     /**
                      * If the cell is displaying an Image with Span, we must
@@ -381,7 +381,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                  * In case we have a rowSpan and an image, we will shift the
                  * cell up so that it will always be displayed in full height.
                  */
-                if (rowSpan > 1) {
+                if (spreadsheetCell.getRowSpan() > 1) {
                     int reverseRowSpan = spreadsheetView.getReverseRowSpan(spreadsheetCell, index);
                     int newIndex = index - reverseRowSpan;
                     for (int p = newIndex + 1; p < index; ++p) {

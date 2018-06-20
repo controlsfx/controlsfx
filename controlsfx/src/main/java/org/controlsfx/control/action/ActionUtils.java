@@ -132,10 +132,24 @@ public class ActionUtils {
      *
      * @param action The {@link Action} that the {@link Button} should bind to.
      * @param button The {@link ButtonBase} that the {@link Action} should be bound to.
+     * @param textBehavior Defines {@link ActionTextBehavior}
+     * @return The {@link ButtonBase} that was bound to the {@link Action}.
+     */
+    public static ButtonBase configureButton(final Action action, ButtonBase button, final ActionTextBehavior textBehavior) {
+        return configure(button, action, textBehavior);
+    }
+
+    /**
+     * Takes the provided {@link Action} and binds the relevant properties to
+     * the supplied {@link Button}. This allows for the use of Actions
+     * within custom Button subclasses.
+     *
+     * @param action The {@link Action} that the {@link Button} should bind to.
+     * @param button The {@link ButtonBase} that the {@link Action} should be bound to.
      * @return The {@link ButtonBase} that was bound to the {@link Action}.
      */
     public static ButtonBase configureButton(final Action action, ButtonBase button) {
-        return configure(button, action, ActionTextBehavior.SHOW);
+        return configureButton(action, button, ActionTextBehavior.SHOW);
     }
 
     /**

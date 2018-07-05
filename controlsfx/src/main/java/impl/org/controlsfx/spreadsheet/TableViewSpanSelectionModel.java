@@ -32,6 +32,7 @@ import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
@@ -411,7 +412,7 @@ public class TableViewSpanSelectionModel extends
      * @param selectedCells
      */
     public void verifySelectedCells(List<Pair<Integer, Integer>> selectedCells) {
-        List<TablePosition<ObservableList<SpreadsheetCell>, ?>> newList = new ArrayList<>();
+        Set<TablePosition<ObservableList<SpreadsheetCell>, ?>> newList = new HashSet<>();
         clearSelection();
 
         final int itemCount = getItemCount();

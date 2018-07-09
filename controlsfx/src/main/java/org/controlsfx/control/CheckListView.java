@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015, ControlsFX
+ * Copyright (c) 2013, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,14 +32,14 @@ import java.util.Map;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.cell.CheckBoxListCell;
-import javafx.util.Callback;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 /**
  * A simple UI control that makes it possible to select zero or more items within
@@ -102,7 +102,7 @@ public class CheckListView<T> extends ListView<T> {
      * Creates a new CheckListView instance with an empty list of choices.
      */
     public CheckListView() {
-        this(FXCollections.<T> observableArrayList());
+        this(FXCollections.observableArrayList());
     }
     
     /**
@@ -120,11 +120,31 @@ public class CheckListView<T> extends ListView<T> {
             setCheckModel(new CheckListViewBitSetCheckModel<>(getItems(), itemBooleanMap));
         });
         
-        setCellFactory(listView -> new CheckBoxListCell<>(new Callback<T, ObservableValue<Boolean>>() {
-            @Override public ObservableValue<Boolean> call(T item) {
-                return getItemBooleanProperty(item);
+        setCellFactory(listView -> {
+            final CheckBoxListCell<T> checkBoxListCell = new CheckBoxListCell<>(item -> getItemBooleanProperty(item));
+            checkBoxListCell.focusedProperty().addListener((o, ov, nv) -> {
+                if (nv) {
+                    checkBoxListCell.getParent().requestFocus();
+                }
+            });
+            return checkBoxListCell;
+        });
+
+        addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() == KeyCode.SPACE) {
+                T item = getSelectionModel().getSelectedItem();
+                if (item != null) {
+                    final IndexedCheckModel<T> checkModel = getCheckModel();
+                    if (checkModel != null) {
+                        if (checkModel.isChecked(item)) {
+                            checkModel.clearCheck(item);
+                        } else {
+                            checkModel.check(item);
+                        }
+                    }
+                }
             }
-        }));
+        });
     }
     
     
@@ -232,11 +252,7 @@ public class CheckListView<T> extends ListView<T> {
             super(itemBooleanMap);
             
             this.items = items;
-            this.items.addListener(new ListChangeListener<T>() {
-                @Override public void onChanged(Change<? extends T> c) {
-                    updateMap();
-                }
-            });
+            this.items.addListener((ListChangeListener<T>) c -> updateMap());
             
             updateMap();
         }

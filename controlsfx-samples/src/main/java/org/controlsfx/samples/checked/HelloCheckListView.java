@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,6 @@ package org.controlsfx.samples.checked;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -39,7 +37,6 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.IndexedCheckModel;
@@ -77,25 +74,19 @@ public class HelloCheckListView extends ControlsFXSample {
         // CheckListView
         checkListView = new CheckListView<>(strings);
         checkListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        checkListView.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<String>() {
-            @Override public void onChanged(ListChangeListener.Change<? extends String> c) {
-                updateText(selectedItemsLabel, c.getList());
-            }
-        });
-        checkListView.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
-            @Override public void onChanged(ListChangeListener.Change<? extends String> change) {
-                updateText(checkedItemsLabel, change.getList());
-                
-                while (change.next()) {
-                    System.out.println("============================================");
-                    System.out.println("Change: " + change);
-                    System.out.println("Added sublist " + change.getAddedSubList());
-                    System.out.println("Removed sublist " + change.getRemoved());
-                    System.out.println("List " + change.getList());
-                    System.out.println("Added " + change.wasAdded() + " Permutated " + change.wasPermutated() + " Removed " + change.wasRemoved() + " Replaced "
-                            + change.wasReplaced() + " Updated " + change.wasUpdated());
-                    System.out.println("============================================");
-                }
+        checkListView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<String>) c -> updateText(selectedItemsLabel, c.getList()));
+        checkListView.getCheckModel().getCheckedItems().addListener((ListChangeListener<String>) change -> {
+            updateText(checkedItemsLabel, change.getList());
+            
+            while (change.next()) {
+                System.out.println("============================================");
+                System.out.println("Change: " + change);
+                System.out.println("Added sublist " + change.getAddedSubList());
+                System.out.println("Removed sublist " + change.getRemoved());
+                System.out.println("List " + change.getList());
+                System.out.println("Added " + change.wasAdded() + " Permutated " + change.wasPermutated() + " Removed " + change.wasRemoved() + " Replaced "
+                        + change.wasReplaced() + " Updated " + change.wasUpdated());
+                System.out.println("============================================");
             }
         });
         
@@ -129,17 +120,13 @@ public class HelloCheckListView extends ControlsFXSample {
         checkItem2Label.getStyleClass().add("property");
         grid.add(checkItem2Label, 0, row);
         final CheckBox checkItem2Btn = new CheckBox();
-        checkItem2Btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                IndexedCheckModel<String> cm = checkListView.getCheckModel();
-                if (cm.isChecked(2)) {
-                    cm.clearCheck(2);
-                } else {
-                    cm.check(2);
-                }
+        checkItem2Btn.setOnAction(e -> {
+            IndexedCheckModel<String> cm = checkListView.getCheckModel();
+            if (cm != null) {
+                cm.toggleCheckState(2);
             }
         });
-        grid.add(checkItem2Btn, 1, row++);
+        grid.add(checkItem2Btn, 1, row);
         
         
         return grid;

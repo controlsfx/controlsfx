@@ -298,9 +298,17 @@ public class CheckTreeView<T> extends TreeView<T> {
                 checkedItems.add(item);
             }
         }
-        
-        
-        
+
+        @Override
+        public void toggleCheckState(TreeItem<T> item) {
+            if (isChecked(item)) {
+                clearCheck(item);
+            } else {
+                check(item);
+            }
+        }
+
+
         /***********************************************************************
          *                                                                     *
          * Private Implementation                                              *

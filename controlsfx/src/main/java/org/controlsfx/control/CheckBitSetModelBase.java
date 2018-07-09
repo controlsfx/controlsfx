@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -112,44 +112,40 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
         
         final MappingChange.Map<Integer,T> map = f -> getItem(f);
         
-        checkedIndicesList.addListener(new ListChangeListener<Integer>() {
-            @Override public void onChanged(final Change<? extends Integer> c) {
-                // when the selectedIndices ObservableList changes, we manually call
-                // the observers of the selectedItems ObservableList.
-                boolean hasRealChangeOccurred = false;
-                while (c.next() && ! hasRealChangeOccurred) {
-                    hasRealChangeOccurred = c.wasAdded() || c.wasRemoved();
-                }
-
-                if (hasRealChangeOccurred) {
-                    c.reset();
-                    checkedItemsList.callObservers(new MappingChange<>(c, map, checkedItemsList));
-                }
-                c.reset();
+        checkedIndicesList.addListener((ListChangeListener<Integer>) c -> {
+            // when the selectedIndices ObservableList changes, we manually call
+            // the observers of the selectedItems ObservableList.
+            boolean hasRealChangeOccurred = false;
+            while (c.next() && ! hasRealChangeOccurred) {
+                hasRealChangeOccurred = c.wasAdded() || c.wasRemoved();
             }
+
+            if (hasRealChangeOccurred) {
+                c.reset();
+                checkedItemsList.callObservers(new MappingChange<>(c, map, checkedItemsList));
+            }
+            c.reset();
         });
         
         // this code is to handle the situation where a developer is manually
         // toggling the check model, and expecting the UI to update (without
         // this it won't happen!).
-        getCheckedItems().addListener(new ListChangeListener<T>() {
-            @Override public void onChanged(ListChangeListener.Change<? extends T> c) {
-                while (c.next()) {
-                    if (c.wasAdded()) {
-                        for (T item : c.getAddedSubList()) {
-                            BooleanProperty p = getItemBooleanProperty(item);
-                            if (p != null) {
-                                p.set(true);
-                            }
+        getCheckedItems().addListener((ListChangeListener<T>) c -> {
+            while (c.next()) {
+                if (c.wasAdded()) {
+                    for (T item : c.getAddedSubList()) {
+                        BooleanProperty p = getItemBooleanProperty(item);
+                        if (p != null) {
+                            p.set(true);
                         }
-                    } 
-                    
-                    if (c.wasRemoved()) {
-                        for (T item : c.getRemoved()) {
-                            BooleanProperty p = getItemBooleanProperty(item);
-                            if (p != null) {
-                                p.set(false);
-                            }
+                    }
+                } 
+                
+                if (c.wasRemoved()) {
+                    for (T item : c.getRemoved()) {
+                        BooleanProperty p = getItemBooleanProperty(item);
+                        if (p != null) {
+                            p.set(false);
                         }
                     }
                 }
@@ -261,6 +257,23 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
 
     /** {@inheritDoc} */
     @Override
+    public void toggleCheckState(T item) {
+        int index = getItemIndex(item);
+        toggleCheckState(index);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void toggleCheckState(int index) {
+        if (isChecked(index)) {
+            clearCheck(index);
+        } else {
+            check(index);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void check(int index) {
         if (index < 0 || index >= getItemCount()) return;
         checkedIndices.set(index);
@@ -274,9 +287,6 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
         int index = getItemIndex(item);
         check(index);
     }
-
-    
-    
     
     /***********************************************************************
      *                                                                     *

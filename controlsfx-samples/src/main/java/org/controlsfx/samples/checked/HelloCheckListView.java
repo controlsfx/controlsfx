@@ -122,10 +122,8 @@ public class HelloCheckListView extends ControlsFXSample {
         final CheckBox checkItem2Btn = new CheckBox();
         checkItem2Btn.setOnAction(e -> {
             IndexedCheckModel<String> cm = checkListView.getCheckModel();
-            if (cm.isChecked(2)) {
-                cm.clearCheck(2);
-            } else {
-                cm.check(2);
+            if (cm != null) {
+                cm.toggleCheckState(2);
             }
         });
         grid.add(checkItem2Btn, 1, row);

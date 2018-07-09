@@ -233,11 +233,7 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
                 if (item != null) {
                     final IndexedCheckModel<T> checkModel = control.getCheckModel();
                     if (checkModel != null) {
-                        if (checkModel.isChecked(item)) {
-                            checkModel.clearCheck(item);
-                        } else {
-                            checkModel.check(item);
-                        }
+                        checkModel.toggleCheckState(item);
                     }
                 }
             } else if (e.getCode() == KeyCode.ESCAPE) {

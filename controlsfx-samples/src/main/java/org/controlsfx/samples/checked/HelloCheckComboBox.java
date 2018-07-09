@@ -84,14 +84,17 @@ public class HelloCheckComboBox extends ControlsFXSample {
 
         // normal ComboBox
         grid.add(new Label("Normal ComboBox: "), 0, row);
-        final ComboBox<String> child = new ComboBox<>(strings);
-        child.focusedProperty().addListener((o, ov, nv) -> {
-            if(nv) child.show(); else child.hide();   
+        final ComboBox<String> comboBox = new ComboBox<>(strings);
+        comboBox.focusedProperty().addListener((o, ov, nv) -> {
+            if(nv) comboBox.show(); else comboBox.hide();   
         });
-        grid.add(child, 1, row++);
+        grid.add(comboBox, 1, row++);
         
         // CheckComboBox
         checkComboBox = new CheckComboBox<>(strings);
+        checkComboBox.focusedProperty().addListener((o, ov, nv) -> {
+            if(nv) checkComboBox.show(); else checkComboBox.hide();
+        });
         checkComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<String>) change -> {
             updateText(checkedItemsLabel, change.getList());
             
@@ -146,10 +149,8 @@ public class HelloCheckComboBox extends ControlsFXSample {
         final CheckBox checkItem2Btn = new CheckBox();
         checkItem2Btn.setOnAction(e -> {
             IndexedCheckModel<String> cm = checkComboBox.getCheckModel();
-            if (cm.isChecked(2)) {
-                cm.clearCheck(2);
-            } else {
-                cm.check(2);
+            if (cm != null) {
+                cm.toggleCheckState(2);
             }
         });
         grid.add(checkItem2Btn, 1, row);

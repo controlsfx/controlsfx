@@ -99,6 +99,11 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
         // installs a custom CheckBoxListCell cell factory
         comboBox.setCellFactory(listView -> {
             CheckBoxListCell<T> result = new CheckBoxListCell<>(control::getItemBooleanProperty);
+            result.focusedProperty().addListener((o, ov, nv) -> {
+                if (nv) {
+                    result.getParent().requestFocus();
+                }
+            });
             //clicking on the label checks/unchecks the item
             result.setOnMouseClicked(e -> {
                 T item = result.getItem();

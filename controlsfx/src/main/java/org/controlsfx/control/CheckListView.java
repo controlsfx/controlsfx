@@ -120,7 +120,15 @@ public class CheckListView<T> extends ListView<T> {
             setCheckModel(new CheckListViewBitSetCheckModel<>(getItems(), itemBooleanMap));
         });
         
-        setCellFactory(listView -> new CheckBoxListCell<>(item -> getItemBooleanProperty(item)));
+        setCellFactory(listView -> {
+            final CheckBoxListCell<T> checkBoxListCell = new CheckBoxListCell<>(item -> getItemBooleanProperty(item));
+            checkBoxListCell.focusedProperty().addListener((o, ov, nv) -> {
+                if (nv) {
+                    checkBoxListCell.getParent().requestFocus();
+                }
+            });
+            return checkBoxListCell;
+        });
 
         addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() == KeyCode.SPACE) {

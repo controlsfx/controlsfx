@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2017, ControlsFX
+ * Copyright (c) 2013, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -89,8 +89,9 @@ public class CheckComboBox<T> extends ControlsFXControl {
     
     private final ObservableList<T> items;
     private final Map<T, BooleanProperty> itemBooleanMap;
+    private CheckComboBoxSkin<T> checkComboBoxSkin;
 
-    
+
     /**************************************************************************
      * 
      * Constructors
@@ -114,7 +115,7 @@ public class CheckComboBox<T> extends ControlsFXControl {
         final int initialSize = items == null ? 32 : items.size();
         
         this.itemBooleanMap = new HashMap<>(initialSize);
-        this.items = items == null ? FXCollections.<T>observableArrayList() : items;
+        this.items = items == null ? FXCollections.observableArrayList() : items;
         setCheckModel(new CheckComboBoxBitSetCheckModel<>(this.items, itemBooleanMap));
     }
 
@@ -127,7 +128,8 @@ public class CheckComboBox<T> extends ControlsFXControl {
     
     /** {@inheritDoc} */
     @Override protected Skin<?> createDefaultSkin() {
-        return new CheckComboBoxSkin<>(this);
+        checkComboBoxSkin = new CheckComboBoxSkin<>(this);
+        return checkComboBoxSkin;
     }
     
     /**
@@ -252,7 +254,31 @@ public class CheckComboBox<T> extends ControlsFXControl {
      */
     public final String getTitle() {
         return title.getValue();
-    }      
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     * Methods                                                                 *
+     *                                                                         *
+     **************************************************************************/
+
+    /**
+     * Requests that the ComboBox display the popup aspect of the user interface.
+     */
+    public void show() {
+        if (checkComboBoxSkin != null) {
+            checkComboBoxSkin.show();
+        }
+    }
+
+    /**
+     * Closes the popup / dialog that was shown when {@link #show()} was called.
+     */
+    public void hide() {
+        if (checkComboBoxSkin != null) {
+            checkComboBoxSkin.hide();
+        }
+    }
     
     
     /**************************************************************************
@@ -283,11 +309,7 @@ public class CheckComboBox<T> extends ControlsFXControl {
             super(itemBooleanMap);
             
             this.items = items;
-            this.items.addListener(new ListChangeListener<T>() {
-                @Override public void onChanged(Change<? extends T> c) {
-                    updateMap();
-                }
-            });
+            this.items.addListener((ListChangeListener<T>) c -> updateMap());
             
             updateMap();
         }

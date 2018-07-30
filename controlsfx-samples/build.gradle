@@ -38,6 +38,10 @@ jar {
     from sourceSets.main.allJava
 }
 
+javadoc {
+    options.encoding = 'UTF-8'
+}
+
 applicationDefaultJvmArgs = [
     // For accessing VirtualFlow field from the base class in GridViewSkin
     "--add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED",

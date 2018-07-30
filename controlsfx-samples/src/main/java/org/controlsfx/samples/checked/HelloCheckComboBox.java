@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,8 +34,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -86,30 +84,35 @@ public class HelloCheckComboBox extends ControlsFXSample {
 
         // normal ComboBox
         grid.add(new Label("Normal ComboBox: "), 0, row);
-        grid.add(new ComboBox<String>(strings), 1, row++);
+        final ComboBox<String> comboBox = new ComboBox<>(strings);
+        comboBox.focusedProperty().addListener((o, ov, nv) -> {
+            if(nv) comboBox.show(); else comboBox.hide();   
+        });
+        grid.add(comboBox, 1, row++);
         
         // CheckComboBox
-        checkComboBox = new CheckComboBox<String>(strings);
-        checkComboBox.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
-            @Override public void onChanged(ListChangeListener.Change<? extends String> change) {
-                updateText(checkedItemsLabel, change.getList());
-                
-                while (change.next()) {
-                    System.out.println("============================================");
-                    System.out.println("Change: " + change);
-                    System.out.println("Added sublist " + change.getAddedSubList());
-                    System.out.println("Removed sublist " + change.getRemoved());
-                    System.out.println("List " + change.getList());
-                    System.out.println("Added " + change.wasAdded() + " Permutated " + change.wasPermutated() + " Removed " + change.wasRemoved() + " Replaced "
-                            + change.wasReplaced() + " Updated " + change.wasUpdated());
-                    System.out.println("============================================");
-                }
+        checkComboBox = new CheckComboBox<>(strings);
+        checkComboBox.focusedProperty().addListener((o, ov, nv) -> {
+            if(nv) checkComboBox.show(); else checkComboBox.hide();
+        });
+        checkComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<String>) change -> {
+            updateText(checkedItemsLabel, change.getList());
+            
+            while (change.next()) {
+                System.out.println("============================================");
+                System.out.println("Change: " + change);
+                System.out.println("Added sublist " + change.getAddedSubList());
+                System.out.println("Removed sublist " + change.getRemoved());
+                System.out.println("List " + change.getList());
+                System.out.println("Added " + change.wasAdded() + " Permutated " + change.wasPermutated() + " Removed " + change.wasRemoved() + " Replaced "
+                        + change.wasReplaced() + " Updated " + change.wasUpdated());
+                System.out.println("============================================");
             }
         });
         grid.add(new Label("CheckComboBox: "), 0, row);
         grid.add(checkComboBox, 1, row++);
         
-        CheckComboBox<Person> checkComboBox2 = new CheckComboBox<Person>(Person.createDemoList());
+        CheckComboBox<Person> checkComboBox2 = new CheckComboBox<>(Person.createDemoList());
         checkComboBox2.setConverter(new StringConverter<Person>() {
             @Override
             public String toString(Person object) {
@@ -121,7 +124,7 @@ public class HelloCheckComboBox extends ControlsFXSample {
             }
         });
         grid.add(new Label("CheckComboBox with data objects: "), 0, row);
-        grid.add(checkComboBox2, 1, row++);
+        grid.add(checkComboBox2, 1, row);
         
         return grid;
     }
@@ -144,17 +147,13 @@ public class HelloCheckComboBox extends ControlsFXSample {
         checkItem2Label.getStyleClass().add("property");
         grid.add(checkItem2Label, 0, row);
         final CheckBox checkItem2Btn = new CheckBox();
-        checkItem2Btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                IndexedCheckModel<String> cm = checkComboBox.getCheckModel();
-                if (cm.isChecked(2)) {
-                    cm.clearCheck(2);
-                } else {
-                    cm.check(2);
-                }
+        checkItem2Btn.setOnAction(e -> {
+            IndexedCheckModel<String> cm = checkComboBox.getCheckModel();
+            if (cm != null) {
+                cm.toggleCheckState(2);
             }
         });
-        grid.add(checkItem2Btn, 1, row++);
+        grid.add(checkItem2Btn, 1, row);
         
         return grid;
     }
@@ -182,14 +181,14 @@ public class HelloCheckComboBox extends ControlsFXSample {
 }
 
 class Person {
-    private StringProperty firstname = new SimpleStringProperty();
-    private StringProperty lastname = new SimpleStringProperty();
+    private StringProperty firstName = new SimpleStringProperty();
+    private StringProperty lastName = new SimpleStringProperty();
     private ReadOnlyStringWrapper fullName = new ReadOnlyStringWrapper();
     
-    public Person(String firstname, String lastname) {
-        this.firstname.set(firstname);
-        this.lastname.set(lastname);
-        fullName.bind(Bindings.concat(firstname, " ", lastname));
+    public Person(String firstName, String lastName) {
+        this.firstName.set(firstName);
+        this.lastName.set(lastName);
+        fullName.bind(Bindings.concat(firstName, " ", lastName));
     }
     
     public static final ObservableList<Person> createDemoList() {
@@ -205,28 +204,28 @@ class Person {
         return result;
     }
 
-    public final StringProperty firstnameProperty() {
-        return this.firstname;
+    public final StringProperty firstNameProperty() {
+        return this.firstName;
     }
 
-    public final java.lang.String getFirstname() {
-        return this.firstnameProperty().get();
+    public final java.lang.String getFirstName() {
+        return this.firstNameProperty().get();
     }
 
-    public final void setFirstname(final String firstname) {
-        this.firstnameProperty().set(firstname);
+    public final void setFirstName(final String firstName) {
+        this.firstNameProperty().set(firstName);
     }
 
-    public final StringProperty lastnameProperty() {
-        return this.lastname;
+    public final StringProperty lastNameProperty() {
+        return this.lastName;
     }
 
-    public final String getLastname() {
-        return this.lastnameProperty().get();
+    public final String getLastName() {
+        return this.lastNameProperty().get();
     }
 
-    public final void setLastname(final String lastname) {
-        this.lastnameProperty().set(lastname);
+    public final void setLastName(final String lastName) {
+        this.lastNameProperty().set(lastName);
     }
 
     public final ReadOnlyStringProperty fullNameProperty() {

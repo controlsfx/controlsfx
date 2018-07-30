@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2013, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1085,7 +1085,6 @@ public class RangeSlider extends ControlsFXControl {
             STYLEABLES = Collections.unmodifiableList(styleables);
         }
     }
-    
 
     /**
      * @return The CssMetaData associated with this class, which may include the
@@ -1093,6 +1092,14 @@ public class RangeSlider extends ControlsFXControl {
      */
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
         return StyleableProperties.STYLEABLES;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
     }
 
     private static final PseudoClass VERTICAL_PSEUDOCLASS_STATE =

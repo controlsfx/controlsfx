@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,11 @@ public interface CheckModel<T> {
      * Checks all items in the control
      */
     public void checkAll();
-    
+
+    /**
+     * Unchecks the given item in the control
+     * @param item The item to uncheck.
+     */
     public void clearCheck(T item);
     
     /**
@@ -56,11 +60,22 @@ public interface CheckModel<T> {
      * Returns true if there are no checked items in the control.
      */
     public boolean isEmpty();
-    
+
+    /**
+     * Returns true if the given item is checked in the control.
+     * @param item Item whose check property is to be tested.
+     */
     public boolean isChecked(T item);
     
     /**
      * Checks the given item in the control.
+     * @param item The item to check.
      */
     public void check(T item);
+
+    /**
+     * Toggles the check state for the given item in the control.
+     * @param item The item for which check state needs to be toggled.
+     */
+    public void toggleCheckState(T item);
 }

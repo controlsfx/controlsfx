@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, ControlsFX
+ * Copyright (c) 2016, 2018 ControlsFX
  * All rights reserved.
  * <p>
  * Redistribution and use in source and binary forms, with or without
@@ -127,7 +127,7 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new SegmentedBarSkin(this);
+        return new SegmentedBarSkin<>(this);
     }
 
     @Override
@@ -169,14 +169,12 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
 
     // orientation
 
-    private ObjectProperty<Orientation> orientation = new StyleableObjectProperty<Orientation>(null) {
+    private ObjectProperty<Orientation> orientation = new StyleableObjectProperty<Orientation>(Orientation.VERTICAL) {
         @Override
         protected void invalidated() {
             final boolean vertical = (get() == Orientation.VERTICAL);
-            pseudoClassStateChanged(VERTICAL_PSEUDOCLASS_STATE,
-                    vertical);
-            pseudoClassStateChanged(HORIZONTAL_PSEUDOCLASS_STATE,
-                    !vertical);
+            pseudoClassStateChanged(VERTICAL_PSEUDOCLASS_STATE, vertical);
+            pseudoClassStateChanged(HORIZONTAL_PSEUDOCLASS_STATE, !vertical);
         }
 
         @Override
@@ -459,6 +457,22 @@ public class SegmentedBar<T extends SegmentedBar.Segment> extends ControlsFXCont
         }
     }
 
+    /**
+     * @return The CssMetaData associated with this class, which may include the
+     * CssMetaData of its super classes.
+     */
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return StyleableProperties.STYLEABLES;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getControlCssMetaData() {
+        return getClassCssMetaData();
+    }
+    
     /**
      * The view class used by the default segment view factory. The view is a simple
      * StackPane that contains a label. The default style class is "segment-view".

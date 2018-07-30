@@ -26,6 +26,7 @@
  */
 package impl.org.controlsfx.skin;
 
+import impl.org.controlsfx.collections.ReadOnlyUnbackedObservableList;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
@@ -39,7 +40,6 @@ import javafx.scene.input.KeyCode;
 
 import org.controlsfx.control.CheckComboBox;
 
-import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
 import org.controlsfx.control.IndexedCheckModel;
 
 public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {

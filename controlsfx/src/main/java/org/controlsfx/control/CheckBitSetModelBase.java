@@ -26,8 +26,9 @@
  */
 package org.controlsfx.control;
 
-import java.util.BitSet;
-import java.util.Map;
+import impl.org.controlsfx.collections.MappingChange;
+import impl.org.controlsfx.collections.NonIterableChange;
+import impl.org.controlsfx.collections.ReadOnlyUnbackedObservableList;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -36,9 +37,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
-import com.sun.javafx.collections.MappingChange;
-import com.sun.javafx.collections.NonIterableChange;
-import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
+import java.util.BitSet;
+import java.util.Map;
 
 // not public API
 abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> { 

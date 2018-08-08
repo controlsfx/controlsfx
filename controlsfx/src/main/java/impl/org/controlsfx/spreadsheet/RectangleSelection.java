@@ -37,6 +37,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
+import org.controlsfx.control.spreadsheet.ClipboardCell;
 import org.controlsfx.control.spreadsheet.GridChange;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
@@ -363,6 +364,15 @@ public class RectangleSelection extends Rectangle {
             set.clear();
             range = null;
             for (GridChange pos : list) {
+                set.add(key(pos.getRow(), pos.getColumn()));
+            }
+            computeRange();
+        }
+        
+        public void fillClipboardRange(List<ClipboardCell> list) {
+            set.clear();
+            range = null;
+            for (ClipboardCell pos : list) {
                 set.add(key(pos.getRow(), pos.getColumn()));
             }
             computeRange();

@@ -1857,7 +1857,7 @@ public class SpreadsheetView extends Control{
     public void copyClipboard() {
         checkFormat();
 
-        final ArrayList<GridChange> list = new ArrayList<>();
+        final ArrayList<ClipboardCell> list = new ArrayList<>();
         final ObservableList<TablePosition> posList = getSelectionModel().getSelectedCells();
 
         Set<SpreadsheetCell> treatedCells = new HashSet<>();
@@ -1866,8 +1866,6 @@ public class SpreadsheetView extends Control{
             if (!treatedCells.contains(cell)) {
                 treatedCells.add(cell);
 
-                // Using SpreadsheetCell change to stock the information
-                // FIXME a dedicated class should be used
                 /**
                  * We need to add every cell contained in a span otherwise the
                  * rectangles computed when pasting will be wrong.
@@ -1876,9 +1874,9 @@ public class SpreadsheetView extends Control{
                     for (int col = 0; col < getColumnSpan(cell); ++col) {
                         try {
                             new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(cell.getItem());
-                            list.add(new GridChange(p.getRow() + row, p.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem()));
+                            list.add(new ClipboardCell(p.getRow() + row, p.getColumn() + col, cell.getItem() == null ? null : cell.getItem()));
                         } catch (IOException exception) {
-                            list.add(new GridChange(p.getRow() + row, p.getColumn() + col, null, cell.getItem() == null ? null : cell.getItem().toString()));
+                            list.add(new ClipboardCell(p.getRow() + row, p.getColumn() + col, cell.getItem() == null ? null : cell.getItem().toString()));
                         }
                     }
                 }
@@ -1893,9 +1891,9 @@ public class SpreadsheetView extends Control{
      * Paste one value from the clipboard over the whole selection.
      * @param change 
      */
-    private void pasteOneValue(GridChange change) {
+    private void pasteOneValue(ClipboardCell change) {
         for (TablePosition position : getSelectionModel().getSelectedCells()) {
-            tryPasteCell(getModelRow(position.getRow()), getModelColumn(position.getColumn()), change.getNewValue());
+            tryPasteCell(getModelRow(position.getRow()), getModelColumn(position.getColumn()), change.getValue());
         }
     }
 
@@ -1926,9 +1924,9 @@ public class SpreadsheetView extends Control{
      * Same goes if we invert the rows and columns.
      * @param list
      */
-    private void pasteMixedValues(ArrayList<GridChange> list) {
+    private void pasteMixedValues(ArrayList<ClipboardCell> list) {
         SelectionRange sourceSelectionRange = new SelectionRange();
-        sourceSelectionRange.fillGridRange(list);
+        sourceSelectionRange.fillClipboardRange(list);
 
         //It means we have a rectangle.
         if (sourceSelectionRange.getRange() != null) {
@@ -1949,20 +1947,20 @@ public class SpreadsheetView extends Control{
 
                 //If the numbers of rows are the same and the targetColumnGap is a multiple of sourceColumnGap
                 if ((sourceRowGap == targetRowGap || targetRowGap == 1) && (targetColumnGap % sourceColumnGap) == 0) {
-                    for (final GridChange change : list) {
+                    for (final ClipboardCell change : list) {
                         int row = getModelRow(change.getRow() + offsetRow);
                         int column = change.getColumn() + offsetCol;
                         do {
                             int modelColumn = getModelColumn(column);
                             if (row < getGrid().getRowCount() && modelColumn < getGrid().getColumnCount()
                                     && row >= 0 && column >= 0) {
-                                tryPasteCell(row, modelColumn, change.getNewValue());
+                                tryPasteCell(row, modelColumn, change.getValue());
                             }
                         } while ((column = column + sourceColumnGap) <= targetRange.getRight());
                     }
                     //If the numbers of columns are the same and the targetRowGap is a multiple of sourceRowGap
                 } else if ((sourceColumnGap == targetColumnGap || targetColumnGap == 1) && (targetRowGap % sourceRowGap) == 0) {
-                    for (final GridChange change : list) {
+                    for (final ClipboardCell change : list) {
 
                         int row = change.getRow() + offsetRow;
                         int column = getModelColumn(change.getColumn() + offsetCol);
@@ -1970,7 +1968,7 @@ public class SpreadsheetView extends Control{
                             int modelRow = getModelRow(row);
                             if (modelRow < getGrid().getRowCount() && column < getGrid().getColumnCount()
                                     && row >= 0 && column >= 0) {
-                                tryPasteCell(modelRow, column, change.getNewValue());
+                                tryPasteCell(modelRow, column, change.getValue());
                             }
                         } while ((row = row + sourceRowGap) <= targetRange.getBottom());
                     }
@@ -1984,13 +1982,13 @@ public class SpreadsheetView extends Control{
      *
      * @param list
      */
-    private void pasteSeveralValues(ArrayList<GridChange> list) {
+    private void pasteSeveralValues(ArrayList<ClipboardCell> list) {
         // TODO algorithm very bad
         int minRow = getGrid().getRowCount();
         int minCol = getGrid().getColumnCount();
         int maxRow = 0;
         int maxCol = 0;
-        for (final GridChange p : list) {
+        for (final ClipboardCell p : list) {
             final int tempcol = p.getColumn();
             final int temprow = p.getRow();
             if (tempcol < minCol) {
@@ -2016,12 +2014,12 @@ public class SpreadsheetView extends Control{
         int row;
         int column;
 
-        for (final GridChange change : list) {
+        for (final ClipboardCell change : list) {
             row = getModelRow(change.getRow() + offsetRow);
             column = getModelColumn(change.getColumn() + offsetCol);
             if (row < rowCount && column < columnCount
                     && row >= 0 && column >= 0) {
-                tryPasteCell(row, column, change.getNewValue());
+                tryPasteCell(row, column, change.getValue());
             }
         }
     }
@@ -2044,7 +2042,7 @@ public class SpreadsheetView extends Control{
         if (clipboard.getContent(fmt) != null) {
 
             @SuppressWarnings("unchecked")
-            final ArrayList<GridChange> list = (ArrayList<GridChange>) clipboard.getContent(fmt);
+            final ArrayList<ClipboardCell> list = (ArrayList<ClipboardCell>) clipboard.getContent(fmt);
             if (list.size() == 1) {
                 pasteOneValue(list.get(0));
             } else if (selectedCells.size() > 1) {

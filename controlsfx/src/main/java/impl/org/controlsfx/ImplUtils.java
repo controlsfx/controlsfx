@@ -40,6 +40,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 
 public class ImplUtils {
 

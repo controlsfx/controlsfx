@@ -40,6 +40,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 
 public class ImplUtils {
 
@@ -50,6 +51,21 @@ public class ImplUtils {
     public static void injectAsRootPane(Scene scene, Parent injectedParent, boolean useReflection) {
         Parent originalParent = scene.getRoot();
         scene.setRoot(injectedParent);
+        
+        // Begin Fix Issue #847, see https://bitbucket.org/controlsfx/controlsfx/issues/847/validationsupport-messes-up-layout
+        if (injectedParent instanceof Region) {
+          Region region = (Region) originalParent;
+
+          region.setMinWidth(Region.USE_PREF_SIZE);
+          region.setMinHeight(Region.USE_PREF_SIZE);
+
+          region.setPrefWidth(Region.USE_COMPUTED_SIZE);
+          region.setPrefHeight(Region.USE_COMPUTED_SIZE);
+
+          region.setMaxWidth(Double.MAX_VALUE);
+          region.setMaxHeight(Double.MAX_VALUE);
+        }
+        // End Fix Issue #847
         
         if (originalParent != null) {
             getChildren(injectedParent, useReflection).add(0, originalParent);

@@ -97,13 +97,19 @@ public final class FilterPanel<T,R> extends VBox {
                 .forEach(item -> item.selectedProperty().set(false));
     }
     void selectValue(Object value) {
-        checkListView.getItems().stream().filter(item -> item.getValue().equals(value))
+        checkListView.getItems().stream().filter(item ->
+                (item.getValue() == null && value == null) ||
+                        (item.getValue() != null && value != null) && item.getValue().equals(value)
+                    )
                 .forEach(item -> item.selectedProperty().set(true));
     }
     void unSelectValue(Object value) {
-        checkListView.getItems().stream().filter(item -> item.getValue() == value)
-                .forEach(item -> item.selectedProperty().set(false));
+        checkListView.getItems().stream().filter(item ->
+                (item.getValue() == null && value == null) ||
+                        (item.getValue() != null && value != null) && item.getValue().equals(value)
+        ).forEach(item -> item.selectedProperty().set(false));
     }
+
 
     FilterPanel(ColumnFilter<T,R> columnFilter, ContextMenu contextMenu) {
         columnFilter.setFilterPanel(this);

@@ -1,10 +1,20 @@
-image: cogniteev/oracle-java:java9
-
 pipelines:
-  default:
-    - step:
-        caches:
-          - gradle
-        script:
-          - chmod +x gradlew
-          - ./gradlew clean assemble
+  branches:
+    default:
+      - step:
+          name: Build and assemble default branch
+          image: cogniteev/oracle-java:java8
+          caches:
+            - gradle
+          script:
+            - chmod +x gradlew
+            - ./gradlew clean assemble
+    9.0.0:
+      - step:
+          name: Build and assemble 9.0.0 branch
+          image: abhinay/oracle-java:java10
+          caches:
+            - gradle
+          script:
+            - chmod +x gradlew
+            - ./gradlew clean assemble

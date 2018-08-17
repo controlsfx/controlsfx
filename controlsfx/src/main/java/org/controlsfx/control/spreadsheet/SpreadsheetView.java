@@ -899,6 +899,36 @@ public class SpreadsheetView extends Control{
     }
 
     /**
+     * Given the row of a SpreadsheetCell, return the actual row as displayed in
+     * the SpreadsheetView. Beware as it can be a time-consuming operation.
+     * Also, calling this method on a row that it hidden will return incoherent
+     * information.
+     *
+     * @param modelRow
+     * @return the ViewRow if possible, -1 or another row if the row is hidden.
+     */
+    public int getViewRow(int modelRow) {
+        //First translate the modelRow to the filtered row.
+        modelRow = getFilteredRow(modelRow);
+        //If the grid is sorted, we retrieve the view row.
+        if (getComparator() != null) {
+            modelRow = getViewIndex(modelRow);
+        }
+        return modelRow;
+    }
+
+    private int getViewIndex(int sourceIndex) {
+        //FIXME Will be improved in JDK9 with https://bugs.openjdk.java.net/browse/JDK-8139848
+        int max = sortedList.size();
+        for (int i = 0; i < max; i++) {
+            if (sortedList.getSourceIndex(i) == sourceIndex) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    /**
      * Given an index on the SpreadsheetView, return a {@link Grid} index it is
      * related to.
      *
@@ -919,7 +949,7 @@ public class SpreadsheetView extends Control{
 
     /**
      * Given an index on the SpreadsheetView, it will return the model row by
-     * simply considering the hidden rows (and not the acutal sort if any).
+     * simply considering the hidden rows (and not the actual sort if any).
      *
      * If you hide the row 2, it means the row 2 in the SpreadsheetView will
      * actually display the row 3 in the model {@link Grid}. Thus calling this
@@ -1677,11 +1707,14 @@ public class SpreadsheetView extends Control{
     }
     
     /**
-     * Scrolls the SpreadsheetView so that the given row is visible.
-     * @param modelRow 
+     * Scrolls the SpreadsheetView so that the given row is visible. Beware, you
+     * must call {@link #getViewRow(int) } before if you are using {@link SpreadsheetCell#getRow()
+     * } and the grid is sorted/filtered.
+     *
+     * @param row
      */
-    public void scrollToRow(int modelRow){
-        cellsView.scrollTo(getFilteredRow(modelRow));
+    public void scrollToRow(int row) {
+        cellsView.scrollTo(row);
     }
     
     /**

@@ -56,15 +56,37 @@ public class SpreadsheetViewSelectionModel {
 
     /**
      * Clears all selection, and then selects the cell at the given row/column
-     * intersection.
+     * intersection in the SpreadsheetView. This method does not consider
+     * sorting and filtering. If you want to select a {@link SpreadsheetCell} in
+     * a filtered/sorted grid, use {@link #clearAndSelect(org.controlsfx.control.spreadsheet.SpreadsheetCell)
+     * } instead.
      *
      * @param row
      * @param column
      */
     public final void clearAndSelect(int row, SpreadsheetColumn column) {
-        selectionModel.clearAndSelect(spv.getFilteredRow(row), column.column);
+        selectionModel.clearAndSelect(row, column.column);
     }
 
+    /**
+     * Clears all selection, and then selects the given {@link SpreadsheetCell}.
+     * This method allow to select a cell no matter if the grid is Filtered or
+     * sorted. Beware, this method can be time-consuming if lots of rows are
+     * present.
+     *
+     *
+     * @param cell
+     */
+    public final void clearAndSelect(SpreadsheetCell cell) {
+        if (spv.isRowHidden(cell.getRow()) || spv.isColumnHidden(cell.getColumn())) {
+            return;
+        }
+        int row = spv.getViewRow(cell.getRow());
+        if (row != -1) {
+            selectionModel.clearAndSelect(row, spv.getColumns().get(cell.getColumn()).column);
+        }
+    }
+    
     /**
      * Private method for inner selection when we already have the ViewRow.
      *

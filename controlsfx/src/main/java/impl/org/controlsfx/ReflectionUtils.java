@@ -223,8 +223,10 @@ public class ReflectionUtils {
         try {
             Class<?> styleManagerClass = Class.forName("com.sun.javafx.css.StyleManager");
             Method getInstance = styleManagerClass.getMethod("getInstance");
+            getInstance.setAccessible(true);
             Object styleManager = getInstance.invoke(styleManagerClass);
             Method addUserStyleSheet = styleManagerClass.getMethod("addUserAgentStylesheet", String.class);
+            addUserStyleSheet.setAccessible(true);
             addUserStyleSheet.invoke(styleManager, stylesheet);
         } catch (IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException("Cannot add UserAgentStylesheet as the method is not accessible");
@@ -241,6 +243,7 @@ public class ReflectionUtils {
         try {
             Class<?> accessorClass = Class.forName("com.sun.javafx.webkit.Accessor");
             Method getInstance = accessorClass.getMethod("getPageFor");
+            getInstance.setAccessible(true);
             WebPage webPage = (WebPage) getInstance.invoke(accessorClass, webEngine);
             return Optional.of(webPage);
         } catch (IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException e) {

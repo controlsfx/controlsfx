@@ -136,6 +136,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         registerChangeListener(searchField.textProperty(), "FILTER-UI"); //$NON-NLS-1$
         registerChangeListener(control.modeSwitcherVisibleProperty(), "TOOLBAR-MODE"); //$NON-NLS-1$
         registerChangeListener(control.searchBoxVisibleProperty(), "TOOLBAR-SEARCH"); //$NON-NLS-1$
+        registerChangeListener(control.categoryComparatorProperty(), "CATEGORY-COMPARATOR"); //$NON-NLS-1$
         
         control.getItems().addListener((ListChangeListener<Item>) change -> refreshProperties());
         
@@ -154,7 +155,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     @Override protected void handleControlPropertyChanged(String p) {
         super.handleControlPropertyChanged(p);
         
-        if (p == "MODE" || p == "EDITOR-FACTORY" || p == "FILTER") { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        if (p == "MODE" || p == "EDITOR-FACTORY" || p == "FILTER" || p == "CATEGORY-COMPARATOR") { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             refreshProperties();
         } else if (p == "FILTER-UI") { //$NON-NLS-1$
             getSkinnable().setTitleFilter(searchField.getText());
@@ -192,7 +193,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
         switch( getSkinnable().modeProperty().get() ) {
             case CATEGORY: {
                 // group by category
-                Map<String, List<Item>> categoryMap = new TreeMap<>();
+                Map<String, List<Item>> categoryMap = new TreeMap(getSkinnable().getCategoryComparator());
                 for( Item p: getSkinnable().getItems()) {
                     String category = p.getCategory();
                     List<Item> list = categoryMap.get(category);

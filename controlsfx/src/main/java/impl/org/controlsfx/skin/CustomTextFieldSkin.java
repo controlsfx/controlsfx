@@ -154,20 +154,20 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
     @Override
     protected double computeMinWidth(double h, double topInset, double rightInset, double bottomInset, double leftInset)
     {
-        final double pw = super.computeMinWidth(h, topInset, rightInset, bottomInset, leftInset);
+        final double mw = super.computeMinWidth(h, topInset, rightInset, bottomInset, leftInset);
         final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.minWidth(h));
         final double rightWidth = rightPane == null ? 0.0 : snapSize(rightPane.minWidth(h));
 
-        return pw + leftWidth + rightWidth;
+        return mw + leftWidth + rightWidth;
     }
 
     @Override
     protected double computeMinHeight(double w, double topInset, double rightInset, double bottomInset, double leftInset)
     {
-        final double ph = super.computeMinHeight(w, topInset, rightInset, bottomInset, leftInset);
+        final double mh = super.computeMinHeight(w, topInset, rightInset, bottomInset, leftInset);
         final double leftHeight = leftPane == null ? 0.0 : snapSize(leftPane.minHeight(-1));
         final double rightHeight = rightPane == null ? 0.0 : snapSize(rightPane.minHeight(-1));
 
-        return Math.max(ph, Math.max(leftHeight, rightHeight));
+        return Math.max(mh, Math.max(leftHeight, rightHeight));
     }
 }

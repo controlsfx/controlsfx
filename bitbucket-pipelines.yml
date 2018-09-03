@@ -18,3 +18,27 @@ pipelines:
           script:
             - chmod +x gradlew
             - ./gradlew clean assemble
+
+  bookmarks:
+    8.[0-9][0-9]*.[0-9][0-9]*:
+      - step:
+          name: Build and release
+          image: cogniteev/oracle-java:java8
+          caches:
+            - gradle
+          script:
+          - chmod +x gradlew .ci/update.sh .ci/commit.sh
+          - ./.ci/update.sh
+          - ./gradlew clean assemble uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.username=$TRANSIFEX_USERNAME -Ptransifex.password=$TRANSIFEX_PASSWORD
+          - ./.ci/commit.sh
+    9.[0-9][0-9]*.[0-9][0-9]*:
+          - step:
+              name: Build and release
+              image: abhinay/oracle-java:java10
+              caches:
+                - gradle
+              script:
+              - chmod +x gradlew .ci/update.sh .ci/commit.sh
+              - ./.ci/update.sh
+              - ./gradlew clean assemble uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.username=$TRANSIFEX_USERNAME -Ptransifex.password=$TRANSIFEX_PASSWORD
+              - ./.ci/commit.sh

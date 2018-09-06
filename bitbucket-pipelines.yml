@@ -8,7 +8,7 @@ pipelines:
             - gradle
           script:
             - chmod +x gradlew
-            - ./gradlew clean assemble
+            - ./gradlew clean assemble uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.username=$TRANSIFEX_USERNAME -Ptransifex.password=$TRANSIFEX_PASSWORD
     9.0.0:
       - step:
           name: Build and assemble 9.0.0 branch
@@ -17,7 +17,7 @@ pipelines:
             - gradle
           script:
             - chmod +x gradlew
-            - ./gradlew clean assemble
+            - ./gradlew clean assemble uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.username=$TRANSIFEX_USERNAME -Ptransifex.password=$TRANSIFEX_PASSWORD
 
   bookmarks:
     8.[0-9][0-9]*.[0-9][0-9]*:

@@ -7,18 +7,14 @@ dependencies {
 }
 
 ext {
-    transifex_username = ""
-    transifex_password = ""
+    transifex_api = ""
 }
 
 configurations {
     jdk
     
-    if (project.hasProperty("transifex.username")) {
-        transifex_username = project.property("transifex.username")
-    }
-    if (project.hasProperty("transifex.password")) {
-        transifex_password = project.getProperty("transifex.password")
+    if (project.hasProperty("transifex.api")) {
+        transifex_api = project.getProperty("transifex.api")
     }
 }
 
@@ -32,7 +28,7 @@ sourceSets {
 task downloadTranslations {
     description = "Download translations from Transifex"
     doLast {
-        if (transifex_username.equals("") || transifex_password.equals("")) {
+        if (transifex_api.isEmpty()) {
             logger.warn "----------------------------------------------------------"
             logger.warn "Cannot determine Transifex Username/Password."
             logger.warn "If you want to build ControlsFX with its translations then"
@@ -44,8 +40,7 @@ task downloadTranslations {
             javaexec {
                 main = 'impl.build.transifex.Transifex'
                 classpath = sourceSets.main.runtimeClasspath
-                systemProperty 'transifex.username', transifex_username
-                systemProperty 'transifex.password', transifex_password
+                systemProperty 'transifex.api', transifex_api
             }
         }
     }

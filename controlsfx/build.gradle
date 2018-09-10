@@ -68,15 +68,13 @@ processResources.finalizedBy(compileCSS)
 
 javadoc {
     exclude 'impl/*'
-    //failOnError = true
     classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
     
     options.windowTitle("ControlsFX Project ${version}")
-    options.links("http://docs.oracle.com/javase/8/docs/api/");
-    options.links("http://docs.oracle.com/javase/8/javafx/api/");
-    options.addBooleanOption("Xdoclint:none").setValue(true);
-    options.addBooleanOption("javafx").setValue(true);
-    options.overview("${projectDir}/src/main/docs/overview.html");
+    options.links("https://docs.oracle.com/javase/9/docs/api")
+    options.addBooleanOption("Xdoclint:none").setValue(true)
+    options.addBooleanOption("javafx").setValue(true)
+    options.overview("${projectDir}/src/main/docs/overview.html")
     
     // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy
     // over the doc-files if they are embedded with the sources. I find this arrangement

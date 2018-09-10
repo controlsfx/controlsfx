@@ -65,9 +65,17 @@ subprojects {
         ]
     }
 
-    // Currently Javadoc creation fails because of exported packages not visible to javadoc task
     javadoc {
-        enabled = false
+        doFirst {
+            options.addMultilineStringsOption("-add-exports").setValue(
+                [
+                    'javafx.base/com.sun.javafx.event=ALL-UNNAMED',
+                    'javafx.web/com.sun.webkit=ALL-UNNAMED', 
+                    'javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED'
+                ]
+            )
+            options.addBooleanOption('html5', true)
+        }
     }
 
     task sourceJar(type: Jar) {

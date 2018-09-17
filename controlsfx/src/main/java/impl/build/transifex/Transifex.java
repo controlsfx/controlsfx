@@ -53,11 +53,10 @@ public class Transifex {
     private static final String GET_TRANSLATION     = BASE_URI + "project/controlsfx/resource/controlsfx-core/translation/%1s?file"; // gets a translation for one language //$NON-NLS-1$
     private static final String TRANSLATION_STATS   = BASE_URI + "project/controlsfx/resource/controlsfx-core/stats/%1s/"; // gets a translation for one language //$NON-NLS-1$
 
-    private static final String USERNAME            = System.getProperty("$transifex_username"); //$NON-NLS-1$
-    private static final String PASSWORD            = System.getProperty("$transifex_password"); //$NON-NLS-1$
+    private static final String TRANSIFEX_API       = System.getProperty("transifex.api"); //$NON-NLS-1$
     private static final boolean FILTER_INCOMPLETE_TRANSLATIONS = Boolean.parseBoolean(System.getProperty("transifex.filterIncompleteTranslations", "false"));
 
-    public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+    public static void main(String[] args) {
         new Transifex().doTransifexCheck();
     }
         
@@ -65,8 +64,8 @@ public class Transifex {
     private void doTransifexCheck() {
         System.out.println("=== Starting Transifex Check ==="); //$NON-NLS-1$
         
-        if (USERNAME == null || PASSWORD == null || USERNAME.isEmpty() || PASSWORD.isEmpty()) {
-            System.out.println("  transifex.username and transifex.password system properties must be specified"); //$NON-NLS-1$
+        if (TRANSIFEX_API == null || TRANSIFEX_API.isEmpty()) {
+            System.out.println("transifex.api system properties must be specified"); //$NON-NLS-1$
             return;
         }
         
@@ -115,9 +114,9 @@ public class Transifex {
             connection.setUseCaches(false);
             connection.setDoInput(true);
             
-            // pass in username / password
-            String encoded = Base64.getEncoder().encodeToString((USERNAME+":"+PASSWORD).getBytes()); //$NON-NLS-1$
-            connection.setRequestProperty("Authorization", "Basic "+encoded); //$NON-NLS-1$ //$NON-NLS-2$
+            // pass in API details
+            String encoded = Base64.getEncoder().encodeToString(("api" + ":" + TRANSIFEX_API).getBytes()); //$NON-NLS-1$
+            connection.setRequestProperty("Authorization", "Basic " + encoded); //$NON-NLS-1$ //$NON-NLS-2$
             connection.setRequestProperty("Accept-Charset", CHARSET);  //$NON-NLS-1$
             
             return consumer.apply(connection.getInputStream());

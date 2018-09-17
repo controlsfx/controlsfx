@@ -77,6 +77,7 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
         if (newLeft != null) {
             getChildren().remove(leftPane);
             leftPane = new StackPane(newLeft);
+            leftPane.setManaged(false);
             leftPane.setAlignment(Pos.CENTER_LEFT);
             leftPane.getStyleClass().add("left-pane"); //$NON-NLS-1$
             getChildren().add(leftPane);
@@ -87,6 +88,7 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
         if (newRight != null) {
             getChildren().remove(rightPane);
             rightPane = new StackPane(newRight);
+            rightPane.setManaged(false);
             rightPane.setAlignment(Pos.CENTER_RIGHT);
             rightPane.getStyleClass().add("right-pane"); //$NON-NLS-1$
             getChildren().add(rightPane);
@@ -148,9 +150,22 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
         
         return Math.max(ph, Math.max(leftHeight, rightHeight));
     }
-//    
-//    @Override
-//    protected double computeMinWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
-//        return computePrefWidth(height, topInset, rightInset, bottomInset, leftInset);
-//}
+
+    @Override
+    protected double computeMinWidth(double h, double topInset, double rightInset, double bottomInset, double leftInset) {
+        final double mw = super.computeMinWidth(h, topInset, rightInset, bottomInset, leftInset);
+        final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.minWidth(h));
+        final double rightWidth = rightPane == null ? 0.0 : snapSize(rightPane.minWidth(h));
+
+        return mw + leftWidth + rightWidth;
+    }
+
+    @Override
+    protected double computeMinHeight(double w, double topInset, double rightInset, double bottomInset, double leftInset) {
+        final double mh = super.computeMinHeight(w, topInset, rightInset, bottomInset, leftInset);
+        final double leftHeight = leftPane == null ? 0.0 : snapSize(leftPane.minHeight(-1));
+        final double rightHeight = rightPane == null ? 0.0 : snapSize(rightPane.minHeight(-1));
+
+        return Math.max(mh, Math.max(leftHeight, rightHeight));
+    }
 }

@@ -1120,7 +1120,7 @@ public class SpreadsheetView extends Control{
      * @param column
      */
     public void edit(int row, SpreadsheetColumn column) {
-       cellsView.edit(row, column.column);
+        cellsView.edit(row, column == null ? null : column.column);
     }
     
     /**

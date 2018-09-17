@@ -264,10 +264,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (empty && emptyRow) {
             textProperty().unbind();
             setText(null);
-            // do not nullify graphic here. Let the TableRow to control cell
-            // dislay
-            // setGraphic(null);
-            setContentDisplay(null);
         } else if (!isEditing() && item != null) {
             show(item);
             if (item.getGraphic() == null) {

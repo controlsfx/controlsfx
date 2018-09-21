@@ -41,8 +41,7 @@ public class ControlsFXSampler implements FXSamplerProject {
         label.setText(desc.toString());
         label.setStyle("-fx-font-size: 1.5em; -fx-padding: 20 0 0 5;");
         vBox.getChildren().addAll(pane, label);
-        WelcomePage wPage = new WelcomePage("Welcome to Controls FX!", vBox);
-        return wPage;
+        return new WelcomePage("Welcome to Controls FX!", vBox);
     }
     
     public static void main(String[] args) {

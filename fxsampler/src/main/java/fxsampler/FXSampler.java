@@ -97,9 +97,9 @@ public class FXSampler extends Application {
         launch(args);
     }
 
-    @Override public void start(final Stage primaryStage) throws Exception {
+    @Override public void start(final Stage primaryStage) {
+
         this.stage = primaryStage;
-//        primaryStage.getIcons().add(new Image("/org/controlsfx/samples/controlsfx-logo.png"));
         
         ServiceLoader<FXSamplerConfiguration> configurationServiceLoader = ServiceLoader.load(FXSamplerConfiguration.class);
 
@@ -117,11 +117,7 @@ public class FXSampler extends Application {
         final TextField searchBox = new TextField();
         searchBox.setPromptText("Search");
         searchBox.getStyleClass().add("search-box");
-        searchBox.textProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable o) {
-                buildSampleTree(searchBox.getText());
-            }
-        });
+        searchBox.textProperty().addListener(o -> buildSampleTree(searchBox.getText()));
         GridPane.setMargin(searchBox, new Insets(5, 0, 0, 0));
         grid.add(searchBox, 0, 0);
         
@@ -131,10 +127,12 @@ public class FXSampler extends Application {
         samplesTreeView.getStyleClass().add("samples-tree");
         samplesTreeView.setMinWidth(200);
         samplesTreeView.setMaxWidth(200);
-        samplesTreeView.setCellFactory(new Callback<TreeView<Sample>, TreeCell<Sample>>() {
-            @Override public TreeCell<Sample> call(TreeView<Sample> param) {
+        samplesTreeView.setCellFactory(new Callback<>() {
+            @Override
+            public TreeCell<Sample> call(TreeView<Sample> param) {
                 return new TreeCell<Sample>() {
-                    @Override protected void updateItem(Sample item, boolean empty) {
+                    @Override
+                    protected void updateItem(Sample item, boolean empty) {
                         super.updateItem(item, empty);
 
                         if (empty) {
@@ -146,35 +144,28 @@ public class FXSampler extends Application {
                 };
             }
         });
-        samplesTreeView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<Sample>>() {
-            @Override public void changed(ObservableValue<? extends TreeItem<Sample>> observable, TreeItem<Sample> oldValue, TreeItem<Sample> newSample) {
-                if (newSample == null) {
-                    return;
-                } else if (newSample.getValue() instanceof EmptySample) {
-                    Sample selectedSample = newSample.getValue();
-                    Project selectedProject = projectsMap.get(selectedSample.getSampleName());
-                    if(selectedProject != null) {
-                        changeToWelcomeTab(selectedProject.getWelcomePage());
-                    }
-                    return;
+        samplesTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newSample) -> {
+            if (newSample == null) {
+                return;
+            } else if (newSample.getValue() instanceof EmptySample) {
+                Sample selectedSample = newSample.getValue();
+                Project selectedProject = projectsMap.get(selectedSample.getSampleName());
+                if(selectedProject != null) {
+                    changeToWelcomeTab(selectedProject.getWelcomePage());
                 }
-                selectedSample = newSample.getValue();
-                changeSample();
+                return;
             }
+            selectedSample = newSample.getValue();
+            changeSample();
         });
         GridPane.setVgrow(samplesTreeView, Priority.ALWAYS);
-//        GridPane.setMargin(samplesTreeView, new Insets(5, 0, 0, 0));
         grid.add(samplesTreeView, 0, 1);
 
         // right hand side
         tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         tabPane.getStyleClass().add(TabPane.STYLE_CLASS_FLOATING);
-        tabPane.getSelectionModel().selectedItemProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable arg0) {
-                updateTab();
-            }
-        });
+        tabPane.getSelectionModel().selectedItemProperty().addListener(o -> updateTab());
         GridPane.setHgrow(tabPane, Priority.ALWAYS);
         GridPane.setVgrow(tabPane, Priority.ALWAYS);
         grid.add(tabPane, 1, 0, 1, 2);
@@ -251,7 +242,7 @@ public class FXSampler extends Application {
         }
         
         // and finally we sort the display a little
-        sort(root, (o1, o2) -> o1.getValue().getSampleName().compareTo(o2.getValue().getSampleName()));
+        sort(root, Comparator.comparing(o -> o.getValue().getSampleName()));
     }
     
     private void sort(TreeItem<Sample> node, Comparator<TreeItem<Sample>> comparator) {
@@ -426,8 +417,7 @@ public class FXSampler extends Application {
                 + "by clicking on the options to the left.");
         welcomeLabel2.setStyle("-fx-font-size: 1.25em; -fx-padding: 0 0 0 5;");
 
-        WelcomePage wPage = new WelcomePage("Welcome!", new VBox(5, welcomeLabel1, welcomeLabel2));
-        return wPage;
+        return new WelcomePage("Welcome!", new VBox(5, welcomeLabel1, welcomeLabel2));
     }
 
     

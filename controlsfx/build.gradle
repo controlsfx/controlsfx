@@ -1,12 +1,5 @@
-dependencies {
-    try {
-        jdk files(jfxrtJar)
-    } catch (MissingPropertyException pne) {
-        // javafx plugin will provide in this case
-    }
-}
-
 ext {
+    moduleName    = 'org.controlsfx.controls'
     transifex_api = ""
 }
 
@@ -48,32 +41,37 @@ task downloadTranslations {
 
 processResources.finalizedBy(downloadTranslations)
 
-task compileCSS {
-    doLast {
-        ant.delete(includeEmptyDirs: 'true') {
-            fileset(dir: file("build/resources/main"), includes: "**/*.bss")
+// Java Packager is not available for Java 11
+if (!JavaVersion.current().isJava11Compatible()) {
+    task compileCSS {
+        doLast {
+            ant.delete(includeEmptyDirs: 'true') {
+                fileset(dir: file("build/resources/main"), includes: "**/*.bss")
+            }
+            javaexec {
+                main = "com.sun.javafx.tools.packager.Main"
+                classpath = files("${System.properties['java.home']}/../lib/ant-javafx.jar")
+                args = ["-createbss",
+                        "-srcdir", "src/main/resources",
+                        "-outdir", "build/resources/main"
+                ]
+            }
         }
-        javaexec {
-            main = "com.sun.javafx.tools.packager.Main"
-            classpath = files("${System.properties['java.home']}/../lib/ant-javafx.jar")
-            args = ["-createbss",
-                    "-srcdir", "src/main/resources",
-                    "-outdir", "build/resources/main"
-            ]
+    }
+
+    processResources.finalizedBy(compileCSS)
+}
+
+if (JavaVersion.current().isJava11Compatible()) {
+    dependencies {
+        rootProject.javafx_modules.each {
+            add("compile", "org.openjfx:$it:$javafx_version:$platform")
         }
     }
 }
 
-processResources.finalizedBy(compileCSS)
-
 javadoc {
-    exclude 'impl/*'
-    classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
-    
     options.windowTitle("ControlsFX Project ${version}")
-    options.links("https://docs.oracle.com/javase/9/docs/api")
-    options.addBooleanOption("Xdoclint:none").setValue(true)
-    options.addBooleanOption("javafx").setValue(true)
     options.overview("${projectDir}/src/main/docs/overview.html")
     
     // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy

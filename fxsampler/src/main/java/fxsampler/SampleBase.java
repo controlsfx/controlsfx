@@ -23,7 +23,7 @@ import javafx.stage.Stage;
 public abstract class SampleBase extends Application implements Sample {
     
     /** {@inheritDoc} */
-    @Override public void start(Stage primaryStage) throws Exception {
+    @Override public void start(Stage primaryStage) {
         ServiceLoader<FXSamplerConfiguration> configurationServiceLoader = ServiceLoader.load(FXSamplerConfiguration.class);
 
         primaryStage.setTitle(getSampleName());
@@ -99,7 +99,7 @@ public abstract class SampleBase extends Application implements Sample {
                   " " + version.trim();
         
         final String projectName = sample.getProjectName() + version;
-        if (projectName != null && ! projectName.isEmpty()) {
+        if (!projectName.isEmpty()) {
             Label projectNameTitleLabel = new Label("Project: ");
             projectNameTitleLabel.getStyleClass().add("project-name-title");
             

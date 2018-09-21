@@ -1,3 +1,5 @@
+ext.moduleName = 'org.controlsfx.samples'
+
 apply plugin: 'application'
 
 applicationName = 'FXSampler'
@@ -10,22 +12,14 @@ configurations {
 sourceSets {
     main {
         compileClasspath += configurations.jdk
+        // Gradle application plugin fails to resolve resources with JDK 11
+        output.resourcesDir = "build/classes/java/main"
     }
 }
 
 dependencies {
-
     compile project(':controlsfx')
     compile project(':fxsampler')
-
-    compile group + ':' + fxsampler_name +':'  + fxsampler_version
-    compile group + ':' + controlsfx_name + ':' + version
-
-    try {
-        jdk files(jfxrtJar)
-    } catch (MissingPropertyException pne) {
-        // javafx plugin will provide in this case
-    }
 }
 
 jar {
@@ -38,13 +32,12 @@ jar {
     from sourceSets.main.allJava
 }
 
-javadoc {
-    options.encoding = 'UTF-8'
+run {
+    doFirst {
+        jvmArgs = java9Args + [
+            '--module-path', classpath.asPath,
+            '--module', mainClassName,
+        ]
+        classpath = files()
+    }
 }
-
-applicationDefaultJvmArgs = [
-    // For accessing VirtualFlow field from the base class in GridViewSkin
-    "--add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED",
-    // For accessing InputMap used in RangeSliderBehavior
-    "--add-exports=javafx.controls/com.sun.javafx.scene.control.inputmap=ALL-UNNAMED"
-]

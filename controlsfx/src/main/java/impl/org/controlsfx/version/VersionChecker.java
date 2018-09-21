@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,6 @@
  */
 package impl.org.controlsfx.version;
 
-import com.sun.javafx.runtime.VersionInfo;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -47,7 +45,7 @@ public class VersionChecker {
     static {
         controlsFX = VersionChecker.class.getPackage();
         
-        javaFXVersion         = VersionInfo.getVersion();
+        javaFXVersion         = System.getProperty("javafx.version");
         controlsFXSpecTitle   = getControlsFXSpecificationTitle();
         controlsFXSpecVersion = getControlsFXSpecificationVersion();
         controlsFXImpVersion  = getControlsFXImplementationVersion();

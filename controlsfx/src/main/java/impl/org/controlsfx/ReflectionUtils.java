@@ -1,6 +1,5 @@
 package impl.org.controlsfx;
 
-import com.sun.javafx.scene.traversal.ParentTraversalEngine;
 import com.sun.webkit.WebPage;
 import javafx.scene.Parent;
 import javafx.scene.control.Control;
@@ -257,7 +256,7 @@ public class ReflectionUtils {
      *
      ****************************************************************************************************/
 
-    public static void setTraversalEngine(Control control, ParentTraversalEngine engine) {
+    public static void setTraversalEngine(Control control, Object engine) {
         try {
             Class<?> parentHelper = Class.forName("com.sun.javafx.scene.ParentHelper");
             Method method = parentHelper.getMethod("setTraversalEngine", Parent.class, engine.getClass());

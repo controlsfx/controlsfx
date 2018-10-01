@@ -41,16 +41,17 @@ static String getOSName() {
     return ("")
 }
 
+ext.javafx_modules = [
+        'javafx-base',
+        'javafx-graphics',
+        'javafx-controls',
+        'javafx-fxml',
+        'javafx-media',
+        'javafx-web'
+]
+
 if (JavaVersion.current().isJava11Compatible()) {
     ext.javafx_version = '11'
-    ext.javafx_modules = [
-            'javafx-base',
-            'javafx-graphics',
-            'javafx-controls',
-            'javafx-fxml',
-            'javafx-media',
-            'javafx-web'
-    ]
     ext.platform = getOSName()
 }
 
@@ -65,7 +66,7 @@ subprojects {
 
     Properties cfg = new Properties()
     cfg.load(new FileInputStream("$rootDir/controlsfx-build.properties"))
-	
+
     ext {
       artifact_suffix       = cfg.artifact_suffix
       specification_title   = cfg.controlsfx_specification_title  //'Java 8u20'
@@ -83,12 +84,12 @@ subprojects {
     targetCompatibility = '1.9'
 
     if (JavaVersion.current().isJava11Compatible()) {
-        sourceCompatibility = '11'
-        targetCompatibility = '11'
+        sourceCompatibility = rootProject.javafx_version
+        targetCompatibility = rootProject.javafx_version
     }
 
     afterEvaluate {
-        
+
         repositories {
             mavenCentral()
         }
@@ -150,8 +151,16 @@ subprojects {
                     options.links("https://openjfx.io/javadoc/11")
                     options.links("https://docs.oracle.com/en/java/javase/11/docs/api")
                 } else {*/
-                    options.links("https://docs.oracle.com/javase/9/docs/api")
+                options.links("https://docs.oracle.com/javase/9/docs/api")
                 // }
+                // Only required JDK 9/10
+                options.addMultilineStringsOption("-add-exports").setValue(
+                    [
+                        'javafx.base/com.sun.javafx.event=ALL-UNNAMED',
+                        'javafx.web/com.sun.webkit=ALL-UNNAMED',
+                        'javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED'
+                    ]
+                )
             }
         }
     }

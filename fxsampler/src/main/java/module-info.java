@@ -8,7 +8,7 @@ module org.controlsfx.fxsampler {
             org.controlsfx.samples;
     exports fxsampler.model to org.controlsfx.samples;
     exports fxsampler.util to org.controlsfx.samples;
-    
+
     uses fxsampler.FXSamplerConfiguration;
     uses fxsampler.FXSamplerProject;
 }

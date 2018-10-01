@@ -1,16 +1,3 @@
-static String getOSName() {
-    final String osName = System.getProperty("os.name").toLowerCase()
-    if (osName.contains("linux")) {
-        return ("linux")
-    } else if (osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx")) {
-        return ("mac")
-    } else if (osName.contains("windows")) {
-        return ("win")
-    }
-    return ("")
-}
-
-ext.platform = getOSName()
 ext.java9Args = [
         // For various usages of TraversalEngine
         "--add-exports=javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",
@@ -32,23 +19,40 @@ ext.java9Args = [
         // For WebPage in SVGLoader
         "--add-exports=javafx.web/com.sun.webkit=org.controlsfx.controls",
         // For enabling FontAwesome
-        "--add-exports=javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
+        "--add-exports=javafx.graphics/com.sun.javafx.css=org.controlsfx.controls"
+]
+
+ext.java9RuntimeArgs = [
         // For accessing VirtualFlow field from the base class in GridViewSkin
         "--add-opens=javafx.controls/javafx.scene.control.skin=org.controlsfx.controls",
         // For accessing getChildren in ImplUtils
         "--add-opens=javafx.graphics/javafx.scene=org.controlsfx.controls"
 ]
 
-ext.javafx_version = '11'
-ext.javafx_modules = [
-        'javafx-base', 
-        'javafx-graphics', 
-        'javafx-controls',
-        'javafx-fxml',
-        'javafx-media',
-        'javafx-web',
-        'javafx-swing'
-]
+static String getOSName() {
+    final String osName = System.getProperty("os.name").toLowerCase()
+    if (osName.contains("linux")) {
+        return ("linux")
+    } else if (osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx")) {
+        return ("mac")
+    } else if (osName.contains("windows")) {
+        return ("win")
+    }
+    return ("")
+}
+
+if (JavaVersion.current().isJava11Compatible()) {
+    ext.javafx_version = '11'
+    ext.javafx_modules = [
+            'javafx-base',
+            'javafx-graphics',
+            'javafx-controls',
+            'javafx-fxml',
+            'javafx-media',
+            'javafx-web'
+    ]
+    ext.platform = getOSName()
+}
 
 subprojects {
 
@@ -120,7 +124,9 @@ subprojects {
             }
             options.encoding = "UTF-8"
             options.incremental = true
-            options.compilerArgs += java9Args
+            if ( project.name != "fxsampler" ) {
+                options.compilerArgs += java9Args
+            }
         }
 
         javadoc {

@@ -1,5 +1,6 @@
 module org.controlsfx.samples {
 
+    requires java.desktop;
     requires org.controlsfx.controls;
     requires org.controlsfx.fxsampler;
     

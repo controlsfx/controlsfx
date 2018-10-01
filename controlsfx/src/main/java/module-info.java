@@ -1,10 +1,11 @@
 module org.controlsfx.controls {
 
+    requires java.desktop;
+
     requires transitive javafx.controls;
     requires transitive javafx.fxml;
     requires transitive javafx.web;
     requires transitive javafx.media;
-    requires transitive javafx.swing;
 
     exports org.controlsfx.control;
     exports org.controlsfx.control.action;

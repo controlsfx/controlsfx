@@ -412,6 +412,8 @@ public class SpreadsheetView extends Control{
     private static final double STEP_ZOOM = 0.10;
     //The visible rows.
     private final ObjectProperty<BitSet> hiddenRowsProperty = new SimpleObjectProperty<>();
+    //Used to get a row index directly from the ObservableList in filteredList.
+    private IdentityHashMap<ObservableList<SpreadsheetCell>, Integer> identityMap;
     private final ObjectProperty<BitSet> hiddenColumnsProperty = new SimpleObjectProperty<>();
     private HashMap<Integer, Integer> rowMap;
     private HashMap<Integer, Integer> columnMap = new HashMap<>();
@@ -508,14 +510,14 @@ public class SpreadsheetView extends Control{
             @Override
             public void invalidated(Observable observable) {
                 computeRowMap();
-                initRowFix(grid);
+                initRowFix(getGrid());
             }
         });
         hiddenColumnsProperty.addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
                 computeColumnMap();
-                initRowFix(grid);
+                initRowFix(getGrid());
             }
         });
         getStyleClass().add("SpreadsheetView"); //$NON-NLS-1$
@@ -776,7 +778,7 @@ public class SpreadsheetView extends Control{
             filteredList.setPredicate(new Predicate<ObservableList<SpreadsheetCell>>() {
                 @Override
                 public boolean test(ObservableList<SpreadsheetCell> t) {
-                    int index = getGrid().getRows().indexOf(t);
+                    int index = identityMap.get(t);
                     return !getHiddenRows().get(index) || index == getFilteredRow();
                 }
             });
@@ -2325,10 +2327,13 @@ public class SpreadsheetView extends Control{
     
     private void initRowFix(Grid grid) {
         ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
-        rowFix = new BitSet(rows.size());
+        final int rowSize = rows.size();
+        rowFix = new BitSet(rowSize);
+        identityMap = new IdentityHashMap<>(rowSize);
         rows:
-        for (int r = 0; r < rows.size(); ++r) {
+        for (int r = 0; r < rowSize; ++r) {
             ObservableList<SpreadsheetCell> row = rows.get(r);
+            identityMap.put(row, r);
             for (SpreadsheetCell cell : row) {
                 if (getRowSpanFilter(cell) > 1) {
                     continue rows;

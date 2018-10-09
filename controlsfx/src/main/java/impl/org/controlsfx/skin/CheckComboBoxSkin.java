@@ -243,6 +243,8 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
                 }
             } else if (e.getCode() == KeyCode.ESCAPE) {
                 hide();
+            } else if (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.RIGHT) {
+                e.consume();
             }
         });
         return comboBoxListViewSkin;

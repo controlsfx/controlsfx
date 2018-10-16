@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2013, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -78,138 +78,157 @@ public interface Grid {
      * let the system compute the best row height.
      */
     public static final double AUTOFIT = -1;
-    
+   
     /**
-     * @return how many rows are inside the grid.
+     * Returns how many rows are inside the {@code Grid}.
+     *
+     * @return the number of rows in the {@code Grid}.
      */
     public int getRowCount();
     
     /**
-     * @return how many columns are inside the grid.
+     * Returns how many columns are inside the {@code Grid}.
+     * 
+     * @return the number of columns in the {@code Grid}.
      */
     public int getColumnCount();
     
     /**
-     * Return an ObservableList of ObservableList of {@link SpreadsheetCell}
-     * instances. Refer to the {@link Grid} class javadoc for more detail.
-     * @return an ObservableList of ObservableList of {@link SpreadsheetCell}
-     * instances
+     * Returns an {@code ObservableList} of {@code ObservableList} of
+     * {@link SpreadsheetCell} instances. Refer to the {@link Grid} class
+     * javadoc for more detail.
+     *
+     * @return an {@code ObservableList} of {@code ObservableList} of
+     * {@link SpreadsheetCell} instances
      */
     public ObservableList<ObservableList<SpreadsheetCell>> getRows();
 
     /**
-     * Change the value situated at the intersection if possible.
-     * Verification and conversion of the value should be done before 
-     * with {@link SpreadsheetCellType#match(Object)}
-     * and {@link SpreadsheetCellType#convertValue(Object)}.
-     * @param row
-     * @param column
-     * @param value
+     * Changes the value situated at the intersection if possible. Verification
+     * and conversion of the value should be done before with
+     * {@link SpreadsheetCellType#match(Object)} and
+     * {@link SpreadsheetCellType#convertValue(Object)}.
+     *
+     * @param row the row index issued from the {@code SpreadsheetCell}
+     * @param column the column index issued from the {@code SpreadsheetCell}
+     * @param value the value to set to the {@code SpreadsheetCell}
      */
     public void setCellValue(int row, int column, Object value);
     
     /**
-     * Return the height of a row. {@link #AUTOFIT } can be returned in order to
-     * let the system compute the best row height.
+     * Returns the height of a row. {@link #AUTOFIT } can be returned in order
+     * to let the system compute the best row height.
      *
-     * @param row
-     * @return the height of a row.
+     * @param row the row index
+     * @return the height in pixels of the given row.
      */
     public double getRowHeight(int row);
 
     /**
-     * Return true if the specified row is resizable.
-     * @param row
-     * @return true if the specified row is resizable.
+     * Returns true if the specified row is resizable.
+     *
+     * @param row the row index
+     * @return {@code true} if the specified row is resizable
      */
     public boolean isRowResizable(int row);
     
     /**
-     * Returns an ObservableList of string to display in the row headers.
-     * 
-     * @return an ObservableList of string to display in the row headers.
+     * Returns an {@code ObservableList} of {@code String} to display in the row
+     * headers.
+     *
+     * @return an {@code ObservableList} of {@code String} to display in the row
+     * headers
      */
     public ObservableList<String> getRowHeaders();
     
     /**
-     * Returns an ObservableList of string to display in the column headers.
-     * 
-     * @return an ObservableList of string to display in the column headers.
+     * Returns an {@code ObservableList} of {@code String} to display in the
+     * column headers.
+     *
+     * @return an {@code ObservableList} of {@code String} to display in the
+     * column headers
      */
     public ObservableList<String> getColumnHeaders();
     
     /**
-     * Span in row the cell situated at rowIndex and colIndex by the number
-     * count
+     * Spans in row the cell situated at rowIndex and colIndex by the number
+     * count.
      * 
-     * @param count
-     * @param rowIndex
-     * @param colIndex
+     * @param count the span range
+     * @param rowIndex the row index
+     * @param colIndex the column index
      */
     public void spanRow(int count, int rowIndex, int colIndex);
     
     /**
-     * Span in column the cell situated at rowIndex and colIndex by the number
-     * count
-     * 
-     * @param count
-     * @param rowIndex
-     * @param colIndex
+     * Spans in column the cell situated at rowIndex and colIndex by the number
+     * count.
+     *
+     * @param count the span range
+     * @param rowIndex the row index
+     * @param colIndex the column index
      */
     public void spanColumn(int count, int rowIndex, int colIndex);
     
     /**
-     * This method sets the rows used by the grid, and updates the rowCount.
-     * @param rows
+     * Sets the rows used by the grid, and updates the rowCount. This method
+     * should be called before the {@code Grid} is actually given to a
+     * {@code SpreadsheetView}. If this method is called after, you should give
+     * the {@code Grid} again to the {@code SpreadsheetView} by using {@link SpreadsheetView#setGrid(org.controlsfx.control.spreadsheet.Grid)
+     * }.
+     *
+     * @param rows the rows to set for this {@code Grid}
      */
     public void setRows(Collection<ObservableList<SpreadsheetCell>> rows);
     
     /**
-     * Return true if the selection (black rectangle) is displayed on the Grid.
-     * Cells may override this property with {@link #setCellDisplaySelection(int, int, boolean)
+     * Return {@code true} if the selection (black rectangle) is displayed on
+     * the {@code Grid}. Cells may override this property with {@link #setCellDisplaySelection(int, int, boolean)
      * }.
      *
-     * @return true if the selection (black rectangle) is displayed on the Grid.
+     * @return {@code true} if the selection (black rectangle) is displayed on
+     * the Grid
      */
     public boolean isDisplaySelection();
 
     /**
      * If set to true, the selection (black rectangle) will be displayed on the
-     * Grid. Cells may override this property with {@link #setCellDisplaySelection(int, int, boolean)
+     * {@code Grid}. Cells may override this property with {@link #setCellDisplaySelection(int, int, boolean)
      * }.
      *
-     * @param value
+     * @param value {@code true} if the selection should be displayed
      */
     public void setDisplaySelection(boolean value);
 
     /**
-     * Return the Boolean property associated with the displayed selection of the
-     * Grid.
+     * Returns the Boolean property associated with the displayed selection of the
+     * {@code Grid}.
      *
      * @return the Boolean property associated with the displayed selecion of the
-     * Grid.
+     * {@code Grid}
      */
     public BooleanProperty displaySelectionProperty();
 
     /**
-     * This method overrides the value defined by {@link #isDisplaySelection() }
+     * Overrides the value defined by {@link #isDisplaySelection() }
      * so that no matter what is defined on the grid, the given cell will always
      * have its selection set to the displaySelection parameter.
      *
-     * @param row
-     * @param column
-     * @param displaySelection
+     * @param row the row index
+     * @param column the column index
+     * @param displaySelection {@code true} is the selection should always be
+     * displayed on this cell
      */
     public void setCellDisplaySelection(int row, int column, boolean displaySelection);
 
     /**
-     * Return true if the given cell will display a selection rectangle when
+     * Returns true if the given cell will display a selection rectangle when
      * selected. If nothing is defined for this cell, 
      * {@link #isDisplaySelection() } is returned.
      *
-     * @param row
-     * @param column
-     * @return true if the given cell will display a selection rectangle.
+     * @param row the row index
+     * @param column the column index
+     * @return {@code true} if the given cell will display a selection rectangle
      */
     public boolean isCellDisplaySelection(int row, int column);
     /**

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2013, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -195,10 +195,10 @@ public class GridBase implements Grid, EventTarget {
      **************************************************************************/
 
     /**
-     * Creates a grid with a fixed number of rows and columns.
+     * Creates a {@code GridBase} with a fixed number of rows and columns.
      * 
-     * @param rowCount
-     * @param columnCount
+     * @param rowCount the number of rows
+     * @param columnCount the numbers of columns
      */
     public GridBase(int rowCount, int columnCount) {
         this.rowCount = rowCount;
@@ -254,29 +254,17 @@ public class GridBase implements Grid, EventTarget {
         return columnCount;
     }
 
-    /**
-     * Return the height of a row. 
-     * It will first look into the {@link Callback}provided at the
-     * initialization. If nothing's found, {@link #AUTOFIT} will be returned.
-     * @param row
-     * @return the height of a row.
-     */
+    /** {@inheritDoc} */
     @Override
     public double getRowHeight(int row) {
         return rowHeightFactory.call((Integer) row);
     }
 
-    /***************************************************************************
-     * 
-     * Public Methods
-     * 
-     **************************************************************************/
-
     /**
-     * Set a new {@link Callback} for this grid in order to specify height of
+     * Sets a new {@link Callback} for this grid in order to specify height of
      * each row.
      * 
-     * @param rowHeight
+     * @param rowHeight the {@code Callback} to use for rown height computation
      */
     public void setRowHeightCallback(Callback<Integer, Double> rowHeight) {
         this.rowHeightFactory = rowHeight;
@@ -295,11 +283,11 @@ public class GridBase implements Grid, EventTarget {
     }
 
     /**
-     * Return a BooleanProperty associated with the locked grid state. It means
+     * Returns a BooleanProperty associated with the locked grid state. It means
      * that the Grid is in a read-only mode and that no SpreadsheetCell can be
-     * modified, no regards for their own
-     * {@link SpreadsheetCell#isEditable()} state.
-     * 
+     * modified, no regards for their own {@link SpreadsheetCell#isEditable()}
+     * state.
+     *
      * @return a BooleanProperty associated with the locked grid state.
      */
     public BooleanProperty lockedProperty() {
@@ -307,18 +295,18 @@ public class GridBase implements Grid, EventTarget {
     }
 
     /**
-     * Return whether this Grid id locked or not.
-     * 
-     * @return whether this Grid id locked or not.
+     * Returns whether this {@code GridBase} id locked or not.
+     *
+     * @return {@code true} if this {@code GridBase} is locked
      */
     public boolean isLocked() {
         return locked.get();
     }
 
     /**
-     * Lock or unlock this Grid.
-     * 
-     * @param lock
+     * Locks or unlocks this {@code GridBase}.
+     *
+     * @param lock {@code true} to lock this {@code GridBase}
      */
     public void setLocked(Boolean lock) {
         locked.setValue(lock);
@@ -374,11 +362,12 @@ public class GridBase implements Grid, EventTarget {
 
     /**
      * Sets the resizable state of all rows. If a bit is set to true in the
-     * BitSet, it means the row is resizable.
+     * {@code BitSet}, it means the row is resizable.
      *
      * The {@link BitSet#length() } must be equal to the {@link #getRowCount() }
      *
-     * @param resizableRow
+     * @param resizableRow a {@code BitSet} where the bits set to {@code true}
+     * represent the resizable rows
      */
     public void setResizableRows(BitSet resizableRow) {
         this.resizableRow = resizableRow;
@@ -390,33 +379,25 @@ public class GridBase implements Grid, EventTarget {
         return resizableRow.get(row);
     }
    
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean isDisplaySelection() {
         return displaySelection.get();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void setDisplaySelection(boolean value) {
         displaySelection.setValue(value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public BooleanProperty displaySelectionProperty() {
         return displaySelection;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void setCellDisplaySelection(int row, int column, boolean displaySelection) {
         Long key = key(row, column);
@@ -429,9 +410,7 @@ public class GridBase implements Grid, EventTarget {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean isCellDisplaySelection(int row, int column) {
         Long key = key(row, column);

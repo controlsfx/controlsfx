@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2013, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -363,18 +363,21 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * Return true if this cell is the original cell (including filters) even
      * when scrolling.
      *
-     * @return
+     * @return true if this cell is the original cell (including filters) even
+     * when scrolling
      */
     public boolean isOriginalCell() {
         return handle.getView().getReverseRowSpan(getItem(), getIndex()) <= 1;
     }
     
     /**
-     * Set the cell graphic if any. 
-     * 
-     * If we have an Image, we try to make it take its full size (never more) within the cell's space.
-     * If we have some row span, we want to compute the image's size one time and then
-     * @param item 
+     * Set the cell graphic if any.
+     *
+     * If we have an Image, we try to make it take its full size (never more)
+     * within the cell's space. If we have some row span, we want to compute the
+     * image's size one time and then
+     *
+     * @param item the {@code SpreadsheetCell} to set the graphic to
      */
     private void setCellGraphic(SpreadsheetCell item) {
         if (isEditing()) {

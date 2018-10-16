@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2017 ControlsFX
+ * Copyright (c) 2014, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,6 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.spreadsheet.ClipboardCell;
-import org.controlsfx.control.spreadsheet.GridChange;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
@@ -360,15 +359,12 @@ public class RectangleSelection extends Rectangle {
             computeRange();
         }
 
-        public void fillGridRange(List<GridChange> list) {
-            set.clear();
-            range = null;
-            for (GridChange pos : list) {
-                set.add(key(pos.getRow(), pos.getColumn()));
-            }
-            computeRange();
-        }
-        
+        /**
+         * Fills this ClipBoardRange with a list a {@code ClipboardCell}. The
+         * result can be accessed with the {@link #getRange() } method.
+         *
+         * @param list the list a {@code ClipboardCell}
+         */
         public void fillClipboardRange(List<ClipboardCell> list) {
             set.clear();
             range = null;

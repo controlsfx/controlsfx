@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2016 ControlsFX
+ * Copyright (c) 2014, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -82,13 +82,14 @@ public interface SpreadsheetCell  {
     }
     
     /**
-     * Verify that the upcoming cell value can be set to the current cell. This
-     * is currently used by the Copy/Paste.
+     * Verifies that the upcoming cell value can be set to the current cell.
+     * This is currently used by the Copy/Paste.
      *
-     * @param cell
-     * @return true if the upcoming cell value can be set to the current cell.
+     * @param value the value that needs to be tested
+     * @return {@code true} if the upcoming cell value can be set to the current
+     * cell
      */
-    public boolean match(SpreadsheetCell cell);
+    public boolean match(Object value);
 
     /**
      * Sets the value of the property Item. This should be used only at
@@ -101,31 +102,31 @@ public interface SpreadsheetCell  {
     public void setItem(Object value);
 
     /**
-     * Return the value contained in the cell.
+     * Returns the value contained in this cell.
      *
-     * @return the value contained in the cell.
+     * @return the value contained in this cell
      */
     public Object getItem();
 
     /**
      * The item property represents the currently-set value inside this
-     * SpreadsheetCell instance.
+     * {@code SpreadsheetCell}.
      *
      * @return the item property which contains the value.
      */
     public ObjectProperty<Object> itemProperty();
 
     /**
-     * Return if this cell can be edited or not.
+     * Returns {@code true} if this cell can be edited.
      *
-     * @return true if this cell is editable.
+     * @return {@code true} if this cell is editable
      */
     public boolean isEditable();
 
     /**
      * Change the editable state of this cell
      *
-     * @param editable
+     * @param editable {@code true} if this cell should be editable
      */
     public void setEditable(boolean editable);
     
@@ -133,7 +134,8 @@ public interface SpreadsheetCell  {
      * If a run of text exceeds the width of the Labeled, then this variable
      * indicates whether the text should wrap onto another line.
      *
-     * @return the value of wrapText property.
+     * @return {@code true} if the text should wrap onto another line if it
+     * exceeds the width of the {@code Labeled}
      */
     public boolean isWrapText();
     
@@ -141,7 +143,9 @@ public interface SpreadsheetCell  {
     /**
      * If a run of text exceeds the width of the Labeled, then this variable
      * indicates whether the text should wrap onto another line.
-     * @param wrapText
+     *
+     * @param wrapText {@code true} if the text should wrap onto another line if
+     * it exceeds the width of the {@code Labeled}
      */
     public void setWrapText(boolean wrapText);
 
@@ -150,32 +154,34 @@ public interface SpreadsheetCell  {
      * are specific to a cell, you can return them here and the
      * {@link SpreadsheetCellEditor} will receive them.
      *
-     * @return a List of options for the {@link SpreadsheetCellEditor}.
+     * @return a {@code List} of options for the {@code SpreadsheetCellEditor}
      */
     public List<Object> getOptionsForEditor();
     
     /**
-     * Return true if this cell needs to display a popup when clicked in order
+     * Returns true if this cell needs to display a popup when clicked in order
      * to show some {@link MenuItem} like a {@link MenuButton}.
      *
-     * @return true if this cell needs to display a popup.
+     * The items can be set in {@link #getPopupItems() }.
+     *
+     * @return {@code true} if this cell needs to display a popup
      */
     public boolean hasPopup();
 
     /**
-     * Set to true if this cell needs to display a popup when clicked in order
-     * to show some {@link MenuItem} like a {@link MenuButton}.
+     * Sets to {@code true} if this cell needs to display a popup when clicked
+     * in order to show some {@link MenuItem} like a {@link MenuButton}.
      *
-     * @param value
+     * @param value {@code true} to display a {@code Popup} when clicked
      */
     public void setHasPopup(boolean value);
 
     /**
-     * If {@link #hasPopup() } is set to true, this method will be called when
+     * If {@link #hasPopup() } is set to {@code true}, this method will be called when
      * the user clicks on the cell in order to gather the {@link MenuItem} to
      * show in the Popup.
      *
-     * @return the {@link MenuItem} to show in the Popup.
+     * @return the {@link MenuItem} to show in the Popup
      */
     public List<MenuItem> getPopupItems();
     
@@ -185,7 +191,8 @@ public interface SpreadsheetCell  {
      * that, like the HTML style attribute, this variable contains style
      * properties and values and not the selector portion of a style rule.
      *
-     * @param style
+     * @param style a string representation of the CSS style associated with
+     * this specific Node
      */
     public void setStyle(String style);
     
@@ -211,88 +218,98 @@ public interface SpreadsheetCell  {
     public StringProperty styleProperty();
     
     /**
-     * This activate the given cornerPosition.
-     * @param position
+     * Activates the given {@code CornerPosition} in order to display a little
+     * triangle in the cell.
+     *
+     * @param position the position where the triangle should be displayed
      */
     public void activateCorner(CornerPosition position);
     
     /**
-     * This deactivate the given cornerPosition.
-     * @param position
+     * This deactivates the given {@code CornerPosition} so that no triangle
+     * will be shown for this cell.
+     *
+     * @param position the position where the triangle should be removed if
+     * displayed
      */
     public void deactivateCorner(CornerPosition position);
 
     /**
-     * 
+     * Returns {@code true} if a triangle is displayed in the cell for the given
+     * {@code CornerPosition}.
+     *
      * @param position
-     * @return the current state of a specific corner.
+     * @return {@code true} if a triangle is displayed in the cell for the given
+     * {@code CornerPosition}
      */
     public boolean isCornerActivated(CornerPosition position);
     
     /**
-     * The {@link StringProperty} linked with the format.
+     * Returns the {@code StringProperty} linked with the format.
      *
-     * @return The {@link StringProperty} linked with the format state.
+     * @return the {@code StringProperty} linked with the format state
      */
     public StringProperty formatProperty();
 
     /**
-     * Return the format of this cell or an empty string if no format has been
+     * Returns the format of this cell or an empty string if no format has been
      * specified.
      *
-     * @return Return the format of this cell or an empty string if no format
-     * has been specified.
+     * @return the format of this cell or an empty string if no format has been
+     * specified
      */
     public String getFormat();
     
     /**
-     * Set a new format for this Cell. You can specify how to represent the
-     * value in the cell.
+     * Sets a new format for this cell. This format will be used by {@link SpreadsheetCellType#toString(java.lang.Object, java.lang.String)
+     * }. This should be used by numbers for example.
      *
-     * @param format
+     * @param format a string pattern understood by the
+     * {@code SpreadsheetCellType}
      */
     public void setFormat(String format);
 
     /**
-     * Return the StringProperty of the representation of the value.
+     * Returns the StringProperty of the representation of the value.
      *
-     * @return the StringProperty of the representation of the value.
+     * @return the StringProperty of the representation of the value
      */
     public ReadOnlyStringProperty textProperty();
 
     /**
-     * Return the String representation currently used for display in the
+     * Returns the String representation currently used for display in the
      * {@link SpreadsheetView}.
      *
-     * @return text representation of the value.
+     * @return the text representation of the value
      */
     public String getText();
 
     /**
-     * Return the {@link SpreadsheetCellType} of this particular cell.
+     * Returns the {@link SpreadsheetCellType} of this cell.
      *
-     * @return the {@link SpreadsheetCellType} of this particular cell.
+     * @return the {@code SpreadsheetCellType} of this cell.
      */
     public SpreadsheetCellType getCellType();
 
     /**
-     * Return the row of this cell.
+     * Returns the row index of this cell.
      *
-     * @return the row of this cell.
+     * @return the row index of this cell
      */
     public int getRow();
 
     /**
-     * Return the column of this cell.
+     * Returns the column index of this cell.
      *
-     * @return the column of this cell.
+     * @return the column index of this cell
      */
     public int getColumn();
 
     /**
-     * Return how much this cell is spanning in row, 1 is normal.
+     * Returns how much this cell is spanning in row, 1 means the cell is not
+     * spanning.
      *
-     * @return how much this cell is spanning in row, 1 is normal.
+     * @return how much this cell is spanning in row, 1 is normal
      */
     public int getRowSpan();
 
@@ -302,12 +319,16 @@ public interface SpreadsheetCell  {
      * {@link Grid#spanRow(int, int, int)} instead of using this method
      * directly.
      *
-     * @param rowSpan
+     * 1 means the cell is not spanning. Thus, the rowSpan should not be
+     * inferior to 1.
+     *
+     * @param rowSpan the rowSpan for this cell
      */
     public void setRowSpan(int rowSpan);
 
     /**
-     * Return how much this cell is spanning in column, 1 is normal.
+     * Returns how much this cell is spanning in column, 1 means the cell is not
+     * spanning.
      *
      * @return how much this cell is spanning in column, 1 is normal.
      */
@@ -319,46 +340,56 @@ public interface SpreadsheetCell  {
      * {@link Grid#spanColumn(int, int, int)} instead of using this method
      * directly.
      *
-     * @param columnSpan
+     * 1 means the cell is not spanning. Thus, the rowSpan should not be
+     * inferior to 1.
+     *
+     * @param columnSpan the columnSpan for this cell
      */
     public void setColumnSpan(int columnSpan);
 
     /**
-     * Return an ObservableList of String of all the style class associated with
-     * this cell. You can easily modify its appearance by adding a style class
-     * (previously set in CSS).
+     * Returns an {@code ObservableList} of {@code String} of all the style
+     * class associated with this cell. You can easily modify its appearance by
+     * adding a style class (previously set in CSS).
      *
-     * @return an ObservableList of String of all the style class
+     * @return an {@code ObservableList} of {@code String} of all the style
+     * class of this cell
      */
     public ObservableSet<String> getStyleClass();
 
     /**
-     * @return an ObjectProperty wrapping a Node for the graphic.
+     * Returns the {@code ObjectProperty} representing this cell graphic.
+     *
+     * @return an ObjectProperty wrapping a Node for the graphic
      */
     public ObjectProperty<Node> graphicProperty();
 
     /**
-     * Set a graphic for this cell to display aside with the text.
+     * Sets a graphic for this cell. It is displayed aside with the text if any
+     * is specified. Otherwise it's fully displayed in the cell.
      *
-     * @param graphic
+     * @param graphic a graphic to display for this cell
      */
     public void setGraphic(Node graphic);
 
     /**
-     * Return the graphic node associated with this cell. Return null if nothing
-     * has been associated.
+     * Returns the graphic node associated with this cell. Returns null if
+     * nothing has been associated.
      *
-     * @return the graphic node associated with this cell.
+     * @return the graphic node associated with this cell
      */
     public Node getGraphic();
     
     /**
-     * @return the tooltip associated with this SpreadsheetCell.
+     * Returns the tooltip for this cell.
+     *
+     * @return the tooltip associated with this {@code SpreadsheetCell}
      */
     public Optional<String> getTooltip();
     
     /**
-     * Registers an event handler to this SpreadsheetCell. 
+     * Registers an event handler to this SpreadsheetCell.
+     *
      * @param eventType the type of the events to receive by the handler
      * @param eventHandler the handler to register
      * @throws NullPointerException if the event type or handler is null
@@ -366,7 +397,9 @@ public interface SpreadsheetCell  {
     public void addEventHandler(EventType<Event> eventType, EventHandler<Event> eventHandler);
     
     /**
-     * Unregisters a previously registered event handler from this SpreadsheetCell. 
+     * Unregisters a previously registered event handler from this
+     * SpreadsheetCell.
+     *
      * @param eventType the event type from which to unregister
      * @param eventHandler the handler to unregister
      * @throws NullPointerException if the event type or handler is null

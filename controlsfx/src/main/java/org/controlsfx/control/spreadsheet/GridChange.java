@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX 
+ * Copyright (c) 2013, 2018 ControlsFX 
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,36 +46,20 @@ public class GridChange extends Event implements Serializable {
     public static final EventType<GridChange> GRID_CHANGE_EVENT 
             = new EventType<>(Event.ANY, "GridChange" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
-    /**
-     * *************************************************************************
-     * * Static field * *
-     ************************************************************************* 
-     */
     private static final long serialVersionUID = 210644901287223524L;
-
-    /**
-     * *************************************************************************
-     * * Private Fields * *
-     ************************************************************************* 
-     */
     private final int modelRow;
     private final int column;
     private final Object oldValue;
     private final Object newValue;
 
     /**
-     * *************************************************************************
-     * * Constructor *
-     ************************************************************************* 
-     */
-    /**
      * Constructor of a GridChange when a change inside a
      * {@link SpreadsheetCell} is happening.
-     * 
-     * @param modelRow
-     * @param column
-     * @param oldValue
-     * @param newValue
+     *
+     * @param modelRow the row index for this change
+     * @param column the column index for this change
+     * @param oldValue the previous value for this change
+     * @param newValue the current value for this change
      */
     public GridChange(int modelRow, int column, Object oldValue, Object newValue) {
         super(GRID_CHANGE_EVENT);
@@ -91,36 +75,36 @@ public class GridChange extends Event implements Serializable {
      ************************************************************************* 
      */
     /**
-     * Return the row number of this change.
+     * Returns the row index of this change.
      * 
-     * @return the row number of this change.
+     * @return the row number of this change
      */
     public int getRow() {
         return modelRow;
     }
 
     /**
-     * Return the column number of this change.
-     * 
-     * @return the column number of this change.
+     * Returns the column index of this change.
+     *
+     * @return the column number of this change
      */
     public int getColumn() {
         return column;
     }
 
     /**
-     * Return the value before the change.
+     * Returns the value before the change.
      * 
-     * @return the value before the change.
+     * @return the value before the change
      */
     public Object getOldValue() {
         return oldValue;
     }
 
     /**
-     * Return the value after the change.
-     * 
-     * @return the value after the change.
+     * Returns the value after the change.
+     *
+     * @return the value after the change
      */
     public Object getNewValue() {
         return newValue;

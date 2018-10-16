@@ -30,7 +30,7 @@ import java.io.Serializable;
 import javafx.scene.input.Clipboard;
 
 /**
- * This class will holds a cell when we do a copy in the
+ * This class will holds a cell value when we do a copy in the
  * {@link SpreadsheetView}.
  *
  * It is internally used by the {@link SpreadsheetView} but developpers may want
@@ -49,9 +49,9 @@ public class ClipboardCell implements Serializable {
      *
      * The value must be serializable.
      *
-     * @param row
-     * @param column
-     * @param value
+     * @param row the row of this {@code ClipboardCell}
+     * @param column the column of this {@code ClipboardCell}
+     * @param value the value of this {@code ClipboardCell}
      */
     public ClipboardCell(int row, int column, Object value) {
         this.row = row;
@@ -60,7 +60,7 @@ public class ClipboardCell implements Serializable {
     }
 
     /**
-     * Return the row of this cell.
+     * Returns the row of this cell.
      *
      * @return the row of this cell.
      */
@@ -69,7 +69,7 @@ public class ClipboardCell implements Serializable {
     }
 
     /**
-     * Return the column of this cell.
+     * Returns the column of this cell.
      *
      * @return the column of this cell.
      */
@@ -78,7 +78,7 @@ public class ClipboardCell implements Serializable {
     }
 
     /**
-     * Return the value of this cell.
+     * Returns the value of this cell.
      *
      * @return the value of this cell.
      */

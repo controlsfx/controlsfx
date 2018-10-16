@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2013, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -901,12 +901,12 @@ public class SpreadsheetView extends Control{
     }
 
     /**
-     * Given the row of a SpreadsheetCell, return the actual row as displayed in
-     * the SpreadsheetView. Beware as it can be a time-consuming operation.
+     * Given the row of a {@code SpreadsheetCell}, returns the actual row as displayed
+     * in the {@code SpreadsheetView}. Beware as it can be a time-consuming operation.
      * Also, calling this method on a row that it hidden will return incoherent
      * information.
      *
-     * @param modelRow
+     * @param modelRow the row retrieved in {@link SpreadsheetCell#getRow() }
      * @return the ViewRow if possible, -1 or another row if the row is hidden.
      */
     public int getViewRow(int modelRow) {
@@ -931,12 +931,11 @@ public class SpreadsheetView extends Control{
     }
     
     /**
-     * Given an index on the SpreadsheetView, return a {@link Grid} index it is
-     * related to.
+     * Given an index on the {@code SpreadsheetView}, return a {@link Grid}
+     * index it is related to.
      *
-     * @param viewRow
-     * @return a {@link Grid} index it is
-     * related to.
+     * @param viewRow a row index based on the {@code SpreadsheetView}
+     * @return a {@link Grid} index it is related to.
      */
     public int getModelRow(int viewRow) {
         if (viewRow < 0 || viewRow >= sortedList.size()) {
@@ -979,9 +978,9 @@ public class SpreadsheetView extends Control{
      * splitted thus explaining why this method can give a different value than {@link SpreadsheetCell#getRowSpan()
      * }.
      *
-     * @param cell
-     * @param index
-     * @return the current row span for the given cell.
+     * @param cell the considered {@code SpreadsheetCell}
+     * @param index the current row position of this cell
+     * @return the current row span for the given cell
      */
     public int getRowSpan(SpreadsheetCell cell, int index) {
         /**
@@ -1003,9 +1002,9 @@ public class SpreadsheetView extends Control{
      * the spanned zone, it's rowSpan will be 1 and its reverse rowspan will be {@link SpreadsheetCell#getRowSpan()
      * }.
      *
-     * @param cell
-     * @param index
-     * @return
+     * @param cell the considered {@code SpreadsheetCell}
+     * @param index the current row position of this cell
+     * @return the current reverse row span for the given cell
      */
     public int getReverseRowSpan(SpreadsheetCell cell, int index) {
         /**
@@ -1148,9 +1147,9 @@ public class SpreadsheetView extends Control{
     }
 
     /**
-     * Set a new Comparator for the SpreadsheetView in order to sort the rows.
+     * Sets a new Comparator for the SpreadsheetView in order to sort the rows.
      *
-     * @param comparator
+     * @param comparator the comparator that will sort the rows.
      */
     public void setComparator(Comparator<ObservableList<SpreadsheetCell>> comparator) {
         sortedList.setComparator(comparator);
@@ -1709,11 +1708,11 @@ public class SpreadsheetView extends Control{
     }
     
     /**
-     * Scrolls the SpreadsheetView so that the given row is visible. Beware, you
-     * must call {@link #getViewRow(int) } before if you are using {@link SpreadsheetCell#getRow()
+     * Scrolls the {@code SpreadsheetView} so that the given row is visible.
+     * Beware, you must call {@link #getViewRow(int) } before if you are using {@link SpreadsheetCell#getRow()
      * } and the grid is sorted/filtered.
      *
-     * @param row
+     * @param row the row to scroll to
      */
     public void scrollToRow(int row) {
         cellsView.scrollTo(row);

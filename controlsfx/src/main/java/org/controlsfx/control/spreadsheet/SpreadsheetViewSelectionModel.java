@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, 2016 ControlsFX
+ * Copyright (c) 2015, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,6 +49,7 @@ public class SpreadsheetViewSelectionModel {
     private final TableViewSpanSelectionModel selectionModel;
     private final SpreadsheetView spv;
 
+    //Package protected access only.
     SpreadsheetViewSelectionModel(SpreadsheetView spv, TableViewSpanSelectionModel selectionModel) {
         this.spv = spv;
         this.selectionModel = selectionModel;
@@ -56,13 +57,13 @@ public class SpreadsheetViewSelectionModel {
 
     /**
      * Clears all selection, and then selects the cell at the given row/column
-     * intersection in the SpreadsheetView. This method does not consider
-     * sorting and filtering. If you want to select a {@link SpreadsheetCell} in
-     * a filtered/sorted grid, use {@link #clearAndSelect(org.controlsfx.control.spreadsheet.SpreadsheetCell)
+     * intersection in the {@code SpreadsheetView}. This method does not
+     * consider sorting and filtering. If you want to select a
+     * {@link SpreadsheetCell} in a filtered/sorted grid, use {@link #clearAndSelect(org.controlsfx.control.spreadsheet.SpreadsheetCell)
      * } instead.
      *
-     * @param row
-     * @param column
+     * @param row the row index to select
+     * @param column the column to select
      */
     public final void clearAndSelect(int row, SpreadsheetColumn column) {
         selectionModel.clearAndSelect(row, column.column);
@@ -70,12 +71,11 @@ public class SpreadsheetViewSelectionModel {
 
     /**
      * Clears all selection, and then selects the given {@link SpreadsheetCell}.
-     * This method allow to select a cell no matter if the grid is Filtered or
+     * This method allow to select a cell no matter if the Grid is Filtered or
      * sorted. Beware, this method can be time-consuming if lots of rows are
      * present.
      *
-     *
-     * @param cell
+     * @param cell the cell to select
      */
     public final void clearAndSelect(SpreadsheetCell cell) {
         if (spv.isRowHidden(cell.getRow()) || spv.isColumnHidden(cell.getColumn())) {
@@ -93,15 +93,15 @@ public class SpreadsheetViewSelectionModel {
      * @param row
      * @param column
      */
-    private final void clearAndSelectView(int row, SpreadsheetColumn column) {
+    private void clearAndSelectView(int row, SpreadsheetColumn column) {
         selectionModel.clearAndSelect(row, column.column);
     }
 
     /**
      * Selects the cell at the given row/column intersection.
      *
-     * @param row
-     * @param column
+     * @param row the row index to select
+     * @param column the column to select
      */
     public final void select(int row, SpreadsheetColumn column) {
         selectionModel.select(spv.getFilteredRow(row), column.column);
@@ -115,26 +115,26 @@ public class SpreadsheetViewSelectionModel {
     }
 
     /**
-     * A read-only ObservableList representing the currently selected cells in
-     * this SpreadsheetView.
+     * Returns a read-only {@code ObservableList} representing the currently selected cells in
+     * this {@code SpreadsheetView}.
      *
-     * @return A read-only ObservableList.
+     * @return a read-only ObservableList
      */
     public final ObservableList<TablePosition> getSelectedCells() {
         return selectionModel.getSelectedCells();
     }
 
     /**
-     * Select all the possible cells.
+     * Selects all the possible cells.
      */
     public final void selectAll() {
         selectionModel.selectAll();
     }
 
     /**
-     * Return the position of the cell that has current focus.
+     * Returns the position of the cell that has current focus.
      *
-     * @return the position of the cell that has current focus.
+     * @return the position of the cell that has current focus
      */
     public final TablePosition getFocusedCell() {
         return selectionModel.getTableView().getFocusModel().getFocusedCell();
@@ -143,8 +143,8 @@ public class SpreadsheetViewSelectionModel {
     /**
      * Causes the cell at the given index to receive the focus.
      *
-     * @param row The row index of the item to give focus to.
-     * @param column The column of the item to give focus to. Can be null.
+     * @param row the row index of the item to give focus to
+     * @param column the column of the item to give focus to. Can be null
      */
     public final void focus(int row, SpreadsheetColumn column) {
         selectionModel.getTableView().getFocusModel().focus(row, column.column);
@@ -156,44 +156,44 @@ public class SpreadsheetViewSelectionModel {
      * be selected at any one time. By default, the selection mode is
      * {@link SelectionMode#MULTIPLE}.
      *
-     * @param value
+     * @param value the {@code SelectionMode} to use
      */
     public final void setSelectionMode(SelectionMode value) {
         selectionModel.setSelectionMode(value);
     }
 
     /**
-     * Return the selectionMode currently used.
+     * Returns the {@code SelectionMode} currently used.
      *
-     * @return the selectionMode currently used.
+     * @return the {@code SelectionMode} currently used
      */
     public SelectionMode getSelectionMode() {
         return selectionModel.getSelectionMode();
     }
 
     /**
-     * Use this method to select discontinuous cells.
+     * Selects discontinuous cells.
      *
      * The {@link Pair} must contain the row index as key and the column index
      * as value. This is useful when you want to select a great amount of cell
      * because it will be more efficient than calling
      * {@link #select(int, org.controlsfx.control.spreadsheet.SpreadsheetColumn) }.
      *
-     * @param selectedCells
+     * @param selectedCells the cells to select
      */
     public void selectCells(List<Pair<Integer, Integer>> selectedCells) {
         selectionModel.verifySelectedCells(selectedCells);
     }
 
     /**
-     * Use this method to select discontinuous cells.
+     * Selects discontinuous cells.
      *
      * The {@link Pair} must contain the row index as key and the column index
      * as value. This is useful when you want to select a great amount of cell
      * because it will be more efficient than calling
      * {@link #select(int, org.controlsfx.control.spreadsheet.SpreadsheetColumn) }.
      *
-     * @param selectedCells
+     * @param selectedCells the cells to select
      */
     public void selectCells(Pair<Integer, Integer>... selectedCells) {
         selectionModel.verifySelectedCells(Arrays.asList(selectedCells));
@@ -203,17 +203,17 @@ public class SpreadsheetViewSelectionModel {
      * Selects the cells in the range (minRow, minColumn) to (maxRow,
      * maxColumn), inclusive.
      *
-     * @param minRow
-     * @param minColumn
-     * @param maxRow
-     * @param maxColumn
+     * @param minRow the minimum row in the range
+     * @param minColumn the minimum column in the range
+     * @param maxRow the maximum row in the range
+     * @param maxColumn the maximum column in the range
      */
     public void selectRange(int minRow, SpreadsheetColumn minColumn, int maxRow, SpreadsheetColumn maxColumn) {
         selectionModel.selectRange(spv.getFilteredRow(minRow), minColumn.column, spv.getFilteredRow(maxRow), maxColumn.column);
     }
 
     /**
-     * Clear the current selection and select the cell on the left of the
+     * Clears the current selection and select the cell on the left of the
      * current focused cell. If the cell is the first one on a row, the last
      * cell of the preceding row is selected.
      */
@@ -237,7 +237,7 @@ public class SpreadsheetViewSelectionModel {
     }
 
     /**
-     * Clear the current selection and select the cell on the right of the
+     * Clears the current selection and select the cell on the right of the
      * current focused cell. If the cell is the last one on a row, the first
      * cell of the next row is selected.
      */
@@ -259,26 +259,4 @@ public class SpreadsheetViewSelectionModel {
             ((GridViewBehavior) spv.getCellsViewSkin().getBehavior()).selectCell(0, 1);
         }
     }
-
-//    /**
-//     * Clear the current selection and select the cell on the previous row.
-//     */
-//    public void clearAndSelectPreviousCell() {
-//        TablePosition<ObservableList<SpreadsheetCell>, ?> position = getFocusedCell();
-//        int nextRow = FocusModelListener.getPreviousRowNumber(position, selectionModel.getTableView(), spv);
-//        if (nextRow >= 0) {
-//            clearAndSelectView(nextRow, spv.getColumns().get(spv.getModelColumn(position.getColumn())));
-//        }
-//    }
-//
-//    /**
-//     * Clear the current selection and select the cell on the next row.
-//     */
-//    public void clearAndSelectNextCell() {
-//        TablePosition<ObservableList<SpreadsheetCell>, ?> position = getFocusedCell();
-//        int nextRow = FocusModelListener.getNextRowNumber(position, selectionModel.getTableView(), spv);
-//        if (nextRow < spv.getGrid().getRowCount()) {
-//            clearAndSelectView(nextRow, spv.getColumns().get(spv.getModelColumn(position.getColumn())));
-//        }
-//    }
 }

@@ -298,8 +298,8 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     
     /** {@inheritDoc} */
     @Override
-    public boolean match(SpreadsheetCell cell) {
-        return type.match(cell, getOptionsForEditor());
+    public boolean match(Object value) {
+        return type.match(value, getOptionsForEditor());
     }
 
     // --- item

@@ -127,12 +127,6 @@ public class CheckComboBox<T> extends ControlsFXControl {
      * 
      **************************************************************************/
     
-    /** {@inheritDoc} */
-    @Override protected Skin<?> createDefaultSkin() {
-        checkComboBoxSkin = new CheckComboBoxSkin<>(this);
-        return checkComboBoxSkin;
-    }
-    
     /**
      * Represents the list of choices available to the user, from which they can
      * select zero or more items.
@@ -279,6 +273,18 @@ public class CheckComboBox<T> extends ControlsFXControl {
         if (checkComboBoxSkin != null) {
             checkComboBoxSkin.hide();
         }
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     * Stylesheet Handling                                                     *
+     *                                                                         *
+     **************************************************************************/
+
+    /** {@inheritDoc} */
+    @Override protected Skin<?> createDefaultSkin() {
+        checkComboBoxSkin = new CheckComboBoxSkin<>(this);
+        return checkComboBoxSkin;
     }
     
     

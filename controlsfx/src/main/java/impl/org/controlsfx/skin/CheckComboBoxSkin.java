@@ -28,6 +28,7 @@ package impl.org.controlsfx.skin;
 
 import java.util.Collections;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
@@ -37,6 +38,8 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.input.KeyCode;
 
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import org.controlsfx.control.CheckComboBox;
 
 import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
@@ -94,8 +97,10 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
                 return createComboBoxListViewSkin(this);
             }
         };
+        comboBox.setFocusTraversable(false);
         comboBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        
+        Bindings.bindContent(control.getStyleClass(), comboBox.getStyleClass());
+
         // installs a custom CheckBoxListCell cell factory
         comboBox.setCellFactory(listView -> {
             CheckBoxListCell<T> result = new CheckBoxListCell<>(control::getItemBooleanProperty);
@@ -243,7 +248,12 @@ public class CheckComboBoxSkin<T> extends BehaviorSkinBase<CheckComboBox<T>, Beh
                 }
             } else if (e.getCode() == KeyCode.ESCAPE) {
                 hide();
-            } else if (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.RIGHT) {
+            } else if (e.getCode() == KeyCode.TAB ||
+                    new KeyCodeCombination(KeyCode.TAB, KeyCombination.SHIFT_ANY).match(e)) {
+                e.consume();
+                hide();
+                control.fireEvent(e);
+            }  else if (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.RIGHT) {
                 e.consume();
             }
         });

@@ -20,7 +20,7 @@ pipelines:
             - ./gradlew clean assemble uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.api=$TRANSIFEX_API
 
   bookmarks:
-    8.[0-9][0-9]*.[0-9][0-9]*:
+    'release/8*':
       - step:
           name: Build and release
           image: cogniteev/oracle-java:java8
@@ -31,14 +31,14 @@ pipelines:
           - ./.ci/update.sh
           - ./gradlew clean assemble uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.api=$TRANSIFEX_API
           - ./.ci/commit.sh
-    9.[0-9][0-9]*.[0-9][0-9]*:
-          - step:
-              name: Build and release
-              image: abhinay/oracle-java:java10
-              caches:
-                - gradle
-              script:
-              - chmod +x gradlew .ci/update.sh .ci/commit.sh
-              - ./.ci/update.sh
-              - ./gradlew clean assemble uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.api=$TRANSIFEX_API
-              - ./.ci/commit.sh
+    'release/9*':
+      - step:
+          name: Build and release
+          image: abhinay/oracle-java:java10
+          caches:
+            - gradle
+          script:
+          - chmod +x gradlew .ci/update.sh .ci/commit.sh
+          - ./.ci/update.sh
+          - ./gradlew clean assemble uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.api=$TRANSIFEX_API
+          - ./.ci/commit.sh

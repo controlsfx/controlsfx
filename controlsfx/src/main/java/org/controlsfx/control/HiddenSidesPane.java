@@ -423,4 +423,15 @@ public class HiddenSidesPane extends ControlsFXControl {
     public final void setAnimationDuration(Duration duration) {
         animationDuration.set(duration);
     }
+    
+    /**
+     * Shows a specific side, hides the current if side is null.
+     * 
+     * @param side 
+     *          the side to show
+     */
+    public void show(Side side)
+    {
+        getProperties().put(HiddenSidesPaneSkin.SHOW, side);
+    }
 }

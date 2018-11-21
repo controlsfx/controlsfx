@@ -33,6 +33,8 @@ import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.event.EventHandler;
 import javafx.geometry.Side;
 import javafx.scene.Node;
@@ -46,6 +48,8 @@ import org.controlsfx.control.HiddenSidesPane;
 
 public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
 
+    public static final String SHOW = "showPane";
+    
     private final StackPane stackPane;
     private final EventHandler<MouseEvent> exitedHandler;
     private boolean mousePressed;
@@ -113,6 +117,10 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
 
         pane.pinnedSideProperty().addListener(
                 observable -> show(getSkinnable().getPinnedSide()));
+        
+        final ObservableMap<Object, Object> properties = pane.getProperties();
+        properties.remove(SHOW);
+        properties.addListener(propertiesMapListener);
 
         Rectangle clip = new Rectangle();
         clip.setX(0);
@@ -122,6 +130,18 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
 
         getSkinnable().setClip(clip);
     }
+    
+    private final MapChangeListener<Object, Object> propertiesMapListener = c -> {
+        if (! c.wasAdded()) return;
+        if (SHOW.equals(c.getKey())) {
+            Object value = c.getValueAdded();
+            if (value == null)
+                hide();
+            else if (value instanceof Side)
+                show((Side)value);
+            getSkinnable().getProperties().remove(SHOW);
+        }
+    };
 
     private boolean isMouseMovedOutsideSides(MouseEvent event) {
         if (getSkinnable().getLeft() != null

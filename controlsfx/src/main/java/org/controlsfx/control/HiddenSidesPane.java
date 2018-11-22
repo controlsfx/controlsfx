@@ -27,6 +27,7 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.HiddenSidesPaneSkin;
+import java.util.Objects;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -425,13 +426,20 @@ public class HiddenSidesPane extends ControlsFXControl {
     }
     
     /**
-     * Shows a specific side, hides the current if side is null.
+     * Shows a specific side
      * 
      * @param side 
      *          the side to show
      */
-    public void show(Side side)
-    {
-        getProperties().put(HiddenSidesPaneSkin.SHOW, side);
+    public void show(Side side) {
+        Objects.requireNonNull(side, "side cannot be null");
+        getProperties().put("showPane", side);
+    }
+    
+    /**
+     * Hides the currently showing side
+     */
+    public void hide() {
+        getProperties().put("showPane", null);
     }
 }

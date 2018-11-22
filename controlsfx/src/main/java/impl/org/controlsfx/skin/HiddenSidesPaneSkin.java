@@ -48,7 +48,7 @@ import org.controlsfx.control.HiddenSidesPane;
 
 public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
 
-    public static final String SHOW = "showPane";
+    private static final String SHOW = "showPane";
     
     private final StackPane stackPane;
     private final EventHandler<MouseEvent> exitedHandler;
@@ -132,13 +132,14 @@ public class HiddenSidesPaneSkin extends SkinBase<HiddenSidesPane> {
     }
     
     private final MapChangeListener<Object, Object> propertiesMapListener = c -> {
-        if (! c.wasAdded()) return;
-        if (SHOW.equals(c.getKey())) {
+        if (c.wasAdded() && SHOW.equals(c.getKey())) {
             Object value = c.getValueAdded();
-            if (value == null)
+            if (value == null) {
                 hide();
-            else if (value instanceof Side)
+            }
+            else if (value instanceof Side) {
                 show((Side)value);
+            }
             getSkinnable().getProperties().remove(SHOW);
         }
     };

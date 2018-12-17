@@ -145,18 +145,26 @@ public class Wizard {
     private final ButtonType BUTTON_PREVIOUS = new ButtonType(localize(asKey("wizard.previous.button")), ButtonData.BACK_PREVIOUS); //$NON-NLS-1$
     private final EventHandler<ActionEvent> BUTTON_PREVIOUS_ACTION_HANDLER = actionEvent -> {
         actionEvent.consume();
-        currentPage = Optional.ofNullable( pageHistory.isEmpty()? null: pageHistory.pop() );
-        updatePage(dialog,false);
+        Optional<WizardPane> nextPage = Optional.ofNullable( pageHistory.isEmpty()? null: pageHistory.pop() );
+        updatePage(dialog, nextPage, false);
     };
     
     private final ButtonType BUTTON_NEXT = new ButtonType(localize(asKey("wizard.next.button")), ButtonData.NEXT_FORWARD); //$NON-NLS-1$
     private final EventHandler<ActionEvent> BUTTON_NEXT_ACTION_HANDLER = actionEvent -> {
         actionEvent.consume();
         currentPage.ifPresent(page->pageHistory.push(page));
-        currentPage = getFlow().advance(currentPage.orElse(null));
-        updatePage(dialog,true);
+        Optional<WizardPane> nextPage = getFlow().advance(currentPage.orElse(null));
+        updatePage(dialog, nextPage, true);
     };
-    
+
+    private final EventHandler<ActionEvent> BUTTON_FINISH_ACTION_HANDLER = actionEvent -> {
+        updatePage(dialog, Optional.empty(), true);
+    };
+
+    private final EventHandler<ActionEvent> BUTTON_CANCEL_ACTION_HANDLER = actionEvent -> {
+        updatePage(dialog, Optional.empty(), false);
+    };
+
     private final StringProperty titleProperty = new SimpleStringProperty(); 
     
     
@@ -289,15 +297,15 @@ public class Wizard {
      */
     private ObjectProperty<Flow> flow = new SimpleObjectProperty<Flow>(new LinearFlow()) {
         @Override protected void invalidated() {
-            updatePage(dialog,false);
+            updatePage(dialog, Optional.empty(), false);
         }
         
         @Override public void set(Flow flow) {
         	super.set(flow);
         	pageHistory.clear();
         	if ( flow != null ) {
-        		currentPage = flow.advance(currentPage.orElse(null));
-        		updatePage(dialog,true);
+        		Optional<WizardPane> nextPage = flow.advance(currentPage.orElse(null));
+        		updatePage(dialog, nextPage, true);
         	}
         };
     };
@@ -456,13 +464,13 @@ public class Wizard {
      * 
      **************************************************************************/
     
-    private void updatePage(Dialog<ButtonType> dialog, boolean advancing) {
+    private void updatePage(Dialog<ButtonType> dialog, Optional<WizardPane> nextPage, boolean advancing) {
         Flow flow = getFlow();
         if (flow == null) {
             return;
         }
         
-        Optional<WizardPane> prevPage = Optional.ofNullable( pageHistory.isEmpty()? null: pageHistory.peek()); 
+        Optional<WizardPane> prevPage = currentPage;
         prevPage.ifPresent( page -> {
 	        // if we are going forward in the wizard, we read in the settings 
 	        // from the page and store them in the settings map.
@@ -476,23 +484,15 @@ public class Wizard {
 	        // based on the settings it has received
 	        page.onExitingPage(this);
         });
-        
+
+        currentPage = nextPage;
         currentPage.ifPresent(currentPage -> {
             // put in default actions
-            List<ButtonType> buttons = currentPage.getButtonTypes();
-            if (! buttons.contains(BUTTON_PREVIOUS)) {
-                buttons.add(BUTTON_PREVIOUS);
-                Button button = (Button)currentPage.lookupButton(BUTTON_PREVIOUS);
-                button.addEventFilter(ActionEvent.ACTION, BUTTON_PREVIOUS_ACTION_HANDLER);
-            }
-            if (! buttons.contains(BUTTON_NEXT)) {
-                buttons.add(BUTTON_NEXT);
-                Button button = (Button)currentPage.lookupButton(BUTTON_NEXT);
-                button.addEventFilter(ActionEvent.ACTION, BUTTON_NEXT_ACTION_HANDLER);
-            }
-            if (! buttons.contains(ButtonType.FINISH)) buttons.add(ButtonType.FINISH);
-            if (! buttons.contains(ButtonType.CANCEL)) buttons.add(ButtonType.CANCEL);
-                
+            addButtonIfMissing(currentPage, BUTTON_PREVIOUS, BUTTON_PREVIOUS_ACTION_HANDLER);
+            addButtonIfMissing(currentPage, BUTTON_NEXT, BUTTON_NEXT_ACTION_HANDLER);
+            addButtonIfMissing(currentPage, ButtonType.FINISH, BUTTON_FINISH_ACTION_HANDLER);
+            addButtonIfMissing(currentPage, ButtonType.CANCEL, BUTTON_CANCEL_ACTION_HANDLER);
+
             // then give user a chance to modify the default actions
             currentPage.onEnteringPage(this);
             
@@ -548,7 +548,16 @@ public class Wizard {
         
         validateActionState();
     }
-    
+
+    private static void addButtonIfMissing(WizardPane page, ButtonType buttonType, EventHandler<ActionEvent> actionHandler) {
+        List<ButtonType> buttons = page.getButtonTypes();
+        if (! buttons.contains(buttonType)) {
+            buttons.add(buttonType);
+            Button button = (Button)page.lookupButton(buttonType);
+            button.addEventFilter(ActionEvent.ACTION, actionHandler);
+        }
+    }
+
     private void validateActionState() {
         final List<ButtonType> currentPaneButtons = dialog.getDialogPane().getButtonTypes();
         

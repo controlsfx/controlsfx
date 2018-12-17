@@ -40,8 +40,9 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>> {
         // Remove any children before creating cells (by default a LabeledText exist and we don't need it)
         getChildren().clear();
         updateCells();
-        
-        registerChangeListener(getSkinnable().indexProperty(), e -> updateCells());
+
+        // We do not have to register a listener for the index property.
+        // Calling updateCells is handled by GridRow if the index is updated.
         registerChangeListener(getSkinnable().widthProperty(), e -> updateCells());
         registerChangeListener(getSkinnable().heightProperty(), e -> updateCells());
     }

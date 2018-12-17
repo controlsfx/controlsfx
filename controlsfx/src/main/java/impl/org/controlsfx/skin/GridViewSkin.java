@@ -170,8 +170,9 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
         for (int i = 0; i < rowCount; i++) {
             GridRow<T> row = flow.getVisibleCell(i);
             if (row != null) {
-                // FIXME hacky - need to better understand what this is about
-                row.updateIndex(-1);
+                // We do not have to force a change of the index by setting the index to -1
+                // before setting it to its actual value. GridRow will update its cells every
+                // time updateIndex is called even if the index did not change.
                 row.updateIndex(i);
             }
         }

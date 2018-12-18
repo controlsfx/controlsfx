@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2013, 2016, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -625,9 +625,14 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
 
     /**
      * Update the text for the SpreadsheetView.
+     * This method is automatically called whenever the item property or the filter property has changed.
+     * In addition it can be called manually whenever an update of the text is necessary, e.g. in a 
+     * case where the item itself has changed to such an amount that the text representation has changed
+     * aswell. In this case the item property itself has not changed, so no automatic text update 
+     * will be triggered.
      */
     @SuppressWarnings("unchecked")
-    private void updateText() {
+    protected void updateText() {
         if(getItem() == null){
             text.setValue(""); //$NON-NLS-1$
         }else if (!("").equals(getFormat())) { //$NON-NLS-1$

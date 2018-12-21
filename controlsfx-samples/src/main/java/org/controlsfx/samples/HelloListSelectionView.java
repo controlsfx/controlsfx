@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,7 @@
 package org.controlsfx.samples;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -34,6 +35,8 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -43,7 +46,11 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
+import org.controlsfx.control.ListActionView;
 import org.controlsfx.control.ListSelectionView;
+import org.controlsfx.glyphfont.FontAwesome;
+
+import java.util.List;
 
 public class HelloListSelectionView extends ControlsFXSample {
 
@@ -104,11 +111,15 @@ public class HelloListSelectionView extends ControlsFXSample {
         
         orientation.getSelectionModel().select(Orientation.HORIZONTAL);
         view.orientationProperty().bind(orientation.getSelectionModel().selectedItemProperty());
-        
+
+        view.getSourceActions().addAll(getSourceAndTargetActions());
+        view.getTargetActions().addAll(getSourceAndTargetActions());
+
         root.getChildren().addAll(useCellFactory, orientation);
         
         return root;
     }
+
 
     @Override
     public String getSampleDescription() {
@@ -127,5 +138,62 @@ public class HelloListSelectionView extends ControlsFXSample {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private ListActionView.ListAction[] getSourceAndTargetActions() {
+        return new ListActionView.ListAction[] {
+            new ListActionView.ListAction<String>(new FontAwesome().create(FontAwesome.Glyph.ANGLE_UP)) {
+                @Override
+                public void initialize(ListView<String> listView) {
+                    setEventHandler(ae -> moveSelectedItemsUp(listView));
+                }
+            },
+
+            new ListActionView.ListAction<String>(new FontAwesome().create(FontAwesome.Glyph.ANGLE_DOWN)) {
+                @Override
+                public void initialize(ListView<String> listView) {
+                    {
+                        setEventHandler(ae -> moveSelectedItemsDown(listView));
+                    }
+                }
+            }
+        };
+    }
+
+    private void moveSelectedItemsUp(ListView<String> listView) {
+        final MultipleSelectionModel<String> selectionModel = listView.getSelectionModel();
+        final ObservableList<Integer> selectedIndices = selectionModel.getSelectedIndices();
+        final ObservableList<String> items = listView.getItems();
+        for (final Integer selectedIndex : selectedIndices) {
+            if (selectedIndex > 0) {
+                if (selectedIndices.contains(selectedIndex - 1)) continue;
+                final String item = items.get(selectedIndex);
+                final String itemToBeReplaced = items.get(selectedIndex - 1);
+                items.set(selectedIndex - 1, item);
+                items.set(selectedIndex, itemToBeReplaced);
+                selectionModel.clearSelection(selectedIndex);
+                selectionModel.select(selectedIndex - 1);
+            }
+        }
+    }
+
+    private void moveSelectedItemsDown(ListView<String> listView) {
+        final ObservableList<String> items = listView.getItems();
+        final MultipleSelectionModel<String> selectionModel = listView.getSelectionModel();
+        final List<Integer> selectedIndices = selectionModel.getSelectedIndices();
+        int lastIndex = items.size() - 1;
+        // Last selected item is to be replaced first
+        for (int index = selectedIndices.size() - 1; index >= 0; index--) {
+            final Integer selectedIndex = selectedIndices.get(index);
+            if (selectedIndex < lastIndex) {
+                if (selectedIndices.contains(selectedIndex + 1)) continue;
+                final String item = items.get(selectedIndex);
+                final String itemToBeReplaced = items.get(selectedIndex + 1);
+                items.set(selectedIndex + 1, item);
+                items.set(selectedIndex, itemToBeReplaced);
+                selectionModel.clearSelection(selectedIndex);
+                selectionModel.select(selectedIndex + 1);
+            }
+        }
     }
 }

@@ -398,7 +398,7 @@ public class ListSelectionView<T> extends ControlsFXControl {
      *
      * @return An ObservableList of actions.
      */
-    public ObservableList<Action> getActions() {
+    public final ObservableList<Action> getActions() {
         return actions;
     }
 
@@ -414,7 +414,7 @@ public class ListSelectionView<T> extends ControlsFXControl {
      * @return An ObservableList of actions.
      * @see ListActionView.ListAction
      */
-    public ObservableList<Action> getSourceActions() {
+    public final ObservableList<Action> getSourceActions() {
         return sourceActions;
     }
 
@@ -429,7 +429,7 @@ public class ListSelectionView<T> extends ControlsFXControl {
      * @return An ObservableList of actions.
      * @see ListActionView.ListAction
      */
-    public ObservableList<Action> getTargetActions() {
+    public final ObservableList<Action> getTargetActions() {
         return targetActions;
     }
 
@@ -502,6 +502,7 @@ public class ListSelectionView<T> extends ControlsFXControl {
      * source list view to the target list view.
      */
     public class MoveToTargetAll extends ListSelectionAction<T> {
+
         public MoveToTargetAll() {
             super(getGlyph(ANGLE_DOUBLE_RIGHT));
             getStyleClass().add("move-to-target-all-button");
@@ -543,6 +544,7 @@ public class ListSelectionView<T> extends ControlsFXControl {
      * target list view to the source list view.
      */
     public class MoveToSourceAll extends ListSelectionAction<T> {
+
         public MoveToSourceAll() {
             super(getGlyph(ANGLE_DOUBLE_LEFT));
             getStyleClass().add("move-to-source-all-button");

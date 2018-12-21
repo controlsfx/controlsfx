@@ -7,7 +7,7 @@ You can learn more about [ControlsFX][1] on its website, and be sure to check ou
 If you think you have a feature you can contribute, a bug you want to fix please review our [guide for contributors][3]
 
    [1]: http://controlsfx.org
-   [2]: http://controlsfx.org/features
+   [2]: http://fxexperience.com/controlsfx/features/
    [3]: https://bitbucket.org/controlsfx/controlsfx/wiki/Contributing%20to%20ControlsFX
 
 ## Build Status and Project Links

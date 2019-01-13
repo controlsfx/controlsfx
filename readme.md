@@ -15,7 +15,7 @@ ControlsFX includes so many features that we're now listing them on a separate p
 
 ## Getting ControlsFX
 
-- For users of Java 8, download [ControlsFX 8.40.14](http://fxexperience.com/downloads/controlsfx-8-40-14/").
+- For users of Java 8, download [ControlsFX 8.40.14](http://fxexperience.com/downloads/controlsfx-8-40-14/).
 - For users of Java 9, download [ControlsFX 9.0.0](http://fxexperience.com/downloads/controlsfx-9-0-0/).
 - For users of Java 11 and later, download will be coming soon!
 

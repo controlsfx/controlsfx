@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2015, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,7 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.HiddenSidesPaneSkin;
+import java.util.Objects;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -422,5 +423,23 @@ public class HiddenSidesPane extends ControlsFXControl {
      */
     public final void setAnimationDuration(Duration duration) {
         animationDuration.set(duration);
+    }
+    
+    /**
+     * Shows a specific side
+     * 
+     * @param side 
+     *          the side to show
+     */
+    public void show(Side side) {
+        Objects.requireNonNull(side, "side cannot be null");
+        getProperties().put("showPane", side);
+    }
+    
+    /**
+     * Hides the currently showing side
+     */
+    public void hide() {
+        getProperties().put("showPane", null);
     }
 }

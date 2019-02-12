@@ -123,6 +123,9 @@ public class HelloCheckComboBox extends ControlsFXSample {
                 return null;
             }
         });
+        checkComboBox2.focusedProperty().addListener((o, ov, nv) -> {
+            if(nv) checkComboBox2.show(); else checkComboBox2.hide();
+        });
         grid.add(new Label("CheckComboBox with data objects: "), 0, row);
         grid.add(checkComboBox2, 1, row);
         

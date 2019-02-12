@@ -1,0 +1,23 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ IDEA
+.idea/
+out/
+controlsfx.iml
+
+# Netbeans
+.nb-gradle/
+.nb-gradle-properties
+
+# Eclipse
+.settings/
+bin/
+
+# MacOS
+.DS_Store
+
+# Miscellenous
+classes/
+gradle.properties

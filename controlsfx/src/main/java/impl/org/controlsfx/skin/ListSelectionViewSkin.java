@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,62 +28,65 @@ package impl.org.controlsfx.skin;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Separator;
 import javafx.scene.control.SkinBase;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.controlsfx.control.ListActionView;
 import org.controlsfx.control.ListSelectionView;
-import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toCollection;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
 
 public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
 
     private GridPane gridPane;
-    private final HBox horizontalButtonBox;
-    private final VBox verticalButtonBox;
-    private Button moveToTarget;
-    private Button moveToTargetAll;
-    private Button moveToSourceAll;
-    private Button moveToSource;
     private ListView<T> sourceListView;
     private ListView<T> targetListView;
+    private ListActionView<T> sourceListActionView;
+    private ListActionView<T> targetListActionView;
 
     public ListSelectionViewSkin(ListSelectionView<T> view) {
         super(view);
 
-        sourceListView = requireNonNull(createSourceListView(),
-                "source list view can not be null");
+        sourceListView = requireNonNull(createSourceListView(), "source list view can not be null");
         sourceListView.setId("source-list-view");
-        sourceListView.setItems(view.getSourceItems());
+        sourceListActionView = createListActionView(sourceListView);
+        Bindings.bindContent(sourceListActionView.getItems(), view.getSourceItems());
+        Bindings.bindContent(sourceListActionView.getActions(), view.getSourceActions());
 
-        targetListView = requireNonNull(createTargetListView(),
-                "target list view can not be null");
+        targetListView = requireNonNull(createTargetListView(), "target list view can not be null");
         targetListView.setId("target-list-view");
-        targetListView.setItems(view.getTargetItems());
+        targetListActionView = createListActionView(targetListView);
+        Bindings.bindContent(targetListActionView.getItems(), view.getTargetItems());
+        Bindings.bindContent(targetListActionView.getActions(), view.getTargetActions());
 
-        sourceListView.cellFactoryProperty().bind(view.cellFactoryProperty());
-        targetListView.cellFactoryProperty().bind(view.cellFactoryProperty());
+        sourceListActionView.cellFactoryProperty().bind(view.cellFactoryProperty());
+        targetListActionView.cellFactoryProperty().bind(view.cellFactoryProperty());
 
         gridPane = createGridPane();
-        horizontalButtonBox = createHorizontalButtonBox();
-        verticalButtonBox = createVerticalButtonBox();
-
         getChildren().add(gridPane);
 
         InvalidationListener updateListener = o -> updateView();
@@ -92,6 +95,7 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         view.sourceFooterProperty().addListener(updateListener);
         view.targetHeaderProperty().addListener(updateListener);
         view.targetFooterProperty().addListener(updateListener);
+        view.getActions().addListener(updateListener);
 
         updateView();
 
@@ -200,7 +204,6 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         row7.setFillHeight(true);
         row7.setVgrow(Priority.NEVER);
 
-
         gridPane.getRowConstraints().addAll(row1, row2, row3, row4, row5, row6, row7);
     }
 
@@ -208,20 +211,7 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     private VBox createVerticalButtonBox() {
         VBox box = new VBox(5);
         box.setFillWidth(true);
-
-        FontAwesome fontAwesome = new FontAwesome();
-        moveToTarget = new Button("",
-                fontAwesome.create(FontAwesome.Glyph.ANGLE_RIGHT));
-        moveToTargetAll = new Button("",
-                fontAwesome.create(FontAwesome.Glyph.ANGLE_DOUBLE_RIGHT));
-
-        moveToSource = new Button("",
-                fontAwesome.create(FontAwesome.Glyph.ANGLE_LEFT));
-        moveToSourceAll = new Button("",
-                fontAwesome.create(FontAwesome.Glyph.ANGLE_DOUBLE_LEFT));
-
-        updateButtons();
-        box.getChildren().addAll(moveToTarget, moveToTargetAll, moveToSource, moveToSourceAll);
+        box.getChildren().addAll(createButtonsFromActions());
         return box;
     }
 
@@ -229,72 +219,8 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     private HBox createHorizontalButtonBox() {
         HBox box = new HBox(5);
         box.setFillHeight(true);
-
-        FontAwesome fontAwesome = new FontAwesome();
-        moveToTarget = new Button("",
-                fontAwesome.create(FontAwesome.Glyph.ANGLE_DOWN));
-        moveToTargetAll = new Button("",
-                fontAwesome.create(FontAwesome.Glyph.ANGLE_DOUBLE_DOWN));
-
-        moveToSource = new Button("",
-                fontAwesome.create(FontAwesome.Glyph.ANGLE_UP));
-        moveToSourceAll = new Button("",
-                fontAwesome.create(FontAwesome.Glyph.ANGLE_DOUBLE_UP));
-
-        updateButtons();
-        box.getChildren().addAll(moveToTarget, moveToTargetAll, moveToSource, moveToSourceAll);
+        box.getChildren().addAll(createButtonsFromActions());
         return box;
-    }
-
-    private void updateButtons() {
-
-        moveToTarget.getStyleClass().add("move-to-target-button");
-        moveToTargetAll.getStyleClass().add("move-to-target-all-button");
-        moveToSource.getStyleClass().add("move-to-source-button");
-        moveToSourceAll.getStyleClass().add("move-to-source-all-button");
-
-        moveToTarget.setMaxWidth(Double.MAX_VALUE);
-        moveToTargetAll.setMaxWidth(Double.MAX_VALUE);
-        moveToSource.setMaxWidth(Double.MAX_VALUE);
-        moveToSourceAll.setMaxWidth(Double.MAX_VALUE);
-
-        getSourceListView().itemsProperty().addListener(
-                it -> bindMoveAllButtonsToDataModel());
-
-        getTargetListView().itemsProperty().addListener(
-                it -> bindMoveAllButtonsToDataModel());
-
-        getSourceListView().selectionModelProperty().addListener(
-                it -> bindMoveButtonsToSelectionModel());
-
-        getTargetListView().selectionModelProperty().addListener(
-                it -> bindMoveButtonsToSelectionModel());
-
-        bindMoveButtonsToSelectionModel();
-        bindMoveAllButtonsToDataModel();
-
-        moveToTarget.setOnAction(evt -> moveToTarget());
-        moveToTargetAll.setOnAction(evt -> moveToTargetAll());
-        moveToSource.setOnAction(evt -> moveToSource());
-        moveToSourceAll.setOnAction(evt -> moveToSourceAll());
-    }
-
-    private void bindMoveAllButtonsToDataModel() {
-        moveToTargetAll.disableProperty().bind(
-                Bindings.isEmpty(getSourceListView().getItems()));
-
-        moveToSourceAll.disableProperty().bind(
-                Bindings.isEmpty(getTargetListView().getItems()));
-    }
-
-    private void bindMoveButtonsToSelectionModel() {
-        moveToTarget.disableProperty().bind(
-                Bindings.isEmpty(getSourceListView().getSelectionModel()
-                        .getSelectedItems()));
-
-        moveToSource.disableProperty().bind(
-                Bindings.isEmpty(getTargetListView().getSelectionModel()
-                        .getSelectedItems()));
     }
 
     private void updateView() {
@@ -304,9 +230,6 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         Node targetHeader = getSkinnable().getTargetHeader();
         Node sourceFooter = getSkinnable().getSourceFooter();
         Node targetFooter = getSkinnable().getTargetFooter();
-
-        ListView<T> sourceList = getSourceListView();
-        ListView<T> targetList = getTargetListView();
 
         StackPane stackPane = new StackPane();
         stackPane.setAlignment(Pos.CENTER);
@@ -324,12 +247,14 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
                 gridPane.add(targetHeader, 2, 0);
             }
 
-            if (sourceList != null) {
-                gridPane.add(sourceList, 0, 1);
+            if (sourceListActionView != null) {
+                sourceListActionView.setSide(Side.LEFT);
+                gridPane.add(sourceListActionView, 0, 1);
             }
 
-            if (targetList != null) {
-                gridPane.add(targetList, 2, 1);
+            if (targetListActionView != null) {
+                targetListActionView.setSide(Side.RIGHT);
+                gridPane.add(targetListActionView, 2, 1);
             }
 
             if (sourceFooter != null) {
@@ -340,7 +265,7 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
                 gridPane.add(targetFooter, 2, 2);
             }
 
-            stackPane.getChildren().add(verticalButtonBox);
+            stackPane.getChildren().add(createVerticalButtonBox());
             gridPane.add(stackPane, 1, 1);
         } else {
             setVerticalViewConstraints();
@@ -353,12 +278,14 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
                 gridPane.add(targetHeader, 0, 4);
             }
 
-            if (sourceList != null) {
-                gridPane.add(sourceList, 0, 1);
+            if (sourceListActionView != null) {
+                sourceListActionView.setSide(Side.RIGHT);
+                gridPane.add(sourceListActionView, 0, 1);
             }
 
-            if (targetList != null) {
-                gridPane.add(targetList, 0, 5);
+            if (targetListActionView != null) {
+                targetListActionView.setSide(Side.RIGHT);
+                gridPane.add(targetListActionView, 0, 5);
             }
 
             if (sourceFooter != null) {
@@ -369,7 +296,7 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
                 gridPane.add(targetFooter, 0, 6);
             }
 
-            stackPane.getChildren().add(horizontalButtonBox);
+            stackPane.getChildren().add(createHorizontalButtonBox());
             gridPane.add(stackPane, 0, 3);
         }
     }
@@ -379,20 +306,8 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         getSourceListView().getSelectionModel().clearSelection();
     }
 
-    private void moveToTargetAll() {
-        move(getSourceListView(), getTargetListView(), new ArrayList<>(
-                getSourceListView().getItems()));
-        getSourceListView().getSelectionModel().clearSelection();
-    }
-
     private void moveToSource() {
         move(getTargetListView(), getSourceListView());
-        getTargetListView().getSelectionModel().clearSelection();
-    }
-
-    private void moveToSourceAll() {
-        move(getTargetListView(), getSourceListView(), new ArrayList<>(
-                getTargetListView().getItems()));
         getTargetListView().getSelectionModel().clearSelection();
     }
 
@@ -405,6 +320,40 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
     private void move(ListView<T> viewA, ListView<T> viewB, List<T> items) {
         viewA.getItems().removeAll(items);
         viewB.getItems().addAll(items);
+    }
+
+    private ObservableList<Node> createButtonsFromActions() {
+        return getSkinnable().getActions().stream()
+                .peek(this::initializeListSelectionAction)
+                .map(this::createActionNode)
+                .collect(toCollection(FXCollections::observableArrayList));
+    }
+
+    private void initializeListSelectionAction(Action action) {
+        if (action instanceof ListSelectionView.ListSelectionAction) {
+            ((ListSelectionView.ListSelectionAction<T>) action).initialize(sourceListView, targetListView);
+        }
+    }
+
+    private Node createActionNode(Action action) {
+        if (action == ActionUtils.ACTION_SEPARATOR) {
+            return new Separator();
+        } else if (action == ActionUtils.ACTION_SPAN) {
+            Pane span = new Pane();
+            HBox.setHgrow(span, Priority.ALWAYS);
+            VBox.setVgrow(span, Priority.ALWAYS);
+            return span;
+        }
+        return createActionButton(action);
+    }
+
+    private Button createActionButton(Action action) {
+        Button button = ActionUtils.createButton(action);
+        button.setMaxWidth(Double.MAX_VALUE);
+        if (action.getAccelerator() != null) {
+            getSkinnable().getScene().getAccelerators().put(action.getAccelerator(), button::fire);
+        }
+        return button;
     }
 
     /**
@@ -452,4 +401,16 @@ public class ListSelectionViewSkin<T> extends SkinBase<ListSelectionView<T>> {
         view.getSelectionModel().setSelectionMode(MULTIPLE);
         return view;
     }
+
+    private ListActionView<T> createListActionView(ListView<T> listView) {
+        ListActionView<T> listActionView = new ListActionView<>();
+        listActionView.setSkin(new ListActionViewSkin<T>(listActionView) {
+            @Override
+            public ListView<T> createListView() {
+                return listView;
+            }
+        } );
+        return listActionView;
+    }
+
 }

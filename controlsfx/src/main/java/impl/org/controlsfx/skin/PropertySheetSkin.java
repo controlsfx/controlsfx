@@ -30,7 +30,6 @@ import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -133,6 +132,7 @@ public class PropertySheetSkin extends SkinBase<PropertySheet> {
         registerChangeListener(searchField.textProperty(), e -> getSkinnable().setTitleFilter(searchField.getText()));
         registerChangeListener(control.modeSwitcherVisibleProperty(), e -> updateToolbar());
         registerChangeListener(control.searchBoxVisibleProperty(), e -> updateToolbar());
+        registerChangeListener(control.categoryComparatorProperty(), e -> refreshProperties());
         
         control.getItems().addListener((ListChangeListener<Item>) change -> refreshProperties());
         
@@ -175,7 +175,7 @@ public class PropertySheetSkin extends SkinBase<PropertySheet> {
         switch( getSkinnable().modeProperty().get() ) {
             case CATEGORY: {
                 // group by category
-                Map<String, List<Item>> categoryMap = new TreeMap<>();
+                Map<String, List<Item>> categoryMap = new TreeMap(getSkinnable().getCategoryComparator());
                 for( Item p: getSkinnable().getItems()) {
                     String category = p.getCategory();
                     List<Item> list = categoryMap.get(category);

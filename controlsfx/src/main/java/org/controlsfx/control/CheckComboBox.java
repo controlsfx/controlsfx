@@ -29,6 +29,7 @@ package org.controlsfx.control;
 import impl.org.controlsfx.skin.CheckComboBoxSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -47,11 +48,23 @@ import java.util.Map;
  * a ComboBox-like control. Each row item shows a {@link CheckBox}, and the state
  * of each row can be queried via the {@link #checkModelProperty() check model}.
  * 
- * <h3>Screenshot</h3>
+ * <br>
+ * The title shown in the combobox is, by default, a concatenation of the selected items
+ * but this behaviour can be changed and it is possible to set a fixed title 
+ * (see {@link #titleProperty() } property), with or without an indication of 
+ * how many items have been checked  (see {@link #showCheckedCountProperty() } property).
+ * 
+ * <h3>Screenshots</h3>
  * <p>The following screenshot shows the CheckComboBox with some sample data:
  * 
  * <br>
  * <img src="checkComboBox.png" alt="Screenshot of CheckComboBox">
+ * <br>
+ * <p>The following screenshot shows the CheckComboBox with a fixed title and the
+ * indication of how many items have been checked:
+ * 
+ * <br>
+ * <img src="checkComboBoxWithCheckedItemCount.png" alt="Screenshot of CheckComboBox with number of checked items">
  * 
  * <h3>Code Example:</h3>
  * <p>To create the CheckComboBox shown in the screenshot, simply do the 
@@ -125,12 +138,6 @@ public class CheckComboBox<T> extends ControlsFXControl {
      * Public API
      * 
      **************************************************************************/
-    
-    /** {@inheritDoc} */
-    @Override protected Skin<?> createDefaultSkin() {
-        checkComboBoxSkin = new CheckComboBoxSkin<>(this);
-        return checkComboBoxSkin;
-    }
     
     /**
      * Represents the list of choices available to the user, from which they can
@@ -278,6 +285,52 @@ public class CheckComboBox<T> extends ControlsFXControl {
         if (checkComboBoxSkin != null) {
             checkComboBoxSkin.hide();
         }
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     * Stylesheet Handling                                                     *
+     *                                                                         *
+     **************************************************************************/
+
+    /** {@inheritDoc} */
+    @Override protected Skin<?> createDefaultSkin() {
+        checkComboBoxSkin = new CheckComboBoxSkin<>(this);
+        return checkComboBoxSkin;
+    }
+    
+    // --- show how many items are checked over total
+    private BooleanProperty showCheckedCount = new SimpleBooleanProperty(false);
+    
+    /**
+     * A boolean to decide if the information of how many items are checked 
+     * should be shown beside the fixed title. 
+     * If a {@link #titleProperty()} has been set and this property is set to true
+     * then a string like (3/10) would be shown when 3 items out of 10 are
+     * checked.<br>
+     * This property has effect only if a fixed title has been set (see {@link #titleProperty()}), 
+     * otherwise the title is constructed with a concatenation of the selected items.
+     * 
+     * @return if the count should be shown
+     */
+    public final BooleanProperty showCheckedCountProperty() {
+        return showCheckedCount;
+    }
+    
+    /**
+     * Sets the value to use to decide whether the checked items count should be
+     * shown or not
+     * @param value the value to set
+     */
+    public final void setShowCheckedCount(boolean value) {
+        showCheckedCount.setValue(value);
+    }
+    
+    /**
+     * @return whether the checked items count is set to be shown beside a fixed title
+     */
+    public final boolean isShowCheckedCount() {
+        return showCheckedCount.getValue();
     }
     
     

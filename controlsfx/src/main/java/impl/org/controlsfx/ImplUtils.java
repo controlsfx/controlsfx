@@ -47,35 +47,30 @@ public class ImplUtils {
     private ImplUtils() {
         // no-op
     }
-    
+
     public static void injectAsRootPane(Scene scene, Parent injectedParent, boolean useReflection) {
         Parent originalParent = scene.getRoot();
         scene.setRoot(injectedParent);
-        
-        // Begin Fix Issue #847, see https://bitbucket.org/controlsfx/controlsfx/issues/847/validationsupport-messes-up-layout
+
+        // Begin Fix Issue #847, see
+        // https://bitbucket.org/controlsfx/controlsfx/issues/847/validationsupport-messes-up-layout
         if (injectedParent instanceof Region) {
-          Region region = (Region) originalParent;
+            Region region = (Region) originalParent;
 
-          region.setMinWidth(Region.USE_PREF_SIZE);
-          region.setMinHeight(Region.USE_PREF_SIZE);
-
-          region.setPrefWidth(Region.USE_COMPUTED_SIZE);
-          region.setPrefHeight(Region.USE_COMPUTED_SIZE);
-
-          region.setMaxWidth(Double.MAX_VALUE);
-          region.setMaxHeight(Double.MAX_VALUE);
+            region.setMaxWidth(Double.MAX_VALUE);
+            region.setMaxHeight(Double.MAX_VALUE);
         }
         // End Fix Issue #847
-        
+
         if (originalParent != null) {
             getChildren(injectedParent, useReflection).add(0, originalParent);
-            
+
             // copy in layout properties, etc, so that the dialogStack displays
             // properly in (hopefully) whatever layout the owner node is in
             injectedParent.getProperties().putAll(originalParent.getProperties());
         }
     }
-    
+
     // parent is where we want to inject the injectedParent. We then need to
     // set the child of the injectedParent to include parent.
     // The end result is that we've forced in the injectedParent node above parent.
@@ -83,9 +78,9 @@ public class ImplUtils {
         if (parent == null) {
             throw new IllegalArgumentException("parent can not be null"); //$NON-NLS-1$
         }
-        
+
         List<Node> ownerParentChildren = getChildren(parent.getParent(), useReflection);
-        
+
         // we've got the children list, now we need to insert a temporary
         // layout container holding our dialogs and opaque layer / effect
         // in place of the owner (the owner will become a child of the dialog
@@ -93,29 +88,29 @@ public class ImplUtils {
         int ownerPos = ownerParentChildren.indexOf(parent);
         ownerParentChildren.remove(ownerPos);
         ownerParentChildren.add(ownerPos, injectedParent);
-        
+
         // now we install the parent as a child of the injectedParent
         getChildren(injectedParent, useReflection).add(0, parent);
-        
+
         // copy in layout properties, etc, so that the dialogStack displays
         // properly in (hopefully) whatever layout the owner node is in
         injectedParent.getProperties().putAll(parent.getProperties());
     }
-    
+
     public static void stripRootPane(Scene scene, Parent originalParent, boolean useReflection) {
         Parent oldParent = scene.getRoot();
         getChildren(oldParent, useReflection).remove(originalParent);
         originalParent.getStyleClass().remove("root"); //$NON-NLS-1$
-        scene.setRoot(originalParent);        
+        scene.setRoot(originalParent);
     }
-    
+
     public static List<Node> getChildren(Node n, boolean useReflection) {
         return n instanceof Parent ? getChildren((Parent)n, useReflection) : Collections.emptyList();
     }
-    
+
     public static List<Node> getChildren(Parent p, boolean useReflection) {
         ObservableList<Node> children = null;
-        
+
         // previously we used reflection immediately, now we try to avoid reflection
         // by checking the type of the Parent. Still not great...
         if (p instanceof Pane) {
@@ -132,22 +127,22 @@ public class ImplUtils {
             // we really want to avoid using this!!!!
             children = getChildrenReflectively(p);
         }
-        
+
         if (children == null) {
             throw new RuntimeException("Unable to get children for Parent of type " + p.getClass() +  //$NON-NLS-1$
                                        ". useReflection is set to " + useReflection); //$NON-NLS-1$
         }
-        
+
         return children == null ? FXCollections.emptyObservableList() : children;
     }
-    
+
     @SuppressWarnings("unchecked")
 	public static ObservableList<Node> getChildrenReflectively(Parent p) {
         ObservableList<Node> children = null;
-        
+
         try {
             Method getChildrenMethod = Parent.class.getDeclaredMethod("getChildren"); //$NON-NLS-1$
-            
+
             if (getChildrenMethod != null) {
                 if (! getChildrenMethod.isAccessible()) {
                     getChildrenMethod.setAccessible(true);
@@ -159,7 +154,7 @@ public class ImplUtils {
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             throw new RuntimeException("Unable to get children for Parent of type " + p.getClass(), e); //$NON-NLS-1$
         }
-        
+
         return children;
     }
 }

@@ -154,7 +154,7 @@ CellView >TextArea .scroll-bar:horizontal {
 
 .spreadsheet-cell .filter-menu-button{
     -fx-background-color: transparent;
-    -fx-padding: 0 0 0 6;
+    -fx-padding: 0 0 0 1;
 }
 .spreadsheet-cell .filter-menu-button > .label{
     -fx-background-color: transparent;

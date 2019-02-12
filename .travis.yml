@@ -1,0 +1,39 @@
+# use java support
+language: java
+matrix:
+  fast_finish: true
+  include:
+    - jdk: oraclejdk8
+      if: branch = master
+    - jdk: openjdk11
+      if: branch = 9.0.0
+
+# run in container
+sudo: false
+
+# use linux as operating system
+os:
+  - linux
+
+# Assemble jars
+script:
+  - ./gradlew clean assemble -Ptransifex.api=$TRANSIFEX_API
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+
+# Deploy snapshots on every commit made to master branch
+# Deploy releases on every tag push
+deploy:
+  - provider: script
+    script: ./gradlew uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD
+    skip_cleanup: true
+    on:
+      all_branches: true # master and 9.0.0
+
+  - provider: script
+    script: ./gradlew uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD
+    skip_cleanup: true
+    on:
+      tags: true

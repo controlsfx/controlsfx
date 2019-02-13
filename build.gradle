@@ -162,6 +162,9 @@ subprojects {
                     ]
                 )
             }
+            // The following can be removed once we start building with 12
+            // https://bugs.openjdk.java.net/browse/JDK-8212233
+            failOnError false
         }
     }
 

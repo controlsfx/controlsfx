@@ -15,6 +15,9 @@ sudo: false
 os:
   - linux
 
+# Do not run travis install step `./gradlew assemble`
+install: true
+
 # Assemble jars
 script:
   - ./gradlew clean assemble -Ptransifex.api=$TRANSIFEX_API

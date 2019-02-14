@@ -1,5 +1,6 @@
 # use java support
 language: java
+
 matrix:
   fast_finish: true
   include:
@@ -12,8 +13,7 @@ matrix:
 sudo: false
 
 # use linux as operating system
-os:
-  - linux
+os: linux
 
 # Do not run travis install step `./gradlew assemble`
 install: true
@@ -26,17 +26,17 @@ cache:
   directories:
     - $HOME/.gradle/caches/
 
-# Deploy snapshots on every commit made to master branch
-# Deploy releases on every tag push
 deploy:
+  # Deploy snapshots on every commit made to master and 9.0.0 branch
   - provider: script
     script: ./gradlew uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD
     skip_cleanup: true
     on:
-      all_branches: true # master and 9.0.0
+      all_branches: true
 
+  # Deploy releases on every tag push
   - provider: script
-    script: ./gradlew uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD
+    script: sh .ci/deploy.sh
     skip_cleanup: true
     on:
       tags: true

@@ -10,7 +10,7 @@ ext.java9Args = [
         "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls",
         // For InputMap used in behavior classes
         "--add-exports=javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls",
-        // For EventHandlerManager across files
+        // For EventHandlerManager in AutoCompletionBinding
         "--add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls",
         // For MappingChange, NonIterableChange across files
         "--add-exports=javafx.base/com.sun.javafx.collections=org.controlsfx.controls",

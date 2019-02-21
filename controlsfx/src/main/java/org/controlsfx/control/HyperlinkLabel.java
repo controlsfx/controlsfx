@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015, ControlsFX
+ * Copyright (c) 2013, 2019, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,6 @@ import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Skin;
-
-import com.sun.javafx.event.EventHandlerManager;
 
 /**
  * A UI control that will convert the given text into a series of text labels
@@ -96,10 +94,7 @@ public class HyperlinkLabel extends ControlsFXControl implements EventTarget {
      * 
      **************************************************************************/
     
-    private final EventHandlerManager eventHandlerManager =
-            new EventHandlerManager(this);
-    
-    
+
     
     /***************************************************************************
      * 
@@ -183,7 +178,7 @@ public class HyperlinkLabel extends ControlsFXControl implements EventTarget {
         if (onAction == null) {
             onAction = new SimpleObjectProperty<EventHandler<ActionEvent>>(this, "onAction") { //$NON-NLS-1$
                 @Override protected void invalidated() {
-                    eventHandlerManager.setEventHandler(ActionEvent.ACTION, get());
+                    setEventHandler(ActionEvent.ACTION, get());
                 }
             };
         }
@@ -206,6 +201,4 @@ public class HyperlinkLabel extends ControlsFXControl implements EventTarget {
     public final EventHandler<ActionEvent> getOnAction() {
         return onAction == null ? null : onAction.get();
     }
-
-    
 }

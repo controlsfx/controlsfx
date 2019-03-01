@@ -195,7 +195,8 @@ public class Decorator {
                 if (_pane == null) {
                     currentlyInstallingScenes.add(scene);
                     _pane = new DecorationPane();
-                    Node oldRoot = scene.getRoot();
+                    Parent oldRoot = scene.getRoot();
+                    _pane.getStylesheets().addAll(oldRoot.getStylesheets());
                     ImplUtils.injectAsRootPane(scene, _pane, true);
                     _pane.setRoot(oldRoot);
                     currentlyInstallingScenes.remove(scene);

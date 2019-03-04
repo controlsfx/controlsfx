@@ -89,6 +89,14 @@ private configurePOM(def pom) {
       //}
 
     }
+    pom.withXml {
+        Node pomNode = asNode()
+        pomNode.dependencies.'*'.findAll() {
+            it.groupId.text() == 'org.openjfx'
+        }.each {
+            it.remove(it.classifier)
+        }
+    }
 }
 
 ext.checkPasswords =  {

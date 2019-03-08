@@ -610,8 +610,6 @@ public class Notifications {
                 return;
             }
 
-            final double newPopupHeight = changedPopup.getContent().get(0).getBoundsInParent().getHeight();
-
             parallelTransition.stop();
             parallelTransition.getChildren().clear();
 
@@ -629,19 +627,20 @@ public class Notifications {
 
                 if (isShowFromTop) {
                     if (i == popups.size() - 1) {
-                        sum = startY + newPopupHeight + padding;
+                        sum = changedPopup.getAnchorY() + popupHeight;
                     } else {
                         sum += popupHeight;
                     }
                     targetAnchors[i] = sum;
+                    _popup.setAnchorY(sum-popupHeight);
                 } else {
                     if (i == popups.size() - 1) {
                         sum = changedPopup.getAnchorY() - popupHeight;
                     } else {
                         sum -= popupHeight;
                     }
-
                     targetAnchors[i] = sum;
+                    _popup.setAnchorY(sum+popupHeight);
                 }
             }
 
@@ -649,6 +648,7 @@ public class Notifications {
             // target
             for (int i = popups.size() - 1; i >= 0; i--) {
                 final Popup _popup = popups.get(i);
+                _popup.setAnchorX(changedPopup.getAnchorX());
                 final double anchorYTarget = targetAnchors[i];
                 if (anchorYTarget < 0) {
                     _popup.hide();

@@ -32,7 +32,7 @@ If you **want to play** with the ControlsFX sample application, simply download 
 
 `java -jar controlsfx-samples-*.jar`
 
-If you think you have a feature **you can contribute**, a bug you want to fix, or have a bug you'd like to file, please direct it to the [issue tracker](https://github.com/controlsfx/controlsfx/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc). You can build controlsfx locally like this:
+If you think you have a feature **you can contribute**, a bug you want to fix, or have a bug you'd like to file, please direct it to the [issue tracker](https://github.com/controlsfx/controlsfx/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc). You can build ControlsFX locally like this:
 
 `bash ./gradlew build test`
 

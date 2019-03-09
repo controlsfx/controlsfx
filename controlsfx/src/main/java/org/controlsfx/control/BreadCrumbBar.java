@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2019, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,6 @@ import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.Event;
-import javafx.event.EventDispatchChain;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.control.Button;
@@ -42,7 +41,6 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.TreeItem;
 import javafx.util.Callback;
 
-import com.sun.javafx.event.EventHandlerManager;
 import java.util.UUID;
 
 /**
@@ -57,9 +55,6 @@ import java.util.UUID;
  * </center>
  */
 public class BreadCrumbBar<T> extends ControlsFXControl {
-
-    private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
-
 
     /**
      * Represents an Event which is fired when a bread crumb was activated.
@@ -161,21 +156,7 @@ public class BreadCrumbBar<T> extends ControlsFXControl {
         setSelectedCrumb(selectedCrumb);
         setCrumbFactory(defaultCrumbNodeFactory);
     }
-    
-    
-    
-    /***************************************************************************
-     *                                                                         *
-     * Public API                                                              *
-     *                                                                         *
-     **************************************************************************/
 
-    /** {@inheritDoc} */
-    @Override public EventDispatchChain buildEventDispatchChain(EventDispatchChain tail) {
-        return tail.prepend(eventHandlerManager);
-    }
-    
-    
     
     /***************************************************************************
      *                                                                         *
@@ -309,7 +290,7 @@ public class BreadCrumbBar<T> extends ControlsFXControl {
     private ObjectProperty<EventHandler<BreadCrumbActionEvent<T>>> onCrumbAction = new ObjectPropertyBase<EventHandler<BreadCrumbBar.BreadCrumbActionEvent<T>>>() {
         @SuppressWarnings({ "rawtypes", "unchecked" })
         @Override protected void invalidated() {
-            eventHandlerManager.setEventHandler(BreadCrumbActionEvent.CRUMB_ACTION, (EventHandler<BreadCrumbActionEvent>)(Object)get());
+            setEventHandler(BreadCrumbActionEvent.CRUMB_ACTION, (EventHandler<BreadCrumbActionEvent>)(Object)get());
         }
 
         @Override

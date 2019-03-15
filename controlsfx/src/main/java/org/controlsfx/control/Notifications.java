@@ -124,6 +124,7 @@ public class Notifications {
     private boolean hideCloseButton;
     private EventHandler<ActionEvent> onAction;
     private Window owner;
+    private Screen screen = null;
 
     private List<String> styleClass = new ArrayList<>();
     private int threshold;
@@ -190,7 +191,9 @@ public class Notifications {
      * primary (default) screen.
      */
     public Notifications owner(Object owner) {
-        if (!(owner instanceof Screen)) {
+        if (owner instanceof Screen) {
+            this.screen = (Screen) owner;
+        } else {
             this.owner = Utils.getWindow(owner);
         }
         return this;
@@ -337,7 +340,10 @@ public class Notifications {
                  * If the owner is not set, we work with the whole screen.
                  */
                 window = Utils.getWindow(null);
-                Rectangle2D screenBounds = getScreenBounds(window).orElse(Screen.getPrimary().getVisualBounds());
+                Screen screen = notification.screen != null
+                                ? notification.screen
+                                : getScreenBounds(window).orElse(Screen.getPrimary());
+                Rectangle2D screenBounds = screen.getBounds();
                 startX = screenBounds.getMinX();
                 startY = screenBounds.getMinY();
                 screenWidth = screenBounds.getWidth();
@@ -356,15 +362,14 @@ public class Notifications {
             show(window, notification);
         }
 
-        private Optional<Rectangle2D> getScreenBounds(Window window) {
+        private Optional<Screen> getScreenBounds(Window window) {
             final ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(window.getX(),
                                                                                              window.getY(),
                                                                                              window.getWidth(),
                                                                                              window.getHeight());
             return screensForRectangle.stream()
                                       .filter(Objects::nonNull)
-                                      .findFirst()
-                                      .map(Screen::getBounds);
+                                      .findFirst();
         }
 
         private void show(Window owner, final Notifications notification) {

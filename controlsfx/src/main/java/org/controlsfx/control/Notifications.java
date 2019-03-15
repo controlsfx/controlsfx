@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -122,7 +124,6 @@ public class Notifications {
     private boolean hideCloseButton;
     private EventHandler<ActionEvent> onAction;
     private Window owner;
-    private Screen screen = Screen.getPrimary();
 
     private List<String> styleClass = new ArrayList<>();
     private int threshold;
@@ -189,9 +190,7 @@ public class Notifications {
      * primary (default) screen.
      */
     public Notifications owner(Object owner) {
-        if (owner instanceof Screen) {
-            this.screen = (Screen) owner;
-        } else {
+        if (!(owner instanceof Screen)) {
             this.owner = Utils.getWindow(owner);
         }
         return this;
@@ -323,8 +322,8 @@ public class Notifications {
         }
 
         private final Map<Pos, List<Popup>> popupsMap = new HashMap<>();
-        private final static double PADDING = 15;
-        private final static double SPACING = 15;
+        private static final double PADDING = 15;
+        private static final double SPACING = 15;
 
         // for animating in the notifications
         private ParallelTransition parallelTransition = new ParallelTransition();
@@ -337,13 +336,12 @@ public class Notifications {
                 /*
                  * If the owner is not set, we work with the whole screen.
                  */
-                Rectangle2D screenBounds = notification.screen.getVisualBounds();
+                window = Utils.getWindow(null);
+                Rectangle2D screenBounds = getScreenBounds(window).orElse(Screen.getPrimary().getVisualBounds());
                 startX = screenBounds.getMinX();
                 startY = screenBounds.getMinY();
                 screenWidth = screenBounds.getWidth();
                 screenHeight = screenBounds.getHeight();
-
-                window = Utils.getWindow(null);
             } else {
                 /*
                  * If the owner is set, we will make the notifications popup
@@ -356,6 +354,17 @@ public class Notifications {
                 window = notification.owner;
             }
             show(window, notification);
+        }
+
+        private Optional<Rectangle2D> getScreenBounds(Window window) {
+            final ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(window.getX(),
+                                                                                             window.getY(),
+                                                                                             window.getWidth(),
+                                                                                             window.getHeight());
+            return screensForRectangle.stream()
+                                      .filter(Objects::nonNull)
+                                      .findFirst()
+                                      .map(Screen::getBounds);
         }
 
         private void show(Window owner, final Notifications notification) {

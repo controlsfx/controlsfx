@@ -103,9 +103,8 @@ public class PropertySheet extends ControlsFXControl {
      */
     public static enum Mode {
         /**
-         * Simply displays the properties in the 
-         * {@link PropertySheet#getItems() items list} in the order they are 
-         * in the list. 
+         * Displays the properties in the
+         * {@link PropertySheet#getItems() items list} in alphabetical order
          */
         NAME,
         

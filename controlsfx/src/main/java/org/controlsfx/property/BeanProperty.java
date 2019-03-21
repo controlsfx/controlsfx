@@ -205,4 +205,9 @@ public class BeanProperty implements PropertySheet.Item {
             // ignore it...
         }
     }
+
+    @Override
+    public int compareTo(Item o) {
+        return getName().compareTo(o.getName());
+    }
 }

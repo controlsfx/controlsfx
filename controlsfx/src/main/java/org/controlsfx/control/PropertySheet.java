@@ -125,7 +125,7 @@ public class PropertySheet extends ControlsFXControl {
      * 
      * @see PropertySheet
      */
-    public static interface Item {
+    public static interface Item extends Comparable<Item> {
         
         /**
          * Returns the class type of the property.

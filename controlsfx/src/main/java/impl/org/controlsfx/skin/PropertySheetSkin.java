@@ -30,6 +30,7 @@ import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -207,8 +208,8 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 // create category-based accordion
                 Accordion accordion = new Accordion();
                 for( String category: categoryMap.keySet() ) {
-                	PropertyPane props = new PropertyPane( categoryMap.get(category));
-                	// Only show non-empty categories 
+                	PropertyPane props = new PropertyPane( categoryMap.get(category), Mode.CATEGORY);
+                	// Only show non-empty categories
                 	if ( props.getChildrenUnmodifiable().size() > 0 ) {
                        TitledPane pane = new TitledPane( category, props );
                        pane.setExpanded(true);
@@ -220,10 +221,14 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 }
                 return accordion;
             }
-            
-            default: return new PropertyPane(getSkinnable().getItems());
+            case NAME: {
+                List<Item> sortedList = new LinkedList<>(getSkinnable().getItems());
+                Collections.sort(sortedList);
+                return new PropertyPane(sortedList, Mode.NAME);
+            }
+
+            default: return new PropertyPane(getSkinnable().getItems(), Mode.CATEGORY);
         }
-        
     }
 
     
@@ -258,20 +263,20 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
     
     private class PropertyPane extends GridPane {
         
-        public PropertyPane( List<Item> properties ) {
-            this( properties, 0 );
+        public PropertyPane( List<Item> properties, Mode mode ) {
+            this( properties, mode, 0);
         }
         
-        public PropertyPane( List<Item> properties, int nestingLevel ) {
+        public PropertyPane( List<Item> properties, Mode mode, int nestingLevel ) {
             setVgap(5);
             setHgap(5);
             setPadding(new Insets(5, 15, 5, 15 + nestingLevel*10 ));
             getStyleClass().add("property-pane"); //$NON-NLS-1$
-            setItems(properties);
+            setItems(properties, mode);
 //            setGridLinesVisible(true);
         }
         
-        public void setItems( List<Item> properties ) {
+        public void setItems( List<Item> properties, Mode mode ) {
             getChildren().clear();
             
             String filter = getSkinnable().titleFilter().get();
@@ -285,18 +290,18 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                 String title = item.getName();
                
                 if ( !filter.isEmpty() && title.toLowerCase().indexOf( filter ) < 0) continue;
-                
-                // setup property label
-                Label label = new Label(title);
-                label.setMinWidth(MIN_COLUMN_WIDTH);
-                
+
+                // setup property title label
+                Label titleLabel = new Label(title);
+                titleLabel.setMinWidth(MIN_COLUMN_WIDTH);
+
                 // show description as a tooltip
                 String description = item.getDescription();
                 if ( description != null && !description.trim().isEmpty()) {
-                    label.setTooltip(new Tooltip(description));
+                    titleLabel.setTooltip(new Tooltip(description));
                 }
                 
-                add(label, 0, row);
+                add(titleLabel, 0, row);
 
                 // setup property editor
                 Node editor = getEditor(item);
@@ -305,10 +310,22 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
                     ((Region)editor).setMinWidth(MIN_COLUMN_WIDTH);
                     ((Region)editor).setMaxWidth(Double.MAX_VALUE);
                 }
-                label.setLabelFor(editor);
+                titleLabel.setLabelFor(editor);
                 add(editor, 1, row);
                 GridPane.setHgrow(editor, Priority.ALWAYS);
-                
+
+                // setup property category label
+                if (mode == Mode.NAME) {
+                    // filter properties
+                    String category = item.getCategory();
+
+                    if (!filter.isEmpty() && title.toLowerCase().indexOf(filter) < 0) continue;
+
+                    Label categoryLabel = new Label(category);
+                    categoryLabel.setMinWidth(MIN_COLUMN_WIDTH);
+
+                    add(categoryLabel, 2, row);
+                }
                 //TODO add support for recursive properties
                 
                 row++;

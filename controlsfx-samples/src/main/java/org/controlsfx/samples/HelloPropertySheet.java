@@ -64,17 +64,17 @@ public class HelloPropertySheet extends ControlsFXSample {
     private static Map<String, Object> customDataMap = new LinkedHashMap<>();
 
     static {
-        customDataMap.put("1. Name#First Name", "Jonathan");
-        customDataMap.put("1. Name#Last Name", "Giles");
-        customDataMap.put("1. Name#Birthday", LocalDate.of(1985, Month.JANUARY, 12));
-        customDataMap.put("2. Billing Address#Address 1", "");
-        customDataMap.put("2. Billing Address#Address 2", "");
-        customDataMap.put("2. Billing Address#City", "");
-        customDataMap.put("2. Billing Address#State", "");
-        customDataMap.put("2. Billing Address#Zip", "");
-        customDataMap.put("3. Phone#Home", "123-123-1234");
-        customDataMap.put("3. Phone#Mobile", "234-234-2345");
-        customDataMap.put("3. Phone#Work", "");
+        customDataMap.put("Name#First Name", "Jonathan");
+        customDataMap.put("Name#Last Name", "Giles");
+        customDataMap.put("Name#Birthday", LocalDate.of(1985, Month.JANUARY, 12));
+        customDataMap.put("Billing Address#Address 1", "");
+        customDataMap.put("Billing Address#Address 2", "");
+        customDataMap.put("Billing Address#City", "");
+        customDataMap.put("Billing Address#State", "");
+        customDataMap.put("Billing Address#Zip", "");
+        customDataMap.put("Phone#Home", "123-123-1234");
+        customDataMap.put("Phone#Mobile", "234-234-2345");
+        customDataMap.put("Phone#Work", "");
     }
 
     private PropertySheet propertySheet = new PropertySheet();
@@ -152,6 +152,10 @@ public class HelloPropertySheet extends ControlsFXSample {
             return Optional.empty();
         }
 
+        @Override
+        public int compareTo(Item o) {
+            return name.compareTo(o.getName());
+        }
     }
 
     class ActionShowInPropertySheet extends Action {

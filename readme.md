@@ -28,7 +28,9 @@ If you **want to play** with the ControlsFX sample application, simply download 
 
 `java -jar controlsfx-samples-*.jar`
 
-If you think you have a feature **you can contribute**, a bug you want to fix, or have a bug you'd like to file, please direct it to the [issue tracker](https://github.com/controlsfx/controlsfx/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc).
+If you think you have a feature **you can contribute**, a bug you want to fix, or have a bug you'd like to file, please direct it to the [issue tracker](https://github.com/controlsfx/controlsfx/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc). You can build ControlsFX locally like this:
+
+`bash ./gradlew build check`
 
 If you **want to use** ControlsFX, then you're probably wondering how to use the API that we've slaved over for hours! In your case, the best and definitive location for help is definitely [our javadocs](http://docs.controlsfx.org). Fear not, these are not a barren wasteland of undescribed functionality - we've poured our hearts into making these javadocs full to the brim of examples, commentary and explanation. If anything is unclear to you, [file a bug in our issue tracker](https://github.com/controlsfx/controlsfx/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) and we'll do our best to update the documentation straight away!
 

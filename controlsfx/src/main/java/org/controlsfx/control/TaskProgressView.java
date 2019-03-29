@@ -62,6 +62,8 @@ import javafx.util.Callback;
  */
 public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
 
+    private boolean retainTaskMode = false;
+
     /**
      * Constructs a new task progress view.
      */
@@ -69,13 +71,15 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
         getStyleClass().add("task-progress-view");
 
         EventHandler<WorkerStateEvent> taskHandler = evt -> {
-            if (evt.getEventType().equals(
-                    WorkerStateEvent.WORKER_STATE_SUCCEEDED)
-                    || evt.getEventType().equals(
-                            WorkerStateEvent.WORKER_STATE_CANCELLED)
-                    || evt.getEventType().equals(
-                            WorkerStateEvent.WORKER_STATE_FAILED)) {
-                getTasks().remove(evt.getSource());
+            if (!retainTaskMode) {
+                if (evt.getEventType().equals(
+                        WorkerStateEvent.WORKER_STATE_SUCCEEDED)
+                        || evt.getEventType().equals(
+                        WorkerStateEvent.WORKER_STATE_CANCELLED)
+                        || evt.getEventType().equals(
+                        WorkerStateEvent.WORKER_STATE_FAILED)) {
+                    getTasks().remove(evt.getSource());
+                }
             }
         };
 
@@ -154,5 +158,23 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
      */
     public final void setGraphicFactory(Callback<T, Node> factory) {
         graphicFactoryProperty().set(factory);
+    }
+
+    /**
+     * Check if tasks will not be removed when succeeded, cancelled or failed
+     *
+     * @return
+     */
+    public boolean isRetainTaskMode() {
+        return retainTaskMode;
+    }
+
+    /**
+     * Do not remove tasks when succeeded, cancelled or failed
+     *
+     * @param retainTaskMode
+     */
+    public void setRetainTaskMode(boolean retainTaskMode) {
+        this.retainTaskMode = retainTaskMode;
     }
 }

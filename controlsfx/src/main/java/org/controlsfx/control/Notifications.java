@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -122,7 +124,7 @@ public class Notifications {
     private boolean hideCloseButton;
     private EventHandler<ActionEvent> onAction;
     private Window owner;
-    private Screen screen = Screen.getPrimary();
+    private Screen screen = null;
 
     private List<String> styleClass = new ArrayList<>();
     private int threshold;
@@ -335,13 +337,15 @@ public class Notifications {
                 /*
                  * If the owner is not set, we work with the whole screen.
                  */
-                Rectangle2D screenBounds = notification.screen.getVisualBounds();
+                window = Utils.getWindow(null);
+                Screen screen = notification.screen != null
+                                ? notification.screen
+                                : getScreenBounds(window).orElse(Screen.getPrimary());
+                Rectangle2D screenBounds = screen.getBounds();
                 startX = screenBounds.getMinX();
                 startY = screenBounds.getMinY();
                 screenWidth = screenBounds.getWidth();
                 screenHeight = screenBounds.getHeight();
-
-                window = Utils.getWindow(null);
             } else {
                 /*
                  * If the owner is set, we will make the notifications popup
@@ -354,6 +358,16 @@ public class Notifications {
                 window = notification.owner;
             }
             show(window, notification);
+        }
+
+        private Optional<Screen> getScreenBounds(Window window) {
+            final ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(window.getX(),
+                                                                                             window.getY(),
+                                                                                             window.getWidth(),
+                                                                                             window.getHeight());
+            return screensForRectangle.stream()
+                                      .filter(Objects::nonNull)
+                                      .findFirst();
         }
 
         private void show(Window owner, final Notifications notification) {

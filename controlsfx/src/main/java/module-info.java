@@ -4,8 +4,8 @@ module org.controlsfx.controls {
 
     requires transitive javafx.controls;
     requires transitive javafx.fxml;
-    requires static javafx.web;
-    requires static javafx.media;
+    requires transitive javafx.web;
+    requires transitive javafx.media;
 
     exports org.controlsfx.control;
     exports org.controlsfx.control.action;

@@ -18,21 +18,22 @@ ControlsFX includes so many features that we're now listing them on a separate p
 
 ## Getting ControlsFX
 
-- For users of Java 8, download [ControlsFX 8.40.14](http://fxexperience.com/downloads/controlsfx-8-40-14/).
-- For users of Java 9, download [ControlsFX 9.0.0](http://fxexperience.com/downloads/controlsfx-9-0-0/).
-- For users of Java 11 and later, download will be coming soon!
+- For users of Java 8, download [ControlsFX 8.40.15](https://repo.maven.apache.org/maven2/org/controlsfx/controlsfx/8.40.15/controlsfx-8.40.15.jar).
+- For users of Java 9 and above, download [ControlsFX 11.0.0](https://repo.maven.apache.org/maven2/org/controlsfx/controlsfx/11.0.0/controlsfx-11.0.0.jar).
 
 ## Getting Started
 
-If you **want to play** with the ControlsFX sample application, simply download the ControlsFX release and run the following command on the command prompt (be sure to replace the * with the actual version number of FXSampler and ControlsFX-samples):
+We have two important branches: `master` for JavaFX 8 and `9.0.0` for JavaFX 9+.
 
-`java -jar controlsfx-samples-*.jar`
+If you **want to play** with the ControlsFX sample application, clone the repository, checkout the branch of your choice and run:
 
-If you think you have a feature **you can contribute**, a bug you want to fix, or have a bug you'd like to file, please direct it to the [issue tracker](https://github.com/controlsfx/controlsfx/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc). You can build ControlsFX locally like this:
+`./gradlew run`
 
-`bash ./gradlew build check`
+If you have a feature **you can contribute**, a bug you want to fix, or have a bug you'd like to file, please direct it to the [issue tracker](https://github.com/controlsfx/controlsfx/issues). You can build ControlsFX locally like this:
 
-If you **want to use** ControlsFX, then you're probably wondering how to use the API that we've slaved over for hours! In your case, the best and definitive location for help is definitely [our javadocs](http://docs.controlsfx.org). Fear not, these are not a barren wasteland of undescribed functionality - we've poured our hearts into making these javadocs full to the brim of examples, commentary and explanation. If anything is unclear to you, [file a bug in our issue tracker](https://github.com/controlsfx/controlsfx/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) and we'll do our best to update the documentation straight away!
+`./gradlew build check`
+
+If you **want to use** ControlsFX, then you're probably wondering how to use the API that we've slaved over for hours! In your case, the best and definitive location for help is definitely [our javadocs](http://docs.controlsfx.org). Fear not, these are not a barren wasteland of undescribed functionality - we've poured our hearts into making these javadocs full to the brim of examples, commentary and explanation. If anything is unclear to you, [file a bug in our issue tracker](https://github.com/controlsfx/controlsfx/issues) and we'll do our best to update the documentation straight away!
 
 If you **have questions**, you should join the the [mailing list](https://groups.google.com/group/controlsfx-dev).
 

@@ -45,7 +45,6 @@ ext.javafx_modules = [
         'javafx-base',
         'javafx-graphics',
         'javafx-controls',
-        'javafx-fxml',
         'javafx-media',
         'javafx-web'
 ]

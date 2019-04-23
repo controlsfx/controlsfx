@@ -46,10 +46,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.Node;
-
-import org.controlsfx.glyphfont.Glyph;
-import org.controlsfx.glyphfont.FontAwesome;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,9 +69,13 @@ public final class FilterPanel<T,R> extends VBox {
     // This collection will reference column header listeners. References must be kept locally because weak listeners are registered
     private final Collection<InvalidationListener> columnHeadersChangeListeners = new ArrayList();
 
-    private static final Supplier<Node> filterImageView = () -> {
-        Glyph gFilter = new FontAwesome().create(FontAwesome.Glyph.FILTER);
-        return gFilter;
+    private static final Image filterIcon = new Image(FilterPanel.class.getResource("/impl/org/controlsfx/table/filter.png").toExternalForm());
+
+    private static final Supplier<ImageView> filterImageView = () -> {
+        ImageView imageView = new ImageView(filterIcon);
+        imageView.setFitHeight(15);
+        imageView.setPreserveRatio(true);
+        return imageView;
     };
 
     private final ChangeListener<Skin<?>> skinListener = (w, o, n) -> {

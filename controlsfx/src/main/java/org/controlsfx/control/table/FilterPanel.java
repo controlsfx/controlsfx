@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, 2016, ControlsFX
+ * Copyright (c) 2015, 2019, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -69,7 +69,7 @@ public final class FilterPanel<T,R> extends VBox {
     // This collection will reference column header listeners. References must be kept locally because weak listeners are registered
     private final Collection<InvalidationListener> columnHeadersChangeListeners = new ArrayList();
 
-    private static final Image filterIcon = new Image("/impl/org/controlsfx/table/filter.png");
+    private static final Image filterIcon = new Image(FilterPanel.class.getResource("/impl/org/controlsfx/table/filter.png").toExternalForm());
 
     private static final Supplier<ImageView> filterImageView = () -> {
         ImageView imageView = new ImageView(filterIcon);

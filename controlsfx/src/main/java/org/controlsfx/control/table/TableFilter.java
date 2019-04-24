@@ -78,7 +78,7 @@ public final class TableFilter<T> {
         tableView.setItems(sortedControlList);
 
         applyForAllColumns();
-        tableView.getStylesheets().add(FilterPanel.class.getResource("/impl/org/controlsfx/table/tablefilter.css").toExternalForm());
+        tableView.getStylesheets().add(TableFilter.class.getResource("/impl/org/controlsfx/table/tablefilter.css").toExternalForm());
 
         if (!isLazy) {
             columnFilters.forEach(ColumnFilter::initialize);

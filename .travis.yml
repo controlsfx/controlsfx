@@ -1,0 +1,42 @@
+# use java support
+language: java
+
+matrix:
+  fast_finish: true
+  include:
+    - jdk: oraclejdk8
+      if: branch = master
+    - jdk: openjdk11
+      if: branch = 9.0.0
+
+# run in container
+sudo: false
+
+# use linux as operating system
+os: linux
+
+# Do not run travis install step `./gradlew assemble`
+install: true
+
+# Assemble jars
+script:
+  - ./gradlew clean assemble -Ptransifex.api=$TRANSIFEX_API
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+
+deploy:
+  # Deploy snapshots on every commit made to master and 9.0.0 branch
+  - provider: script
+    script: ./gradlew uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD
+    skip_cleanup: true
+    on:
+      all_branches: true
+
+  # Deploy releases on every tag push
+  - provider: script
+    script: sh .ci/deploy.sh
+    skip_cleanup: true
+    on:
+      tags: true

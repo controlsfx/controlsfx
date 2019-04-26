@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018 ControlsFX
+ * Copyright (c) 2018, 2019, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,7 @@ public class ListActionViewSkin<T> extends SkinBase<ListActionView<T>> {
 
         this.listView = createListView();
         this.listView.cellFactoryProperty().bind(getSkinnable().cellFactoryProperty());
-        Bindings.bindContent(this.listView.getItems(), getSkinnable().getItems());
+        Bindings.bindContentBidirectional(listView.getItems(), getSkinnable().getItems());
 
         control.getActions().addListener((InvalidationListener)  o -> update());
         control.sideProperty().addListener(o -> update());

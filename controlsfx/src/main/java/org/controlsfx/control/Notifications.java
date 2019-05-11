@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2016, ControlsFX
+ * Copyright (c) 2014, 2019, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -313,6 +313,7 @@ public class Notifications {
     private static final class NotificationPopupHandler {
 
         private static final NotificationPopupHandler INSTANCE = new NotificationPopupHandler();
+        private static final String FINAL_ANCHOR_Y = "finalAnchorY";
 
         private double startX;
         private double startY;
@@ -324,7 +325,8 @@ public class Notifications {
         }
 
         private final Map<Pos, List<Popup>> popupsMap = new HashMap<>();
-        private final double padding = 15;
+        private static final double PADDING = 15;
+        private static final double SPACING = 15;
 
         // for animating in the notifications
         private ParallelTransition parallelTransition = new ParallelTransition();
@@ -493,7 +495,7 @@ public class Notifications {
                         case BOTTOM_LEFT:
                         case BOTTOM_CENTER:
                         case BOTTOM_RIGHT:
-                            popup.setAnchorY(y - padding);
+                            popup.setAnchorY(y - PADDING);
                             break;
                         default:
                             // no-op
@@ -527,20 +529,20 @@ public class Notifications {
                 case TOP_LEFT:
                 case CENTER_LEFT:
                 case BOTTOM_LEFT:
-                    anchorX = padding + startX;
+                    anchorX = PADDING + startX;
                     break;
 
                 case TOP_CENTER:
                 case CENTER:
                 case BOTTOM_CENTER:
-                    anchorX = startX + (screenWidth / 2.0) - barWidth / 2.0 - padding / 2.0;
+                    anchorX = startX + (screenWidth / 2.0) - barWidth / 2.0 - PADDING / 2.0;
                     break;
 
                 default:
                 case TOP_RIGHT:
                 case CENTER_RIGHT:
                 case BOTTOM_RIGHT:
-                    anchorX = startX + screenWidth - barWidth - padding;
+                    anchorX = startX + screenWidth - barWidth - PADDING;
                     break;
             }
 
@@ -549,24 +551,25 @@ public class Notifications {
                 case TOP_LEFT:
                 case TOP_CENTER:
                 case TOP_RIGHT:
-                    anchorY = padding + startY;
+                    anchorY = PADDING + startY;
                     break;
 
                 case CENTER_LEFT:
                 case CENTER:
                 case CENTER_RIGHT:
-                    anchorY = startY + (screenHeight / 2.0) - barHeight / 2.0 - padding / 2.0;
+                    anchorY = startY + (screenHeight / 2.0) - barHeight / 2.0 - PADDING / 2.0;
                     break;
 
                 default:
                 case BOTTOM_LEFT:
                 case BOTTOM_CENTER:
                 case BOTTOM_RIGHT:
-                    anchorY = startY + screenHeight - barHeight - padding;
+                    anchorY = startY + screenHeight - barHeight - PADDING;
                     break;
             }
 
             popup.setAnchorX(anchorX);
+            setFinalAnchorY(popup, anchorY);
             popup.setAnchorY(anchorY);
 
             isShowing = true;
@@ -627,8 +630,6 @@ public class Notifications {
                 return;
             }
 
-            final double newPopupHeight = changedPopup.getContent().get(0).getBoundsInParent().getHeight();
-
             parallelTransition.stop();
             parallelTransition.getChildren().clear();
 
@@ -642,23 +643,26 @@ public class Notifications {
             for (int i = popups.size() - 1; i >= 0; i--) {
                 Popup _popup = popups.get(i);
 
-                final double popupHeight = _popup.getContent().get(0).getBoundsInParent().getHeight();
+                final NotificationBar notificationBar = (NotificationBar) _popup.getContent().get(0);
+                final double popupHeight = notificationBar.minHeight(notificationBar.getWidth());
 
                 if (isShowFromTop) {
                     if (i == popups.size() - 1) {
-                        sum = startY + newPopupHeight + padding;
+                        sum = getFinalAnchorY(changedPopup) + popupHeight + SPACING;
                     } else {
-                        sum += popupHeight;
+                        sum += popupHeight + SPACING;
                     }
                     targetAnchors[i] = sum;
+                    _popup.setAnchorY(sum-popupHeight);
                 } else {
                     if (i == popups.size() - 1) {
-                        sum = changedPopup.getAnchorY() - popupHeight;
+                        sum = getFinalAnchorY(changedPopup) - (popupHeight + SPACING);
                     } else {
-                        sum -= popupHeight;
+                        sum -= (popupHeight + SPACING);
                     }
 
                     targetAnchors[i] = sum;
+                    _popup.setAnchorY(sum+popupHeight);
                 }
             }
 
@@ -666,18 +670,28 @@ public class Notifications {
             // target
             for (int i = popups.size() - 1; i >= 0; i--) {
                 final Popup _popup = popups.get(i);
+                _popup.setAnchorX(changedPopup.getAnchorX());
                 final double anchorYTarget = targetAnchors[i];
                 if (anchorYTarget < 0) {
                     _popup.hide();
                 }
-                final double oldAnchorY = _popup.getAnchorY();
+                final double oldAnchorY = getFinalAnchorY(_popup);
                 final double distance = anchorYTarget - oldAnchorY;
 
+                setFinalAnchorY(_popup, oldAnchorY + distance);
                 Transition t = new CustomTransition(_popup, oldAnchorY, distance);
                 t.setCycleCount(1);
                 parallelTransition.getChildren().add(t);
             }
             parallelTransition.play();
+        }
+
+        private double getFinalAnchorY(Popup popup) {
+            return (double) popup.getProperties().get(FINAL_ANCHOR_Y);
+        }
+
+        private void setFinalAnchorY(Popup popup, double anchorY) {
+            popup.getProperties().put(FINAL_ANCHOR_Y, anchorY);
         }
 
         private boolean isShowFromTop(Pos p) {

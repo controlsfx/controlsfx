@@ -361,6 +361,9 @@ public class Notifications {
         }
 
         private Optional<Screen> getScreenBounds(Window window) {
+            if (window == null) {
+                return Optional.empty();
+            }
             final ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(window.getX(),
                                                                                              window.getY(),
                                                                                              window.getWidth(),

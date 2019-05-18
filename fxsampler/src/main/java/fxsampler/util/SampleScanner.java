@@ -56,8 +56,6 @@ public class SampleScanner {
      * Gets the list of sample classes to load
      *
      * @return The classes
-     * @throws ClassNotFoundException
-     * @throws IOException
      */
     public Map<String, Project> discoverSamples() {
         Class<?>[] results = new Class[] { };

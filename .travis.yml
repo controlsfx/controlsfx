@@ -32,6 +32,7 @@ deploy:
     script: ./gradlew uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD
     skip_cleanup: true
     on:
+      tags: false
       all_branches: true
 
   # Deploy releases on every tag push

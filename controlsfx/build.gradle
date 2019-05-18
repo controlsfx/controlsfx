@@ -62,18 +62,27 @@ if (!JavaVersion.current().isJava11Compatible()) {
     processResources.finalizedBy(compileCSS)
 }
 
-if (JavaVersion.current().isJava11Compatible()) {
-    dependencies {
-        rootProject.javafx_modules.each {
-            add("compile", "org.openjfx:$it:$javafx_version:$platform")
-        }
-    }
+compileJava {
+    options.compilerArgs += java9Args
 }
 
 javadoc {
     options.windowTitle("ControlsFX Project ${version}")
     options.overview("${projectDir}/src/main/docs/overview.html")
-    
+    options.addStringOption("Xdoclint:none", "-quiet")
+    options.addBooleanOption('html5', true)
+    options.addBooleanOption('javafx', true)
+    options.addMultilineStringsOption('-add-exports').setValue(
+        [
+                "javafx.base/com.sun.javafx.event=org.controlsfx.controls",
+                "javafx.web/com.sun.webkit=org.controlsfx.controls",
+                "javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls",
+                "javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
+                "javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
+                "javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls",
+                "javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls"
+        ]
+    )
     // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy
     // over the doc-files if they are embedded with the sources. I find this arrangement
     // somewhat cleaner anyway (never was a fan of mixing javadoc files with the sources)
@@ -101,14 +110,9 @@ jar {
             'Implementation-Version': version,\
             'Bundle-Name': 'ControlsFX'
         )
-        instruction 'Bundle-Description', 'High quality UI controls and other tools to complement the core JavaFX distribution'        
-	instruction 'Import-Package',
-                '!org.controlsfx*',
-                '*'
-
-        instruction 'Export-Package',
-                '!impl.org.controlsfx.*',
-                'org.controlsfx.*'
+        instruction 'Bundle-Description', 'High quality UI controls and other tools to complement the core JavaFX distribution'
+        instruction 'Import-Package', '!org.controlsfx*', '*'
+        instruction 'Export-Package', '!impl.org.controlsfx.*', 'org.controlsfx.*'
     }
 }
 

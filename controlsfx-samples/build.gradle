@@ -22,6 +22,37 @@ dependencies {
     compile project(':fxsampler')
 }
 
+/**
+ * compileJava and javadoc tasks should have controlsfx and fxsampler on module-path
+ */
+compileJava {
+    if (!JavaVersion.current().isJava11Compatible()) {
+        inputs.property("moduleName", moduleName)
+        doFirst {
+            options.compilerArgs += [
+                    '--module-path', classpath.asPath,
+            ]
+            classpath = files()
+        }
+    }
+}
+
+javadoc {
+    if (!JavaVersion.current().isJava11Compatible()) {
+        doFirst {
+            options.addStringOption('-module-path', classpath.asPath)
+            classpath = files()
+        }
+    } else {
+        moduleOptions {
+            addModules = [
+                    'org.controlsfx.controls',
+                    'org.controlsfx.fxsampler'
+            ]
+        }
+    }
+}
+
 jar {
     manifest {
         attributes  'Implementation-Title':     'ControlsFX-Samples',
@@ -35,10 +66,6 @@ jar {
 run {
     doFirst {
         java9Args.addAll(java9RuntimeArgs)
-        jvmArgs = java9Args + [
-            '--module-path', classpath.asPath,
-            '--module', mainClassName,
-        ]
-        classpath = files()
+        jvmArgs = java9RuntimeArgs
     }
 }

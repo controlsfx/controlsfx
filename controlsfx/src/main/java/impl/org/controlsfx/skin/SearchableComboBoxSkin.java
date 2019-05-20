@@ -288,16 +288,13 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
      * ENTER and SPACE, but we need to override this behavior.
      */
     private void preventDefaultComboBoxKeyListener() {
-        filteredComboBox.skinProperty().addListener((obs, oldVal, newVal) ->
-        {
-            if (newVal != null) {
-                if(filteredComboBox.skinProperty().get() instanceof ComboBoxListViewSkin) {
-                    ComboBoxListViewSkin cblwSkin = (ComboBoxListViewSkin)filteredComboBox.skinProperty().get();
-                    if(cblwSkin.getPopupContent() instanceof ListView) {
-                        final ListView<T> listView = (ListView<T>) cblwSkin.getPopupContent();
-                        if (listView != null) {
-                            listView.setOnKeyPressed(this::checkApplyAndCancel);
-                        }
+        filteredComboBox.skinProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal instanceof ComboBoxListViewSkin) {
+                ComboBoxListViewSkin cblwSkin = (ComboBoxListViewSkin)newVal;
+                if(cblwSkin.getPopupContent() instanceof ListView) {
+                    final ListView<T> listView = (ListView<T>) cblwSkin.getPopupContent();
+                    if (listView != null) {
+                        listView.setOnKeyPressed(this::checkApplyAndCancel);
                     }
                 }
             }

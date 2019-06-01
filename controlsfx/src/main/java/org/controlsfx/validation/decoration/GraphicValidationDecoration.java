@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2019, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,6 +60,7 @@ public class GraphicValidationDecoration extends AbstractValidationDecoration {
 	
     private static final Image ERROR_IMAGE = new Image(GraphicValidationDecoration.class.getResource("/impl/org/controlsfx/control/validation/decoration-error.png").toExternalForm()); //$NON-NLS-1$
     private static final Image WARNING_IMAGE = new Image(GraphicValidationDecoration.class.getResource("/impl/org/controlsfx/control/validation/decoration-warning.png").toExternalForm()); //$NON-NLS-1$
+    private static final Image INFO_IMAGE = new Image(GraphicValidationDecoration.class.getResource("/impl/org/controlsfx/control/validation/decoration-info.png").toExternalForm()); //$NON-NLS-1$
     private static final Image REQUIRED_IMAGE = new Image(GraphicValidationDecoration.class.getResource("/impl/org/controlsfx/control/validation/required-indicator.png").toExternalForm()); //$NON-NLS-1$
 
     private static final String SHADOW_EFFECT = "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);"; //$NON-NLS-1$
@@ -72,6 +73,9 @@ public class GraphicValidationDecoration extends AbstractValidationDecoration {
     private static final String WARNING_TOOLTIP_EFFECT = POPUP_SHADOW_EFFECT + TOOLTIP_COMMON_EFFECTS
             + "-fx-background-color: FFFFCC; -fx-text-fill: CC9900; -fx-border-color: CC9900;"; //$NON-NLS-1$
 
+    private static final String INFO_TOOLTIP_EFFECT = POPUP_SHADOW_EFFECT + TOOLTIP_COMMON_EFFECTS
+            + "-fx-background-color: c4d0ef; -fx-text-fill: FFFFFF; -fx-border-color: a8c8ff;"; //$NON-NLS-1$
+
     /**
      * Creates default instance
      */
@@ -80,17 +84,25 @@ public class GraphicValidationDecoration extends AbstractValidationDecoration {
     }
 
     // TODO write javadoc that users should override these methods to customise
-    // the error / warning / success nodes to use 
+    // the error / warning / success nodes to use
+    /**
+     * @deprecated See {@link #getGraphicBySeverity(Severity)} method
+     */
+    @Deprecated
     protected Node createErrorNode() {
         return new ImageView(ERROR_IMAGE);
     }
 
+    /**
+     * @deprecated See {@link #getGraphicBySeverity(Severity)} method
+     */
+    @Deprecated
     protected Node createWarningNode() {
         return new ImageView(WARNING_IMAGE);
     }
 
     protected Node createDecorationNode(ValidationMessage message) {
-        Node graphic = Severity.ERROR == message.getSeverity() ? createErrorNode() : createWarningNode();
+        Node graphic = getGraphicBySeverity(message.getSeverity());
         graphic.setStyle(SHADOW_EFFECT);
         Label label = new Label();
         label.setGraphic(graphic);
@@ -99,12 +111,34 @@ public class GraphicValidationDecoration extends AbstractValidationDecoration {
         return label;
     }
 
+    protected Node getGraphicBySeverity(Severity severity) {
+        switch (severity) {
+        case ERROR:
+            return createErrorNode();
+        case WARNING:
+            return createWarningNode();
+        default:
+            return new ImageView(INFO_IMAGE);
+        }
+    }
+
     protected Tooltip createTooltip(ValidationMessage message) {
         Tooltip tooltip = new Tooltip(message.getText());
         tooltip.setOpacity(.9);
         tooltip.setAutoFix(true);
-        tooltip.setStyle( Severity.ERROR == message.getSeverity()? ERROR_TOOLTIP_EFFECT: WARNING_TOOLTIP_EFFECT);
+        tooltip.setStyle(getStyleBySeverity(message.getSeverity()));
         return tooltip;
+    }
+
+    protected String getStyleBySeverity(Severity severity) {
+        switch (severity) {
+        case ERROR:
+            return ERROR_TOOLTIP_EFFECT;
+        case WARNING:
+            return WARNING_TOOLTIP_EFFECT;
+        default:
+            return INFO_TOOLTIP_EFFECT;
+        }
     }
 
     /**

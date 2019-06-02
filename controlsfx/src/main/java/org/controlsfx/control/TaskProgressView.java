@@ -27,7 +27,9 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.TaskProgressViewSkin;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -62,7 +64,7 @@ import javafx.util.Callback;
  */
 public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
 
-    private boolean retainTaskMode = false;
+    private BooleanProperty retainTasks = new SimpleBooleanProperty(this, "retainTasks", false);
 
     /**
      * Constructs a new task progress view.
@@ -71,7 +73,7 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
         getStyleClass().add("task-progress-view");
 
         EventHandler<WorkerStateEvent> taskHandler = evt -> {
-            if (!retainTaskMode) {
+            if (!retainTasks.get()) {
                 if (evt.getEventType().equals(
                         WorkerStateEvent.WORKER_STATE_SUCCEEDED)
                         || evt.getEventType().equals(
@@ -163,18 +165,19 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
     /**
      * Check if tasks will not be removed when succeeded, cancelled or failed
      *
-     * @return
+     * @return boolean
      */
-    public boolean isRetainTaskMode() {
-        return retainTaskMode;
+    public boolean isRetainTasks() {
+        return retainTasks.get();
     }
 
     /**
      * Do not remove tasks when succeeded, cancelled or failed
      *
-     * @param retainTaskMode
+     * @return BooleanProperty
      */
-    public void setRetainTaskMode(boolean retainTaskMode) {
-        this.retainTaskMode = retainTaskMode;
+    public BooleanProperty retainTasksProperty() {
+        return retainTasks;
     }
+
 }

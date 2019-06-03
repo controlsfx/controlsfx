@@ -64,7 +64,7 @@ import javafx.util.Callback;
  */
 public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
 
-    private BooleanProperty retainTasks = new SimpleBooleanProperty(this, "retainTasks", false);
+    private final BooleanProperty retainTasks = new SimpleBooleanProperty(this, "retainTasks", false);
 
     /**
      * Constructs a new task progress view.
@@ -73,7 +73,7 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
         getStyleClass().add("task-progress-view");
 
         EventHandler<WorkerStateEvent> taskHandler = evt -> {
-            if (!retainTasks.get()) {
+            if (!isRetainTasks()) {
                 if (evt.getEventType().equals(
                         WorkerStateEvent.WORKER_STATE_SUCCEEDED)
                         || evt.getEventType().equals(
@@ -167,7 +167,7 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
      *
      * @return boolean
      */
-    public boolean isRetainTasks() {
+    public final boolean isRetainTasks() {
         return retainTasks.get();
     }
 
@@ -176,7 +176,7 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
      *
      * @return BooleanProperty
      */
-    public BooleanProperty retainTasksProperty() {
+    public final BooleanProperty retainTasksProperty() {
         return retainTasks;
     }
 

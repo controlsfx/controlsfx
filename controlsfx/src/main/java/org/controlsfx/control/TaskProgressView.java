@@ -180,4 +180,12 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
         return retainTasks;
     }
 
+    /**
+     * Do not remove tasks when succeeded, cancelled or failed
+     *
+     * @param retainTasks
+     */
+    public final void setRetainTasks(boolean retainTasks) {
+        this.retainTasks.set(retainTasks);
+    }
 }

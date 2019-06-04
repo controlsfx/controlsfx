@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2019 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -163,27 +163,27 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
     }
 
     /**
-     * Check if tasks will not be removed when succeeded, cancelled or failed
+     * Checks if tasks will not be removed when succeeded, cancelled or failed.
      *
-     * @return boolean
+     * @return boolean determines if tasks will be retained
      */
     public final boolean isRetainTasks() {
         return retainTasks.get();
     }
 
     /**
-     * Do not remove tasks when succeeded, cancelled or failed
+     * Do not remove tasks when succeeded, cancelled or failed.
      *
-     * @return BooleanProperty
+     * @return BooleanProperty the retainTasks property
      */
     public final BooleanProperty retainTasksProperty() {
         return retainTasks;
     }
 
     /**
-     * Do not remove tasks when succeeded, cancelled or failed
+     * Do not remove tasks when succeeded, cancelled or failed.
      *
-     * @param retainTasks
+     * @param retainTasks determines if tasks will be retained
      */
     public final void setRetainTasks(boolean retainTasks) {
         this.retainTasks.set(retainTasks);

@@ -220,6 +220,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     private static final int EDITABLE_BIT_POSITION = 4;
     private static final int WRAP_BIT_POSITION = 5;
     private static final int POPUP_BIT_POSITION = 6;
+    private static final int IS_BROWSER_POSITION = 7;
     private final SpreadsheetCellType type;
     private final int row;
     private final int column;
@@ -348,7 +349,15 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     public boolean isWrapText(){
         return isSet(WRAP_BIT_POSITION);
     }
-
+    
+    public boolean isBrowser(){
+        return isSet(IS_BROWSER_POSITION);
+    }
+    
+    public void setBrowser(boolean isBrowser){
+        setMask(isBrowser, IS_BROWSER_POSITION);
+    }
+    
     /** {@inheritDoc} */
     @Override
     public void setWrapText(boolean wrapText) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2019 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,9 +37,6 @@ import impl.org.controlsfx.spreadsheet.RectangleSelection.SelectionRange;
 import impl.org.controlsfx.spreadsheet.SpreadsheetGridView;
 import impl.org.controlsfx.spreadsheet.SpreadsheetHandle;
 import impl.org.controlsfx.spreadsheet.TableViewSpanSelectionModel;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Comparator;
@@ -420,6 +417,7 @@ public class SpreadsheetView extends Control{
     private Integer filteredRow;
     private FilteredList<ObservableList<SpreadsheetCell>> filteredList;
     private SortedList<ObservableList<SpreadsheetCell>> sortedList;
+    private BrowserInterface browser;
 
     /**
      * Since the default with applied to TableColumn is 80. If a user sets a
@@ -491,6 +489,26 @@ public class SpreadsheetView extends Control{
         for(SpreadsheetColumn column: getColumns()){
             column.setPrefWidth(100);
         }
+    }
+  
+    /**
+     * Sets the BrowserInterface that will provide an implementation for cell
+     * that have {@link SpreadsheetCell#isBrowser() } set to {@code true}.
+     *
+     * @param browser the BrowserInterface
+     */
+    public void setBrowser(BrowserInterface browser) {
+        this.browser = browser;
+    }
+    
+    /**
+     * Returns the BrowserInterface if set that provide implementation for
+     * browser in {@code SpreadsheetCell}.
+     *
+     * @return the BrowserInterface
+     */
+    public BrowserInterface getBrowser() {
+        return browser;
     }
     
     /**
@@ -1906,12 +1924,7 @@ public class SpreadsheetView extends Control{
                  */
                 for (int row = 0; row < getRowSpan(cell, p.getRow()); ++row) {
                     for (int col = 0; col < getColumnSpan(cell); ++col) {
-                        try {
-                            new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(cell.getItem());
-                            list.add(new ClipboardCell(p.getRow() + row, p.getColumn() + col, cell.getItem() == null ? null : cell.getItem()));
-                        } catch (IOException exception) {
-                            list.add(new ClipboardCell(p.getRow() + row, p.getColumn() + col, cell.getItem() == null ? null : cell.getItem().toString()));
-                        }
+                        list.add(new ClipboardCell(p.getRow() + row, p.getColumn() + col, cell));
                     }
                 }
             }
@@ -1927,7 +1940,7 @@ public class SpreadsheetView extends Control{
      */
     private void pasteOneValue(ClipboardCell change) {
         for (TablePosition position : getSelectionModel().getSelectedCells()) {
-            tryPasteCell(getModelRow(position.getRow()), getModelColumn(position.getColumn()), change.getValue());
+            tryPasteCell(getModelRow(position.getRow()), getModelColumn(position.getColumn()), change);
         }
     }
 
@@ -1937,10 +1950,14 @@ public class SpreadsheetView extends Control{
      * @param column
      * @param value 
      */
-    private void tryPasteCell(int row, int column, Object value) {
+    private void tryPasteCell(int row, int column, ClipboardCell change) {
         final SpanType type = getSpanType(row, column);
         if (type == SpanType.NORMAL_CELL || type == SpanType.ROW_VISIBLE) {
             SpreadsheetCell cell = getGrid().getRows().get(row).get(column);
+            //Retrieve html in value if exists
+            //Value contains the HTML version or the nomrla value.
+            Object value = change.getHtmlVersion() == null ? change.getValue() : change.getHtmlVersion();
+            value = cell.isBrowser() ? value : change.getValue();
             boolean succeed = cell.getCellType().match(value, cell.getOptionsForEditor());
             if (succeed) {
                 getGrid().setCellValue(cell.getRow(), cell.getColumn(),
@@ -1988,7 +2005,7 @@ public class SpreadsheetView extends Control{
                             int modelColumn = getModelColumn(column);
                             if (row < getGrid().getRowCount() && modelColumn < getGrid().getColumnCount()
                                     && row >= 0 && column >= 0) {
-                                tryPasteCell(row, modelColumn, change.getValue());
+                                tryPasteCell(row, modelColumn, change);
                             }
                         } while ((column = column + sourceColumnGap) <= targetRange.getRight());
                     }
@@ -2002,7 +2019,7 @@ public class SpreadsheetView extends Control{
                             int modelRow = getModelRow(row);
                             if (modelRow < getGrid().getRowCount() && column < getGrid().getColumnCount()
                                     && row >= 0 && column >= 0) {
-                                tryPasteCell(modelRow, column, change.getValue());
+                                tryPasteCell(modelRow, column, change);
                             }
                         } while ((row = row + sourceRowGap) <= targetRange.getBottom());
                     }
@@ -2053,7 +2070,7 @@ public class SpreadsheetView extends Control{
             column = getModelColumn(change.getColumn() + offsetCol);
             if (row < rowCount && column < columnCount
                     && row >= 0 && column >= 0) {
-                tryPasteCell(row, column, change.getValue());
+                tryPasteCell(row, column, change);
             }
         }
     }

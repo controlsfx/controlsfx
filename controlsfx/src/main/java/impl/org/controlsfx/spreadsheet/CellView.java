@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2019 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,10 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
-import javafx.application.Platform;
 import javafx.beans.binding.When;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
@@ -42,7 +39,6 @@ import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
 import javafx.geometry.Side;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
@@ -59,16 +55,21 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.Region;
 import javafx.util.Duration;
 import org.controlsfx.control.spreadsheet.Filter;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.Node;
+import javafx.scene.layout.Region;
+import org.controlsfx.control.spreadsheet.BrowserInterface;
 
 /**
- * 
+ *
  * The View cell that will be visible on screen. It holds the
  * {@link SpreadsheetCell}.
  */
@@ -83,6 +84,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     //Handler for drag n drop in lazy instantiation.
     private EventHandler<DragEvent> dragOverHandler;
     private EventHandler<DragEvent> dragDropHandler;
+    //Set to true when the style has changed
+    private boolean dirtyStyle = false;
 
     /***************************************************************************
      * * Static Fields * *
@@ -106,7 +109,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             table.getProperties().put(ANCHOR_PROPERTY_KEY, anchor);
         }
     }
-    
+
     static void removeAnchor(Control table) {
         table.getProperties().remove(ANCHOR_PROPERTY_KEY);
     }
@@ -144,12 +147,12 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             updateTableColumn(null);
             return;
         }
-        
+
         if (!isEditable()) {
             getTableView().edit(-1, null);
             return;
-        } 
-        
+        }
+
         final int column = this.getTableView().getColumns().indexOf(this.getTableColumn());
         final int row = getIndex();
         // We start to edit only if the Cell is a normal Cell (aka visible).
@@ -162,7 +165,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
              * We may come to the situation where this method is called two
              * times. One time by the row inside the VirtualFlow. And another by
              * the row inside myFixedCells used by our GridVirtualFlow.
-             * 
+             *
              * In that case, we have to give priority to the one used by the
              * VirtualFlow. So we just check if the row is managed. If not, we
              * know for sure that the our GridVirtualFlow has stepped out.
@@ -184,7 +187,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
     /**
      * Return the Filter associated to this cell or null otherwise.
-     * @return 
+     * @return
      */
     Filter getFilter() {
         Filter filter = getItem() != null  && getItem().getColumn() < handle.getView().getColumns().size() ? handle.getView().getColumns().get(getItem().getColumn()).getFilter() : null;
@@ -211,7 +214,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         fadeTransition.setFromValue(0);
         fadeTransition.setToValue(1);
         fadeTransition.play();
-        
+
         if (!isEditing()) {
             return;
         }
@@ -253,7 +256,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
          * don't call super.updateItem() because it will trigger cancelEdit() if
          * the cell is being edited. It causes calling commitEdit() ALWAYS call
          * cancelEdit as well which is undesired.
-         * 
+         *
          */
         if (!isEditing()) {
             super.updateItem(item, empty && emptyRow);
@@ -264,11 +267,28 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (empty && emptyRow) {
             textProperty().unbind();
             setText(null);
-        } else if (!isEditing() && item != null) {
-            show(item);
-            if (item.getGraphic() == null) {
+            //Release any browser we might have
+            BrowserInterface browserImpl = handle.getView().getBrowser();
+            if (browserImpl != null && getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass())) {
+                browserImpl.setUnusedBrowser(getGraphic());
                 setGraphic(null);
             }
+        } else if (!isEditing() && item != null) {
+            show(item);
+            if (item.getGraphic() == null && !item.isBrowser()) {
+                setGraphic(null);
+            }
+        }
+    }
+
+    @Override
+    protected void layoutChildren() {
+        super.layoutChildren();
+        BrowserInterface browserImpl = handle.getView().getBrowser();
+        //When layout is called, the Font has been set on the cell, we can give it to the browserInterface
+        if (dirtyStyle && browserImpl != null && getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass())) {
+            browserImpl.loadStyle(getGraphic(), getFont());
+            dirtyStyle = false;
         }
     }
 
@@ -284,7 +304,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
         Optional<String> tooltipText = cell.getTooltip();
         String trimTooltip = tooltipText.isPresent() ? tooltipText.get().trim() : null;
-        
+
         if (trimTooltip != null && !trimTooltip.isEmpty()) {
             /**
              * Here we check if the Tooltip has not been created in order NOT TO
@@ -316,11 +336,11 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             }
             setTooltip(null);
         }
-        
+
         setWrapText(cell.isWrapText());
 
         setEditable(cell.hasPopup() ? false : cell.isEditable());
-        
+
         if (cell.hasPopup()) {
             setOnMouseClicked(weakActionhandler);
             setCursor(Cursor.HAND);
@@ -358,7 +378,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
         return null;
     }
-    
+
     /**
      * Return true if this cell is the original cell (including filters) even
      * when scrolling.
@@ -369,7 +389,25 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     public boolean isOriginalCell() {
         return handle.getView().getReverseRowSpan(getItem(), getIndex()) <= 1;
     }
-    
+
+    /**
+     * Sets the browser in the cell.
+     * @param item 
+     */
+    private void setBrowserGraphic(SpreadsheetCell item) {
+        BrowserInterface browserImpl = handle.getView().getBrowser();
+        if (browserImpl == null) {
+            return;
+        }
+        textProperty().unbind();
+        setText(null);
+        if (getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass())) {
+            browserImpl.load(getGraphic(), item.getItem());
+        } else {
+            setGraphic(browserImpl.getBrowser(item.getItem()));
+        }
+    }
+
     /**
      * Set the cell graphic if any.
      *
@@ -383,6 +421,13 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (isEditing()) {
             return;
         }
+        if (item.isBrowser() && item.getItem() != null) {
+            setBrowserGraphic(item);
+            return;
+        } else if (getGraphic() != null && handle.getView().getBrowser() != null && handle.getView().getBrowser().getType().isAssignableFrom(getGraphic().getClass())) {
+            handle.getView().getBrowser().setUnusedBrowser(getGraphic());
+            setGraphic(null);
+        }
         Node graphic = item.getGraphic();
         if (graphic != null) {
             if (graphic instanceof ImageView) {
@@ -391,12 +436,12 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                 image.setPreserveRatio(true);
                 image.setSmooth(true);
                 if(image.getImage() != null){
-                        image.fitHeightProperty().bind(
-                                new When(heightProperty().greaterThan(image.getImage().getHeight())).then(
-                                        image.getImage().getHeight()).otherwise(heightProperty()));
-                        image.fitWidthProperty().bind(
-                                new When(widthProperty().greaterThan(image.getImage().getWidth())).then(
-                                        image.getImage().getWidth()).otherwise(widthProperty()));
+                    image.fitHeightProperty().bind(
+                            new When(heightProperty().greaterThan(image.getImage().getHeight())).then(
+                                    image.getImage().getHeight()).otherwise(heightProperty()));
+                    image.fitWidthProperty().bind(
+                            new When(widthProperty().greaterThan(image.getImage().getWidth())).then(
+                                    image.getImage().getWidth()).otherwise(widthProperty()));
                 }
                 /**
                  * If we have a Region and no text, we force it to take full
@@ -428,7 +473,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * the build-in editor-Cell because we cannot know in advance which editor
      * we will need. Furthermore, we want to control the behavior very closely
      * in regards of the spanned cell (invisible etc).
-     * 
+     *
      * @param cell
      *            The SpreadsheetCell
      * @param bc
@@ -461,7 +506,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
                 editor.endEdit(false);
             }
-            
+
             editor.updateSpreadsheetCell(this);
             editor.updateDataCell(cell);
             editor.updateSpreadsheetCellEditor(cellEditor.get());
@@ -470,7 +515,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             return null;
         }
     }
-    
+
     private EventHandler<DragEvent> getDragOverHandler() {
         if (dragOverHandler == null) {
             dragOverHandler = new EventHandler<DragEvent>() {
@@ -519,7 +564,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     };
 
     private final WeakChangeListener<Node> weakGraphicListener = new WeakChangeListener<>(graphicListener);
-    
+
     private final SetChangeListener<String> styleClassListener = new SetChangeListener<String>() {
         @Override
         public void onChanged(javafx.collections.SetChangeListener.Change<? extends String> arg0) {
@@ -528,19 +573,20 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             } else if (arg0.wasRemoved()) {
                 getStyleClass().remove(arg0.getElementRemoved());
             }
+            dirtyStyle = true;
         }
     };
-    
+
     private final WeakSetChangeListener<String> weakStyleClassListener = new WeakSetChangeListener<>(styleClassListener);
-    
+
     //Listeners for the styles, not initialized by default in order not to impact performance
     private ChangeListener<String> styleListener;
     private WeakChangeListener<String> weakStyleListener;
-    
+
     /**
      * Method that will select all the cells between the drag place and that
      * cell.
-     * 
+     *
      * @param e
      */
     private void dragSelect(MouseEvent e) {
@@ -614,7 +660,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     /**
      * Will safely execute the request on the JFX thread by checking whether we
      * are on the JFX thread or not.
-     * 
+     *
      * @param runnable
      */
     public static void getValue(final Runnable runnable) {
@@ -639,14 +685,14 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             }
         }
     };
-    
+
     private final EventHandler<MouseEvent> dragMouseEventHandler = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent arg0) {
             dragSelect(arg0);
         }
     };
-    
+
     private final ChangeListener<SpreadsheetCell> itemChangeListener = new ChangeListener<SpreadsheetCell>() {
 
         @Override
@@ -676,10 +722,11 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                     //We clear the previous style.
                     setStyle(null);
                 }
+                dirtyStyle = true;
             }
         }
     };
-    
+
     /**
      * Event Handler when the cell is simply clicked in order to display the
      * possible actions in MenuItem.
@@ -703,11 +750,12 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         }
     };
     private final WeakEventHandler weakActionhandler = new WeakEventHandler(actionEventHandler);
-    
+
     private void initStyleListener(){
         if(styleListener == null){
             styleListener = (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
                 styleProperty().set(newValue);
+                dirtyStyle = true;
             };
         }
         weakStyleListener = new WeakChangeListener<>(styleListener);

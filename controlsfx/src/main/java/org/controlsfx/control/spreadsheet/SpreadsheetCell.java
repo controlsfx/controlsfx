@@ -138,7 +138,25 @@ public interface SpreadsheetCell  {
      * exceeds the width of the {@code Labeled}
      */
     public boolean isWrapText();
-    
+
+    /**
+     * Returns {@code true} if this cell contains HTML (URL or pure HTML) in its
+     * item and a browser given by the {@link BrowserInterface} will be used to
+     * display it.
+     *
+     * @return {@code true} if this cell contains HTML
+     */
+    public boolean isBrowser();
+
+    /**
+     * If {@code isBrowser} is {@code true}, this cell item contains some HTML
+     * and should be display by using {@link BrowserInterface} object in the
+     * CellView.
+     *
+     * @param isBrowser if {@code true}, a browser will be used to display HTML
+     * for the cell
+     */
+    public void setBrowser(boolean isBrowser);
     
     /**
      * If a run of text exceeds the width of the Labeled, then this variable

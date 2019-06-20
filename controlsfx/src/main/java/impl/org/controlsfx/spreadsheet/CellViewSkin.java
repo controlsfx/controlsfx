@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2019 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,7 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
+import javafx.scene.web.WebView;
 import org.controlsfx.control.spreadsheet.Filter;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell.CornerPosition;
@@ -96,6 +97,12 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
 
     @Override
     protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        Node graphic = getSkinnable().getGraphic();
+        //WebView resize is not working so we do not consider it right now
+        if (graphic instanceof WebView) {
+            //WebView must not impact autofit
+            return -1;
+        }
         /**
          * If we have an Image in the Cell, its fitHeight will be affected by
          * the cell height (see CellView). But during calculation for autofit
@@ -103,7 +110,6 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
          * the fitHeight option is returned by default so we must override and
          * return the Height of the image inside.
          */
-        Node graphic = getSkinnable().getGraphic();
         if (graphic != null && graphic instanceof ImageView) {
             ImageView view = (ImageView) graphic;
             if (!((CellView) getSkinnable()).isOriginalCell()) {
@@ -120,6 +126,12 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
 
     @Override
     protected double computePrefWidth(double height, double topInset, double rightInset, double bottomInset, double leftInset) {
+        Node graphic = getSkinnable().getGraphic();
+        //WebView resize is not working so we do not consider it right now
+        if(graphic instanceof WebView){
+            //WebView must not impact autofit
+            return -1;
+        }
         /**
          * We integrate the filter width into the total width for autosize. We
          * do just like Excel.

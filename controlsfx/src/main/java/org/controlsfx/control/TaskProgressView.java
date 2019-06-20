@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2019 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,9 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.TaskProgressViewSkin;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -62,6 +64,8 @@ import javafx.util.Callback;
  */
 public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
 
+    private final BooleanProperty retainTasks = new SimpleBooleanProperty(this, "retainTasks", false);
+
     /**
      * Constructs a new task progress view.
      */
@@ -69,13 +73,15 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
         getStyleClass().add("task-progress-view");
 
         EventHandler<WorkerStateEvent> taskHandler = evt -> {
-            if (evt.getEventType().equals(
-                    WorkerStateEvent.WORKER_STATE_SUCCEEDED)
-                    || evt.getEventType().equals(
-                            WorkerStateEvent.WORKER_STATE_CANCELLED)
-                    || evt.getEventType().equals(
-                            WorkerStateEvent.WORKER_STATE_FAILED)) {
-                getTasks().remove(evt.getSource());
+            if (!isRetainTasks()) {
+                if (evt.getEventType().equals(
+                        WorkerStateEvent.WORKER_STATE_SUCCEEDED)
+                        || evt.getEventType().equals(
+                        WorkerStateEvent.WORKER_STATE_CANCELLED)
+                        || evt.getEventType().equals(
+                        WorkerStateEvent.WORKER_STATE_FAILED)) {
+                    getTasks().remove(evt.getSource());
+                }
             }
         };
 
@@ -154,5 +160,32 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
      */
     public final void setGraphicFactory(Callback<T, Node> factory) {
         graphicFactoryProperty().set(factory);
+    }
+
+    /**
+     * Checks if tasks will not be removed when succeeded, cancelled or failed.
+     *
+     * @return boolean determines if tasks will be retained
+     */
+    public final boolean isRetainTasks() {
+        return retainTasks.get();
+    }
+
+    /**
+     * Do not remove tasks when succeeded, cancelled or failed.
+     *
+     * @return BooleanProperty the retainTasks property
+     */
+    public final BooleanProperty retainTasksProperty() {
+        return retainTasks;
+    }
+
+    /**
+     * Do not remove tasks when succeeded, cancelled or failed.
+     *
+     * @param retainTasks determines if tasks will be retained
+     */
+    public final void setRetainTasks(boolean retainTasks) {
+        this.retainTasks.set(retainTasks);
     }
 }

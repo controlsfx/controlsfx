@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2019, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,6 @@ import javafx.scene.control.Control;
 
 import org.controlsfx.control.decoration.Decoration;
 import org.controlsfx.control.decoration.StyleClassDecoration;
-import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationMessage;
 
 /**
@@ -48,6 +47,8 @@ public class StyleClassValidationDecoration extends AbstractValidationDecoration
 
     private final String errorClass;
     private final String warningClass;
+    private final String infoClass;
+    private final String okClass;
 
     /**
      * Creates a default instance of a decorator
@@ -62,15 +63,42 @@ public class StyleClassValidationDecoration extends AbstractValidationDecoration
      * @param warningClass class name for warning decoration
      */
     public StyleClassValidationDecoration(String errorClass, String warningClass) {
-        this.errorClass = errorClass != null? errorClass : "error"; //$NON-NLS-1$
-        this.warningClass = warningClass != null? warningClass : "warning";	 //$NON-NLS-1$
+        this(errorClass, warningClass, null, null);
     }
 
+    /**
+     * Creates an instance of validator using custom class names
+     * @param errorClass class name for error decoration
+     * @param warningClass class name for warning decoration
+     * @param infoClass class name for info decoration
+     * @param okClass class name for ok decoration
+     */
+    public StyleClassValidationDecoration(String errorClass, String warningClass, String infoClass, String okClass) {
+        this.errorClass = errorClass != null? errorClass : "error"; //$NON-NLS-1$
+        this.warningClass = warningClass != null? warningClass : "warning";	 //$NON-NLS-1$
+        this.infoClass = infoClass != null? infoClass : "info";	 //$NON-NLS-1$
+        this.okClass = okClass != null? okClass : "ok";	 //$NON-NLS-1$
+    }
 
-	@Override
-	protected Collection<Decoration> createValidationDecorations(ValidationMessage message) {
-		return Arrays.asList(new StyleClassDecoration( Severity.ERROR == message.getSeverity()? errorClass:warningClass));
-	}
+    @Override
+    protected Collection<Decoration> createValidationDecorations(ValidationMessage message) {
+        String validationClass = infoClass;
+        switch (message.getSeverity()) {
+        case ERROR:
+            validationClass = errorClass;
+            break;
+        case WARNING:
+            validationClass = warningClass;
+            break;
+        case OK:
+            validationClass = okClass;
+            break;
+        default:
+            validationClass = infoClass;
+            break;
+        }
+        return Arrays.asList(new StyleClassDecoration( validationClass ));
+    }
 
 	@Override
 	protected Collection<Decoration> createRequiredDecorations(Control target) {

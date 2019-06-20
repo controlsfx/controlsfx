@@ -7,7 +7,7 @@
 .notification-bar > .pane {
     -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
     -fx-padding: 7 7 7 7;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 11, 0.0, 0, 3);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 5, 0, 5, 5);
     -fx-background-insets: 0, 1, 2;
 }
 

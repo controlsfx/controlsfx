@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2018 ControlsFX
+ * Copyright (c) 2014, 2019 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,8 @@ package org.controlsfx.validation;
  * Defines severity of validation messages 
  */
 public enum Severity {
+    OK,
+    INFO,
     WARNING,
     ERROR
 }

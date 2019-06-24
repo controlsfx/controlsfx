@@ -230,41 +230,38 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
              * fixedColumnWidth will be wrong.
              */
             boolean increaseFixedWidth = false;
-            final int viewColumn =spreadsheetView.getViewColumn(spreadsheetCell.getColumn()); 
+            final int viewColumn = spreadsheetView.getViewColumn(spreadsheetCell.getColumn());
             //Virtualization of column
+            SpreadsheetView.SpanType spanType = null;
             // We translate that column by the Hbar Value if it's fixed
             if (isFixed) {
+                spanType = spreadsheetView.getSpanType(index, indexColumn);
                 /**
-                 * Here we verify if our cell must be shifted. The second
-                 * condition is to determine that we are dealing with the very
-                 * first cell of a columnSpan. If we have the hidden cells, we
-                 * must not increase the fixedColumnWidth.
+                 * Here we verify if our cell must be shifted. We must increase
+                 * all cells that are not column_span_invisible because their
+                 * whole width will be computed by the original cell that is
+                 * row_visible.
                  */
-                if (hbarValue + fixedColumnWidth > x &&  spreadsheetCell.getColumn() == indexColumn) {
+                if (spanType != SpreadsheetView.SpanType.COLUMN_SPAN_INVISIBLE && hbarValue + fixedColumnWidth > x) {
                     increaseFixedWidth = true;
                     tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
-//                	 tableCell.toFront();
                     fixedColumnWidth += width;
-//                    isVisible = true; // If in fixedColumn, it's obviously visible
                     fixedCells.add(tableCell);
                 }
             }
 
             if (isVisible) {
-                final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(index, indexColumn);
-
+                spanType = spanType == null ? spreadsheetView.getSpanType(index, indexColumn) : spanType;
                 switch (spanType) {
                     case ROW_SPAN_INVISIBLE:
                     case BOTH_INVISIBLE:
                         fixedCells.remove(tableCell);
                         getChildren().remove(tableCell);
-//                        cells.remove(tableCell);
                         x += width;
                         continue; // we don't want to fall through
                     case COLUMN_SPAN_INVISIBLE:
                         fixedCells.remove(tableCell);
                         getChildren().remove(tableCell);
-//                        cells.remove(tableCell);
                         continue; // we don't want to fall through
                     case ROW_VISIBLE:
                     case NORMAL_CELL: // fall through and carry on
@@ -293,7 +290,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                      * variable
                      */
                     final int max = skin.getSkinnable().getVisibleLeafColumns().size() - viewColumn;
-                    for (int i = 1, colSpan = columnSpan; i < colSpan && i < max; i++) {
+                    for (int i = 1; i < columnSpan && i < max; i++) {
                         double tempWidth = snapSize(skin.getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
                         width += tempWidth;
                         if (increaseFixedWidth) {
@@ -301,7 +298,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                         }
                     }
                 }
-
+                 
                 /**
                  * If we are in autofit and the prefHeight of this cell is
                  * superior to the default cell height. Then we will use this

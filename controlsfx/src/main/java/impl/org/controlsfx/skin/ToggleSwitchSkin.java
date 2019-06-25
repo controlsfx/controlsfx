@@ -169,7 +169,7 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         thumbArea.setLayoutX(contentWidth - thumbAreaWidth);
         thumbArea.setLayoutY(thumbAreaY);
 
-        labelContainer.resize(contentWidth - thumbAreaWidth, thumbAreaHeight);
+        labelContainer.resize(label.prefWidth(-1), thumbAreaHeight);
         labelContainer.setLayoutY(thumbAreaY);
 
         if (!toggleSwitch.isSelected())

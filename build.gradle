@@ -73,4 +73,9 @@ subprojects {
         archives javadocJar
     }
 
+    // Used in Travis
+    task getVersion << {
+        println "$project.version"
+    }
+
 }

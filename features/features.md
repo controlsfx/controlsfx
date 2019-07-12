@@ -40,7 +40,7 @@ The [Actions](http://docs.controlsfx.org/org/controlsfx/control/action/Action.ht
 *   Support for [ActionTraits](http://controlsfx.bitbucket.org/index.html?org/controlsfx/dialog/Dialog.ActionTrait.html) to more cleanly specify the functionality of actions when used in dialogs.
 *   [ActionTextBehavior](http://controlsfx.bitbucket.org/index.html?org/controlsfx/control/action/ActionUtils.ActionTextBehavior.html) to more easily specify what text is shown in UI controls when built from an action.
 
-## <a id="border"></a>Borders**  
+## <a id="border"></a>Borders
 The Borders API is a simple (and still relatively exploratory) API that allows you to easily wrap panes or nodes with a border, in a similar fashion to the Swing BorderFactory API. Here’s a some code, and then a screenshot of what that code results in:
 
 ``` java
@@ -212,10 +212,10 @@ In addition, there is API to make it really easy for you to customise a TextFiel
 
 ![TextFieldsExample](images/TextFieldsExample.png)
 
-## <a id="javadocs"></a>Top Quality JavaDocs!**  
+## <a id="javadocs"></a>Top Quality JavaDocs!
 One of the goals of ControlsFX is to have high quality JavaDocs, so one of the main drivers for every release is to improve those further. As always, [the JavaDocs can be read online](http://docs.controlsfx.org/), but they are also available as part of the download. The intention is that the JavaDocs should be the primary way of people learning how to use the ControlsFX API, so there are good code samples and screenshots of the controls in action. Hopefully this will help to get people started quickly.
 
-## <a id="translations"></a>Translations**  
+## <a id="translations"></a>Translations
 We did a big push in ControlsFX 8.0.6 to externalise all translatable strings, and to get the community to help translate these strings into their local languages. As of ControlsFX 8.0.6, we are now [translated into 17 languages](https://bitbucket.org/controlsfx/controlsfx/wiki/ControlsFX%20i18n)! Hopefully in future versions we can take that number even higher, but for now we really do have an excellent amount of language coverage.
 
 If you like what you see in the list above, be sure to go to the [ControlsFX](http://www.controlsfx.org/) main page and download ControlsFX! 🙂

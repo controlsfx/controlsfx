@@ -8,7 +8,7 @@ ControlsFX is an open source project for JavaFX that aims to provide really high
 
 ## Features
 
-ControlsFX includes so many features that we're now listing them on a separate page! Go to the <a href="http://fxexperience.com/controlsfx/features">ControlsFX features</a> page to see some of what is included in ControlsFX.
+ControlsFX includes so many features that we're now listing them on a separate page! Go to the [ControlFX features](features/features.md) page to see some of what is included in ControlsFX.
 
 ## Quick links
 

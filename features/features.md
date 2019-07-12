@@ -187,7 +187,7 @@ When you have a ToggleGroup with buttons in it, it looks nicer when the buttons 
 
 ![segmentedButton](images/segmentedButton.png)
 ## <a id="snapshotview"></a>SnapshotView  
-The SnapshotView is a control that allows for users to draw a bounding box inside a scenegraph (or typically in an ImageView). This bounding box represents the dimensions of their selection, and from which an image can be created of the selected area. This is another of those controls that is easier to describe with an image, so, see below! ![🙂](images/1f642.svg)
+The SnapshotView is a control that allows for users to draw a bounding box inside a scenegraph (or typically in an ImageView). This bounding box represents the dimensions of their selection, and from which an image can be created of the selected area. This is another of those controls that is easier to describe with an image, so, see below! 🙂
 
 ![SnapshotView - the 'Controls' section of the image has been selected.](images/snapshotView.png)
 
@@ -220,4 +220,4 @@ One of the goals of ControlsFX is to have high quality JavaDocs, so one of the m
 ## <a id="translations"></a>Translations**  
 We did a big push in ControlsFX 8.0.6 to externalise all translatable strings, and to get the community to help translate these strings into their local languages. As of ControlsFX 8.0.6, we are now [translated into 17 languages](https://bitbucket.org/controlsfx/controlsfx/wiki/ControlsFX%20i18n)! Hopefully in future versions we can take that number even higher, but for now we really do have an excellent amount of language coverage.
 
-If you like what you see in the list above, be sure to go to the [ControlsFX](http://www.controlsfx.org/) main page and download ControlsFX! ![🙂](images/1f642.svg)
+If you like what you see in the list above, be sure to go to the [ControlsFX](http://www.controlsfx.org/) main page and download ControlsFX! 🙂

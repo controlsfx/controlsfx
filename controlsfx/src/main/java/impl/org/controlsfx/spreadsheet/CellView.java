@@ -287,7 +287,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         BrowserInterface browserImpl = handle.getView().getBrowser();
         //When layout is called, the Font has been set on the cell, we can give it to the browserInterface
         if (dirtyStyle && browserImpl != null && getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass())) {
-            browserImpl.loadStyle(getGraphic(), getFont());
+            browserImpl.loadStyle(getGraphic(), getFont(), getTextFill(), getAlignment(), getBackground());
             dirtyStyle = false;
         }
     }

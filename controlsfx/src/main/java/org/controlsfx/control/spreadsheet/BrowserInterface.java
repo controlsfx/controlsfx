@@ -26,7 +26,10 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.layout.Background;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 
@@ -64,12 +67,16 @@ public interface BrowserInterface<T extends Node> {
 
     /**
      * Once a {@code SpreadsheetCell} has been effectively loaded in the grid,
-     * this method is called if the browser wants to access the cell's font.
+     * this method is called if the browser wants to access the cell's graphic
+     * details.
      *
-     * @param browser the considered browsr
-     * @param font the cell font
+     * @param browser the considered browser
+     * @param font the cell {@code Font}
+     * @param textFill the text's color
+     * @param alignment the cell's vertical and horizontal alignment
+     * @param background the cell's background
      */
-    public void loadStyle(T browser, Font font);
+    public void loadStyle(T browser, Font font, Paint textFill, Pos alignment, Background background);
 
     /**
      * Once a browser is no longer used in a cell, it is given back.

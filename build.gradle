@@ -74,8 +74,10 @@ subprojects {
     }
 
     // Used in Travis
-    task getVersion << {
-        println "$project.version"
+    task getVersion {
+        doLast {
+            println "$project.version"
+        }
     }
 
 }

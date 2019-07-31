@@ -49,10 +49,10 @@ public interface BrowserInterface<T extends Node> {
      * internally by the SpreadsheetView when a cell is being visible and needs
      * to display a browser.
      *
-     * @param itemValue what is contained in {@link SpreadsheetCell#getItem() }
+     * @param cell the considered SpreadsheetCell
      * @return a {@code Node} to display in the cell graphic
      */
-    public Node getBrowser(Object itemValue);
+    public Node getBrowser(SpreadsheetCell cell);
 
     /**
      * When a browser is reused (transfered from one cell to another for
@@ -61,22 +61,24 @@ public interface BrowserInterface<T extends Node> {
      * and itemValue.
      *
      * @param browser the considered browser
-     * @param itemValue what is contained in {@link SpreadsheetCell#getItem() }
+     * @param cell the considered SpreadsheetCell
      */
-    public void load(T browser, Object itemValue);
+    public void load(T browser, SpreadsheetCell cell);
 
     /**
      * Once a {@code SpreadsheetCell} has been effectively loaded in the grid,
      * this method is called if the browser wants to access the cell's graphic
      * details.
      *
-     * @param browser the considered browser
+     * @param browser the considered browser, may be {@code null} for empty
+     * browser cell.
+     * @param cell the considered SpreadsheetCell
      * @param font the cell {@code Font}
      * @param textFill the text's color
      * @param alignment the cell's vertical and horizontal alignment
      * @param background the cell's background
      */
-    public void loadStyle(T browser, Font font, Paint textFill, Pos alignment, Background background);
+    public void loadStyle(T browser, SpreadsheetCell cell, Font font, Paint textFill, Pos alignment, Background background);
 
     /**
      * Once a browser is no longer used in a cell, it is given back.

@@ -285,9 +285,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     protected void layoutChildren() {
         super.layoutChildren();
         BrowserInterface browserImpl = handle.getView().getBrowser();
-        //When layout is called, the Font has been set on the cell, we can give it to the browserInterface
-        if (dirtyStyle && browserImpl != null && getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass())) {
-            browserImpl.loadStyle(getGraphic(), getFont(), getTextFill(), getAlignment(), getBackground());
+        //When layout is called, the cell style has been set on the cell, we can give it to the browserInterface
+        if (dirtyStyle && browserImpl != null && getItem().isBrowser()) {
+            //getGraphic may be null if the cell is empty
+            browserImpl.loadStyle(getGraphic(), getItem(), getFont(), getTextFill(), getAlignment(), getBackground());
             dirtyStyle = false;
         }
     }
@@ -402,9 +403,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         textProperty().unbind();
         setText(null);
         if (getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass())) {
-            browserImpl.load(getGraphic(), item.getItem());
+            browserImpl.load(getGraphic(), item);
         } else {
-            setGraphic(browserImpl.getBrowser(item.getItem()));
+            setGraphic(browserImpl.getBrowser(item));
         }
     }
 

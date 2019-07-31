@@ -30,11 +30,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 import org.controlsfx.control.spreadsheet.BrowserInterface;
+import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 
 /**
  *
@@ -48,18 +52,18 @@ public class BrowserImpl implements BrowserInterface<WebView> {
     private final Map<WebView, String> loadedUrl = new HashMap<>();
 
     @Override
-    public Node getBrowser(Object url) {
+    public Node getBrowser(SpreadsheetCell cell) {
         //Limit the number of browser displayed.
         if (browserCounter.get() < 256) {
             if (browserList.isEmpty()) {
                 browserCounter.incrementAndGet();
                 WebView webView = new WebView();
-                webView.getEngine().loadContent(url.toString());
-                loadedUrl.put(webView, url.toString());
+                webView.getEngine().loadContent(cell.getItem().toString());
+                loadedUrl.put(webView, cell.getItem().toString());
                 return webView;
             } else {
                 WebView webView = browserList.pop();
-                webView.getEngine().loadContent(url.toString());
+                webView.getEngine().loadContent(cell.getItem().toString());
                 return webView;
             }
         } else {
@@ -68,14 +72,14 @@ public class BrowserImpl implements BrowserInterface<WebView> {
     }
 
     @Override
-    public void load(WebView browser, Object url) {
-        if (!loadedUrl.containsKey(browser) || !loadedUrl.get(browser).equals(url)) {
-            browser.getEngine().loadContent(url.toString());
-            loadedUrl.put(browser, url.toString());
+    public void load(WebView browser, SpreadsheetCell cell) {
+        if (!loadedUrl.containsKey(browser) || !loadedUrl.get(browser).equals(cell.getItem())) {
+            browser.getEngine().loadContent(cell.getItem().toString());
+            loadedUrl.put(browser, cell.getItem().toString());
         }
     }
 
-    public void loadStyle(WebView browser, Font font) {
+    public void loadStyle(WebView browser, SpreadsheetCell cell, Font font, Paint textFill, Pos alignment, Background background) {
         //no-op
     }
 

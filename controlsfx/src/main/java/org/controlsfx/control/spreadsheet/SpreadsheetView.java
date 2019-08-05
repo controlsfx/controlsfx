@@ -404,7 +404,7 @@ public class SpreadsheetView extends Control{
     
     //Zoom for the SpreadsheetView.
     private DoubleProperty zoomFactor = new SimpleDoubleProperty(1);
-    private static final double MIN_ZOOM = 0.1;
+    private static final double MIN_ZOOM = 0.2;
     private static final double MAX_ZOOM = 2;
     private static final double STEP_ZOOM = 0.10;
     //The visible rows.

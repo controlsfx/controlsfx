@@ -1111,21 +1111,23 @@ public class SpreadsheetView extends Control{
      *
      */
     public void incrementZoom() {
-        double newZoom = getZoomFactor();
-        int prevValue = (int) ((newZoom - MIN_ZOOM) / STEP_ZOOM);
-        newZoom = (prevValue + 1) * STEP_ZOOM + MIN_ZOOM;
-        setZoomFactor(newZoom > MAX_ZOOM ? MAX_ZOOM : newZoom);
+        double newZoom = zoomFactor.getValue() + STEP_ZOOM;
+        newZoom *= 10;
+        newZoom = Math.floor((float) newZoom);
+        newZoom /= 10;
+        zoomFactor.setValue(newZoom > MAX_ZOOM ? MAX_ZOOM : newZoom);
     }
 
     /**
-     * Decrement the level of zoom by 0.10. It will block at 0.25.The base is 1
+     * Decrement the level of zoom by 0.10. It will block at 0.20. The base is 1
      * so we will try to stay of the intervals.
      */
     public void decrementZoom() {
-        double newZoom = getZoomFactor() - 0.01;
-        int prevValue = (int) ((newZoom - MIN_ZOOM) / STEP_ZOOM);
-        newZoom = (prevValue) * STEP_ZOOM + MIN_ZOOM;
-        setZoomFactor(newZoom < MIN_ZOOM ? MIN_ZOOM : newZoom);
+        double newZoom = zoomFactor.getValue() - STEP_ZOOM;
+        newZoom *= 10;
+        newZoom = Math.ceil((float) newZoom);
+        newZoom /= 10;
+        zoomFactor.setValue(newZoom < MIN_ZOOM ? MIN_ZOOM : newZoom);
     }
 
     /**

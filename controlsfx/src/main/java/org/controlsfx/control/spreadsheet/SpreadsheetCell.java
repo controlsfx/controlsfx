@@ -140,23 +140,24 @@ public interface SpreadsheetCell  {
     public boolean isWrapText();
 
     /**
-     * Returns {@code true} if this cell contains HTML (URL or pure HTML) in its
-     * item and a browser given by the {@link BrowserInterface} will be used to
+     * Returns {@code true} if this cell contains something particular in its
+     * item and a Node given by the {@link CellGraphicFactory} will be used to
      * display it.
      *
-     * @return {@code true} if this cell contains HTML
+     * @return {@code true} if this cell item needs to be given to a particular
+     * Node
      */
-    public boolean isBrowser();
+    public boolean isCellGraphic();
 
     /**
-     * If {@code isBrowser} is {@code true}, this cell item contains some HTML
-     * and should be display by using {@link BrowserInterface} object in the
-     * CellView.
+     * If {@code isCellGraphic} is {@code true}, this cell item contains
+     * something particular and should be display by using
+     * {@link CellGraphicFactory} object in the CellView.
      *
-     * @param isBrowser if {@code true}, a browser will be used to display HTML
-     * for the cell
+     * @param isCellGraphic if {@code true}, a Node will be used to display
+     * something particular for the cell
      */
-    public void setBrowser(boolean isBrowser);
+    public void setCellGraphic(boolean isCellGraphic);
     
     /**
      * If a run of text exceeds the width of the Labeled, then this variable

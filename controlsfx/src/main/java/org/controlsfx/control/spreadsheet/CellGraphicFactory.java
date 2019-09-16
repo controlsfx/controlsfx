@@ -35,64 +35,65 @@ import javafx.scene.web.WebView;
 
 /**
  *
- * If anyone wants to display Rich Text in a SpreadsheetCell, a solution is to
- * provide a Browser (for example a {@link WebView}) that will be displayed in
- * the cell.
+ * If anyone wants to display a specific Graphic in a SpreadsheetCell, a
+ * solution is to provide a Node (for example a {@link WebView}) that will be
+ * displayed in the cell.
  *
- * Because a browser consumes a lot of memory, we need this BrowserInterface
- * that will recycle the Browser to only provide them for visible cells.
+ * Because a Node can consume a lot of memory, we need this
+ * {@code CellGraphicFactory} that will recycle the Nodes to only provide them
+ * for visible cells.
  */
-public interface BrowserInterface<T extends Node> {
+public interface CellGraphicFactory<T extends Node> {
 
     /**
      * Returns a {@code Node} to display in the cell graphic. This is called
      * internally by the SpreadsheetView when a cell is being visible and needs
-     * to display a browser.
+     * to display a {@code Node}.
      *
      * @param cell the considered SpreadsheetCell
      * @return a {@code Node} to display in the cell graphic
      */
-    public Node getBrowser(SpreadsheetCell cell);
+    public Node getNode(SpreadsheetCell cell);
 
     /**
-     * When a browser is reused (transfered from one cell to another for
-     * example), we ask the browser to reload. Beware, only reload when
-     * necessary! This method can be called several times with the same browser
-     * and itemValue.
+     * When a {@code Node} is reused (transfered from one cell to another for
+     * example), we ask the Node to reload. Beware, only reload when necessary!
+     * This method can be called several times with the same {@code Node} and
+     * itemValue.
      *
-     * @param browser the considered browser
+     * @param node the considered {@code Node}
      * @param cell the considered SpreadsheetCell
      */
-    public void load(T browser, SpreadsheetCell cell);
+    public void load(T node, SpreadsheetCell cell);
 
     /**
      * Once a {@code SpreadsheetCell} has been effectively loaded in the grid,
-     * this method is called if the browser wants to access the cell's graphic
-     * details.
+     * this method is called if the {@code Node} wants to access the cell's
+     * graphic details.
      *
-     * @param browser the considered browser, may be {@code null} for empty
-     * browser cell.
+     * @param node the considered {@code Node}, may be {@code null} for empty
+     * cell.
      * @param cell the considered SpreadsheetCell
      * @param font the cell {@code Font}
      * @param textFill the text's color
      * @param alignment the cell's vertical and horizontal alignment
      * @param background the cell's background
      */
-    public void loadStyle(T browser, SpreadsheetCell cell, Font font, Paint textFill, Pos alignment, Background background);
+    public void loadStyle(T node, SpreadsheetCell cell, Font font, Paint textFill, Pos alignment, Background background);
 
     /**
-     * Once a browser is no longer used in a cell, it is given back.
+     * Once a {@code Node} is no longer used in a cell, it is given back.
      *
-     * @param browser the browser
+     * @param node the {@code Node}
      */
-    public void setUnusedBrowser(T browser);
+    public void setUnusedNode(T node);
 
     /**
-     * Returns the exact class used in this BrowserInterface. It is used to
+     * Returns the exact class used in this CellGraphicFactory. It is used to
      * determine if the cell's graphic is handled by the cell of by this
      * interface.
      *
-     * @return the exact class used in this BrowserInterface
+     * @return the exact class used in this CellGraphicFactory
      */
     public Class getType();
 

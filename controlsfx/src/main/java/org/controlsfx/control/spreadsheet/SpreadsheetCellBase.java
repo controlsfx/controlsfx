@@ -350,11 +350,11 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
         return isSet(WRAP_BIT_POSITION);
     }
     
-    public boolean isBrowser(){
+    public boolean isCellGraphic(){
         return isSet(IS_BROWSER_POSITION);
     }
     
-    public void setBrowser(boolean isBrowser){
+    public void setCellGraphic(boolean isBrowser){
         setMask(isBrowser, IS_BROWSER_POSITION);
     }
     

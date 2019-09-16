@@ -417,7 +417,7 @@ public class SpreadsheetView extends Control{
     private Integer filteredRow;
     private FilteredList<ObservableList<SpreadsheetCell>> filteredList;
     private SortedList<ObservableList<SpreadsheetCell>> sortedList;
-    private BrowserInterface browser;
+    private CellGraphicFactory cellGraphicFactory;
 
     /**
      * Since the default with applied to TableColumn is 80. If a user sets a
@@ -492,23 +492,23 @@ public class SpreadsheetView extends Control{
     }
   
     /**
-     * Sets the BrowserInterface that will provide an implementation for cell
-     * that have {@link SpreadsheetCell#isBrowser() } set to {@code true}.
+     * Sets the CellGraphicFactory that will provide an implementation for cell
+     * that have {@link SpreadsheetCell#isCellGraphic() } set to {@code true}.
      *
-     * @param browser the BrowserInterface
+     * @param cellGraphicFactory the CellGraphicFactory
      */
-    public void setBrowser(BrowserInterface browser) {
-        this.browser = browser;
+    public void setCellGraphicFactory(CellGraphicFactory cellGraphicFactory) {
+        this.cellGraphicFactory = cellGraphicFactory;
     }
-    
+
     /**
-     * Returns the BrowserInterface if set that provide implementation for
+     * Returns the CellGraphicFactory if set that provide implementation for
      * browser in {@code SpreadsheetCell}.
      *
-     * @return the BrowserInterface
+     * @return the CellGraphicFactory
      */
-    public BrowserInterface getBrowser() {
-        return browser;
+    public CellGraphicFactory getCellGraphicFactory() {
+        return cellGraphicFactory;
     }
     
     /**
@@ -1959,7 +1959,7 @@ public class SpreadsheetView extends Control{
             //Retrieve html in value if exists
             //Value contains the HTML version or the nomrla value.
             Object value = change.getHtmlVersion() == null ? change.getValue() : change.getHtmlVersion();
-            value = cell.isBrowser() ? value : change.getValue();
+            value = cell.isCellGraphic() ? value : change.getValue();
             boolean succeed = cell.getCellType().match(value, cell.getOptionsForEditor());
             if (succeed) {
                 getGrid().setCellValue(cell.getRow(), cell.getColumn(),

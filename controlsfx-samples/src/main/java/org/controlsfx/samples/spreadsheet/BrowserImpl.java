@@ -37,33 +37,33 @@ import javafx.scene.layout.Background;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
-import org.controlsfx.control.spreadsheet.BrowserInterface;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.CellGraphicFactory;
 
 /**
  *
  * Example of implementation of the BrowserInterface in order to provide WebView
  * inside of cells.
  */
-public class BrowserImpl implements BrowserInterface<WebView> {
+public class BrowserImpl implements CellGraphicFactory<WebView> {
 
     private final LinkedList<WebView> browserList = new LinkedList<>();
     private final AtomicInteger browserCounter = new AtomicInteger();
     private final Map<WebView, String> loadedUrl = new HashMap<>();
 
     @Override
-    public Node getBrowser(SpreadsheetCell cell) {
+    public Node getNode(SpreadsheetCell cell) {
         //Limit the number of browser displayed.
         if (browserCounter.get() < 256) {
             if (browserList.isEmpty()) {
                 browserCounter.incrementAndGet();
                 WebView webView = new WebView();
-                webView.getEngine().loadContent(cell.getItem().toString());
+                webView.getEngine().loadContent( cell.getItem().toString());
                 loadedUrl.put(webView, cell.getItem().toString());
                 return webView;
             } else {
                 WebView webView = browserList.pop();
-                webView.getEngine().loadContent(cell.getItem().toString());
+                webView.getEngine().load(cell.getItem().toString());
                 return webView;
             }
         } else {
@@ -74,20 +74,22 @@ public class BrowserImpl implements BrowserInterface<WebView> {
     @Override
     public void load(WebView browser, SpreadsheetCell cell) {
         if (!loadedUrl.containsKey(browser) || !loadedUrl.get(browser).equals(cell.getItem())) {
-            browser.getEngine().loadContent(cell.getItem().toString());
+            browser.getEngine().load(cell.getItem().toString());
             loadedUrl.put(browser, cell.getItem().toString());
         }
     }
 
+    @Override
     public void loadStyle(WebView browser, SpreadsheetCell cell, Font font, Paint textFill, Pos alignment, Background background) {
         //no-op
     }
 
     @Override
-    public void setUnusedBrowser(WebView browser) {
+    public void setUnusedNode(WebView browser) {
         browserList.add(browser);
     }
 
+    @Override
     public Class getType() {
         return WebView.class;
     }

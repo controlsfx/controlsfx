@@ -66,7 +66,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
-import org.controlsfx.control.spreadsheet.BrowserInterface;
+import org.controlsfx.control.spreadsheet.CellGraphicFactory;
 
 /**
  *
@@ -268,14 +268,14 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             textProperty().unbind();
             setText(null);
             //Release any browser we might have
-            BrowserInterface browserImpl = handle.getView().getBrowser();
+            CellGraphicFactory browserImpl = handle.getView().getCellGraphicFactory();
             if (browserImpl != null && getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass())) {
-                browserImpl.setUnusedBrowser(getGraphic());
+                browserImpl.setUnusedNode(getGraphic());
                 setGraphic(null);
             }
         } else if (!isEditing() && item != null) {
             show(item);
-            if (item.getGraphic() == null && !item.isBrowser()) {
+            if (item.getGraphic() == null && !item.isCellGraphic()) {
                 setGraphic(null);
             }
         }
@@ -284,11 +284,12 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     @Override
     protected void layoutChildren() {
         super.layoutChildren();
-        BrowserInterface browserImpl = handle.getView().getBrowser();
-        //When layout is called, the cell style has been set on the cell, we can give it to the browserInterface
-        if (dirtyStyle && browserImpl != null && getItem().isBrowser()) {
-            //getGraphic may be null if the cell is empty
-            browserImpl.loadStyle(getGraphic(), getItem(), getFont(), getTextFill(), getAlignment(), getBackground());
+        CellGraphicFactory browserImpl = handle.getView().getCellGraphicFactory();
+        //When layout is called, the cell style has been set on the cell, we can give it to the CellGraphicFactory
+        if (dirtyStyle && browserImpl != null && getItem().isCellGraphic()) {
+            //Send the graphic only if it's the right type, otherwise send null.
+            Node node = getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass()) ? getGraphic() : null;
+            browserImpl.loadStyle(node, getItem(), getFont(), getTextFill(), getAlignment(), getBackground());
             dirtyStyle = false;
         }
     }
@@ -396,7 +397,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
      * @param item 
      */
     private void setBrowserGraphic(SpreadsheetCell item) {
-        BrowserInterface browserImpl = handle.getView().getBrowser();
+        CellGraphicFactory browserImpl = handle.getView().getCellGraphicFactory();
         if (browserImpl == null) {
             return;
         }
@@ -405,7 +406,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass())) {
             browserImpl.load(getGraphic(), item);
         } else {
-            setGraphic(browserImpl.getBrowser(item));
+            setGraphic(browserImpl.getNode(item));
         }
     }
 
@@ -422,11 +423,11 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (isEditing()) {
             return;
         }
-        if (item.isBrowser() && item.getItem() != null) {
+        if (item.isCellGraphic() && item.getItem() != null) {
             setBrowserGraphic(item);
             return;
-        } else if (getGraphic() != null && handle.getView().getBrowser() != null && handle.getView().getBrowser().getType().isAssignableFrom(getGraphic().getClass())) {
-            handle.getView().getBrowser().setUnusedBrowser(getGraphic());
+        } else if (getGraphic() != null && handle.getView().getCellGraphicFactory() != null && handle.getView().getCellGraphicFactory().getType().isAssignableFrom(getGraphic().getClass())) {
+            handle.getView().getCellGraphicFactory().setUnusedNode(getGraphic());
             setGraphic(null);
         }
         Node graphic = item.getGraphic();

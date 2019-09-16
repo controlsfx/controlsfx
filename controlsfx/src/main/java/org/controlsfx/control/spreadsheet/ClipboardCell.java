@@ -61,7 +61,7 @@ public class ClipboardCell implements Serializable {
         this.row = row;
         this.column = column;
         Object value = spc.getItem();
-        if (spc.isBrowser()) {
+        if (spc.isCellGraphic()) {
             this.htmlVersion = value == null ? null : value.toString();
             //Trust the SpreadsheetCellType to return a proper String version of the HTML
             this.value = spc.getCellType().toString(spc.getItem());
@@ -104,7 +104,7 @@ public class ClipboardCell implements Serializable {
     }
 
     /**
-     * If the original cell had its {@link SpreadsheetCell#isBrowser() } to
+     * If the original cell had its {@link SpreadsheetCell#isCellGraphic() } to
      * {@code true}, the cell HTML content will be here and the string version
      * in {@link #getValue() }.
      *

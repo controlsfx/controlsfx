@@ -183,6 +183,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         boolean needToBeShifted;
         boolean rowHeightChange = false;
         boolean isFixed;
+        GridRow topRow = null;
         for (int indexColumn = 0; indexColumn < columns.size(); indexColumn++) {
             //FIXME Problem qwith column span
             if(!skin.getSkinnable().getColumns().get(indexColumn).isVisible()){
@@ -243,6 +244,8 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                  * row_visible.
                  */
                 if (spanType != SpreadsheetView.SpanType.COLUMN_SPAN_INVISIBLE && hbarValue + fixedColumnWidth > x) {
+                    //We will need it later
+                    topRow = topRow == null ? skin.getFlow().getTopRow() : topRow;
                     increaseFixedWidth = true;
                     tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
                     fixedColumnWidth += width;
@@ -279,7 +282,17 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                          * getSkinnable because of the deportedCells.
                          */
                         if (!tableCell.isEditing() && tableCell.getParent() != getSkinnable()) {
-                            getChildren().add(0, tableCell);
+                            /**
+                             * If the considered cell is fixed and already
+                             * contained in the topRow, no need to put it in
+                             * this row, then put in the topRow right after.
+                             * Prevent constant layout when WebView are
+                             * contained in frozen row and columns, and
+                             * horizontal scollbar is scrolled.
+                             */
+                            if (topRow == null || !fixedCells.contains(tableCell) || !skin.deportedCells.containsKey(topRow) || !skin.deportedCells.get(topRow).contains(tableCell)) {
+                                getChildren().add(0, tableCell);
+                            }
                         }
                 }
 
@@ -394,7 +407,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             x += width;
         }
         skin.fixedColumnWidth = fixedColumnWidth;
-        handleFixedCell(fixedCells, index);
+        handleFixedCell(fixedCells, index, topRow);
         removeUselessCell(index);
         if (handle.getCellsViewSkin().lastRowLayout.get() == true) {
             handle.getCellsViewSkin().lastRowLayout.setValue(false);
@@ -466,7 +479,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
      * @param fixedCells
      * @param index
      */
-     private void handleFixedCell(List<CellView> fixedCells, int index) {
+     private void handleFixedCell(List<CellView> fixedCells, int index, GridRow topRow) {
         removeDeportedCells();
         if (fixedCells.isEmpty()) {
             return;
@@ -478,21 +491,20 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
          * we need to put it in another row.
          */
         if (skin.rowToLayout.get(index)) {
-            GridRow gridRow = skin.getFlow().getTopRow();
-            if (gridRow != null) {
+            if (topRow != null) {
                 for (CellView cell : fixedCells) {
                     if (!cell.isEditing()) {
-                        gridRow.removeCell(cell);
-                        gridRow.addCell(cell);
+                        topRow.removeCell(cell);
+                        topRow.addCell(cell);
                     }
                     final double originalLayoutY = getSkinnable().getLayoutY() + cell.getLayoutY();
 
-                    if (skin.deportedCells.containsKey(gridRow)) {
-                        skin.deportedCells.get(gridRow).add(cell);
+                    if (skin.deportedCells.containsKey(topRow)) {
+                        skin.deportedCells.get(topRow).add(cell);
                     } else {
                         Set<CellView> temp = new HashSet<>();
                         temp.add(cell);
-                        skin.deportedCells.put(gridRow, temp);
+                        skin.deportedCells.put(topRow, temp);
                     }
                     /**
                      * I need to have the layoutY of the original row, but also
@@ -501,7 +513,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                      * translate in order to be visible, we need to remove that
                      * "bit of translate".
                      */
-                    cell.relocate(cell.getLayoutX(), originalLayoutY - gridRow.getLayoutY());
+                    cell.relocate(cell.getLayoutX(), originalLayoutY - topRow.getLayoutY());
                 }
             }
         } else {

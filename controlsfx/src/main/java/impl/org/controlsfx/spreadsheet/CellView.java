@@ -65,6 +65,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.layout.Region;
 import org.controlsfx.control.spreadsheet.CellGraphicFactory;
 
@@ -124,6 +125,14 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setOnMouseDragEntered(new WeakEventHandler<>(dragMouseEventHandler));
 
         itemProperty().addListener(itemChangeListener);
+        parentProperty().addListener(new ChangeListener<Parent>() {
+            @Override
+            public void changed(ObservableValue<? extends Parent> observable, Parent oldValue, Parent newParent) {
+                if(newParent == null && getGraphic() != null){
+                    releaseCellGraphic();
+                }
+            }
+        });
     }
 
     /***************************************************************************
@@ -268,16 +277,26 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             textProperty().unbind();
             setText(null);
             //Release any browser we might have
-            CellGraphicFactory browserImpl = handle.getView().getCellGraphicFactory();
-            if (browserImpl != null && getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass())) {
-                browserImpl.setUnusedNode(getGraphic());
-                setGraphic(null);
-            }
+            releaseCellGraphic();
         } else if (!isEditing() && item != null) {
             show(item);
             if (item.getGraphic() == null && !item.isCellGraphic()) {
                 setGraphic(null);
             }
+        }
+    }
+
+    /**
+     * Releases and remove the graphic if any has been defined. Useful when the
+     * graphic comes from the {@link SpreadsheetView#getCellGraphicFactory() }
+     * and explicitly needs to be given back.
+     */
+    public void releaseCellGraphic() {
+        //Release any browser we might have
+        CellGraphicFactory browserImpl = handle.getView().getCellGraphicFactory();
+        if (browserImpl != null && getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass())) {
+            browserImpl.setUnusedNode(getGraphic());
+            setGraphic(null);
         }
     }
 
@@ -426,9 +445,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (item.isCellGraphic() && item.getItem() != null) {
             setBrowserGraphic(item);
             return;
-        } else if (getGraphic() != null && handle.getView().getCellGraphicFactory() != null && handle.getView().getCellGraphicFactory().getType().isAssignableFrom(getGraphic().getClass())) {
-            handle.getView().getCellGraphicFactory().setUnusedNode(getGraphic());
-            setGraphic(null);
+        } else if (getGraphic() != null) {
+            releaseCellGraphic();
         }
         Node graphic = item.getGraphic();
         if (graphic != null) {

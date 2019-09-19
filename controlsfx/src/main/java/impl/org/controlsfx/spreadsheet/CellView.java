@@ -125,14 +125,6 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         setOnMouseDragEntered(new WeakEventHandler<>(dragMouseEventHandler));
 
         itemProperty().addListener(itemChangeListener);
-        parentProperty().addListener(new ChangeListener<Parent>() {
-            @Override
-            public void changed(ObservableValue<? extends Parent> observable, Parent oldValue, Parent newParent) {
-                if(newParent == null && getGraphic() != null){
-                    releaseCellGraphic();
-                }
-            }
-        });
     }
 
     /***************************************************************************
@@ -297,6 +289,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (browserImpl != null && getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass())) {
             browserImpl.setUnusedNode(getGraphic());
             setGraphic(null);
+            parentProperty().removeListener(parentListener);
         }
     }
 
@@ -426,6 +419,10 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             browserImpl.load(getGraphic(), item);
         } else {
             setGraphic(browserImpl.getNode(item));
+            //If row or column is fixed, don't try to remove the graphic because constant layout can happen
+            if (!handle.getView().getFixedRows().contains(getIndex()) && !handle.getView().getFixedColumns().contains(item.getColumn())) {
+                parentProperty().addListener(parentListener);
+            }
         }
     }
 
@@ -771,6 +768,18 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     };
     private final WeakEventHandler weakActionhandler = new WeakEventHandler(actionEventHandler);
 
+    /**
+     * When this cell looses its parent, we release the Graphic if we had one.
+     */
+    private ChangeListener<Parent> parentListener = new ChangeListener<Parent>() {
+        @Override
+        public void changed(ObservableValue<? extends Parent> observable, Parent oldValue, Parent newParent) {
+            if (newParent == null && getGraphic() != null) {
+                releaseCellGraphic();
+            }
+        }
+    };
+    
     private void initStyleListener(){
         if(styleListener == null){
             styleListener = (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {

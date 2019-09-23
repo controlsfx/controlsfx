@@ -85,7 +85,7 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     //Handler for drag n drop in lazy instantiation.
     private EventHandler<DragEvent> dragOverHandler;
     private EventHandler<DragEvent> dragDropHandler;
-    //Set to true when the style has changed
+    //Set to true when the style has changed, and the item has a cellgraphic.
     private boolean dirtyStyle = false;
 
     /***************************************************************************
@@ -296,13 +296,15 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
     @Override
     protected void layoutChildren() {
         super.layoutChildren();
-        CellGraphicFactory browserImpl = handle.getView().getCellGraphicFactory();
         //When layout is called, the cell style has been set on the cell, we can give it to the CellGraphicFactory
-        if (dirtyStyle && browserImpl != null && getItem().isCellGraphic()) {
-            //Send the graphic only if it's the right type, otherwise send null.
-            Node node = getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass()) ? getGraphic() : null;
-            browserImpl.loadStyle(node, getItem(), getFont(), getTextFill(), getAlignment(), getBackground());
-            dirtyStyle = false;
+        if (dirtyStyle && getItem().isCellGraphic()) {
+            CellGraphicFactory browserImpl = handle.getView().getCellGraphicFactory();
+            if (browserImpl != null) {
+                //Send the graphic only if it's the right type, otherwise send null.
+                Node node = getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass()) ? getGraphic() : null;
+                browserImpl.loadStyle(node, getItem(), getFont(), getTextFill(), getAlignment(), getBackground());
+                dirtyStyle = false;
+            }
         }
     }
 
@@ -406,7 +408,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
 
     /**
      * Sets the browser in the cell.
-     * @param item 
+     *
+     * @param item
      */
     private void setBrowserGraphic(SpreadsheetCell item) {
         CellGraphicFactory browserImpl = handle.getView().getCellGraphicFactory();
@@ -418,6 +421,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass())) {
             browserImpl.load(getGraphic(), item);
         } else {
+            //In any case, the WebView will need to update its style to match the cell.
+            dirtyStyle = true;
             setGraphic(browserImpl.getNode(item));
             //If row or column is fixed, don't try to remove the graphic because constant layout can happen
             if (!handle.getView().getFixedRows().contains(getIndex()) && !handle.getView().getFixedColumns().contains(item.getColumn())) {
@@ -590,7 +595,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
             } else if (arg0.wasRemoved()) {
                 getStyleClass().remove(arg0.getElementRemoved());
             }
-            dirtyStyle = true;
+            if (getItem() != null && getItem().isCellGraphic()) {
+                dirtyStyle = true;
+            }
         }
     };
 
@@ -739,7 +746,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
                     //We clear the previous style.
                     setStyle(null);
                 }
-                dirtyStyle = true;
+                if (getItem() != null && getItem().isCellGraphic()) {
+                    dirtyStyle = true;
+                }
             }
         }
     };
@@ -784,7 +793,9 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if(styleListener == null){
             styleListener = (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
                 styleProperty().set(newValue);
-                dirtyStyle = true;
+                if (getItem() != null && getItem().isCellGraphic()) {
+                    dirtyStyle = true;
+                }
             };
         }
         weakStyleListener = new WeakChangeListener<>(styleListener);

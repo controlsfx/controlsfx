@@ -333,22 +333,21 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         }
     }
     
+    /**
+     * When we layout, we also remove the cell that have been deported into
+     * other rows in order not to have some TableCell hanging out.
+     *
+     * When scrolling with mouse wheel, we will request the layout of all rows,
+     * but only one row will be really called. Thus by wiping entirely the
+     * deportedCell, all cells in fixedColumns are gone. So we must be smarter.
+     */
     private void removeDeportedCells() {
-        /**
-         * When we layout, we also remove the cell that have been deported into
-         * other rows in order not to have some TableCell hanging out.
-         *
-         * When scrolling with mouse wheel, we will request the layout of all
-         * rows, but only one row will be really called. Thus by wiping entirely
-         * the deportedCell, all cells in fixedColumns are gone. So we must be
-         * smarter.
-         */
         ArrayList<GridRow> rowToRemove = new ArrayList<>();
         for (Entry<GridRow, Set<CellView>> entry : gridViewSkin.deportedCells.entrySet()) {
             ArrayList<CellView> toRemove = new ArrayList<>();
             for (CellView cell : entry.getValue()) {
                 //If we're not editing and the TableRow of the cell is not contained anymore, we remove.
-                if (!cell.isEditing() && !getCells().contains(cell.getTableRow())) {
+                if (!cell.isEditing() && !getCells().contains(cell.getTableRow()) && !myFixedCells.contains(cell.getTableRow())) {
                     entry.getKey().removeCell(cell);
                     toRemove.add(cell);
                 }

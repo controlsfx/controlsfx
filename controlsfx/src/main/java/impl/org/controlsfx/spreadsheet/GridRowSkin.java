@@ -283,14 +283,13 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                          */
                         if (!tableCell.isEditing() && tableCell.getParent() != getSkinnable()) {
                             /**
-                             * If the considered cell is fixed and already
-                             * contained in the topRow, no need to put it in
-                             * this row, then put in the topRow right after.
+                             * If this cell is eligible to be put into the
+                             * deportedCell, no need to add it in this row.
                              * Prevent constant layout when WebView are
                              * contained in frozen row and columns, and
                              * horizontal scollbar is scrolled.
                              */
-                            if (topRow == null || !fixedCells.contains(tableCell) || !skin.deportedCells.containsKey(topRow) || !skin.deportedCells.get(topRow).contains(tableCell)) {
+                            if (!skin.rowToLayout.get(index) || topRow == null || !fixedCells.contains(tableCell)) {
                                 getChildren().add(0, tableCell);
                             }
                         }

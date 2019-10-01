@@ -66,6 +66,6 @@ jar {
 run {
     doFirst {
         java9Args.addAll(java9RuntimeArgs)
-        jvmArgs = java9RuntimeArgs
+        jvmArgs = java9Args
     }
 }

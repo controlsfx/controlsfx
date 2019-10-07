@@ -5,7 +5,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("org.openjfx:javafx-plugin:0.0.7")
+        classpath("org.openjfx:javafx-plugin:0.0.8")
     }
 }
 
@@ -71,6 +71,7 @@ subprojects {
     if (JavaVersion.current().isJava11Compatible()) {
         apply plugin: 'org.openjfx.javafxplugin'
         javafx {
+            version = '13'
             modules = [ 'javafx.controls', 'javafx.media', 'javafx.web' ]
         }
     }

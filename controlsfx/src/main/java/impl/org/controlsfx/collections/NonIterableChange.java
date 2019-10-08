@@ -98,6 +98,23 @@ public abstract class NonIterableChange<E> extends Change<E> {
         return "{ " + string + " }";
     }
 
+     public static class GenericAddRemoveChange<E> extends NonIterableChange<E> {
+
+        private final List<E> removed;
+
+        public GenericAddRemoveChange(int from, int to, List<E> removed, ObservableList<E> list) {
+            super(from, to, list);
+            this.removed = removed;
+        }
+
+        @Override
+        public List<E> getRemoved() {
+            checkState();
+            return removed;
+        }
+
+    }
+     
     public static class SimpleRemovedChange<E> extends NonIterableChange<E> {
 
         private final List<E> removed;

@@ -30,7 +30,11 @@ ext.java9Args = [
         // For WebPage in SVGLoader
         "--add-exports=javafx.web/com.sun.webkit=org.controlsfx.controls",
         // For enabling FontAwesome
-        "--add-exports=javafx.graphics/com.sun.javafx.css=org.controlsfx.controls"
+        "--add-exports=javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
+        //For SpreadsheetView
+        "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior.TableViewBehavior=org.controlsfx.controls",
+        //For SpreadsheetView
+        "--add-exports=javafx.base/com.sun.javafx.event.EventHandlerManager=org.controlsfx.controls"
 ]
 
 ext.java9RuntimeArgs = [

@@ -50,7 +50,7 @@ public class Translations {
         File file = new File(Translations.class.getProtectionDomain().getCodeSource().getLocation().getPath());
         if (file.getName().endsWith(".jar")) { //$NON-NLS-1$
             Path jarFile = file.toPath();
-            try (FileSystem fs = FileSystems.newFileSystem(jarFile, null)) {
+            try (FileSystem fs = FileSystems.newFileSystem(jarFile, (ClassLoader)null)) {
                 fs.getRootDirectories().forEach(path -> loadFrom(path));
             } catch (IOException e) {
                 e.printStackTrace();

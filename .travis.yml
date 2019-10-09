@@ -14,13 +14,13 @@ sudo: false
 
 # use linux as operating system
 os: linux
+dist: trusty
 
 # Do not run travis install step `./gradlew assemble`
 install: true
 
 # Assemble jars
-script:
-  - ./gradlew clean assemble -Ptransifex.api=$TRANSIFEX_API
+script: ./gradlew clean assemble -Ptransifex.api=$TRANSIFEX_API
 
 cache:
   directories:
@@ -29,15 +29,14 @@ cache:
 deploy:
   # Deploy snapshots on every commit made to master and 9.0.0 branch
   - provider: script
-    script: ./gradlew uploadPublished -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD
+    script: bash .ci/deploy-snapshot.sh
     skip_cleanup: true
     on:
-      tags: false
-      all_branches: true
+      condition: $TRAVIS_BRANCH =~ ^master|9.0.0$
 
   # Deploy releases on every tag push
   - provider: script
-    script: sh .ci/deploy.sh
+    script: bash .ci/deploy.sh
     skip_cleanup: true
     on:
       tags: true

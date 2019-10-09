@@ -29,7 +29,10 @@ package org.controlsfx.samples.spreadsheet;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -58,6 +61,19 @@ public class BrowserImpl implements CellGraphicFactory<WebView> {
             if (browserList.isEmpty()) {
                 browserCounter.incrementAndGet();
                 WebView webView = new WebView();
+                webView.setMouseTransparent(true);
+                webView.setContextMenuEnabled(false);
+                webView.setPrefHeight(48);
+                //https://stackoverflow.com/questions/11206942/how-to-hide-scrollbars-in-the-javafx-webview?lq=1
+                webView.getChildrenUnmodifiable().addListener(new InvalidationListener() {
+                    @Override
+                    public void invalidated(Observable observable) {
+                        Set<Node> deadSeaScrolls = webView.lookupAll(".scroll-bar");
+                        for (Node scroll : deadSeaScrolls) {
+                            scroll.setVisible(false);
+                        }
+                    }
+                });
                 webView.getEngine().loadContent( cell.getItem().toString());
                 loadedUrl.put(webView, cell.getItem().toString());
                 return webView;
@@ -93,4 +109,4 @@ public class BrowserImpl implements CellGraphicFactory<WebView> {
     public Class getType() {
         return WebView.class;
     }
-}
+        }

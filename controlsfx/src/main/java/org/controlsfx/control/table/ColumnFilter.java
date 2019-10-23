@@ -37,12 +37,15 @@ import javafx.collections.WeakListChangeListener;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 
 public final class ColumnFilter<T,R> {
     private final TableFilter<T> tableFilter;
@@ -54,7 +57,16 @@ public final class ColumnFilter<T,R> {
     private final DupeCounter<R> visibleValuesDupeCounter = new DupeCounter<>(false);
     private final HashSet<R> unselectedValues = new HashSet<>();
     private final HashMap<CellIdentity<T>,ChangeListener<R>> trackedCells = new HashMap<>();
-    
+
+    private static final Image filterIcon = new Image("/impl/org/controlsfx/table/filter.png");
+    private static final Supplier<ImageView> filterImageView = () -> {
+        ImageView imageView = new ImageView(filterIcon);
+        imageView.setFitHeight(15);
+        imageView.setPreserveRatio(true);
+        return imageView;
+    };
+
+    private boolean bumpedWidth = false;    // Used to determine to add a padding to the filterIcon.
     private boolean lastFilter = false;
     private boolean isDirty = false;
     private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.toLowerCase().contains(inputString.toLowerCase());
@@ -136,6 +148,23 @@ public final class ColumnFilter<T,R> {
     }
 
     /**
+     * Display or hides the Filter Icon in the tableColumn header.
+     * This should only be called through {@link TableFilter#executeFilter()}
+     */
+    void applyFilterIcon() {
+        if (hasUnselections()) {
+            tableColumn.setGraphic(filterImageView.get());
+            if (!bumpedWidth) {
+                tableColumn.setPrefWidth(tableColumn.getWidth() + 20);
+                bumpedWidth = true;
+            }
+        }
+        else {
+            tableColumn.setGraphic(null);
+        }
+    }
+
+    /**
      * Initializes this ColumnFilter, particularly if it was set up in a lazy context
      */
     public void initialize() {
@@ -157,6 +186,7 @@ public final class ColumnFilter<T,R> {
      * Allows selecting a given value programmatically for this ColumnFilter
      */
     public void selectValue(Object value) {
+        if (!isInitialized()) initialize();
         filterPanel.selectValue(value);
     }
 
@@ -164,6 +194,7 @@ public final class ColumnFilter<T,R> {
      * Allows unselecting a given value programmatically for this ColumnFilter
      */
     public void unselectValue(Object value) {
+        if (!isInitialized()) initialize();
         filterPanel.unSelectValue(value);
     }
 
@@ -171,12 +202,14 @@ public final class ColumnFilter<T,R> {
      * Selects all values for this given ColumnFilter
      */
     public void selectAllValues() {
+        if (!isInitialized()) initialize();
         filterPanel.selectAllValues();
     }
     /**
      * Unselects all values for this given ColumnFilter
      */
     public void unSelectAllValues() {
+        if (!isInitialized()) initialize();
         filterPanel.unSelectAllValues();
     }
 

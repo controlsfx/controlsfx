@@ -157,7 +157,6 @@ public final class TableFilter<T> {
 
     /**
      * Programmatically selects all values for the specified TableColumn
-
      */
     public void selectAllValues(TableColumn<?,?> column) {
         columnFilters.stream().filter(c -> c.getTableColumn() == column)
@@ -178,6 +177,10 @@ public final class TableFilter<T> {
         }
         else {
             resetFilter();
+        }
+
+        for (ColumnFilter columnFilter : columnFilters) {
+            columnFilter.applyFilterIcon();
         }
     }
     public void resetFilter() {
@@ -233,5 +236,4 @@ public final class TableFilter<T> {
             return new TableFilter<>(tableView, lazyInd);
         }
     }
-    
 }

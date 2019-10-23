@@ -40,8 +40,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -49,7 +47,6 @@ import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static impl.org.controlsfx.i18n.Localization.getString;
@@ -62,21 +59,11 @@ public final class FilterPanel<T,R> extends VBox {
     private final FilteredList<FilterValue> filterList;
     private final TextField searchBox = new TextField();
     private boolean searchMode = false;
-    private boolean bumpedWidth = false;
 
     private final ListView<FilterValue> checkListView;
 	
     // This collection will reference column header listeners. References must be kept locally because weak listeners are registered
     private final Collection<InvalidationListener> columnHeadersChangeListeners = new ArrayList();
-
-    private static final Image filterIcon = new Image("/impl/org/controlsfx/table/filter.png");
-
-    private static final Supplier<ImageView> filterImageView = () -> {
-        ImageView imageView = new ImageView(filterIcon);
-        imageView.setFitHeight(15);
-        imageView.setPreserveRatio(true);
-        return imageView;
-    };
 
     private final ChangeListener<Skin<?>> skinListener = (w, o, n) -> {
         // Clear references to listeners, this will (eventually) cause the WeakListeners to expire
@@ -137,23 +124,11 @@ public final class FilterPanel<T,R> extends VBox {
         HBox.setHgrow(applyBttn, Priority.ALWAYS);
 
         applyBttn.setOnAction(e -> {
-                    if (columnFilter.getTableFilter().isDirty()) {
-                        columnFilter.applyFilter();
-                        columnFilter.getTableFilter().getColumnFilters().stream().map(ColumnFilter::getFilterPanel)
-                                .forEach(fp -> {
-                                    if (!fp.columnFilter.hasUnselections()) {
-                                        fp.columnFilter.getTableColumn().setGraphic(null);
-                                    } else {
-                                        fp.columnFilter.getTableColumn().setGraphic(filterImageView.get());
-                                        if (!bumpedWidth) {
-                                            fp.columnFilter.getTableColumn().setPrefWidth(columnFilter.getTableColumn().getWidth() + 20);
-                                            bumpedWidth = true;
-                                        }
-                                    }
-                                });
-                    }
-                contextMenu.hide();
-                });
+            if (columnFilter.getTableFilter().isDirty()) {
+                columnFilter.applyFilter();
+            }
+            contextMenu.hide();
+        });
 
         buttonBox.getChildren().add(applyBttn);
 

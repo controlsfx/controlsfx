@@ -50,7 +50,8 @@ public class ValidationResult {
     public ValidationResult() {}
 
     /**
-     * Factory method to create validation result out of one message
+     * Factory method to create validation result out of one message.
+     * Messages with {@link Severity#OK} will be ignored.
      * @param target validation target
      * @param text message text
      * @param severity message severity
@@ -182,7 +183,7 @@ public class ValidationResult {
     }
 
     /**
-     * Add one message to validation result with condition
+     * Add one message to validation result with condition. Messages with {@link Severity#OK} will be ignored.
      * @param target validation target
      * @param text message text
      * @param severity message severity
@@ -227,7 +228,7 @@ public class ValidationResult {
     }
 
     /**
-     * Add collection of validation messages
+     * Add collection of validation messages. Messages with {@link Severity#OK} will be ignored.
      * @param messages
      * @return updated validation result
      */
@@ -237,7 +238,7 @@ public class ValidationResult {
     }
 
     /**
-     * Add several validation messages
+     * Add several validation messages. Messages with {@link Severity#OK} will be ignored.
      * @param messages
      * @return updated validation result
      */
@@ -276,7 +277,7 @@ public class ValidationResult {
 
     /**
      * Retrieve errors represented by validation result
-     * @return collection of errors
+     * @return an unmodifiable collection of errors
      */
     public Collection<ValidationMessage> getErrors() {
         return getMessages(Severity.ERROR);
@@ -284,7 +285,7 @@ public class ValidationResult {
 
     /**
      * Retrieve warnings represented by validation result
-     * @return collection of warnings
+     * @return an unmodifiable collection of warnings
      */
     public Collection<ValidationMessage> getWarnings() {
         return getMessages(Severity.WARNING);
@@ -292,7 +293,7 @@ public class ValidationResult {
 
     /**
      * Retrieve infos represented by validation result
-     * @return collection of infos
+     * @return an unmodifiable collection of infos
      */
     public Collection<ValidationMessage> getInfos() {
         return getMessages(Severity.INFO);
@@ -300,7 +301,7 @@ public class ValidationResult {
 
     /**
      * Retrieve all messages represented by validation result
-     * @return collection of messages
+     * @return an unmodifiable collection of messages
      */
     public Collection<ValidationMessage> getMessages() {
         return getMessages(null);
@@ -309,7 +310,7 @@ public class ValidationResult {
     /**
      * Helper method to get all messages for a given severity.
      * A null severity will return all messages.
-     * @return collection of messages
+     * @return an unmodifiable collection of messages
      */
     private Collection<ValidationMessage> getMessages(Severity severity) {
         List<ValidationMessage> messages = severity == null ?

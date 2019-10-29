@@ -411,7 +411,10 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
                 if(!isCancelled()){
                     final Collection<T> fetchedSuggestions = provider.call(this);
                     Platform.runLater(() -> {
-                        if(fetchedSuggestions != null && !fetchedSuggestions.isEmpty()){
+                        // check whether completionTarget is still valid
+                        boolean validNode = completionTarget.getScene() != null
+                                            && completionTarget.getScene().getWindow() != null;
+                        if(fetchedSuggestions != null && !fetchedSuggestions.isEmpty() && validNode){
                             autoCompletionPopup.getSuggestions().setAll(fetchedSuggestions);
                             showPopup();
                         }else{

@@ -46,7 +46,8 @@ ext.javafx_modules = [
         'javafx-graphics',
         'javafx-controls',
         'javafx-media',
-        'javafx-web'
+        'javafx-web',
+        'javafx-swing'
 ]
 
 if (JavaVersion.current().isJava11Compatible()) {

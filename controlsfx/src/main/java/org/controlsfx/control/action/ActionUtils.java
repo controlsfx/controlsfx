@@ -638,6 +638,9 @@ public class ActionUtils {
         };
 
         if (styleable instanceof Node) {
+            if(((Node) styleable).getProperties().containsKey(ListChangeListener.class.getCanonicalName())) {
+                throw new RuntimeException("222 Can't bind node to two actions!");
+            }
             ((Node) styleable).getProperties().put(ListChangeListener.class.getCanonicalName(), listChangeListener);
         }
         action.getStyleClass().addListener(listChangeListener);
@@ -727,6 +730,7 @@ public class ActionUtils {
 
         Object listChangeListener = btn.getProperties().get(ListChangeListener.class.getCanonicalName());
         if (listChangeListener instanceof ListChangeListener<?>) {
+            btn.getProperties().remove(ListChangeListener.class.getCanonicalName());
             action.getStyleClass().removeListener((ListChangeListener<? super String>) listChangeListener);
         }
 

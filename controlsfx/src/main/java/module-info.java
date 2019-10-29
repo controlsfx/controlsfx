@@ -3,8 +3,11 @@ module org.controlsfx.controls {
     requires java.desktop;
 
     requires transitive javafx.controls;
+    requires transitive javafx.swing;
     requires static javafx.web;
     requires static javafx.media;
+    //requires transitive java.management;
+    //requires transitive jdk.management;
 
     exports org.controlsfx.control;
     exports org.controlsfx.control.action;

@@ -114,7 +114,7 @@ public class ValidationResult {
         return fromMessages(ValidationMessage.warning(target, text));
     }
 
-        /**
+    /**
      * Factory method to create validation result out of one info
      * @param target validation target
      * @param text message text
@@ -169,15 +169,13 @@ public class ValidationResult {
     }
 
     /**
-     * Add one message to validation result
+     * Add one message to validation result. Messages with {@link Severity#OK} will be ignored.
      * @param message validation message
      * @return updated validation result
      */
     public ValidationResult add(ValidationMessage message) {
-        if (message != null) {
-            if (message.getSeverity() != Severity.OK) {
-                invalidMessages.add(message);
-            }
+        if (message != null && message.getSeverity() != Severity.OK) {
+            invalidMessages.add(message);
         }
 
         return this;

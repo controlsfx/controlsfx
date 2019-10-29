@@ -174,8 +174,7 @@ public final class TableFilter<T> {
         if (columnFilters.stream().anyMatch(ColumnFilter::isFiltered)) {
             filteredList.setPredicate(item -> columnFilters.stream()
                     .allMatch(cf -> cf.evaluate(item)));
-        }
-        else {
+        } else {
             resetFilter();
         }
 

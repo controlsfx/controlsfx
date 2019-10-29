@@ -158,8 +158,7 @@ public final class ColumnFilter<T,R> {
                 tableColumn.setPrefWidth(tableColumn.getWidth() + 20);
                 bumpedWidth = true;
             }
-        }
-        else {
+        } else {
             tableColumn.setGraphic(null);
         }
     }

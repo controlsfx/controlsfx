@@ -58,7 +58,6 @@ public final class FilterPanel<T,R> extends VBox {
 
     private final FilteredList<FilterValue> filterList;
     private final TextField searchBox = new TextField();
-    private boolean searchMode = false;
 
     private final ListView<FilterValue> checkListView;
 	
@@ -186,8 +185,6 @@ public final class FilterPanel<T,R> extends VBox {
     }
     private void initializeListeners() {
         searchBox.textProperty().addListener(l -> {
-            searchMode = !searchBox.getText().isEmpty();
-
             //filter scope based on search text
             filterList.setPredicate(val -> searchBox.getText().isEmpty() ||
                     columnFilter.getSearchStrategy().test(searchBox.getText(), Optional.ofNullable(val.getValue()).map(Object::toString).orElse("")));

@@ -86,7 +86,10 @@ import javafx.util.StringConverter;
  * // selected items change).
  * checkComboBox.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
  *     public void onChanged(ListChangeListener.Change<? extends String> c) {
- *         System.out.println(checkComboBox.getCheckModel().getSelectedItems());
+ *          while(c.next()) {
+ *              //do something with changes here
+ *          }
+ *          System.out.println(checkComboBox.getCheckModel().getCheckedItems());
  *     }
  * });}
  * }</pre>

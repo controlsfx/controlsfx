@@ -82,11 +82,14 @@ import javafx.util.StringConverter;
  * // Create the CheckComboBox with the data 
  * final CheckComboBox<String> checkComboBox = new CheckComboBox<String>(strings);
  * 
- * // and listen to the relevant events (e.g. when the selected indices or 
+ * // and listen to the relevant events (e.g. when the selected indices or
  * // selected items change).
  * checkComboBox.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
  *     public void onChanged(ListChangeListener.Change<? extends String> c) {
- *         System.out.println(checkComboBox.getCheckModel().getSelectedItems());
+*           while(c.next()) {
+*               //do something with changes here
+*           }
+ *         System.out.println(checkComboBox.getCheckModel().getCheckedItems());
  *     }
  * });}
  * }</pre>

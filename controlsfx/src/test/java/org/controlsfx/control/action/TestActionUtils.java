@@ -4,6 +4,7 @@ import javafx.scene.control.Button;
 import org.controlsfx.control.spreadsheet.JavaFXThreadingRule;
 import org.junit.Rule;
 import org.junit.Test;
+import de.sandec.jmemorybuddy.JMemoryBuddy;
 
 public class TestActionUtils {
     @Rule
@@ -24,13 +25,13 @@ public class TestActionUtils {
     public void testActionIsCollectable() {
         Button button = new Button("button");
 
-        MemoryLeakUtils.doMemTest((checker) -> {
+        JMemoryBuddy.doMemTest((checker) -> {
             Action action = new Action("action");
 
             ActionUtils.configureButton(action,button);
             ActionUtils.unconfigureButton(button);
 
-            checker.accept(action);
+            checker.assertCollectable(action);
         });
     }
 
@@ -38,13 +39,13 @@ public class TestActionUtils {
     public void testButtonIsCollectable() {
         Action action = new Action("button");
 
-        MemoryLeakUtils.doMemTest((checker) -> {
+        JMemoryBuddy.doMemTest((checker) -> {
             Button button = new Button("Ignore");
 
             ActionUtils.configureButton(action,button);
             ActionUtils.unconfigureButton(button);
 
-            checker.accept(button);
+            checker.assertCollectable(button);
         });
     }
 }

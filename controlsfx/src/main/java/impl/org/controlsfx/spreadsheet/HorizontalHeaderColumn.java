@@ -26,6 +26,8 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import javafx.event.EventHandler;
@@ -42,49 +44,20 @@ import javafx.scene.control.skin.TableViewSkinBase;
  */
 public class HorizontalHeaderColumn extends NestedTableColumnHeader {
 
-    int lastColumnResized = -1;
-    TableViewSkinBase<?, ?, ?, ?, ?> skin;
-   public HorizontalHeaderColumn(
-            TableViewSkinBase<?, ?, ?, ?, ?> skin, TableColumnBase<?, ?> tc) {
+
+
+   public HorizontalHeaderColumn(TableColumnBase<?, ?> tc) {
         super(tc);
-        this.skin = skin;
+
         /**
          * Resolve https://bitbucket.org/controlsfx/controlsfx/issue/395
          * and https://bitbucket.org/controlsfx/controlsfx/issue/434
          */
         widthProperty().addListener((Observable observable) -> {
-            //FIXME
-           if (skin != null) {
-               ((GridViewSkin) skin).hBarValue.clear();
-               ((GridViewSkin) skin).rectangleSelection.updateRectangle();
-           }
+               ((GridViewSkin)  getTableSkin()).hBarValue.clear();
+               ((GridViewSkin)  getTableSkin()).rectangleSelection.updateRectangle();
+
        });
-        
-        /**
-         * We want to resize all other selected columns when we resize one.
-         *
-         * I cannot really determine when a resize is finished. Apparently, when
-         * this variable Layout is set to 0, it means the drag is done, so until
-         * a beter solution is shown, it will do the trick.
-         */
-        //FIXME
-//        getTableHeaderRow().reorderingProperty().addListener(new ChangeListener<Boolean>() {
-//            @Override
-//            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
-//
-//                    HorizontalHeader headerRow = (HorizontalHeader) ((GridViewSkin) skin).getHorizontalHeader();
-//                    GridViewSkin mySkin = ((GridViewSkin) skin);
-//                    if (!t1 && lastColumnResized >= 0) {
-//                        if (headerRow.selectedColumns.get(lastColumnResized)) {
-//                            double width1 = mySkin.getColumns().get(lastColumnResized).getWidth();
-//                            for (int i = headerRow.selectedColumns.nextSetBit(0); i >= 0; i = headerRow.selectedColumns.nextSetBit(i + 1)) {
-//                                mySkin.getColumns().get(i).setPrefWidth(width1);
-//                            }
-//                        }
-//                    }
-//                }
-//
-//        });
     }
 
     @Override
@@ -100,13 +73,13 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
                 @Override
                 public void handle(MouseEvent mouseEvent) {
                     if (mouseEvent.getClickCount() == 2 && mouseEvent.isPrimaryButtonDown()) {
-                        ((GridViewSkin) (Object) skin).resize(col, -1);
+                        ((GridViewSkin) getTableSkin()).resize(col, -1);
                     }
                 }
             });
             return columnHeader;
         } else {
-            return new HorizontalHeaderColumn(skin, col);
+            return new HorizontalHeaderColumn(col);
         }
     }
 
@@ -120,8 +93,7 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
      * We want ColumnHeader to be fixed when we freeze some columns
      */
     public void layoutFixedColumns() {
-        System.out.println(skin);
-        SpreadsheetHandle handle = ((GridViewSkin) (Object) skin).handle;
+        SpreadsheetHandle handle = ((GridViewSkin) getTableSkin()).handle;
         final SpreadsheetView spreadsheetView = handle.getView();
         if (handle.getCellsViewSkin() == null || getChildren().isEmpty()) {
             return;

@@ -57,6 +57,7 @@ import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableFocusModel;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.stage.Screen;
@@ -91,33 +92,10 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      **************************************************************************/
 
     /** Default height of a row. */
-    public static final double DEFAULT_CELL_HEIGHT;
+    public static final double DEFAULT_CELL_HEIGHT = 24.0;
 
     // FIXME This should seriously be investigated ..
     private static final double DATE_CELL_MIN_WIDTH = 200 - Screen.getPrimary().getDpi();
-
-    static {
-        double cell_size = 24.0;
-        try {
-            Class<?> clazz = javafx.scene.control.skin.CellSkinBase.class;
-            Field f = clazz.getDeclaredField("DEFAULT_CELL_SIZE"); //$NON-NLS-1$
-            f.setAccessible(true);
-            cell_size = f.getDouble(null);
-        } catch (NoSuchFieldException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        DEFAULT_CELL_HEIGHT = cell_size;
-    }
 
     /**
      * When we add some tableCell to some topRow in order for them to be on top
@@ -268,52 +246,30 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         getFlow().getHorizontalBar().addEventFilter(MouseEvent.MOUSE_PRESSED, ml);
 
         // init the behavior 'closures'
-        TableViewBehavior<ObservableList<SpreadsheetCell>> behavior = getBehavior();
-        behavior.setOnFocusPreviousRow(new Runnable() {
-            @Override public void run() { onFocusAboveCell(); }
-        });
-        behavior.setOnFocusNextRow(new Runnable() {
-            @Override public void run() { onFocusBelowCell(); }
-        });
-        behavior.setOnMoveToFirstCell(new Runnable() {
-            @Override public void run() { onMoveToFirstCell(); }
-        });
-        behavior.setOnMoveToLastCell(new Runnable() {
-            @Override public void run() { onMoveToLastCell(); }
-        });
-        behavior.setOnScrollPageDown(new Callback<Boolean, Integer>() {
-            @Override public Integer call(Boolean isFocusDriven) { return onScrollPageDown(isFocusDriven); }
-        });
-        behavior.setOnScrollPageUp(new Callback<Boolean, Integer>() {
-            @Override public Integer call(Boolean isFocusDriven) { return onScrollPageUp(isFocusDriven); }
-        });
-        behavior.setOnSelectPreviousRow(new Runnable() {
-            @Override public void run() { onSelectAboveCell(); }
-        });
-        behavior.setOnSelectNextRow(new Runnable() {
-            @Override public void run() { onSelectBelowCell(); }
-        });
-        behavior.setOnSelectLeftCell(new Runnable() {
-            @Override public void run() { onSelectLeftCell(); }
-        });
-        behavior.setOnSelectRightCell(new Runnable() {
-            @Override public void run() { onSelectRightCell(); }
-        });
+        GridViewBehavior behavior = getBehavior();
+        behavior.setOnFocusPreviousRow(() -> onFocusAboveCell());
+        behavior.setOnFocusNextRow(() -> onFocusBelowCell());
+        behavior.setOnMoveToFirstCell(() -> onMoveToFirstCell());
+        behavior.setOnMoveToLastCell(() -> onMoveToLastCell());
+        behavior.setOnScrollPageDown(isFocusDriven -> onScrollPageDown(isFocusDriven));
+        behavior.setOnScrollPageUp(isFocusDriven -> onScrollPageUp(isFocusDriven));
+        behavior.setOnSelectPreviousRow(() -> onSelectAboveCell());
+        behavior.setOnSelectNextRow(() -> onSelectBelowCell());
+        behavior.setOnSelectLeftCell(() -> onSelectLeftCell());
+        behavior.setOnSelectRightCell(() -> onSelectRightCell());
+        behavior.setOnFocusLeftCell(() -> onFocusLeftCell());
+        behavior.setOnFocusRightCell(() -> onFocusRightCell());
 
-        //FIXME
-//        registerChangeListener(tableView.fixedCellSizeProperty(), "FIXED_CELL_SIZE");
+        this.registerChangeListener(tableView.fixedCellSizeProperty(), (var1x) -> {
+            getFlow().setFixedCellSize(((TableView)this.getSkinnable()).getFixedCellSize());
+        });
     }
 
-    //FIXME
     private TableRow<ObservableList<SpreadsheetCell>> createCell() {
         TableRow<ObservableList<SpreadsheetCell>> row = null;
 
         TableView<ObservableList<SpreadsheetCell>> tableView = getSkinnable();
-        if (tableView.getRowFactory() != null) {
-            row = tableView.getRowFactory().call(tableView);
-        } else {
-            //FIXME SHould not happen
-        }
+        row = tableView.getRowFactory().call(tableView);
 
         row.updateTableView(tableView);
         return row;
@@ -543,8 +499,6 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                     ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null)) {
                 cell.setWrapText(true);
 
-                //FIXME
-//                cell.impl_processCSS(false);
                 maxHeight = Math.max(maxHeight, cell.prefHeight(width));
             }
         }
@@ -883,15 +837,15 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          */
         final int row = fm.getFocusedIndex();
         // We try to make visible the rows that may be hidden by Fixed rows
-        if (!getFlow().getCells().isEmpty()
-                //FIXME
-                && getFlow().getCells().get(getFixedRowSize()).getIndex() > row
-                && !spreadsheetView.getFixedRows().contains(spreadsheetView.getModelRow(row))) {
+//        if (!getFlow().getCells().isEmpty()
+//                //FIXME
+//                && getFlow().getCells().get(getFixedRowSize()).getIndex() > row
+//                && !spreadsheetView.getFixedRows().contains(spreadsheetView.getModelRow(row))) {
+//            getFlow().scrollTo(row);
+//        } else {
+            // FIXME flow.show() has been removed so ScrollTo is the only method left
             getFlow().scrollTo(row);
-        } else {
-            //FIXME
-            getFlow().scrollTo(row);
-        }
+//        }
         scrollHorizontally();
         /**
          * ***************************************************************
@@ -1192,6 +1146,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
 //        getHorizontalHeader().getRootHeader().lastColumnResized = getColumns().indexOf(tc);
 //        boolean returnedValue = getSkinnable().resizeColumn(tc, delta);
 //        if(returnedValue){
+                //FIXME Reactivate that
 //            Event.fireEvent(spreadsheetView, new SpreadsheetView.ColumnWidthEvent(getColumns().indexOf(tc), tc.getWidth()));
 //        }
 //        return returnedValue;

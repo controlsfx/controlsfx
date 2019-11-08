@@ -38,6 +38,14 @@ public final class MappingChange<E, F> extends Change<F> {
     private final Change<? extends E> original;
     private List<F> removed;
 
+    public static final Map NOOP_MAP = new Map() {
+
+        @Override
+        public Object map(Object original) {
+            return original;
+        }
+    };
+
     public interface Map<E, F> {
         F map(E original);
     }

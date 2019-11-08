@@ -19,6 +19,7 @@ module org.controlsfx.samples {
     opens org.controlsfx.samples.dialogs;
     opens org.controlsfx.samples.actions to org.controlsfx.controls;
     opens org.controlsfx.samples.tableview to javafx.base;
+    opens org.controlsfx.samples.spreadsheet to javafx.graphics;
     
     provides fxsampler.FXSamplerProject with org.controlsfx.ControlsFXSampler;
 }

@@ -61,8 +61,8 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
 
         getSkinnable().setPickOnBounds(false);
 
-        //FIXME
-         gridRow.itemProperty().addListener(o -> requestCellUpdate());
+        //Index and Item are registered again. FixedCellSize not, but not used?
+        gridRow.itemProperty().addListener(o -> requestCellUpdate());
         registerChangeListener(gridRow.indexProperty(), e -> {
             // Fix for RT-36661, where empty table cells were showing content, as they
             // had incorrect table cell indices (but the table row index was correct).
@@ -72,6 +72,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                 requestCellUpdate();
             }
         });
+
     }
 
 //    @Override

@@ -56,6 +56,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 public class HorizontalHeader extends TableHeaderRow {
 
     final GridViewSkin gridViewSkin;
+    private int lastColumnResized = -1;
 
     // Indicate whether the this HorizontalHeader is activated or not
     private boolean working = true;
@@ -73,6 +74,30 @@ public class HorizontalHeader extends TableHeaderRow {
     public HorizontalHeader(final GridViewSkin skin) {
         super(skin);
         this.gridViewSkin = skin;
+
+        /**
+         * We want to resize all other selected columns when we resize one.
+         *
+         * I cannot really determine when a resize is finished. Apparently, when
+         * this variable Layout is set to 0, it means the drag is done, so until
+         * a better solution is shown, it will do the trick.
+         */
+        //FIXME Moving it here but this trick is no longer working
+//        reorderingProperty().addListener(new ChangeListener<Boolean>() {
+//            @Override
+//            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
+//                HorizontalHeader headerRow = (HorizontalHeader) gridViewSkin.getHorizontalHeader();
+//                GridViewSkin mySkin = gridViewSkin;
+//                if (!t1 && lastColumnResized >= 0) {
+//                    if (headerRow.selectedColumns.get(lastColumnResized)) {
+//                        double width1 = mySkin.getColumns().get(lastColumnResized).getWidth();
+//                        for (int i = headerRow.selectedColumns.nextSetBit(0); i >= 0; i = headerRow.selectedColumns.nextSetBit(i + 1)) {
+//                            mySkin.getColumns().get(i).setPrefWidth(width1);
+//                        }
+//                    }
+//                }
+//            }
+//        });
     }
 
     /**************************************************************************
@@ -82,8 +107,6 @@ public class HorizontalHeader extends TableHeaderRow {
      **************************************************************************/
     public void init() {
         SpreadsheetView spv = gridViewSkin.handle.getView();
-        //FIXME Hack because createRootHeader is called before gridViewSkin is initialized
-        ((HorizontalHeaderColumn)getRootHeader()).skin = gridViewSkin;
         updateHorizontalHeaderVisibility(spv.isShowColumnHeader());
 
         //Visibility of vertical Header listener
@@ -126,11 +149,6 @@ public class HorizontalHeader extends TableHeaderRow {
         });
     }
 
-//    @Override
-//    public HorizontalHeaderColumn getRootHeader() {
-//        return (HorizontalHeaderColumn) super.getRootHeader();
-//    }
-
     void clearSelectedColumns(){
         selectedColumns.clear();
     }
@@ -170,7 +188,7 @@ public class HorizontalHeader extends TableHeaderRow {
 
     @Override
     protected NestedTableColumnHeader createRootHeader() {
-        return new HorizontalHeaderColumn(gridViewSkin, null);
+        return new HorizontalHeaderColumn(null);
     }
 
     /**************************************************************************

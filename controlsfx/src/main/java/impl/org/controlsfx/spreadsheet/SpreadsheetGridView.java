@@ -57,7 +57,6 @@ public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCel
             stylesheet = SpreadsheetView.class.getResource("spreadsheet.css") //$NON-NLS-1$
                     .toExternalForm();
         }
-
         return stylesheet;
     }
 

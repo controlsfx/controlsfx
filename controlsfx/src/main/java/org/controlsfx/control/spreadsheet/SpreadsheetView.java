@@ -938,14 +938,15 @@ public class SpreadsheetView extends Control{
     }
 
     private int getViewIndex(int sourceIndex) {
-        //FIXME Will be improved in JDK9 with https://bugs.openjdk.java.net/browse/JDK-8139848
-        int max = sortedList.size();
-        for (int i = 0; i < max; i++) {
-            if (sortedList.getSourceIndex(i) == sourceIndex) {
-                return i;
-            }
-        }
-        return -1;
+        //Improved in JDK9 with https://bugs.openjdk.java.net/browse/JDK-8139848
+        return sortedList.getViewIndex(sourceIndex);
+//        int max = sortedList.size();
+//        for (int i = 0; i < max; i++) {
+//            if (sortedList.getSourceIndex(i) == sourceIndex) {
+//                return i;
+//            }
+//        }
+//        return -1;
     }
     
     /**

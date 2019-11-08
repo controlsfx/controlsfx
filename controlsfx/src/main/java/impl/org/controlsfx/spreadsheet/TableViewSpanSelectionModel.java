@@ -215,18 +215,10 @@ public class TableViewSpanSelectionModel extends
             return;
         }
 
-        selectedCellsSeq.callObservers(new MappingChange<>(c, NOOP_MAP, selectedCellsSeq));
+        selectedCellsSeq.callObservers(new MappingChange<>(c, MappingChange.NOOP_MAP, selectedCellsSeq));
         c.reset();
     }
 
-    //FIXME
-    public static final Map NOOP_MAP = new Map() {
-
-        @Override
-        public Object map(Object original) {
-            return original;
-        }
-    };
     /**
      * *********************************************************************
      * * Public selection API * *

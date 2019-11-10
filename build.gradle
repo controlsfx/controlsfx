@@ -75,30 +75,14 @@ subprojects {
         }
     }
 
-    afterEvaluate {
+    repositories {
+        mavenCentral()
+    }
 
-        repositories {
-            mavenCentral()
-        }
+    afterEvaluate {
 
         dependencies {
             testCompile 'junit:junit:[4,)'
-            testCompile 'org.testfx:testfx-core:4.0.10-alpha'
-	        testRuntime 'org.testfx:openjfx-monocle:1.8.0_20'
-        }
-
-        test {
-            if (!project.hasProperty("headless") || project.headless == "true") {
-                // execute TestFX Tests headless -- switch off by using ./gradlew -Pheadless=false
-                systemProperty("testfx.robot", "glass")
-                systemProperty("testfx.headless", "true")
-                systemProperty("prism.order", "sw")
-                systemProperty("prism.text", "t2k")
-            }
-            testLogging {
-                // Show that tests are run in the command-line output
-                events 'started', 'passed'
-            }
         }
     }
     

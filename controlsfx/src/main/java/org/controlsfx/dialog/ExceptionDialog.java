@@ -53,8 +53,9 @@ public class ExceptionDialog extends Dialog<ButtonType> {
         
         // --- content
         String contentText = getContentText();
-        dialogPane.setContent(new Label(contentText != null && ! contentText.isEmpty() ? 
-                contentText : exception.getMessage()));
+        Label contentLabel = new Label(contentText != null && ! contentText.isEmpty() ? contentText : exception.getMessage());
+        contentLabel.setWrapText(true);
+        dialogPane.setContent(contentLabel);
         
         // --- expandable content
         StringWriter sw = new StringWriter();

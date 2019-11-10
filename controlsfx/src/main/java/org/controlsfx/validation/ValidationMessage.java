@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2019, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -83,6 +83,35 @@ public interface ValidationMessage extends Comparable<ValidationMessage>{
      */
     public static ValidationMessage warning( Control target, String text ) {
         return new SimpleValidationMessage(target, text, Severity.WARNING);
+    }
+    
+    /**
+     * Factory method to create a simple info message 
+     * @param target message target
+     * @param text message text 
+     * @return info message
+     */
+    public static ValidationMessage info( Control target , String text ) {
+    	return new SimpleValidationMessage(target, text, Severity.INFO);
+    }
+
+    /**
+     * Factory method to create a simple ok message 
+     * @param target message target
+     * @param text message text 
+     * @return ok message
+     */
+    public static ValidationMessage ok( Control target , String text ) {
+    	return new SimpleValidationMessage(target, text, Severity.OK);
+    }
+
+    /**
+     * Factory method to create a simple ok message 
+     * @param target message target
+     * @return ok message
+     */
+    public static ValidationMessage ok( Control target ) {
+    	return new SimpleValidationMessage(target, "", Severity.OK);
     }
 
     @Override default public int compareTo(ValidationMessage msg) {

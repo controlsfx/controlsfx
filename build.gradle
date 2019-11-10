@@ -71,7 +71,7 @@ subprojects {
     if (JavaVersion.current().isJava11Compatible()) {
         apply plugin: 'org.openjfx.javafxplugin'
         javafx {
-            modules = [ 'javafx.controls', 'javafx.media', 'javafx.web' ]
+            modules = [ 'javafx.controls', 'javafx.media', 'javafx.web', 'javafx.swing' ]
         }
     }
 

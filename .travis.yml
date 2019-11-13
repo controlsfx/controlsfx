@@ -32,7 +32,8 @@ deploy:
     script: bash .ci/deploy-snapshot.sh
     skip_cleanup: true
     on:
-      condition: $TRAVIS_BRANCH =~ ^master|9.0.0$
+      all_branches: true
+      condition: $TRAVIS_BRANCH =~ master|9.0.0
 
   # Deploy releases on every tag push
   - provider: script

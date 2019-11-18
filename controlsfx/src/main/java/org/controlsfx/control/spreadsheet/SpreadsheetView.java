@@ -583,7 +583,8 @@ public class SpreadsheetView extends Control{
         /**
          * Keyboard action, maybe use an accelerator
          */
-        cellsView.setOnKeyPressed(keyPressedHandler);
+        cellsView.addEventFilter(KeyEvent.KEY_PRESSED, keyPressedHandler);
+//        cellsView.setOnKeyPressed(keyPressedHandler);
         /**
          * ContextMenu handling.
          */

@@ -174,6 +174,10 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
     private void handleFilter(double x, final double y, final double w, final double h) {
         Filter filter = ((CellView) getSkinnable()).getFilter();
         if (filter != null) {
+            //FIXME Layout children may be called when menuButton is clicked
+            if(filter.getMenuButton().isShowing()){
+                return;
+            }
             //We first remove it.
             removeMenuButton();
             filterButton = filter.getMenuButton();

@@ -26,8 +26,6 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import com.sun.javafx.scene.control.behavior.TableViewBehavior;
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -57,7 +55,6 @@ import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableFocusModel;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.stage.Screen;
@@ -647,8 +644,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                 if (((SpreadsheetCell) cell.getItem()).getItem() instanceof LocalDate) {
                     datePresent = true;
                 }
-                //FIXME
-//                cell.impl_processCSS(false);
+                cell.applyCss();
                 /**
                  * The cell will automatically add the filter width if
                  * necessary. The padding is also directly computed.
@@ -876,7 +872,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         return new HorizontalHeader(this);
     }
     
-    protected HorizontalHeader getHorizontalHeader(){
+    public HorizontalHeader getHorizontalHeader(){
         return (HorizontalHeader) getTableHeaderRow();
     }
 

@@ -27,7 +27,9 @@
 package impl.org.controlsfx.spreadsheet;
 
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TableColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
@@ -67,5 +69,16 @@ public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCel
 
     public GridViewSkin getGridViewSkin() {
         return handle.getCellsViewSkin();
+    }
+    
+    @Override
+    public boolean resizeColumn(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, double delta) {
+        //FIXME Reactivate that
+//        handle.getCellsViewSkin().getHorizontalHeader().getRootHeader().lastColumnResized = getColumns().indexOf(tc);
+        boolean returnedValue = super.resizeColumn(tc, delta);
+        if(returnedValue){
+            Event.fireEvent(handle.getView(), new SpreadsheetView.ColumnWidthEvent(getColumns().indexOf(tc), tc.getWidth()));
+        }
+        return returnedValue;
     }
 };

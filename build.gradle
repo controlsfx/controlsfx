@@ -34,7 +34,7 @@ subprojects {
     dependencies {
        testCompile 'junit:junit:[4,)'
 	   testCompile 'org.testfx:testfx-core:4.0.10-alpha'
-       testCompile 'de.sandec:JMemoryBuddy:0.1.1'
+       testCompile 'de.sandec:JMemoryBuddy:0.1.3'
 	   testRuntime 'org.testfx:openjfx-monocle:1.8.0_20'
     }
 

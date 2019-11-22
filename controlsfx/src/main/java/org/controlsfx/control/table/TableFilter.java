@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, ControlsFX
+ * Copyright (c) 2015, 2019, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -78,7 +78,7 @@ public final class TableFilter<T> {
         tableView.setItems(sortedControlList);
 
         applyForAllColumns();
-        tableView.getStylesheets().add("/impl/org/controlsfx/table/tablefilter.css");
+        tableView.getStylesheets().add(TableFilter.class.getResource("/impl/org/controlsfx/table/tablefilter.css").toExternalForm());
 
         if (!isLazy) {
             columnFilters.forEach(ColumnFilter::initialize);

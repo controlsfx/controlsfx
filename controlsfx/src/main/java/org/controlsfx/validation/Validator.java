@@ -50,10 +50,10 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
      * @return a Validator instance
      */
     @SafeVarargs
-    static <T> Validator<T> combine(Validator<T>... validators) {
+    static <T> Validator<T> combine(Validator<? super T>... validators) {
         return (control, value) -> Stream.of(validators)
-            .map(validator -> validator.apply(control, value))
-            .collect(Collectors.reducing(new ValidationResult(), ValidationResult::combine));
+                .map(validator -> validator.apply(control, value))
+                .reduce(new ValidationResult(), ValidationResult::combine);
     }
 
     /**
@@ -85,7 +85,7 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
      * @param severity severity of a message to be created if value is found
      * @return new validator
      */
-    public static <T> Validator<T> createEqualsValidator(final String message, final Severity severity, final Collection<T> values) {
+    public static <T> Validator<T> createEqualsValidator(final String message, final Severity severity, final Collection<? super T> values) {
         return (c, value) -> ValidationResult.fromMessageIf(c,message,severity, !values.contains(value));
     }
 
@@ -96,7 +96,7 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
      * @param values
      * @return new validator
      */
-    public static <T> Validator<T> createEqualsValidator(final String message, final Collection<T> values) {
+    public static <T> Validator<T> createEqualsValidator(final String message, final Collection<? super T> values) {
         return createEqualsValidator(message, Severity.ERROR, values);
     }
     
@@ -107,7 +107,7 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
      * @param predicate the predicate to be used for the value validity evaluation.
      * @return new validator
      */
-    static <T> Validator<T> createPredicateValidator(Predicate<T> predicate, String message) {
+    static <T> Validator<T> createPredicateValidator(Predicate<? super T> predicate, String message) {
         return createPredicateValidator(predicate, message, Severity.ERROR);
     }
     
@@ -119,7 +119,7 @@ public interface Validator<T> extends BiFunction<Control, T, ValidationResult> {
      * @param severity severity of a message to be created if value is invalid
      * @return new validator
      */
-    static <T> Validator<T> createPredicateValidator(Predicate<T> predicate, String message, Severity severity) {
+    static <T> Validator<T> createPredicateValidator(Predicate<? super T> predicate, String message, Severity severity) {
         return (control, value) -> ValidationResult.fromMessageIf(
             control, message,
             severity,

@@ -6,4 +6,6 @@ if [[ ! -s sonatype.gpg ]]
    exit 1
 fi
 
-./gradlew publish --info -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Psigning.keyId=$GPG_KEY_ID -Psigning.password=$GPG_KEY_PASSPHRASE -Psigning.secretKeyRingFile=/home/travis/build/controlsfx/controlsfx/sonatype.gpg
+./gradlew publish -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD \
+-Psigning.keyId=$GPG_KEY_ID -Psigning.password=$GPG_KEY_PASSPHRASE -Psigning.secretKeyRingFile=/home/travis/build/controlsfx/controlsfx/sonatype.gpg \
+-Dorg.gradle.internal.publish.checksums.insecure=true

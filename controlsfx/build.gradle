@@ -105,14 +105,6 @@ jar {
             'Implementation-Version': version,\
             'Bundle-Name': 'ControlsFX'
         )
-        instruction 'Bundle-Description', 'High quality UI controls and other tools to complement the core JavaFX distribution'        
-	instruction 'Import-Package',
-                '!org.controlsfx*',
-                '*'
-
-        instruction 'Export-Package',
-                '!impl.org.controlsfx.*',
-                'org.controlsfx.*'
     }
 }
 

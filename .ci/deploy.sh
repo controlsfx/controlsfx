@@ -6,4 +6,4 @@ if [[ ! -s sonatype.gpg ]]
    exit 1
 fi
 
-./gradlew uploadPublished --info -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Psigning.keyId=$GPG_KEY_ID -Psigning.password=$GPG_KEY_PASSPHRASE -Psigning.secretKeyRingFile=/home/travis/build/controlsfx/controlsfx/sonatype.gpg
+./gradlew publish --info -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Psigning.keyId=$GPG_KEY_ID -Psigning.password=$GPG_KEY_PASSPHRASE -Psigning.secretKeyRingFile=/home/travis/build/controlsfx/controlsfx/sonatype.gpg

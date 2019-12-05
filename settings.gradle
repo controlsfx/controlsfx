@@ -1,1 +1,14 @@
 include "controlsfx", "fxsampler", "controlsfx-samples"
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+    dependencies {
+        classpath 'org.openjfx:javafx-plugin:0.0.7'
+        classpath 'de.marcphilipp.gradle:nexus-publish-plugin:0.4.0'
+    }
+}

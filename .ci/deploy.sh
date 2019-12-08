@@ -9,3 +9,11 @@ fi
 ./gradlew publish -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD \
 -Psigning.keyId=$GPG_KEY_ID -Psigning.password=$GPG_KEY_PASSPHRASE -Psigning.secretKeyRingFile=/home/travis/build/controlsfx/controlsfx/sonatype.gpg \
 -Dorg.gradle.internal.publish.checksums.insecure=true
+
+# Update to next development version
+newVersion=${TRAVIS_TAG%.*}.$((${TRAVIS_TAG##*.} + 1))
+sed -i "0,/^controlsfx_specification_version=$TRAVIS_TAG/s//controlsfx_specification_version=$newVersion/" controlsfx-build.properties
+sed -i "0,/^artifact_suffix=/s//artifact_suffix=-SNAPSHOT/" controlsfx-build.properties
+
+git commit controlsfx-build.properties -m "Upgrade version to $newVersion-SNAPSHOT" --author "Abhinay Agarwal <abhinay_agarwal@live.com>"
+git push https://abhinayagarwal:$GITHUB_PASSWORD@github.com/controlsfx/controlsfx HEAD:master

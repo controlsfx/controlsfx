@@ -31,6 +31,7 @@ import impl.org.controlsfx.skin.CheckComboBoxSkin;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.beans.NamedArg;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -128,7 +129,7 @@ public class CheckComboBox<T> extends ControlsFXControl {
      * 
      * @param items The items to display within the CheckComboBox.
      */
-    public CheckComboBox(final ObservableList<T> items) {
+    public CheckComboBox(@NamedArg("items") final ObservableList<T> items) {
         final int initialSize = items == null ? 32 : items.size();
         
         this.itemBooleanMap = new HashMap<>(initialSize);

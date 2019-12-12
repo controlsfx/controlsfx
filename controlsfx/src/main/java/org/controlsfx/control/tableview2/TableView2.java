@@ -36,6 +36,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import javafx.beans.InvalidationListener;
+import javafx.beans.NamedArg;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -283,7 +284,7 @@ public class TableView2<S> extends TableView<S> {
      * @param items The items to insert into the TableView2, and the list to watch
      *          for changes (to automatically show in the TableView2).
      */
-    public TableView2(ObservableList<S> items) {
+    public TableView2(@NamedArg("items") ObservableList<S> items) {
         super(items);
         getStyleClass().add("table-view2"); //$NON-NLS-1$
         

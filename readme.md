@@ -18,8 +18,8 @@ ControlsFX includes so many features that we're now listing them on a separate p
 
 ## Getting ControlsFX
 
-- For users of Java 8, download [ControlsFX 8.40.15](https://repo.maven.apache.org/maven2/org/controlsfx/controlsfx/8.40.15/controlsfx-8.40.15.jar).
-- For users of Java 9 and above, download [ControlsFX 11.0.0](https://repo.maven.apache.org/maven2/org/controlsfx/controlsfx/11.0.0/controlsfx-11.0.0.jar).
+- For users of Java 8, download [ControlsFX 8.40.16](https://repo.maven.apache.org/maven2/org/controlsfx/controlsfx/8.40.16/controlsfx-8.40.16.jar).
+- For users of Java 9 and above, download [ControlsFX 11.0.1](https://repo.maven.apache.org/maven2/org/controlsfx/controlsfx/11.0.1/controlsfx-11.0.1.jar).
 
 ## Getting Started
 

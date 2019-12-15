@@ -7,5 +7,5 @@
 }
 
 .info {
-    -fx-effect: dropshadow(three-pass-box, rgba(196, 208, 239, 0.7), 14, 0, 0, 0);
+    -fx-effect: dropshadow(three-pass-box, skyblue, 14, 0, 0, 0);
 }

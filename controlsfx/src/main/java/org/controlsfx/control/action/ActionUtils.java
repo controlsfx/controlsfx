@@ -623,7 +623,7 @@ public class ActionUtils {
     // Binding as not a good solution since it wipes out existing styleable classes
     private static void bindStyle(final Styleable styleable, final Action action ) {
         styleable.getStyleClass().addAll( action.getStyleClass() );
-        action.getStyleClass().addListener(new ListChangeListener<String>() {
+        ListChangeListener<String> listChangeListener = new ListChangeListener<String>() {
             @Override
             public void onChanged(Change<? extends String> c) {
                 while(c.next()) {
@@ -635,7 +635,15 @@ public class ActionUtils {
                     }
                 }
             }
-        });
+        };
+
+        if (styleable instanceof Node) {
+            if(((Node) styleable).getProperties().containsKey(ListChangeListener.class.getCanonicalName())) {
+                throw new RuntimeException("222 Can't bind node to two actions!");
+            }
+            ((Node) styleable).getProperties().put(ListChangeListener.class.getCanonicalName(), listChangeListener);
+        }
+        action.getStyleClass().addListener(listChangeListener);
     }
 
     private static <T extends ButtonBase> T configure(final T btn, final Action action, final ActionTextBehavior textBehavior) {
@@ -719,6 +727,12 @@ public class ActionUtils {
         }
 
         Action action = (Action) btn.getOnAction();
+
+        Object listChangeListener = btn.getProperties().get(ListChangeListener.class.getCanonicalName());
+        if (listChangeListener instanceof ListChangeListener<?>) {
+            btn.getProperties().remove(ListChangeListener.class.getCanonicalName());
+            action.getStyleClass().removeListener((ListChangeListener<? super String>) listChangeListener);
+        }
 
         btn.styleProperty().unbind();
         btn.textProperty().unbind();

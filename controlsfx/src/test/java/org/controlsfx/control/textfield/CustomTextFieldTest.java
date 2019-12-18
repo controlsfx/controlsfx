@@ -30,7 +30,6 @@ import java.util.concurrent.TimeoutException;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
-import org.controlsfx.control.textfield.CustomTextField;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,7 +41,7 @@ import static org.testfx.api.FxToolkit.setupStage;
 
 public class CustomTextFieldTest extends FxRobot {
 
-    StackPane sceneRoot;
+    private StackPane sceneRoot;
 
     @BeforeClass
     public static void setupSpec() throws TimeoutException {

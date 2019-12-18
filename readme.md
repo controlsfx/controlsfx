@@ -2,6 +2,7 @@ ControlsFX
 =====
 
 [![BSD-3 license](https://img.shields.io/badge/license-BSD--3-%230778B9.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/controlsfx/controlsfx.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/controlsfx/controlsfx/context:java)
 
 [![Travis CI](https://img.shields.io/travis/controlsfx/controlsfx/master?label=JDK8%20build)](https://travis-ci.org/controlsfx/controlsfx)
 [![Maven Central](https://img.shields.io/maven-central/v/org.controlsfx/controlsfx/8)](https://search.maven.org/search?q=g:org.controlsfx%20AND%20a:controlsfx%20AND%20v:8*)

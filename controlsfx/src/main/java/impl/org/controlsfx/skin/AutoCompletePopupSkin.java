@@ -50,19 +50,24 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
     }
 
     /**
-     * @param displayConverter
-     *            An alternate {@link StringConverter} to use. This way, you can show autocomplete suggestions that when applied will fill in a
-     *            different text than displayed. For example, you may preview {@code Files.newBufferedReader(Path: path) - Bufferedreader} but
-     *            only fill in {@code Files.newBufferedReader(}
-     */
+	 * @param control
+	 *            The popup to be skinned
+	 * @param displayConverter
+	 *            An alternate {@link StringConverter} to use. This way, you can show autocomplete suggestions
+	 *            that when applied will fill in a different text than displayed. For example, you may preview
+	 *            {@code Files.newBufferedReader(Path: path) - Bufferedreader} but only fill in
+	 *            {@code Files.newBufferedReader(}
+	 */
     public AutoCompletePopupSkin(AutoCompletePopup<T> control, StringConverter<T> displayConverter) {
         this(control, TextFieldListCell.forListView(displayConverter));
     }
 
     /**
-     * @param cellFactory
-     *            Set a custom cell factory for the suggestions.
-     */
+	 * @param control
+	 *            The popup to be skinned
+	 * @param cellFactory
+	 *            Set a custom cell factory for the suggestions.
+	 */
     public AutoCompletePopupSkin(AutoCompletePopup<T> control, Callback<ListView<T>, ListCell<T>> cellFactory) {
         this.control = control;
         suggestionList = new ListView<>(control.getSuggestions());

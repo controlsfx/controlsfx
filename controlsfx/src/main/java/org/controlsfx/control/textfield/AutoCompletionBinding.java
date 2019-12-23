@@ -271,6 +271,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
 
     /**
      * Set the skin of the popup
+     * @param skin The new skin
      */
     public final void setSkin(Skin<?> skin) {
         autoCompletionPopup.setSkin(skin);
@@ -278,6 +279,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
 
     /**
      * Return the skin of the popup
+     * @return The current skin
      */
     public final Skin<?> getSkin() {
         return autoCompletionPopup.getSkin();

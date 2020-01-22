@@ -26,7 +26,7 @@
  */
 package org.controlsfx.tools;
 
-import java.util.List;
+import java.util.Iterator;
 
 import javafx.scene.Node;
 import javafx.stage.PopupWindow;
@@ -44,14 +44,16 @@ public class Utils {
      */
     public static Window getWindow(Object owner) throws IllegalArgumentException {
         if (owner == null) {
+            Window window = null;
             // lets just get the focused stage and show the dialog in there
-            List<Window> windows = Window.getWindows();
-            for (Window window : windows) {
+            Iterator<Window> windows = Window.getWindows().iterator();
+            while (windows.hasNext()) {
+                window = windows.next();
                 if (window.isFocused() && !(window instanceof PopupWindow)) {
-                    return window;
+                    break;
                 }
             }
-            return null;
+            return window;
         } else if (owner instanceof Window) {
             return (Window) owner;
         } else if (owner instanceof Node) {

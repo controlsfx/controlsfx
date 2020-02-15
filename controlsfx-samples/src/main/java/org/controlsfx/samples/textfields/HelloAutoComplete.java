@@ -183,23 +183,17 @@ public class HelloAutoComplete extends ControlsFXSample {
         return grid;
     }
 
-	// https://stackoverflow.com/a/17465261/6094756
+	/* Modified from https://stackoverflow.com/a/17465261/6094756 */
 	private Map<String, Color> allColorsWithName() {
         Map<String, Color> map = new HashMap<>();
         try {
-			Class<?> clazz = Class.forName("javafx.scene.paint.Color");
-			if (clazz != null) {
-				Field[] field = clazz.getFields();
-				for (int i = 0; i < field.length; i++) {
-					Field f = field[i];
-					Object obj = f.get(null);
-					if (obj instanceof Color) {
-						map.put(f.getName(), (Color) obj);
-					}
-
+			for (Field f : Color.class.getFields()) {
+				Object obj = f.get(null);
+				if (obj instanceof Color) {
+					map.put(f.getName(), (Color) obj);
 				}
 			}
-		} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException e) {
+		} catch (IllegalArgumentException | IllegalAccessException e) {
 			map.put("red", Color.RED);
 			map.put("green", Color.GREEN);
 			map.put("blue", Color.BLUE);

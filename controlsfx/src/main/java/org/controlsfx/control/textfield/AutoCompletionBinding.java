@@ -190,7 +190,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     public final IntegerProperty visibleRowCountProperty() {
         return autoCompletionPopup.visibleRowCountProperty();
     }
-
+    
     /**
      * Sets the prefWidth of the popup.
      *
@@ -267,29 +267,6 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      */
     public final DoubleProperty maxWidthProperty() {
         return autoCompletionPopup.maxWidthProperty();
-    }
-
-    /**
-     * Set the skin of the popup
-     * @param skin The new skin
-     */
-    public final void setSkin(Skin<?> skin) {
-        autoCompletionPopup.setSkin(skin);
-    }
-
-    /**
-     * Return the skin of the popup
-     * @return The current skin
-     */
-    public final Skin<?> getSkin() {
-        return autoCompletionPopup.getSkin();
-    }
-
-    /**
-     * Return the property associated with the popup's skin
-     */
-    public final ObjectProperty<Skin<?>> skinProperty() {
-        return autoCompletionPopup.skinProperty();
     }
 
     /***************************************************************************

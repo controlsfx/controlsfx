@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2013, 2019 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -74,27 +74,35 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
     
     private void updateChildren() {
         Node newLeft = leftProperty().get();
+        //Remove leftPane in any case
+        getChildren().remove(leftPane);
         if (newLeft != null) {
-            getChildren().remove(leftPane);
             leftPane = new StackPane(newLeft);
             leftPane.setManaged(false);
             leftPane.setAlignment(Pos.CENTER_LEFT);
             leftPane.getStyleClass().add("left-pane"); //$NON-NLS-1$
             getChildren().add(leftPane);
             left = newLeft;
+        } else {
+            leftPane = null;
+            left = null;
         }
-        
+
         Node newRight = rightProperty().get();
+        //Remove rightPane in anycase
+        getChildren().remove(rightPane);
         if (newRight != null) {
-            getChildren().remove(rightPane);
             rightPane = new StackPane(newRight);
             rightPane.setManaged(false);
             rightPane.setAlignment(Pos.CENTER_RIGHT);
             rightPane.getStyleClass().add("right-pane"); //$NON-NLS-1$
             getChildren().add(rightPane);
             right = newRight;
+        } else {
+            rightPane = null;
+            right = null;
         }
-        
+
         control.pseudoClassStateChanged(HAS_LEFT_NODE, left != null);
         control.pseudoClassStateChanged(HAS_RIGHT_NODE, right != null);
         control.pseudoClassStateChanged(HAS_NO_SIDE_NODE, left == null && right == null);

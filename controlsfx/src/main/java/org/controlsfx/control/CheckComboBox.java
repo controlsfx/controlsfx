@@ -31,6 +31,7 @@ import impl.org.controlsfx.skin.CheckComboBoxSkin;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.beans.DefaultProperty;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -96,6 +97,7 @@ import javafx.util.StringConverter;
  *
  * @param <T> The type of the data in the ComboBox.
  */
+@DefaultProperty("items")
 public class CheckComboBox<T> extends ControlsFXControl {
     
     /**************************************************************************

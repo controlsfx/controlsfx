@@ -30,6 +30,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.table.TableFilter;
@@ -40,18 +41,23 @@ public class HelloTableFilter extends ControlsFXSample {
         return "TableFilter";
     }
 
+    TableFilter<Person> tableFilter;
+    TableColumn<String, Person> firstNameCol;
+    TableColumn<String, Person> lastNameCol;
+    TableColumn<String, Person> emailCol;
+
     @Override
     @SuppressWarnings("unchecked")
     public Node getPanel(Stage stage) {
         TableView tableView = new TableView();
 
-        TableColumn<String, Person> firstNameCol = new TableColumn<>("First Name");
+        firstNameCol = new TableColumn<>("First Name");
         firstNameCol.setCellValueFactory(new PropertyValueFactory<>("firstName"));
 
-        TableColumn<String, Person> lastNameCol = new TableColumn<>("Last Name");
+        lastNameCol = new TableColumn<>("Last Name");
         lastNameCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
 
-        TableColumn<String, Person> emailCol = new TableColumn<>("Email");
+        emailCol = new TableColumn<>("Email");
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
 
         tableView.getColumns().addAll(firstNameCol, lastNameCol, emailCol);
@@ -64,9 +70,54 @@ public class HelloTableFilter extends ControlsFXSample {
         tableView.getItems().add(new Person("Isabella", "Smith", "isabella.smith@example.com"));
 
         // apply filter
-        TableFilter.forTableView(tableView).apply();
+        tableFilter = TableFilter.forTableView(tableView).apply();
 
         return tableView;
+    }
+
+    @Override
+    public Node getControlPanel() {
+        VBox controlPane = new VBox(10);
+
+        String sFirstname = "Isabella";
+        Button buttonFilterFirstname = new Button("Filter Firstname == '" + sFirstname + "'");
+        buttonFilterFirstname.setOnAction(e -> {
+            tableFilter.unSelectAllValues(firstNameCol);
+            tableFilter.selectValue(firstNameCol, sFirstname);
+            tableFilter.executeFilter();
+        });
+
+        String sLastname = "Smith";
+        Button buttonFilterLastname = new Button("Filter Lastname == '" + sLastname + "'");
+        buttonFilterLastname.setOnAction(e -> {
+            tableFilter.unSelectAllValues(lastNameCol);
+            tableFilter.selectValue(lastNameCol, sLastname);
+            tableFilter.executeFilter();
+        });
+
+        String sEmail = "michael.brown@example.com";
+        Button buttonFilterEmail = new Button("Filter Email == '" + sEmail + "'");
+        buttonFilterEmail.setOnAction(e -> {
+            tableFilter.unSelectAllValues(emailCol);
+            tableFilter.selectValue(emailCol, sEmail);
+            tableFilter.executeFilter();
+        });
+
+        Button buttonResetAll = new Button("Reset All");
+        buttonResetAll.setOnAction(e -> {
+            // tableFilter.getColumnFilters().forEach(cf -> cf.getTableColumn().setGraphic(null));
+            // tableFilter.getColumnFilters().forEach(cf -> tableFilter.selectAllValues(cf.getTableColumn()));
+            // tableFilter.executeFilter();
+            // tableFilter.resetFilter();
+            tableFilter.resetAllFilters();
+        });
+
+        controlPane.getChildren().add(buttonFilterFirstname);
+        controlPane.getChildren().add(buttonFilterLastname);
+        controlPane.getChildren().add(buttonFilterEmail);
+        controlPane.getChildren().add(buttonResetAll);
+
+        return controlPane;
     }
 
     @Override

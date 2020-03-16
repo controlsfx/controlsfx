@@ -105,10 +105,6 @@ public class HelloTableFilter extends ControlsFXSample {
 
         Button buttonResetAll = new Button("Reset All");
         buttonResetAll.setOnAction(e -> {
-            // tableFilter.getColumnFilters().forEach(cf -> cf.getTableColumn().setGraphic(null));
-            // tableFilter.getColumnFilters().forEach(cf -> tableFilter.selectAllValues(cf.getTableColumn()));
-            // tableFilter.executeFilter();
-            // tableFilter.resetFilter();
             tableFilter.resetAllFilters();
         });
 

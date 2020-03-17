@@ -80,37 +80,54 @@ public class HelloTableFilter extends ControlsFXSample {
         VBox controlPane = new VBox(10);
 
         String sFirstname = "Isabella";
-        Button buttonFilterFirstname = new Button("Filter Firstname == '" + sFirstname + "'");
+        Button buttonFilterFirstname = new Button("Filter First Name '" + sFirstname + "'");
         buttonFilterFirstname.setOnAction(e -> {
             tableFilter.unSelectAllValues(firstNameCol);
             tableFilter.selectValue(firstNameCol, sFirstname);
             tableFilter.executeFilter();
         });
+        Button buttonFilterFirstnameReset = new Button("\u21BA");
+        buttonFilterFirstnameReset.setOnAction(e -> {
+            tableFilter.selectAllValues(firstNameCol);
+            tableFilter.executeFilter();
+        });
 
         String sLastname = "Smith";
-        Button buttonFilterLastname = new Button("Filter Lastname == '" + sLastname + "'");
+        Button buttonFilterLastname = new Button("Filter Last Name '" + sLastname + "'");
         buttonFilterLastname.setOnAction(e -> {
             tableFilter.unSelectAllValues(lastNameCol);
             tableFilter.selectValue(lastNameCol, sLastname);
             tableFilter.executeFilter();
         });
+        Button buttonFilterLastnamReset = new Button("\u21BA");
+        buttonFilterLastnamReset.setOnAction(e -> {
+            tableFilter.selectAllValues(lastNameCol);
+            tableFilter.executeFilter();
+        });
 
         String sEmail = "michael.brown@example.com";
-        Button buttonFilterEmail = new Button("Filter Email == '" + sEmail + "'");
+        Button buttonFilterEmail = new Button("Filter Email '" + sEmail + "'");
         buttonFilterEmail.setOnAction(e -> {
             tableFilter.unSelectAllValues(emailCol);
             tableFilter.selectValue(emailCol, sEmail);
             tableFilter.executeFilter();
         });
+        Button buttonFilterEmailReset = new Button("\u21BA");
+        buttonFilterEmailReset.setOnAction(e -> {
+            tableFilter.selectAllValues(emailCol);
+            tableFilter.executeFilter();
+        });
 
-        Button buttonResetAll = new Button("Reset All");
+        Button buttonResetAll = new Button("Reset All Filters \u21BA");
         buttonResetAll.setOnAction(e -> {
             tableFilter.resetAllFilters();
         });
 
-        controlPane.getChildren().add(buttonFilterFirstname);
-        controlPane.getChildren().add(buttonFilterLastname);
-        controlPane.getChildren().add(buttonFilterEmail);
+        controlPane.getChildren().add(new Label("Programmatic Filtering:"));
+        controlPane.getChildren().add(new HBox(10, buttonFilterFirstname, buttonFilterFirstnameReset));
+        controlPane.getChildren().add(new HBox(10,buttonFilterLastname, buttonFilterLastnamReset));
+        controlPane.getChildren().add(new HBox(10,buttonFilterEmail, buttonFilterEmailReset));
+        buttonResetAll.setPrefWidth(Double.MAX_VALUE);
         controlPane.getChildren().add(buttonResetAll);
 
         return controlPane;

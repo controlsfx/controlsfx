@@ -259,14 +259,12 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
     	
     }
     
-//    private double getSpacing() {
-//        return (backgroundContainer instanceof HBox) ?
-//                ((HBox)backgroundContainer).getSpacing() :
-//                ((VBox)backgroundContainer).getSpacing();
-//    }
+    protected Node createButtonNode() {
+        return new Region();
+    }
     
     private Node createButton() {
-        Region btn = new Region();
+        Node btn = createButtonNode();
         btn.getStyleClass().add("button"); //$NON-NLS-1$
         
         btn.setOnMouseMoved(mouseMoveHandler);

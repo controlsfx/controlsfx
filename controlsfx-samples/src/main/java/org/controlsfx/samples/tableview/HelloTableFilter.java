@@ -29,6 +29,8 @@ package org.controlsfx.samples.tableview;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
@@ -123,12 +125,30 @@ public class HelloTableFilter extends ControlsFXSample {
             tableFilter.resetAllFilters();
         });
 
+        CheckBox cbRegularExpSearchStrategy = new CheckBox("Use regular expressions");
+        cbRegularExpSearchStrategy.selectedProperty().addListener((ov, old_val, new_val) -> {
+            if(cbRegularExpSearchStrategy.isSelected()) {
+                tableFilter.setSearchStrategy((input,target) -> {
+                    try {
+                        return target.matches(input);
+                    } catch (Exception e) {
+                        return false;
+                    }
+                });
+            } else {
+                // fallback to normal
+                tableFilter.setSearchStrategy((inputString, subjectString) -> subjectString.toLowerCase().contains(inputString.toLowerCase()));
+            }
+        });
+
         controlPane.getChildren().add(new Label("Programmatic Filtering:"));
         controlPane.getChildren().add(new HBox(10, buttonFilterFirstname, buttonFilterFirstnameReset));
         controlPane.getChildren().add(new HBox(10,buttonFilterLastname, buttonFilterLastnamReset));
         controlPane.getChildren().add(new HBox(10,buttonFilterEmail, buttonFilterEmailReset));
         buttonResetAll.setPrefWidth(Double.MAX_VALUE);
         controlPane.getChildren().add(buttonResetAll);
+        controlPane.getChildren().add(new Label("Custom Search Strategies (e.g., '.*o.*n' for 'Last Name')"));
+        controlPane.getChildren().add(cbRegularExpSearchStrategy);
 
         return controlPane;
     }

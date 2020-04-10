@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2019 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -96,6 +96,7 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
 
     @Override
     protected double computePrefHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+        Node graphic = getSkinnable().getGraphic();
         /**
          * If we have an Image in the Cell, its fitHeight will be affected by
          * the cell height (see CellView). But during calculation for autofit
@@ -103,7 +104,6 @@ public class CellViewSkin extends TableCellSkin<ObservableList<SpreadsheetCell>,
          * the fitHeight option is returned by default so we must override and
          * return the Height of the image inside.
          */
-        Node graphic = getSkinnable().getGraphic();
         if (graphic != null && graphic instanceof ImageView) {
             ImageView view = (ImageView) graphic;
             if (!((CellView) getSkinnable()).isOriginalCell()) {

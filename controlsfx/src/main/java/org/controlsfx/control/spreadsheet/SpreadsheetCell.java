@@ -138,7 +138,29 @@ public interface SpreadsheetCell  {
      * exceeds the width of the {@code Labeled}
      */
     public boolean isWrapText();
-    
+
+    /**
+     * Returns {@code true} if this cell contains something particular in its
+     * item and a {@code Node} given by the {@link CellGraphicFactory} will be used to
+     * display it.
+     * 
+     * @return {@code true} if this cell item needs to be given to a particular
+     * Node
+     */
+    public boolean isCellGraphic();
+
+    /**
+     * If {@code isCellGraphic} is {@code true}, this cell item contains
+     * something particular and should be display by using a Node provided by
+     * {@link CellGraphicFactory} object in the CellView.
+     *
+     * If you only seek to place a simple {@code Node} for this cell, simply use {@link #setGraphic(javafx.scene.Node)
+     * }.
+     *
+     * @param isCellGraphic if {@code true}, a Node will be used to display
+     * something particular for the cell
+     */
+    public void setCellGraphic(boolean isCellGraphic);
     
     /**
      * If a run of text exceeds the width of the Labeled, then this variable

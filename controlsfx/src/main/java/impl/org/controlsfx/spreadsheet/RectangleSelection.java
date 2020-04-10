@@ -254,7 +254,8 @@ public class RectangleSelection extends Rectangle {
          * translate the starting point in because the rectangle must also be
          * hidden by the fixed column.
          */
-        if (!skin.spreadsheetView.getFixedColumns().contains(columns.get(skin.spreadsheetView.getModelColumn(minColumn)))) {
+        int col = skin.spreadsheetView.getModelColumn(minColumn);
+        if (col < columns.size() && !skin.spreadsheetView.getFixedColumns().contains(columns.get(col))) {
             if (x < skin.fixedColumnWidth) {
                 //Since I translate the starting point, I must reduce the width by the value I'm translating.
                 width -= skin.fixedColumnWidth - x;

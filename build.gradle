@@ -16,8 +16,6 @@ ext.java9Args = [
         "--add-exports=javafx.base/com.sun.javafx.collections=org.controlsfx.controls",
         // For VersionInfo in VersionChecker
         "--add-exports=javafx.base/com.sun.javafx.runtime=org.controlsfx.controls",
-        // For WebPage in SVGLoader
-        "--add-exports=javafx.web/com.sun.webkit=org.controlsfx.controls",
         // For enabling FontAwesome
         "--add-exports=javafx.graphics/com.sun.javafx.css=org.controlsfx.controls"
 ]
@@ -58,9 +56,6 @@ subprojects {
 
     if (JavaVersion.current().isJava11Compatible()) {
         apply plugin: 'org.openjfx.javafxplugin'
-        javafx {
-            modules = [ 'javafx.controls', 'javafx.media', 'javafx.web', 'javafx.swing' ]
-        }
     }
 
     repositories {

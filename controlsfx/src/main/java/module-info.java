@@ -3,7 +3,6 @@ module org.controlsfx.controls {
     requires java.desktop;
 
     requires transitive javafx.controls;
-    requires static javafx.web;
     requires static javafx.media;
     // Required for JavaFXThreadingRule
     requires static javafx.swing;

@@ -109,7 +109,8 @@ javadoc {
 
 ext.java9TestArgs = [
         "--add-reads=$moduleName=org.testfx",
-        "--add-modules=org.testfx"
+        "--add-modules=org.testfx",
+        "--add-exports=javafx.graphics/com.sun.javafx.application=org.testfx"
 ]
 
 test {

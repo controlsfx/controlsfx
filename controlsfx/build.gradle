@@ -3,6 +3,10 @@ ext {
     transifex_api = ""
 }
 
+javafx {
+    modules = [ 'javafx.controls', 'javafx.media', 'javafx.swing' ]
+}
+
 configurations {
     jdk
     

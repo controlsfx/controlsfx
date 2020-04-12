@@ -5,6 +5,10 @@ apply plugin: 'application'
 applicationName = 'FXSampler'
 mainClassName = fxsampler_mainClass
 
+javafx {
+    modules = [ 'javafx.controls', 'javafx.web' ]
+}
+
 configurations {
     jdk
 }

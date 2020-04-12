@@ -9,8 +9,8 @@ ext {
 
 dependencies {
     testCompile 'junit:junit:[4,)'
-    testCompile 'org.testfx:testfx-core:4.0.10-alpha'
-    testRuntime 'org.testfx:openjfx-monocle:1.8.0_20'
+    testCompile 'org.testfx:testfx-core:4.0.16-alpha'
+    testRuntime 'org.testfx:openjfx-monocle:jdk-11+26'
 }
 
 javafx {

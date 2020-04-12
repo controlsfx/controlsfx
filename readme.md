@@ -1,10 +1,16 @@
 ControlsFX
 =====
 
-ControlsFX is an open source project for JavaFX that aims to provide really high quality UI controls and other tools to complement the core JavaFX distribution. It has been developed for JavaFX 8.0 and beyond, and has a guiding principle of only accepting new controls / features when all existing code is at an acceptably high level, including thankless jobs like having [high quality javadoc documentation](http://docs.controlsfx.org). This ensure a high quality release is available at all times, with all experimental work being done in branches of the main code base.
-
-[![Maven Central](http://img.shields.io/maven-central/v/org.controlsfx/controlsfx.svg?color=%234DC71F)](https://search.maven.org/#search|ga|1|org.controlsfx.controlsfx)
 [![BSD-3 license](https://img.shields.io/badge/license-BSD--3-%230778B9.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/controlsfx/controlsfx.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/controlsfx/controlsfx/context:java)
+
+[![Travis CI](https://img.shields.io/travis/controlsfx/controlsfx/master?label=JDK8%20build)](https://travis-ci.org/controlsfx/controlsfx)
+[![Maven Central](https://img.shields.io/maven-central/v/org.controlsfx/controlsfx/8)](https://search.maven.org/search?q=g:org.controlsfx%20AND%20a:controlsfx%20AND%20v:8*)
+
+[![Travis CI](https://img.shields.io/travis/controlsfx/controlsfx/9.0.0?label=JDK9%2B%20build)](https://travis-ci.org/controlsfx/controlsfx)
+[![Maven Central](http://img.shields.io/maven-central/v/org.controlsfx/controlsfx)](https://search.maven.org/search?q=g:org.controlsfx%20AND%20a:controlsfx)
+
+ControlsFX is an open source project for JavaFX that aims to provide really high quality UI controls and other tools to complement the core JavaFX distribution. It has been developed for JavaFX 8.0 and beyond, and has a guiding principle of only accepting new controls / features when all existing code is at an acceptably high level, including thankless jobs like having [high quality javadoc documentation](http://docs.controlsfx.org). This ensure a high quality release is available at all times, with all experimental work being done in branches of the main code base.
 
 ## Features
 
@@ -15,11 +21,6 @@ ControlsFX includes so many features that we're now listing them on a separate p
 - [JavaDoc](http://docs.controlsfx.org)
 - [Mailing List](https://groups.google.com/group/controlsfx-dev)
 - [Bug / Feature Tracking](https://github.com/controlsfx/controlsfx/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc)
-
-## Getting ControlsFX
-
-- For users of Java 8, download [ControlsFX 8.40.16](https://repo.maven.apache.org/maven2/org/controlsfx/controlsfx/8.40.16/controlsfx-8.40.16.jar).
-- For users of Java 9 and above, download [ControlsFX 11.0.1](https://repo.maven.apache.org/maven2/org/controlsfx/controlsfx/11.0.1/controlsfx-11.0.1.jar).
 
 ## Getting Started
 

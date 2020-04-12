@@ -62,12 +62,6 @@ subprojects {
         mavenCentral()
     }
 
-    afterEvaluate {
-        dependencies {
-            testCompile 'junit:junit:[4,)'
-        }
-    }
-
     compileJava {
         options.encoding = "UTF-8"
         options.incremental = true

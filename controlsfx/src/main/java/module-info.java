@@ -20,6 +20,8 @@ module org.controlsfx.controls {
     exports org.controlsfx.tools;
     exports org.controlsfx.validation;
     exports org.controlsfx.validation.decoration;
+    
+    exports impl.org.controlsfx.skin to org.controlsfx.samples;
 
     // opens org.controlsfx.glyphfont to org.controlsfx.fxsampler;
     

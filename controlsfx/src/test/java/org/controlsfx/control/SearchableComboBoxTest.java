@@ -52,7 +52,7 @@ import static java.util.Arrays.asList;
 import static javafx.scene.input.KeyCode.*;
 import static org.junit.Assert.*;
 
-public class SearchableComboBoxTest {
+public class SearchableComboBoxTest extends FxRobot{
 
     private static Application application;
 
@@ -222,7 +222,8 @@ public class SearchableComboBoxTest {
         robot.type(TAB);
 
         // when: "input search text '100'"
-        robot.type(DIGIT1, DIGIT0, DIGIT0);
+        // Use Numpad instead of Digit for foreign keyboard (french for example)
+        robot.type(NUMPAD1, NUMPAD0, NUMPAD0);
 
         // then: "list is filtered"
         assertEquals(asList("100"), filteredComboBox.getItems());
@@ -234,7 +235,8 @@ public class SearchableComboBoxTest {
         robot.type(TAB);
 
         // when: "input search text '1 00'"
-        robot.type(DIGIT1, SPACE, DIGIT0, DIGIT0);
+        // Use Numpad instead of Digit for foreign keyboard (french for example)
+        robot.type(NUMPAD1, SPACE, NUMPAD0, NUMPAD0);
 
         // then: "list is filtered"
         assertEquals(asList("100"), filteredComboBox.getItems());
@@ -259,7 +261,8 @@ public class SearchableComboBoxTest {
         robot.type(TAB);
 
         // when: "input search text '100'"
-        robot.type(DIGIT1, DIGIT0, DIGIT0);
+        // Use Numpad instead of Digit for foreign keyboard (french for example)
+        robot.type(NUMPAD1, NUMPAD0, NUMPAD0);
 
         // then: "value is still selected"
         assertEquals(0, filteredComboBox.getSelectionModel().getSelectedIndex());
@@ -271,7 +274,8 @@ public class SearchableComboBoxTest {
         robot.type(TAB);
 
         // when: "input search text '100'"
-        robot.type(DIGIT1, DIGIT0, DIGIT0);
+        // Use Numpad instead of Digit for foreign keyboard (french for example)
+        robot.type(NUMPAD1, NUMPAD0, NUMPAD0);
 
         // then: "no value is selected"
         assertEquals(-1, filteredComboBox.getSelectionModel().getSelectedIndex());

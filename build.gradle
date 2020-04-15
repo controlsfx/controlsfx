@@ -2,8 +2,6 @@ ext.java9Args = [
         // For various usages of TraversalEngine
         "--add-exports=javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",
         "--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
-        // For FontAwesome Style
-        "--add-exports=javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
         // For various behaviors across controls
         "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls",
         // For ReadOnlyUnbackedObservableList across files
@@ -16,8 +14,6 @@ ext.java9Args = [
         "--add-exports=javafx.base/com.sun.javafx.collections=org.controlsfx.controls",
         // For VersionInfo in VersionChecker
         "--add-exports=javafx.base/com.sun.javafx.runtime=org.controlsfx.controls",
-        // For enabling FontAwesome
-        "--add-exports=javafx.graphics/com.sun.javafx.css=org.controlsfx.controls"
 ]
 
 ext.java9RuntimeArgs = [

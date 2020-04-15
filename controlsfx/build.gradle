@@ -10,7 +10,9 @@ ext {
 dependencies {
     testCompile 'junit:junit:[4,)'
     testCompile 'org.testfx:testfx-core:4.0.16-alpha'
-    testRuntime 'org.testfx:openjfx-monocle:jdk-11+26'
+    testRuntime ('org.testfx:openjfx-monocle:jdk-11+26') {
+        exclude group: 'org.openjfx'
+    }
 }
 
 javafx {
@@ -110,7 +112,10 @@ javadoc {
 ext.java9TestArgs = [
         "--add-reads=$moduleName=org.testfx",
         "--add-modules=org.testfx",
-        "--add-exports=javafx.graphics/com.sun.javafx.application=org.testfx"
+        "--add-exports=javafx.graphics/com.sun.javafx.application=org.testfx",
+        // For Monocle
+        "--add-exports=javafx.graphics/com.sun.glass.ui=org.testfx.monocle",
+        "--add-opens=javafx.graphics/com.sun.glass.ui=org.testfx"
 ]
 
 test {
@@ -118,6 +123,17 @@ test {
         java9Args.addAll(java9RuntimeArgs)
         java9Args.addAll(java9TestArgs)
         jvmArgs = java9Args
+    }
+    if (!project.hasProperty("headless") || project.headless == "true") {
+        // execute TestFX Tests headless -- switch off by using ./gradlew -Pheadless=false
+        systemProperty("testfx.robot", "glass")
+        systemProperty("testfx.headless", "true")
+        systemProperty("prism.order", "sw")
+        systemProperty("prism.text", "t2k")
+    }
+    testLogging {
+        // Show that tests are run in the command-line output
+        events 'started', 'passed'
     }
 }
 

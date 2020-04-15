@@ -4,8 +4,6 @@ module org.controlsfx.controls {
 
     requires transitive javafx.controls;
     requires static javafx.media;
-    // Required for JavaFXThreadingRule
-    requires static javafx.swing;
 
     exports org.controlsfx.control;
     exports org.controlsfx.control.action;

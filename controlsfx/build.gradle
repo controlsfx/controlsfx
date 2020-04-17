@@ -17,7 +17,7 @@ dependencies {
 
 javafx {
     version = "11.0.2"
-    modules = [ 'javafx.controls', 'javafx.media', 'javafx.swing' ]
+    modules = [ 'javafx.controls', 'javafx.media' ]
 }
 
 configurations {

@@ -238,26 +238,6 @@ public class ReflectionUtils {
 
     /****************************************************************************************************
      *
-     * StyleManager
-     *
-     ****************************************************************************************************/
-
-    public static void addUserAgentStylesheet(String stylesheet) {
-        try {
-            Class<?> styleManagerClass = Class.forName("com.sun.javafx.css.StyleManager");
-            Method getInstance = styleManagerClass.getMethod("getInstance");
-            getInstance.setAccessible(true);
-            Object styleManager = getInstance.invoke(styleManagerClass);
-            Method addUserStyleSheet = styleManagerClass.getMethod("addUserAgentStylesheet", String.class);
-            addUserStyleSheet.setAccessible(true);
-            addUserStyleSheet.invoke(styleManager, stylesheet);
-        } catch (IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException e) {
-            throw new RuntimeException("Cannot add UserAgentStylesheet as the method is not accessible");
-        }
-    }
-
-    /****************************************************************************************************
-     *
      * TraversalEngine
      *
      ****************************************************************************************************/

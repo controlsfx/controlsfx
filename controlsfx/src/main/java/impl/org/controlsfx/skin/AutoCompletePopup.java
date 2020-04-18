@@ -31,6 +31,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -57,6 +58,7 @@ public class AutoCompletePopup<T> extends PopupControl{
 
     private final ObservableList<T> suggestions = FXCollections.observableArrayList();
     private StringConverter<T> converter;
+    private ChangeListener<Number> widthListener;
     /**
      * The maximum number of rows to be visible in the popup when it is
      * showing. By default this value is 10, but this can be changed to increase
@@ -145,10 +147,22 @@ public class AutoCompletePopup<T> extends PopupControl{
         }
         
         Window parent = node.getScene().getWindow();
+        // Remove old listener
+        if (widthListener != null) {
+            widthProperty().removeListener(widthListener);
+        }
+        // Create new listener with new node (since it might have changed since last call)
+        // This listener will change X anchor based on popup width
+        widthListener = (observable, oldValue, newValue) -> setAnchorX(
+                parent.getX() + node.localToScene(0, 0).getX() +
+                        node.getScene().getX() -
+                        (node.getEffectiveNodeOrientation() ==
+                                NodeOrientation.RIGHT_TO_LEFT ? getSkin().getNode().getLayoutBounds().getWidth() : 0));
+        widthProperty().addListener(widthListener);
         this.show(
                 parent,
                 parent.getX() + node.localToScene(0, 0).getX() +
-                node.getScene().getX() - (node.getEffectiveNodeOrientation() == NodeOrientation.RIGHT_TO_LEFT ? getWidth() : 0),
+                node.getScene().getX(),
                 parent.getY() + node.localToScene(0, 0).getY() +
                 node.getScene().getY() + node.getBoundsInParent().getHeight());
 

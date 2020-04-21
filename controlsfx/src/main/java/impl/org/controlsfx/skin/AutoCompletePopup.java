@@ -145,10 +145,16 @@ public class AutoCompletePopup<T> extends PopupControl{
         }
         
         Window parent = node.getScene().getWindow();
+        getScene().setNodeOrientation(node.getEffectiveNodeOrientation());
+        if (node.getEffectiveNodeOrientation() == NodeOrientation.RIGHT_TO_LEFT) {
+            setAnchorLocation(AnchorLocation.CONTENT_TOP_RIGHT);
+        } else {
+            setAnchorLocation(AnchorLocation.CONTENT_TOP_LEFT);
+        }
         this.show(
                 parent,
                 parent.getX() + node.localToScene(0, 0).getX() +
-                node.getScene().getX() - (node.getEffectiveNodeOrientation() == NodeOrientation.RIGHT_TO_LEFT ? getWidth() : 0),
+                node.getScene().getX(),
                 parent.getY() + node.localToScene(0, 0).getY() +
                 node.getScene().getY() + node.getBoundsInParent().getHeight());
 

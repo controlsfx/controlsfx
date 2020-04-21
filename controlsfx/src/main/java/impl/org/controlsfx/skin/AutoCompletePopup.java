@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2017, ControlsFX
+ * Copyright (c) 2014, 2020, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,7 @@ import javafx.event.Event;
 import javafx.event.EventDispatchChain;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
@@ -147,6 +148,12 @@ public class AutoCompletePopup<T> extends PopupControl{
         }
         
         Window parent = node.getScene().getWindow();
+        getScene().setNodeOrientation(node.getEffectiveNodeOrientation());
+        if (node.getEffectiveNodeOrientation() == NodeOrientation.RIGHT_TO_LEFT) {
+            setAnchorLocation(AnchorLocation.CONTENT_TOP_RIGHT);
+        } else {
+            setAnchorLocation(AnchorLocation.CONTENT_TOP_LEFT);
+        }
         this.show(
                 parent,
                 parent.getX() + node.localToScene(0, 0).getX() +

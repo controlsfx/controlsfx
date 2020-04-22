@@ -131,6 +131,7 @@ test {
         systemProperty("testfx.headless", "true")
         systemProperty("prism.order", "sw")
         systemProperty("prism.text", "t2k")
+        systemProperty("headless.geometry", "1600x1200-32")
     }
     testLogging {
         // Show that tests are run in the command-line output

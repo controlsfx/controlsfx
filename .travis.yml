@@ -20,7 +20,7 @@ dist: trusty
 install: true
 
 # Assemble jars
-script: ./gradlew clean assemble -Ptransifex.api=$TRANSIFEX_API
+script: ./gradlew clean build -Ptransifex.api=$TRANSIFEX_API
 
 cache:
   directories:

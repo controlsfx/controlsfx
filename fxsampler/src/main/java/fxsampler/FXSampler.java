@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014, ControlsFX
+ * Copyright (c) 2013, 2020, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,24 +26,12 @@
  */
 package fxsampler;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
-
+import fxsampler.model.EmptySample;
+import fxsampler.model.Project;
+import fxsampler.model.SampleTree.TreeNode;
+import fxsampler.model.WelcomePage;
+import fxsampler.util.SampleScanner;
 import javafx.application.Application;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
@@ -63,13 +51,20 @@ import javafx.scene.web.WebView;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import fxsampler.model.EmptySample;
-import fxsampler.model.Project;
-import fxsampler.model.SampleTree.TreeNode;
-import fxsampler.model.WelcomePage;
-import fxsampler.util.SampleScanner;
 
-public class FXSampler extends Application {
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ServiceLoader;
+
+public final class FXSampler extends Application {
     
     private Map<String, Project> projectsMap;
 
@@ -91,13 +86,14 @@ public class FXSampler extends Application {
     private WebView javaDocWebView;
     private WebView sourceWebView;
     private WebView cssWebView;
-
+    private Project selectedProject;
 
     public static void main(String[] args) {
         launch(args);
     }
 
-    @Override public void start(final Stage primaryStage) {
+    @Override 
+    public void start(final Stage primaryStage) {
 
         this.stage = primaryStage;
         
@@ -130,7 +126,7 @@ public class FXSampler extends Application {
         samplesTreeView.setCellFactory(new Callback<>() {
             @Override
             public TreeCell<Sample> call(TreeView<Sample> param) {
-                return new TreeCell<Sample>() {
+                return new TreeCell<>() {
                     @Override
                     protected void updateItem(Sample item, boolean empty) {
                         super.updateItem(item, empty);
@@ -149,7 +145,7 @@ public class FXSampler extends Application {
                 return;
             } else if (newSample.getValue() instanceof EmptySample) {
                 Sample selectedSample = newSample.getValue();
-                Project selectedProject = projectsMap.get(selectedSample.getSampleName());
+                selectedProject = projectsMap.get(selectedSample.getSampleName());
                 if(selectedProject != null) {
                     changeToWelcomeTab(selectedProject.getWelcomePage());
                 }
@@ -197,10 +193,10 @@ public class FXSampler extends Application {
         Scene scene = new Scene(grid);
         scene.getStylesheets().add(getClass().getResource("fxsampler.css").toExternalForm());
         for (FXSamplerConfiguration fxsamplerConfiguration : configurationServiceLoader) {
-        	String stylesheet = fxsamplerConfiguration.getSceneStylesheet();
-        	if (stylesheet != null) {
-            	scene.getStylesheets().add(stylesheet);
-        	}
+            String stylesheet = fxsamplerConfiguration.getSceneStylesheet();
+            if (stylesheet != null) {
+                scene.getStylesheets().add(stylesheet);
+            }
         }
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(1000);
@@ -313,13 +309,13 @@ public class FXSampler extends Application {
     }
     
     private String getResource(String resourceName, Class<?> baseClass) {
-        Class<?> clz = baseClass == null? getClass(): baseClass;
+        Class<?> clz = baseClass == null ? getClass() : baseClass;
         return getResource(clz.getResourceAsStream(resourceName));
     }
 
     private String getResource(InputStream is) {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
-        	String line;
+            String line;
             StringBuilder sb = new StringBuilder();
             while ((line = br.readLine()) != null) {
                 sb.append(line);
@@ -327,24 +323,9 @@ public class FXSampler extends Application {
             } 
             return sb.toString();
         } catch (IOException e) {
-			e.printStackTrace();
-			return "";
-		}
-    }
-    
-    private String getSourceCode( Sample sample ) {
-        String sourceURL = sample.getSampleSourceURL();
-        
-        try {
-            // try loading via the web or local file system
-            URL url = new URL(sourceURL);
-            InputStream is = url.openStream();
-            return getResource(is);
-        } catch (IOException e) {
-            // no-op - the URL may not be valid, no biggy
+            e.printStackTrace();
+            return "";
         }
-        
-        return getResource(sourceURL, sample.getClass());
     }
     
     private String formatSourceCode(Sample sample) {
@@ -353,12 +334,12 @@ public class FXSampler extends Application {
         if (sourceURL == null) {
             src = "No sample source available";
         } else {
-	        src = "Sample Source not found";
-	        try {
-	           src = getSourceCode(sample);
-	        } catch(Throwable ex){
-	            ex.printStackTrace();
-	        }
+            src = "Sample Source not found";
+            try {
+               src = getSourceCode(sample);
+            } catch(Throwable ex){
+                ex.printStackTrace();
+            }
         }
         
         // Escape '<' by "&lt;" to ensure correct rendering by SyntaxHighlighter
@@ -367,31 +348,51 @@ public class FXSampler extends Application {
         String template = getResource("/fxsampler/util/SourceCodeTemplate.html", null);
         return template.replace("<source/>", src);
     }
-    
-    
+
+    private String getSourceCode(Sample sample) {
+        String sourceURL = sample.getSampleSourceURL();
+        try {
+            // try loading via the web or local file system
+            URL url = new URL(sourceURL);
+            InputStream is = url.openStream();
+            return getResource(is);
+        } catch (IOException e) {
+            // no-op - the URL may not be valid, no biggy
+        }
+        return getResource(sourceURL, sample.getClass());
+    }
+
     private String formatCss(Sample sample) {
         String cssUrl = sample.getControlStylesheetURL();
         String src;
         if (cssUrl == null) {
             src = "No CSS source available";
         } else {
-	        src = "Css not found";
-	        try {
-	        	src = new String(
-					Files.readAllBytes( Paths.get(getClass().getResource(cssUrl).toURI()) )
-				);
-	        } catch(Throwable ex){
-	            ex.printStackTrace();
-	        }
+            src = "Css not found";
+            try {
+                final Optional<Module> fxsamplerModule = ModuleLayer.boot().findModule("org.controlsfx.fxsampler");
+                if (fxsamplerModule.isPresent() && selectedProject != null) {
+                    // module-path
+                    final Optional<Module> controlsFXModule = ModuleLayer.boot().findModule(selectedProject.getModuleName());
+                    if (controlsFXModule.isPresent()) {
+                        final Module controlsfx = controlsFXModule.get();
+                        src = getResource(controlsfx.getResourceAsStream(cssUrl));
+                    }
+                } else {
+                    // classpath
+                    src = getResource(getClass().getResourceAsStream(cssUrl));
+                }
+            } catch(Throwable ex){
+                ex.printStackTrace();
+            }
         }
-        
+
         // Escape '<' by "&lt;" to ensure correct rendering by SyntaxHighlighter
         src = src.replace("<", "&lt;");
         
         String template = getResource("/fxsampler/util/CssTemplate.html", null);
         return template.replace("<source/>", src);
-    }    
-
+    }
 
     private Node buildSampleTabContent(Sample sample) {
         return SampleBase.buildSample(sample, stage);
@@ -420,8 +421,6 @@ public class FXSampler extends Application {
         return new WelcomePage("Welcome!", new VBox(5, welcomeLabel1, welcomeLabel2));
     }
 
-    
-    
     public final GridPane getGrid() {
         return grid;
     }
@@ -449,8 +448,6 @@ public class FXSampler extends Application {
     public final Tab getCssTab() {
         return cssTab;
     }
-    
-    
 }
 
 

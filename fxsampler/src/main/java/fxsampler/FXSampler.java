@@ -405,10 +405,10 @@ public final class FXSampler extends Application {
                 final Optional<Module> fxsamplerModule = ModuleLayer.boot().findModule("org.controlsfx.fxsampler");
                 if (fxsamplerModule.isPresent() && selectedProject != null) {
                     // module-path
-                    final Optional<Module> controlsFXModule = ModuleLayer.boot().findModule(selectedProject.getModuleName());
-                    if (controlsFXModule.isPresent()) {
-                        final Module controlsfx = controlsFXModule.get();
-                        src = getResource(controlsfx.getResourceAsStream(cssUrl));
+                    final Optional<Module> projectModuleOptional = ModuleLayer.boot().findModule(selectedProject.getModuleName());
+                    if (projectModuleOptional.isPresent()) {
+                        final Module projectModule = projectModuleOptional.get();
+                        src = getResource(projectModule.getResourceAsStream(cssUrl));
                     }
                 } else {
                     // classpath

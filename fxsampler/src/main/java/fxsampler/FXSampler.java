@@ -32,11 +32,13 @@ import fxsampler.model.SampleTree.TreeNode;
 import fxsampler.model.WelcomePage;
 import fxsampler.util.SampleScanner;
 import javafx.application.Application;
+import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
@@ -46,7 +48,9 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -66,6 +70,8 @@ import java.util.ServiceLoader;
 
 public final class FXSampler extends Application {
     
+    private static final String CACHE_RESULT = "CACHE_RESULT";
+    
     private Map<String, Project> projectsMap;
 
     private Stage stage;
@@ -83,6 +89,9 @@ public final class FXSampler extends Application {
     private Tab sourceTab;
     private Tab cssTab;
 
+    private ProgressIndicator progressIndicator;
+    private StackPane progressIndicatorPane;
+    
     private WebView javaDocWebView;
     private WebView sourceWebView;
     private WebView cssWebView;
@@ -156,6 +165,10 @@ public final class FXSampler extends Application {
         });
         GridPane.setVgrow(samplesTreeView, Priority.ALWAYS);
         grid.add(samplesTreeView, 0, 1);
+        
+        // ProgressIndicator
+        progressIndicator = new ProgressIndicator();
+        progressIndicatorPane = new StackPane(progressIndicator);
 
         // right hand side
         tabPane = new TabPane();
@@ -216,7 +229,7 @@ public final class FXSampler extends Application {
     protected void buildSampleTree(String searchText) {
         // rebuild the whole tree (it isn't memory intensive - we only scan
         // classes once at startup)
-        root = new TreeItem<Sample>(new EmptySample("FXSampler"));
+        root = new TreeItem<>(new EmptySample("FXSampler"));
         root.setExpanded(true);
         
         for (String projectName : projectsMap.keySet()) {
@@ -284,30 +297,49 @@ public final class FXSampler extends Application {
         if (selectedSample == null) {
             return;
         }
-
         if (tabPane.getTabs().contains(welcomeTab)) {
-            tabPane.getTabs().setAll(sampleTab, javaDocTab, sourceTab,cssTab);
+            tabPane.getTabs().setAll(sampleTab, javaDocTab, sourceTab, cssTab);
+            tabPane.getTabs().forEach(tab -> tab.getProperties().put(CACHE_RESULT, false));
         }
-        
         updateTab();
     }
     
     private void updateTab() {
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+
+        // If result was already loaded and its just a tab switch, no need to reload.
+        final Object cacheResult = selectedTab.getProperties().get(CACHE_RESULT);
+        if (cacheResult != null && (boolean)cacheResult) return;
         
+        progressIndicator.progressProperty().unbind();
         // we only update the selected tab - leaving the other tabs in their
         // previous state until they are selected
         if (selectedTab == sampleTab) {
             sampleTab.setContent(buildSampleTabContent(selectedSample));
         } else if (selectedTab == javaDocTab) {
+            prepareTabContent(javaDocTab, javaDocWebView);
             javaDocWebView.getEngine().load(selectedSample.getJavaDocURL());
         } else if (selectedTab == sourceTab) {
+            prepareTabContent(sourceTab, sourceWebView);
             sourceWebView.getEngine().loadContent(formatSourceCode(selectedSample));
         } else if (selectedTab == cssTab) {
+            prepareTabContent(cssTab, cssWebView);
             cssWebView.getEngine().loadContent(formatCss(selectedSample));
         }  
     }
-    
+
+    private void prepareTabContent(Tab tab, WebView webView) {
+        tab.setContent(progressIndicatorPane);
+        final WebEngine engine = webView.getEngine();
+        progressIndicator.progressProperty().bind(engine.getLoadWorker().progressProperty());
+        engine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == Worker.State.SUCCEEDED) {
+                tab.setContent(webView);
+                tab.getProperties().put(CACHE_RESULT,true);
+            }
+        });
+    }
+
     private String getResource(String resourceName, Class<?> baseClass) {
         Class<?> clz = baseClass == null ? getClass() : baseClass;
         return getResource(clz.getResourceAsStream(resourceName));

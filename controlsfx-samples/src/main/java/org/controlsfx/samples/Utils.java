@@ -30,4 +30,5 @@ public class Utils {
     private Utils() { }
     
     public static final String JAVADOC_BASE = "https://controlsfx.github.io/javadoc/11.0.1/org.controlsfx.controls/";
+    public static final String SAMPLES_BASE = "https://raw.githubusercontent.com/controlsfx/controlsfx/master/controlsfx-samples/src/main/java/";
 }

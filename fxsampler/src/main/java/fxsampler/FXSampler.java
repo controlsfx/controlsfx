@@ -402,13 +402,14 @@ public final class FXSampler extends Application {
         } else {
             src = "Css not found";
             try {
-                final Optional<Module> fxsamplerModule = ModuleLayer.boot().findModule("org.controlsfx.fxsampler");
-                if (fxsamplerModule.isPresent() && selectedProject != null) {
+                if (selectedProject != null && !selectedProject.getModuleName().isEmpty()) {
                     // module-path
                     final Optional<Module> projectModuleOptional = ModuleLayer.boot().findModule(selectedProject.getModuleName());
                     if (projectModuleOptional.isPresent()) {
                         final Module projectModule = projectModuleOptional.get();
                         src = getResource(projectModule.getResourceAsStream(cssUrl));
+                    } else {
+                        System.err.println("Module name defined doesn't exist");
                     }
                 } else {
                     // classpath

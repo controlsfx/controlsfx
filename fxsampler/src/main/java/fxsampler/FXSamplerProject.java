@@ -53,5 +53,7 @@ public interface FXSamplerProject {
      * For example, in case of ControlsFX this is "org.controlsfx.controls".
      * Can be left blank if the sampler application is running on classpath.
      */
-    String getModuleName();
+    default String getModuleName() {
+        return "";
+    }
 }

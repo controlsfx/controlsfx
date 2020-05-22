@@ -70,7 +70,7 @@ import java.util.ServiceLoader;
 
 public final class FXSampler extends Application {
     
-    private static final String CACHE_RESULT = "CACHE_RESULT";
+    private static final String TAB_LOAD_CACHE = "TAB_LOAD_CACHE";
     
     private Map<String, Project> projectsMap;
 
@@ -299,7 +299,7 @@ public final class FXSampler extends Application {
         }
         if (tabPane.getTabs().contains(welcomeTab)) {
             tabPane.getTabs().setAll(sampleTab, javaDocTab, sourceTab, cssTab);
-            tabPane.getTabs().forEach(tab -> tab.getProperties().put(CACHE_RESULT, false));
+            tabPane.getTabs().forEach(tab -> tab.getProperties().put(TAB_LOAD_CACHE, false));
         }
         updateTab();
     }
@@ -307,9 +307,9 @@ public final class FXSampler extends Application {
     private void updateTab() {
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
 
-        // If result was already loaded and its just a tab switch, no need to reload.
-        final Object cacheResult = selectedTab.getProperties().get(CACHE_RESULT);
-        if (cacheResult != null && (boolean)cacheResult) return;
+        // If the tab was already loaded and its just a tab switch, no need to reload.
+        final Object tabLoadCache = selectedTab.getProperties().get(TAB_LOAD_CACHE);
+        if (tabLoadCache != null && (boolean)tabLoadCache) return;
         
         progressIndicator.progressProperty().unbind();
         // we only update the selected tab - leaving the other tabs in their
@@ -335,7 +335,7 @@ public final class FXSampler extends Application {
         engine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == Worker.State.SUCCEEDED) {
                 tab.setContent(webView);
-                tab.getProperties().put(CACHE_RESULT,true);
+                tab.getProperties().put(TAB_LOAD_CACHE,true);
             }
         });
     }

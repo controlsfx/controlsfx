@@ -289,8 +289,8 @@ public final class FXSampler extends Application {
         }
         if (tabPane.getTabs().contains(welcomeTab)) {
             tabPane.getTabs().setAll(sampleTab, javaDocTab, sourceTab, cssTab);
-            tabPane.getTabs().forEach(tab -> tab.getProperties().put(TAB_LOAD_CACHE, false));
         }
+        tabPane.getTabs().forEach(tab -> tab.getProperties().put(TAB_LOAD_CACHE, false));
         updateTab();
     }
     

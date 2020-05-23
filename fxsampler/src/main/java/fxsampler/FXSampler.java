@@ -67,6 +67,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.function.Function;
 
 public final class FXSampler extends Application {
     
@@ -226,6 +227,34 @@ public final class FXSampler extends Application {
         samplesTreeView.requestFocus();
     }
 
+    public final GridPane getGrid() {
+        return grid;
+    }
+
+    public final TabPane getTabPane() {
+        return tabPane;
+    }
+    // should never be null
+    public final Tab getWelcomeTab() {
+        return welcomeTab;
+    }
+
+    public final Tab getSampleTab() {
+        return sampleTab;
+    }
+
+    public final Tab getJavaDocTab() {
+        return javaDocTab;
+    }
+
+    public final Tab getSourceTab() {
+        return sourceTab;
+    }
+
+    public final Tab getCssTab() {
+        return cssTab;
+    }
+
     protected void buildSampleTree(String searchText) {
         // rebuild the whole tree (it isn't memory intensive - we only scan
         // classes once at startup)
@@ -252,6 +281,17 @@ public final class FXSampler extends Application {
         
         // and finally we sort the display a little
         sort(root, Comparator.comparing(o -> o.getValue().getSampleName()));
+    }
+
+    protected void changeSample() {
+        if (selectedSample == null) {
+            return;
+        }
+        if (tabPane.getTabs().contains(welcomeTab)) {
+            tabPane.getTabs().setAll(sampleTab, javaDocTab, sourceTab, cssTab);
+            tabPane.getTabs().forEach(tab -> tab.getProperties().put(TAB_LOAD_CACHE, false));
+        }
+        updateTab();
     }
     
     private void sort(TreeItem<Sample> node, Comparator<TreeItem<Sample>> comparator) {
@@ -293,24 +333,13 @@ public final class FXSampler extends Application {
         }
     }
     
-    protected void changeSample() {
-        if (selectedSample == null) {
-            return;
-        }
-        if (tabPane.getTabs().contains(welcomeTab)) {
-            tabPane.getTabs().setAll(sampleTab, javaDocTab, sourceTab, cssTab);
-            tabPane.getTabs().forEach(tab -> tab.getProperties().put(TAB_LOAD_CACHE, false));
-        }
-        updateTab();
-    }
-    
     private void updateTab() {
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
 
         // If the tab was already loaded and its just a tab switch, no need to reload.
         final Object tabLoadCache = selectedTab.getProperties().get(TAB_LOAD_CACHE);
         if (tabLoadCache != null && (boolean)tabLoadCache) return;
-        
+
         progressIndicator.progressProperty().unbind();
         // we only update the selected tab - leaving the other tabs in their
         // previous state until they are selected
@@ -318,14 +347,24 @@ public final class FXSampler extends Application {
             sampleTab.setContent(buildSampleTabContent(selectedSample));
         } else if (selectedTab == javaDocTab) {
             prepareTabContent(javaDocTab, javaDocWebView);
-            javaDocWebView.getEngine().load(selectedSample.getJavaDocURL());
+            loadWebViewContent(javaDocWebView, selectedSample, Sample::getJavaDocURL, sample -> "No Javadoc available");
         } else if (selectedTab == sourceTab) {
             prepareTabContent(sourceTab, sourceWebView);
-            sourceWebView.getEngine().loadContent(formatSourceCode(selectedSample));
+            loadWebViewContent(sourceWebView, selectedSample, Sample::getSampleSourceURL, this::formatSourceCode);
         } else if (selectedTab == cssTab) {
             prepareTabContent(cssTab, cssWebView);
-            cssWebView.getEngine().loadContent(formatCss(selectedSample));
+            loadWebViewContent(cssWebView, selectedSample, Sample::getControlStylesheetURL, this::formatCss);
         }  
+    }
+
+    private void loadWebViewContent(WebView webView, Sample sample,
+                                    Function<Sample, String> urlFunction, Function<Sample, String> contentFunction) {
+        final String url = urlFunction.apply(sample);
+        if (url != null && url.startsWith("http")) {
+            webView.getEngine().load(url);
+        } else {
+            webView.getEngine().loadContent(contentFunction.apply(sample));
+        }
     }
 
     private void prepareTabContent(Tab tab, WebView webView) {
@@ -452,34 +491,6 @@ public final class FXSampler extends Application {
         welcomeLabel2.setStyle("-fx-font-size: 1.25em; -fx-padding: 0 0 0 5;");
 
         return new WelcomePage("Welcome!", new VBox(5, welcomeLabel1, welcomeLabel2));
-    }
-
-    public final GridPane getGrid() {
-        return grid;
-    }
-
-    public final TabPane getTabPane() {
-        return tabPane;
-    }
-    // should never be null
-    public final Tab getWelcomeTab() {
-        return welcomeTab;
-    }
-
-    public final Tab getSampleTab() {
-        return sampleTab;
-    }
-
-    public final Tab getJavaDocTab() {
-        return javaDocTab;
-    }
-
-    public final Tab getSourceTab() {
-        return sourceTab;
-    }
-
-    public final Tab getCssTab() {
-        return cssTab;
     }
 }
 

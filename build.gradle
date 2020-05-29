@@ -13,8 +13,6 @@ ext.java9Args = [
         // For various usages of TraversalEngine
         "--add-exports=javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",
         "--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
-        // For FontAwesome Style
-        "--add-exports=javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
         // For various behaviors across controls
         "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls",
         // For ReadOnlyUnbackedObservableList across files
@@ -49,7 +47,6 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'idea'
-    apply plugin: 'osgi'
     apply plugin: 'maven'
     apply from  : '../mavenPublish.gradle'
 
@@ -80,24 +77,15 @@ subprojects {
         }
     }
 
-    afterEvaluate {
-
-        repositories {
-            mavenCentral()
-        }
-
-        dependencies {
-            testCompile 'junit:junit:[4,)'
-        }
-
-        test {
-            testLogging {
-                // Show that tests are run in the command-line output
-                events 'started', 'passed'
-            }
-        }
+    repositories {
+        mavenCentral()
     }
-    
+
+    compileJava {
+        options.encoding = "UTF-8"
+        options.incremental = true
+    }
+
     javadoc {
         def javaVersion = JavaVersion.current().majorVersion
         if (JavaVersion.current().java11Compatible) {
@@ -125,4 +113,10 @@ subprojects {
         archives javadocJar
     }
 
+    // Used in Travis
+    task getVersion {
+        doLast {
+            println "$project.version"
+        }
+    }
 }

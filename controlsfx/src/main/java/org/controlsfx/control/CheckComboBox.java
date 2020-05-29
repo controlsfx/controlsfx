@@ -27,6 +27,8 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.CheckComboBoxSkin;
+
+import javafx.beans.DefaultProperty;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -85,13 +87,17 @@ import java.util.Map;
  * // selected items change).
  * checkComboBox.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
  *     public void onChanged(ListChangeListener.Change<? extends String> c) {
- *         System.out.println(checkComboBox.getCheckModel().getSelectedItems());
+ *          while(c.next()) {
+ *              //do something with changes here
+ *          }
+ *          System.out.println(checkComboBox.getCheckModel().getCheckedItems());
  *     }
  * });}
  * }</pre>
  *
  * @param <T> The type of the data in the ComboBox.
  */
+@DefaultProperty("items")
 public class CheckComboBox<T> extends ControlsFXControl {
     
     /**************************************************************************

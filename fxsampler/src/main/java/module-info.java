@@ -1,7 +1,7 @@
 module org.controlsfx.fxsampler {
 
     requires transitive javafx.controls;
-    requires static javafx.web;
+    requires transitive javafx.web;
 
     exports fxsampler to 
             javafx.graphics,

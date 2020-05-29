@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2019 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.Parent;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.cell.CheckBoxListCell;
@@ -124,7 +125,10 @@ public class CheckListView<T> extends ListView<T> {
             final CheckBoxListCell<T> checkBoxListCell = new CheckBoxListCell<>(item -> getItemBooleanProperty(item));
             checkBoxListCell.focusedProperty().addListener((o, ov, nv) -> {
                 if (nv) {
-                    checkBoxListCell.getParent().requestFocus();
+                    final Parent parent = checkBoxListCell.getParent();
+                    if (parent != null) {
+                        parent.requestFocus();
+                    }
                 }
             });
             return checkBoxListCell;

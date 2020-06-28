@@ -9,21 +9,14 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.web' ]
 }
 
-configurations {
-    jdk
-}
-
-sourceSets {
-    main {
-        compileClasspath += configurations.jdk
-        // Gradle application plugin fails to resolve resources with JDK 11
-        output.resourcesDir = "build/classes/java/main"
-    }
-}
-
 dependencies {
-    compile project(':controlsfx')
-    compile project(':fxsampler')
+    implementation project(':controlsfx')
+    implementation project(':fxsampler')
+}
+
+/** We need Java files as resources for showing them in Source Tab **/
+processResources {
+    from sourceSets.main.allJava
 }
 
 /**
@@ -64,7 +57,6 @@ jar {
                     'Class-Path':               configurations.compile.collect { it.getName() }.join(' '),
                     'Main-Class':               fxsampler_mainClass
     }
-    from sourceSets.main.allJava
 }
 
 run {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2020, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,8 @@
 package org.controlsfx.samples;
 
 public class Utils {
-    private Utils() { } 
+    private Utils() { }
     
-    public static final String JAVADOC_BASE = "http://docs.controlsfx.org/";
+    public static final String JAVADOC_BASE = "https://controlsfx.github.io/javadoc/11.0.1/org.controlsfx.controls/";
+    public static final String SAMPLES_BASE = "https://raw.githubusercontent.com/controlsfx/controlsfx/master/controlsfx-samples/src/main/java/";
 }

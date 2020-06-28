@@ -21,19 +21,10 @@ javafx {
 }
 
 configurations {
-    jdk
-
     if (project.hasProperty("transifex.api")) {
         transifex_api = project.getProperty("transifex.api")
     }
 }
-
-sourceSets {
-    main {
-        compileClasspath += configurations.jdk
-    }
-}
-
 
 task downloadTranslations {
     description = "Download translations from Transifex"

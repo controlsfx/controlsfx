@@ -64,6 +64,7 @@ import java.util.UUID;
  * </center>
  */
 public class BreadCrumbBar<T> extends ControlsFXControl {
+
     private static final String STYLE_CLASS_FIRST = "first"; //$NON-NLS-1$
 
     /**

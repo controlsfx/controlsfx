@@ -110,7 +110,7 @@ public class ValidationSupport {
 
     private final ObservableSet<Control> controls = FXCollections.observableSet(ConcurrentHashMap.newKeySet());
     private final ObservableMap<Control,ValidationResult> validationResults = 
-            FXCollections.observableMap(new WeakHashMap<>());
+            FXCollections.synchronizedObservableMap(FXCollections.observableMap(new WeakHashMap<>()));
 
     
     private final AtomicBoolean dataChanged = new AtomicBoolean(false);

@@ -170,6 +170,5 @@ public abstract class SampleBase extends Application implements Sample {
 
     @Override
     public void dispose() {
-//        System.out.println("Dispose " + getSampleName());
     }
 }

@@ -47,7 +47,10 @@ public class EmptySample implements Sample {
     @Override public Node getControlPanel() {
         return null;
     }
-    
+
+    @Override
+    public void dispose() {}
+
     public double getControlPanelDividerPosition() {
     	return 0.6;
     }

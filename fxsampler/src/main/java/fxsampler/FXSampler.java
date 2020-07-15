@@ -161,6 +161,9 @@ public final class FXSampler extends Application {
                 }
                 return;
             }
+            if ( selectedSample != null ) {
+                selectedSample.dispose();
+            }
             selectedSample = newSample.getValue();
             changeSample();
         });

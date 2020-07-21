@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2020 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,14 +43,14 @@ import java.util.stream.Collectors;
 
 public class Translations {
 
-    private static List<Translation> translations = new ArrayList<>();
+    private static final List<Translation> translations = new ArrayList<>();
 
     static {
         // firstly try to read from the controlsfx jar
         File file = new File(Translations.class.getProtectionDomain().getCodeSource().getLocation().getPath());
         if (file.getName().endsWith(".jar")) { //$NON-NLS-1$
             Path jarFile = file.toPath();
-            try (FileSystem fs = FileSystems.newFileSystem(jarFile, null)) {
+            try (FileSystem fs = FileSystems.newFileSystem(jarFile, (ClassLoader)null)) {
                 fs.getRootDirectories().forEach(path -> loadFrom(path));
             } catch (IOException e) {
                 e.printStackTrace();

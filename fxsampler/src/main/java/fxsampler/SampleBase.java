@@ -167,4 +167,8 @@ public abstract class SampleBase extends Application implements Sample {
 
         return splitPane;
     }
+
+    @Override
+    public void dispose() {
+    }
 }

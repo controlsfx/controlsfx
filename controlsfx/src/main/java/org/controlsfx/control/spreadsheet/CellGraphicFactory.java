@@ -31,12 +31,11 @@ import javafx.scene.Node;
 import javafx.scene.layout.Background;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
-import javafx.scene.web.WebView;
 
 /**
  *
  * If anyone wants to display a specific Graphic in a SpreadsheetCell, a
- * solution is to provide a Node (for example a {@link WebView}) that will be
+ * solution is to provide a Node (for example a WebView) that will be
  * displayed in the cell.
  *
  * Because a Node can consume a lot of memory, we need this

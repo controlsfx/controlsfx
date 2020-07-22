@@ -3,8 +3,8 @@ module org.controlsfx.samples {
     requires java.desktop;
     requires org.controlsfx.controls;
     requires org.controlsfx.fxsampler;
-    
-    exports org.controlsfx.samples to org.controlsfx.fxsampler;
+
+    exports org.controlsfx.samples to javafx.graphics;
     exports org.controlsfx.samples.actions to org.controlsfx.fxsampler;
     exports org.controlsfx.samples.button to org.controlsfx.fxsampler;
     exports org.controlsfx.samples.checked to org.controlsfx.fxsampler;

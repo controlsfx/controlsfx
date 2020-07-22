@@ -21,11 +21,12 @@ module org.controlsfx.controls {
     exports org.controlsfx.tools;
     exports org.controlsfx.validation;
     exports org.controlsfx.validation.decoration;
-    
+
     exports impl.org.controlsfx.skin to org.controlsfx.samples;
 
-    // opens org.controlsfx.glyphfont to org.controlsfx.fxsampler;
-    
+    // Required for reading CSS files for the CSS Tab
+    opens org.controlsfx.control to org.controlsfx.fxsampler;
+
     uses org.controlsfx.glyphfont.GlyphFont;
     provides org.controlsfx.glyphfont.GlyphFont with org.controlsfx.glyphfont.FontAwesome;
 }

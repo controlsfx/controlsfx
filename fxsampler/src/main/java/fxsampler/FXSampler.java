@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014, ControlsFX
+ * Copyright (c) 2013, 2020, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,29 +26,19 @@
  */
 package fxsampler;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
-
+import fxsampler.model.EmptySample;
+import fxsampler.model.Project;
+import fxsampler.model.SampleTree.TreeNode;
+import fxsampler.model.WelcomePage;
+import fxsampler.util.SampleScanner;
 import javafx.application.Application;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
@@ -58,18 +48,30 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import fxsampler.model.EmptySample;
-import fxsampler.model.Project;
-import fxsampler.model.SampleTree.TreeNode;
-import fxsampler.model.WelcomePage;
-import fxsampler.util.SampleScanner;
 
-public class FXSampler extends Application {
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ServiceLoader;
+import java.util.function.Function;
+
+public final class FXSampler extends Application {
+    
+    private static final String TAB_LOAD_CACHE = "TAB_LOAD_CACHE";
     
     private Map<String, Project> projectsMap;
 
@@ -88,16 +90,20 @@ public class FXSampler extends Application {
     private Tab sourceTab;
     private Tab cssTab;
 
+    private ProgressIndicator progressIndicator;
+    private StackPane progressIndicatorPane;
+    
     private WebView javaDocWebView;
     private WebView sourceWebView;
     private WebView cssWebView;
-
+    private Project selectedProject;
 
     public static void main(String[] args) {
         launch(args);
     }
 
-    @Override public void start(final Stage primaryStage) {
+    @Override 
+    public void start(final Stage primaryStage) {
 
         this.stage = primaryStage;
         
@@ -130,7 +136,7 @@ public class FXSampler extends Application {
         samplesTreeView.setCellFactory(new Callback<>() {
             @Override
             public TreeCell<Sample> call(TreeView<Sample> param) {
-                return new TreeCell<Sample>() {
+                return new TreeCell<>() {
                     @Override
                     protected void updateItem(Sample item, boolean empty) {
                         super.updateItem(item, empty);
@@ -149,7 +155,7 @@ public class FXSampler extends Application {
                 return;
             } else if (newSample.getValue() instanceof EmptySample) {
                 Sample selectedSample = newSample.getValue();
-                Project selectedProject = projectsMap.get(selectedSample.getSampleName());
+                selectedProject = projectsMap.get(selectedSample.getSampleName());
                 if(selectedProject != null) {
                     changeToWelcomeTab(selectedProject.getWelcomePage());
                 }
@@ -160,6 +166,10 @@ public class FXSampler extends Application {
         });
         GridPane.setVgrow(samplesTreeView, Priority.ALWAYS);
         grid.add(samplesTreeView, 0, 1);
+        
+        // ProgressIndicator
+        progressIndicator = new ProgressIndicator();
+        progressIndicatorPane = new StackPane(progressIndicator);
 
         // right hand side
         tabPane = new TabPane();
@@ -197,10 +207,10 @@ public class FXSampler extends Application {
         Scene scene = new Scene(grid);
         scene.getStylesheets().add(getClass().getResource("fxsampler.css").toExternalForm());
         for (FXSamplerConfiguration fxsamplerConfiguration : configurationServiceLoader) {
-        	String stylesheet = fxsamplerConfiguration.getSceneStylesheet();
-        	if (stylesheet != null) {
-            	scene.getStylesheets().add(stylesheet);
-        	}
+            String stylesheet = fxsamplerConfiguration.getSceneStylesheet();
+            if (stylesheet != null) {
+                scene.getStylesheets().add(stylesheet);
+            }
         }
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(1000);
@@ -217,10 +227,38 @@ public class FXSampler extends Application {
         samplesTreeView.requestFocus();
     }
 
+    public final GridPane getGrid() {
+        return grid;
+    }
+
+    public final TabPane getTabPane() {
+        return tabPane;
+    }
+    // should never be null
+    public final Tab getWelcomeTab() {
+        return welcomeTab;
+    }
+
+    public final Tab getSampleTab() {
+        return sampleTab;
+    }
+
+    public final Tab getJavaDocTab() {
+        return javaDocTab;
+    }
+
+    public final Tab getSourceTab() {
+        return sourceTab;
+    }
+
+    public final Tab getCssTab() {
+        return cssTab;
+    }
+
     protected void buildSampleTree(String searchText) {
         // rebuild the whole tree (it isn't memory intensive - we only scan
         // classes once at startup)
-        root = new TreeItem<Sample>(new EmptySample("FXSampler"));
+        root = new TreeItem<>(new EmptySample("FXSampler"));
         root.setExpanded(true);
         
         for (String projectName : projectsMap.keySet()) {
@@ -243,6 +281,17 @@ public class FXSampler extends Application {
         
         // and finally we sort the display a little
         sort(root, Comparator.comparing(o -> o.getValue().getSampleName()));
+    }
+
+    protected void changeSample() {
+        if (selectedSample == null) {
+            return;
+        }
+        if (tabPane.getTabs().contains(welcomeTab)) {
+            tabPane.getTabs().setAll(sampleTab, javaDocTab, sourceTab, cssTab);
+        }
+        tabPane.getTabs().forEach(tab -> tab.getProperties().put(TAB_LOAD_CACHE, false));
+        updateTab();
     }
     
     private void sort(TreeItem<Sample> node, Comparator<TreeItem<Sample>> comparator) {
@@ -284,42 +333,60 @@ public class FXSampler extends Application {
         }
     }
     
-    protected void changeSample() {
-        if (selectedSample == null) {
-            return;
-        }
-
-        if (tabPane.getTabs().contains(welcomeTab)) {
-            tabPane.getTabs().setAll(sampleTab, javaDocTab, sourceTab,cssTab);
-        }
-        
-        updateTab();
-    }
-    
     private void updateTab() {
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
-        
+
+        // If the tab was already loaded and its just a tab switch, no need to reload.
+        final Object tabLoadCache = selectedTab.getProperties().get(TAB_LOAD_CACHE);
+        if (tabLoadCache != null && (boolean)tabLoadCache) return;
+
+        progressIndicator.progressProperty().unbind();
         // we only update the selected tab - leaving the other tabs in their
         // previous state until they are selected
         if (selectedTab == sampleTab) {
             sampleTab.setContent(buildSampleTabContent(selectedSample));
         } else if (selectedTab == javaDocTab) {
-            javaDocWebView.getEngine().load(selectedSample.getJavaDocURL());
+            prepareTabContent(javaDocTab, javaDocWebView);
+            loadWebViewContent(javaDocWebView, selectedSample, Sample::getJavaDocURL, sample -> "No Javadoc available");
         } else if (selectedTab == sourceTab) {
-            sourceWebView.getEngine().loadContent(formatSourceCode(selectedSample));
+            prepareTabContent(sourceTab, sourceWebView);
+            loadWebViewContent(sourceWebView, selectedSample, Sample::getSampleSourceURL, this::formatSourceCode);
         } else if (selectedTab == cssTab) {
-            cssWebView.getEngine().loadContent(formatCss(selectedSample));
+            prepareTabContent(cssTab, cssWebView);
+            loadWebViewContent(cssWebView, selectedSample, Sample::getControlStylesheetURL, this::formatCss);
         }  
     }
-    
+
+    private void loadWebViewContent(WebView webView, Sample sample,
+                                    Function<Sample, String> urlFunction, Function<Sample, String> contentFunction) {
+        final String url = urlFunction.apply(sample);
+        if (url != null && url.startsWith("http")) {
+            webView.getEngine().load(url);
+        } else {
+            webView.getEngine().loadContent(contentFunction.apply(sample));
+        }
+    }
+
+    private void prepareTabContent(Tab tab, WebView webView) {
+        tab.setContent(progressIndicatorPane);
+        final WebEngine engine = webView.getEngine();
+        progressIndicator.progressProperty().bind(engine.getLoadWorker().progressProperty());
+        engine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == Worker.State.SUCCEEDED) {
+                tab.setContent(webView);
+                tab.getProperties().put(TAB_LOAD_CACHE,true);
+            }
+        });
+    }
+
     private String getResource(String resourceName, Class<?> baseClass) {
-        Class<?> clz = baseClass == null? getClass(): baseClass;
+        Class<?> clz = baseClass == null ? getClass() : baseClass;
         return getResource(clz.getResourceAsStream(resourceName));
     }
 
     private String getResource(InputStream is) {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
-        	String line;
+            String line;
             StringBuilder sb = new StringBuilder();
             while ((line = br.readLine()) != null) {
                 sb.append(line);
@@ -327,24 +394,9 @@ public class FXSampler extends Application {
             } 
             return sb.toString();
         } catch (IOException e) {
-			e.printStackTrace();
-			return "";
-		}
-    }
-    
-    private String getSourceCode( Sample sample ) {
-        String sourceURL = sample.getSampleSourceURL();
-        
-        try {
-            // try loading via the web or local file system
-            URL url = new URL(sourceURL);
-            InputStream is = url.openStream();
-            return getResource(is);
-        } catch (IOException e) {
-            // no-op - the URL may not be valid, no biggy
+            e.printStackTrace();
+            return "";
         }
-        
-        return getResource(sourceURL, sample.getClass());
     }
     
     private String formatSourceCode(Sample sample) {
@@ -353,12 +405,12 @@ public class FXSampler extends Application {
         if (sourceURL == null) {
             src = "No sample source available";
         } else {
-	        src = "Sample Source not found";
-	        try {
-	           src = getSourceCode(sample);
-	        } catch(Throwable ex){
-	            ex.printStackTrace();
-	        }
+            src = "Sample Source not found";
+            try {
+               src = getSourceCode(sample);
+            } catch(Throwable ex){
+                ex.printStackTrace();
+            }
         }
         
         // Escape '<' by "&lt;" to ensure correct rendering by SyntaxHighlighter
@@ -367,31 +419,52 @@ public class FXSampler extends Application {
         String template = getResource("/fxsampler/util/SourceCodeTemplate.html", null);
         return template.replace("<source/>", src);
     }
-    
-    
+
+    private String getSourceCode(Sample sample) {
+        String sourceURL = sample.getSampleSourceURL();
+        try {
+            // try loading via the web or local file system
+            URL url = new URL(sourceURL);
+            InputStream is = url.openStream();
+            return getResource(is);
+        } catch (IOException e) {
+            // no-op - the URL may not be valid, no biggy
+        }
+        return getResource(sourceURL, sample.getClass());
+    }
+
     private String formatCss(Sample sample) {
         String cssUrl = sample.getControlStylesheetURL();
         String src;
         if (cssUrl == null) {
             src = "No CSS source available";
         } else {
-	        src = "Css not found";
-	        try {
-	        	src = new String(
-					Files.readAllBytes( Paths.get(getClass().getResource(cssUrl).toURI()) )
-				);
-	        } catch(Throwable ex){
-	            ex.printStackTrace();
-	        }
+            src = "Css not found";
+            try {
+                if (selectedProject != null && !selectedProject.getModuleName().isEmpty()) {
+                    // module-path
+                    final Optional<Module> projectModuleOptional = ModuleLayer.boot().findModule(selectedProject.getModuleName());
+                    if (projectModuleOptional.isPresent()) {
+                        final Module projectModule = projectModuleOptional.get();
+                        src = getResource(projectModule.getResourceAsStream(cssUrl));
+                    } else {
+                        System.err.println("Module name defined doesn't exist");
+                    }
+                } else {
+                    // classpath
+                    src = getResource(getClass().getResourceAsStream(cssUrl));
+                }
+            } catch(Throwable ex){
+                ex.printStackTrace();
+            }
         }
-        
+
         // Escape '<' by "&lt;" to ensure correct rendering by SyntaxHighlighter
         src = src.replace("<", "&lt;");
         
         String template = getResource("/fxsampler/util/CssTemplate.html", null);
         return template.replace("<source/>", src);
-    }    
-
+    }
 
     private Node buildSampleTabContent(Sample sample) {
         return SampleBase.buildSample(sample, stage);
@@ -419,38 +492,6 @@ public class FXSampler extends Application {
 
         return new WelcomePage("Welcome!", new VBox(5, welcomeLabel1, welcomeLabel2));
     }
-
-    
-    
-    public final GridPane getGrid() {
-        return grid;
-    }
-
-    public final TabPane getTabPane() {
-        return tabPane;
-    }
-    // should never be null
-    public final Tab getWelcomeTab() {
-        return welcomeTab;
-    }
-
-    public final Tab getSampleTab() {
-        return sampleTab;
-    }
-
-    public final Tab getJavaDocTab() {
-        return javaDocTab;
-    }
-
-    public final Tab getSourceTab() {
-        return sourceTab;
-    }
-
-    public final Tab getCssTab() {
-        return cssTab;
-    }
-    
-    
 }
 
 

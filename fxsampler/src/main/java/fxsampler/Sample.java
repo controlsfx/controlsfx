@@ -39,7 +39,7 @@ public interface Sample {
     String getSampleName();
 
     /**
-     * A short, multiple sentence description of the sample. 
+     * A short, multiple sentence description of the sample.
      */
     String getSampleDescription();
 
@@ -66,7 +66,13 @@ public interface Sample {
     Node getControlPanel();
 
     /**
-     * Returns divider position to use for split between main panel and control panel 
+     * Provides a place to dispose of any resources when sample is deselected
+     */
+    void dispose();
+
+
+    /**
+     * Returns divider position to use for split between main panel and control panel
      */
     double getControlPanelDividerPosition();
 

@@ -28,10 +28,6 @@ package org.controlsfx.control.textfield;
 
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import impl.org.controlsfx.autocompletion.SuggestionProvider;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -45,8 +41,10 @@ import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-
 import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * A class containing useful customizations for the JavaFX {@link TextField}.
@@ -98,7 +96,10 @@ public class TextFields {
         clearButtonPane.getStyleClass().addAll("clear-button"); //$NON-NLS-1$
         clearButtonPane.setOpacity(0.0);
         clearButtonPane.setCursor(Cursor.DEFAULT);
-        clearButtonPane.setOnMouseReleased(e -> inputField.clear());
+        clearButtonPane.setOnMouseReleased(e -> {
+            inputField.clear();
+            inputField.fireEvent(new ClearEvent(ClearEvent.CLEAR_PRESSED));
+        });
         clearButtonPane.managedProperty().bind(inputField.editableProperty());
         clearButtonPane.visibleProperty().bind(inputField.editableProperty());
 

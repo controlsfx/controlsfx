@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, 2019 ControlsFX
+ * Copyright (c) 2016, 2020 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,15 +43,15 @@ public class HelloTableFilter extends ControlsFXSample {
     @Override
     @SuppressWarnings("unchecked")
     public Node getPanel(Stage stage) {
-        TableView tableView = new TableView();
+        TableView<Person> tableView = new TableView<>();
 
-        TableColumn<String, Person> firstNameCol = new TableColumn<>("First Name");
+        TableColumn<Person, String> firstNameCol = new TableColumn<>("First Name");
         firstNameCol.setCellValueFactory(new PropertyValueFactory<>("firstName"));
 
-        TableColumn<String, Person> lastNameCol = new TableColumn<>("Last Name");
+        TableColumn<Person, String> lastNameCol = new TableColumn<>("Last Name");
         lastNameCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
 
-        TableColumn<String, Person> emailCol = new TableColumn<>("Email");
+        TableColumn<Person, String> emailCol = new TableColumn<>("Email");
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
 
         tableView.getColumns().addAll(firstNameCol, lastNameCol, emailCol);

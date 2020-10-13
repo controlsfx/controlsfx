@@ -185,6 +185,12 @@ public final class TableFilter<T> {
     public void resetFilter() {
         filteredList.setPredicate(item -> true);
     }
+    public void resetAllFilters() {
+        for (ColumnFilter columnFilter : columnFilters) {
+            columnFilter.resetAllFilters();
+            columnFilter.applyFilterIcon();
+        }
+    }
     /** 
      * @treatAsPrivate
      */

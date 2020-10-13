@@ -43,10 +43,10 @@ public class HelloTableFilter extends ControlsFXSample {
         return "TableFilter";
     }
 
-    TableFilter<Person> tableFilter;
-    TableColumn<String, Person> firstNameCol;
-    TableColumn<String, Person> lastNameCol;
-    TableColumn<String, Person> emailCol;
+    private TableFilter<Person> tableFilter;
+    private TableColumn<String, Person> firstNameCol;
+    private TableColumn<String, Person> lastNameCol;
+    private TableColumn<String, Person> emailCol;
 
     @Override
     @SuppressWarnings("unchecked")

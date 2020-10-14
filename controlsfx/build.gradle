@@ -1,3 +1,7 @@
+plugins {
+    id 'biz.aQute.bnd.builder'
+}
+
 dependencies {
     try {
         jdk files(jfxrtJar)
@@ -12,7 +16,7 @@ ext {
 
 configurations {
     jdk
-    
+
     if (project.hasProperty("transifex.api")) {
         transifex_api = project.getProperty("transifex.api")
     }
@@ -70,14 +74,14 @@ javadoc {
     exclude 'impl/*'
     //failOnError = true
     classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
-    
+
     options.windowTitle("ControlsFX Project ${version}")
     options.links("http://docs.oracle.com/javase/8/docs/api/");
     options.links("http://docs.oracle.com/javase/8/javafx/api/");
     options.addBooleanOption("Xdoclint:none").setValue(true);
     options.addBooleanOption("javafx").setValue(true);
     options.overview("${projectDir}/src/main/docs/overview.html");
-    
+
     // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy
     // over the doc-files if they are embedded with the sources. I find this arrangement
     // somewhat cleaner anyway (never was a fan of mixing javadoc files with the sources)
@@ -96,34 +100,37 @@ jar {
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
     exclude '**/impl/build/**'
-
-    manifest { // the manifest of the default jar is of type OsgiManifest
-        attributes (\
-            'Specification-Title': specification_title,\
-            'Specification-Version': specification_version,\
-            'Implementation-Title': 'ControlsFX',\
-            'Implementation-Version': version,\
-            'Bundle-Name': 'ControlsFX'
+    if(JavaVersion.current() != JavaVersion.VERSION_1_8){
+        bnd(
+                'Bundle-Name': 'ControlsFX',
+                'Bundle-Description': 'High quality UI controls and other tools to complement the core JavaFX distribution',
+                'Specification-Title': specification_title,
+                'Specification-Version': specification_version,
+                'Implementation-Title': 'ControlsFX',
+                'Import-Package': '', // Javafx is part of the JDK
+                'Export-Package': '!impl.org.controlsfx.*, org.controlsfx.*'
         )
-        instruction 'Bundle-Description', 'High quality UI controls and other tools to complement the core JavaFX distribution'        
-	instruction 'Import-Package',
-                '!org.controlsfx*',
-                '*'
-
-        instruction 'Export-Package',
-                '!impl.org.controlsfx.*',
-                'org.controlsfx.*'
+    } else {
+        bnd(
+                'Bundle-Name': 'ControlsFX',
+                'Bundle-Description': 'High quality UI controls and other tools to complement the core JavaFX distribution',
+                'Specification-Title': specification_title,
+                'Specification-Version': specification_version,
+                'Implementation-Title': 'ControlsFX',
+                'Export-Package': '!impl.org.controlsfx.*, org.controlsfx.*'
+        )
     }
+
 }
 
-task native2ascii(type:Copy) {
+task native2ascii(type: Copy) {
     // Files are downloaded with extension utf8, then renamed .properties...
-    from ("$buildDir/resources/main") {
-        include('**/controlsfx_*.utf8') 
+    from("$buildDir/resources/main") {
+        include('**/controlsfx_*.utf8')
         filesMatching("controlsfx_*.utf8") {
             println "  native2ascii: $name"
             name = name[0..-6] + '.properties'
-        } 
+        }
     } into "$buildDir/resources/main"
 }
 

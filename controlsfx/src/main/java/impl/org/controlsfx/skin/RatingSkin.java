@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2020, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -259,14 +259,17 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
     	
     }
     
-//    private double getSpacing() {
-//        return (backgroundContainer instanceof HBox) ?
-//                ((HBox)backgroundContainer).getSpacing() :
-//                ((VBox)backgroundContainer).getSpacing();
-//    }
+    /**
+     * Creates the node for one star.
+     * By default, an empty region is returned.
+     * This method can be overwritten to customize the styling of the star, e.g. to use a font-based icon.
+     */
+    protected Node createButtonNode() {
+        return new Region();
+    }
     
     private Node createButton() {
-        Region btn = new Region();
+        Node btn = createButtonNode();
         btn.getStyleClass().add("button"); //$NON-NLS-1$
         
         btn.setOnMouseMoved(mouseMoveHandler);

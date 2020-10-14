@@ -230,41 +230,38 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
              * fixedColumnWidth will be wrong.
              */
             boolean increaseFixedWidth = false;
-            final int viewColumn =spreadsheetView.getViewColumn(spreadsheetCell.getColumn()); 
+            final int viewColumn = spreadsheetView.getViewColumn(spreadsheetCell.getColumn());
             //Virtualization of column
+            SpreadsheetView.SpanType spanType = null;
             // We translate that column by the Hbar Value if it's fixed
             if (isFixed) {
+                spanType = spreadsheetView.getSpanType(index, indexColumn);
                 /**
-                 * Here we verify if our cell must be shifted. The second
-                 * condition is to determine that we are dealing with the very
-                 * first cell of a columnSpan. If we have the hidden cells, we
-                 * must not increase the fixedColumnWidth.
+                 * Here we verify if our cell must be shifted. We must increase
+                 * all cells that are not column_span_invisible because their
+                 * whole width will be computed by the original cell that is
+                 * row_visible.
                  */
-                if (hbarValue + fixedColumnWidth > x &&  spreadsheetCell.getColumn() == indexColumn) {
+                if (spanType != SpreadsheetView.SpanType.COLUMN_SPAN_INVISIBLE && hbarValue + fixedColumnWidth > x) {
                     increaseFixedWidth = true;
                     tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
-//                	 tableCell.toFront();
                     fixedColumnWidth += width;
-//                    isVisible = true; // If in fixedColumn, it's obviously visible
                     fixedCells.add(tableCell);
                 }
             }
 
             if (isVisible) {
-                final SpreadsheetView.SpanType spanType = spreadsheetView.getSpanType(index, indexColumn);
-
+                spanType = spanType == null ? spreadsheetView.getSpanType(index, indexColumn) : spanType;
                 switch (spanType) {
                     case ROW_SPAN_INVISIBLE:
                     case BOTH_INVISIBLE:
                         fixedCells.remove(tableCell);
                         getChildren().remove(tableCell);
-//                        cells.remove(tableCell);
                         x += width;
                         continue; // we don't want to fall through
                     case COLUMN_SPAN_INVISIBLE:
                         fixedCells.remove(tableCell);
                         getChildren().remove(tableCell);
-//                        cells.remove(tableCell);
                         continue; // we don't want to fall through
                     case ROW_VISIBLE:
                     case NORMAL_CELL: // fall through and carry on
@@ -282,7 +279,16 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                          * getSkinnable because of the deportedCells.
                          */
                         if (!tableCell.isEditing() && tableCell.getParent() != getSkinnable()) {
-                            getChildren().add(0, tableCell);
+                            /**
+                             * If this cell is eligible to be put into the
+                             * deportedCell, no need to add it in this row.
+                             * Prevent constant layout when WebView are
+                             * contained in frozen row and columns, and
+                             * horizontal scollbar is scrolled.
+                             */
+                            if (!spreadsheetCell.isCellGraphic() || !skin.rowToLayout.get(index) || !fixedCells.contains(tableCell)) {
+                                getChildren().add(0, tableCell);
+                            }
                         }
                 }
 
@@ -293,7 +299,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                      * variable
                      */
                     final int max = skin.getSkinnable().getVisibleLeafColumns().size() - viewColumn;
-                    for (int i = 1, colSpan = columnSpan; i < colSpan && i < max; i++) {
+                    for (int i = 1; i < columnSpan && i < max; i++) {
                         double tempWidth = snapSize(skin.getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
                         width += tempWidth;
                         if (increaseFixedWidth) {
@@ -301,7 +307,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                         }
                     }
                 }
-
+                 
                 /**
                  * If we are in autofit and the prefHeight of this cell is
                  * superior to the default cell height. Then we will use this
@@ -481,21 +487,21 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
          * we need to put it in another row.
          */
         if (skin.rowToLayout.get(index)) {
-            GridRow gridRow = skin.getFlow().getTopRow();
-            if (gridRow != null) {
+            GridRow topRow = skin.getFlow().getTopRow();
+            if (topRow != null) {
                 for (CellView cell : fixedCells) {
                     if (!cell.isEditing()) {
-                        gridRow.removeCell(cell);
-                        gridRow.addCell(cell);
+                        topRow.removeCell(cell);
+                        topRow.addCell(cell);
                     }
                     final double originalLayoutY = getSkinnable().getLayoutY() + cell.getLayoutY();
 
-                    if (skin.deportedCells.containsKey(gridRow)) {
-                        skin.deportedCells.get(gridRow).add(cell);
+                    if (skin.deportedCells.containsKey(topRow)) {
+                        skin.deportedCells.get(topRow).add(cell);
                     } else {
                         Set<CellView> temp = new HashSet<>();
                         temp.add(cell);
-                        skin.deportedCells.put(gridRow, temp);
+                        skin.deportedCells.put(topRow, temp);
                     }
                     /**
                      * I need to have the layoutY of the original row, but also
@@ -504,7 +510,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                      * translate in order to be visible, we need to remove that
                      * "bit of translate".
                      */
-                    cell.relocate(cell.getLayoutX(), originalLayoutY - gridRow.getLayoutY());
+                    cell.relocate(cell.getLayoutX(), originalLayoutY - topRow.getLayoutY());
                 }
             }
         } else {

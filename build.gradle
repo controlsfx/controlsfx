@@ -3,13 +3,12 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'idea'
-    apply plugin: 'osgi'
     apply plugin: 'maven'
     apply from  : '../mavenPublish.gradle'
 
     Properties cfg = new Properties()
     cfg.load(new FileInputStream("$rootDir/controlsfx-build.properties"))
-	
+
     ext {
       artifact_suffix       = cfg.artifact_suffix
       specification_title   = cfg.controlsfx_specification_title  //'Java 8u20'
@@ -19,7 +18,6 @@ subprojects {
       fxsampler_version     = cfg.fxsampler_specification_version + artifact_suffix
       fxsampler_mainClass   = 'fxsampler.FXSampler'
     }
-
 
     group = 'org.controlsfx'
     version = specification_version + artifact_suffix
@@ -33,8 +31,9 @@ subprojects {
 
     dependencies {
        testCompile 'junit:junit:[4,)'
-	   testCompile 'org.testfx:testfx-core:4.0.10-alpha'
-	   testRuntime 'org.testfx:openjfx-monocle:1.8.0_20'
+       testCompile 'org.testfx:testfx-core:4.0.10-alpha'
+       testCompile 'de.sandec:JMemoryBuddy:0.1.3'
+       testRuntime 'org.testfx:openjfx-monocle:1.8.0_20'
     }
 
     test {
@@ -79,5 +78,4 @@ subprojects {
             println "$project.version"
         }
     }
-
 }

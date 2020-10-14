@@ -1,1 +1,18 @@
 include "controlsfx", "fxsampler", "controlsfx-samples"
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+    pluginManagement {
+        plugins {
+            id 'biz.aQute.bnd.builder' version '5.0.0'
+        }
+    }
+    dependencies {
+        classpath 'de.marcphilipp.gradle:nexus-publish-plugin:0.4.0'
+    }
+}

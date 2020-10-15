@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018 ControlsFX
+ * Copyright (c) 2018, 2019 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,9 @@
  */
 package org.controlsfx.control.spreadsheet;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import javafx.scene.input.Clipboard;
 
@@ -42,21 +45,35 @@ public class ClipboardCell implements Serializable {
 
     private final int row;
     private final int column;
-    private final Object value;
+    private Object value;
+    private final String htmlVersion;
 
     /**
      * Constructor of a ClipboardCell for a cell.
      *
-     * The value must be serializable.
+     * The SpreadsheetCell item must be serializable.
      *
      * @param row the row of this {@code ClipboardCell}
      * @param column the column of this {@code ClipboardCell}
-     * @param value the value of this {@code ClipboardCell}
+     * @param spc the SpreadsheetCell which value will be serialized
      */
-    public ClipboardCell(int row, int column, Object value) {
+    public ClipboardCell(int row, int column, SpreadsheetCell spc) {
         this.row = row;
         this.column = column;
-        this.value = value;
+        Object value = spc.getItem();
+        if (spc.isCellGraphic()) {
+            this.htmlVersion = value == null ? null : value.toString();
+            //Trust the SpreadsheetCellType to return a proper String version of the HTML
+            this.value = spc.getCellType().toString(spc.getItem());
+        } else {
+            try {
+                new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(value);
+                this.value = value;
+            } catch (IOException exception) {
+                this.value = value == null ? null : value.toString();
+            }
+            this.htmlVersion = null;
+        }
     }
 
     /**
@@ -84,5 +101,16 @@ public class ClipboardCell implements Serializable {
      */
     public Object getValue() {
         return value;
+    }
+
+    /**
+     * If the original cell had its {@link SpreadsheetCell#isCellGraphic() } to
+     * {@code true}, the cell HTML content will be here and the string version
+     * in {@link #getValue() }.
+     *
+     * @return the html version of the value
+     */
+    public String getHtmlVersion() {
+        return htmlVersion;
     }
 }

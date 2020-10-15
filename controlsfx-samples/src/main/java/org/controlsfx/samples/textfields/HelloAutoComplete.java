@@ -26,30 +26,40 @@
  */
 package org.controlsfx.samples.textfields;
 
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.stage.Stage;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.samples.Utils;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import impl.org.controlsfx.skin.AutoCompletePopup;
+import impl.org.controlsfx.skin.AutoCompletePopupSkin;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 
 public class HelloAutoComplete extends ControlsFXSample {
 
     private AutoCompletionBinding<String> autoCompletionBinding;
     private String[] _possibleSuggestions = {"Hey", "Hello", "Hello World", "Apple", "Cool", "Costa", "Cola", "Coca Cola"};
     private Set<String> possibleSuggestions = new HashSet<>(Arrays.asList(_possibleSuggestions));
+	private Map<String, Color> colorSuggestions = allColorsWithName();
     
     private TextField learningTextField;
 
@@ -71,7 +81,10 @@ public class HelloAutoComplete extends ControlsFXSample {
                 + "\n\n"
                 + "The 'Learning TextField' will add whatever words are typed "
                 + "to the auto-complete popup, as long as you press Enter once "
-                + "you've finished typing the word.";
+                + "you've finished typing the word."
+                + "\n\n"
+                + "The Color TextField will suggest different colors when you type "
+                + "in their name.";
     }
 
     @Override public Node getPanel(final Stage stage) {
@@ -116,9 +129,33 @@ public class HelloAutoComplete extends ControlsFXSample {
             }
         });
 
-        grid.add(new Label("Learning TextField"), 0, 1);
-        grid.add(learningTextField, 1, 1);
-        GridPane.setHgrow(learningTextField, Priority.ALWAYS);
+		grid.add(new Label("Learning TextField"), 0, 1);
+		grid.add(learningTextField, 1, 1);
+		GridPane.setHgrow(learningTextField, Priority.ALWAYS);
+
+		//
+		// TextField with custom cell factory
+		// Completes color names
+		//
+		TextField customTextField = new TextField();
+		AutoCompletePopup<String> colorCompletionPopup = TextFields.bindAutoCompletion(customTextField, colorSuggestions.keySet()).getAutoCompletionPopup();
+		colorCompletionPopup.setSkin(new AutoCompletePopupSkin<String>(colorCompletionPopup, param -> new ListCell<String>() {
+			@Override
+			public void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+				if (empty) {
+					setText(null);
+					setGraphic(null);
+				} else {
+					setGraphic(new Rectangle(32, 32, colorSuggestions.get(item)));
+					setText(item);
+				}
+			}
+		}));
+
+		grid.add(new Label("Color TextField with custom CellFactory"), 0, 2);
+		grid.add(customTextField, 1, 2);
+		GridPane.setHgrow(customTextField, Priority.ALWAYS);
 
         root.setTop(grid);
         return root;
@@ -146,6 +183,23 @@ public class HelloAutoComplete extends ControlsFXSample {
         return grid;
     }
 
+	/* Modified from https://stackoverflow.com/a/17465261/6094756 */
+	private Map<String, Color> allColorsWithName() {
+        Map<String, Color> map = new HashMap<>();
+        try {
+			for (Field f : Color.class.getFields()) {
+				Object obj = f.get(null);
+				if (obj instanceof Color) {
+					map.put(f.getName(), (Color) obj);
+				}
+			}
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			map.put("red", Color.RED);
+			map.put("green", Color.GREEN);
+			map.put("blue", Color.BLUE);
+        }
+        return map;
+    }
 
     public static void main(String[] args) {
         launch(args);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016, 2019 ControlsFX
+ * Copyright (c) 2016, 2020 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,14 +44,14 @@ public class HelloTableFilter extends ControlsFXSample {
     }
 
     private TableFilter<Person> tableFilter;
-    private TableColumn<String, Person> firstNameCol;
-    private TableColumn<String, Person> lastNameCol;
-    private TableColumn<String, Person> emailCol;
+    private TableColumn<Person, String> firstNameCol;
+    private TableColumn<Person, String> lastNameCol;
+    private TableColumn<Person, String> emailCol;
 
     @Override
     @SuppressWarnings("unchecked")
     public Node getPanel(Stage stage) {
-        TableView tableView = new TableView();
+        TableView<Person> tableView = new TableView<>();
 
         firstNameCol = new TableColumn<>("First Name");
         firstNameCol.setCellValueFactory(new PropertyValueFactory<>("firstName"));

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2016 ControlsFX
+ * Copyright (c) 2014, 2016, 2020 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,9 +30,12 @@ import javafx.beans.binding.Bindings;
 import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.Skin;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.MouseButton;
+import javafx.util.StringConverter;
+import javafx.util.Callback;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 
@@ -42,7 +45,30 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
     private final ListView<T> suggestionList;
     final int LIST_CELL_HEIGHT = 24;
 
-    public AutoCompletePopupSkin(AutoCompletePopup<T> control){
+    public AutoCompletePopupSkin(AutoCompletePopup<T> control) {
+        this(control, control.getConverter());
+    }
+
+    /**
+	 * @param control
+	 *            The popup to be skinned
+	 * @param displayConverter
+	 *            An alternate {@link StringConverter} to use. This way, you can show autocomplete suggestions
+	 *            that when applied will fill in a different text than displayed. For example, you may preview
+	 *            {@code Files.newBufferedReader(Path: path) - Bufferedreader} but only fill in
+	 *            {@code Files.newBufferedReader(}
+	 */
+    public AutoCompletePopupSkin(AutoCompletePopup<T> control, StringConverter<T> displayConverter) {
+        this(control, TextFieldListCell.forListView(displayConverter));
+    }
+
+    /**
+	 * @param control
+	 *            The popup to be skinned
+	 * @param cellFactory
+	 *            Set a custom cell factory for the suggestions.
+	 */
+    public AutoCompletePopupSkin(AutoCompletePopup<T> control, Callback<ListView<T>, ListCell<T>> cellFactory) {
         this.control = control;
         suggestionList = new ListView<>(control.getSuggestions());
 
@@ -59,7 +85,7 @@ public class AutoCompletePopupSkin<T> implements Skin<AutoCompletePopup<T>> {
         suggestionList.prefHeightProperty().bind(
                 Bindings.min(control.visibleRowCountProperty(), Bindings.size(suggestionList.getItems()))
                 .multiply(LIST_CELL_HEIGHT).add(18));
-        suggestionList.setCellFactory(TextFieldListCell.forListView(control.getConverter()));
+        suggestionList.setCellFactory(cellFactory);
         
         //Allowing the user to control ListView width.
         suggestionList.prefWidthProperty().bind(control.prefWidthProperty());

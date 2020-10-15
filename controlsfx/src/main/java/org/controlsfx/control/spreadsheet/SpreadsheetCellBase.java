@@ -126,25 +126,30 @@ import javafx.stage.Popup;
  * feature is completely different from the {@link Filter}. Filters are shown on
  * one particular row whereas popup can be added to every cell.
  *
- * 
+ *
  * <h3>Graphic</h3>
  * Each cell can have a graphic to display next to the text in the cells. Just
  * use the {@link #setGraphic(Node)} in order to specify the graphic you want.
- * If you specify an {@link ImageView}, the SpreadsheetView will try to resize it in
- * order to fit the space available in the cell.
- * 
+ * If you specify an {@link ImageView}, the SpreadsheetView will try to resize
+ * it in order to fit the space available in the cell.
+ *
  * For example :
- * 
+ *
  * <pre>
  * cell.setGraphic(new ImageView(new Image(getClass().getResourceAsStream(&quot;icons/exclamation.png&quot;))));
  * </pre>
- * 
- * <center><img src="graphicNodeToCell.png" alt="SpreadsheetCellBase with graphic"></center> <br>
+ *
+ * If you only want to only provide Graphics for visible cells (for example a
+ * {@code WebView}), you can toggle {@link #setCellGraphic(boolean) } and
+ * provide the graphics with the factory in {@link SpreadsheetView#setCellGraphicFactory(org.controlsfx.control.spreadsheet.CellGraphicFactory)
+ * }.
+ * <center><img src="graphicNodeToCell.png" alt="SpreadsheetCellBase with graphic"></center>
+ * <br>
  * In addition to that, you can also specify another graphic property to your
- * cell with {@link #activateCorner(org.controlsfx.control.spreadsheet.SpreadsheetCell.CornerPosition) }.
- * This allow you to activate or deactivate some graphics on the cell in every 
- * corner. Right now it's a little red triangle but you can modify this in your CSS by
- * using the "<b>cell-corner</b>" style class.
+ * cell with {@link #activateCorner(org.controlsfx.control.spreadsheet.SpreadsheetCell.CornerPosition)
+ * }. This allow you to activate or deactivate some graphics on the cell in
+ * every corner. Right now it's a little red triangle but you can modify this in
+ * your CSS by using the "<b>cell-corner</b>" style class.
  * 
  * <pre>
  * .cell-corner.top-left{
@@ -220,6 +225,7 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     private static final int EDITABLE_BIT_POSITION = 4;
     private static final int WRAP_BIT_POSITION = 5;
     private static final int POPUP_BIT_POSITION = 6;
+    private static final int IS_BROWSER_POSITION = 7;
     private final SpreadsheetCellType type;
     private final int row;
     private final int column;
@@ -348,7 +354,19 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     public boolean isWrapText(){
         return isSet(WRAP_BIT_POSITION);
     }
-
+    
+    /** {@inheritDoc} */
+    @Override
+    public boolean isCellGraphic(){
+        return isSet(IS_BROWSER_POSITION);
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public void setCellGraphic(boolean isBrowser){
+        setMask(isBrowser, IS_BROWSER_POSITION);
+    }
+    
     /** {@inheritDoc} */
     @Override
     public void setWrapText(boolean wrapText) {

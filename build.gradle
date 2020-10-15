@@ -1,20 +1,7 @@
-buildscript {
-    repositories {
-        maven {
-            setUrl("https://plugins.gradle.org/m2/")
-        }
-    }
-    dependencies {
-        classpath("org.openjfx:javafx-plugin:0.0.8")
-    }
-}
-
 ext.java9Args = [
         // For various usages of TraversalEngine
         "--add-exports=javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",
         "--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
-        // For FontAwesome Style
-        "--add-exports=javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
         // For various behaviors across controls
         "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls",
         // For ReadOnlyUnbackedObservableList across files
@@ -27,10 +14,6 @@ ext.java9Args = [
         "--add-exports=javafx.base/com.sun.javafx.collections=org.controlsfx.controls",
         // For VersionInfo in VersionChecker
         "--add-exports=javafx.base/com.sun.javafx.runtime=org.controlsfx.controls",
-        // For WebPage in SVGLoader
-        "--add-exports=javafx.web/com.sun.webkit=org.controlsfx.controls",
-        // For enabling FontAwesome
-        "--add-exports=javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
         //For SpreadsheetView
         "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior.TableViewBehavior=org.controlsfx.controls",
         //For SpreadsheetView
@@ -49,7 +32,6 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'idea'
-    apply plugin: 'osgi'
     apply plugin: 'maven'
     apply from  : '../mavenPublish.gradle'
 
@@ -64,6 +46,7 @@ subprojects {
       fxsampler_name        = 'fxsampler'
       fxsampler_version     = cfg.fxsampler_specification_version + artifact_suffix
       fxsampler_mainClass   = 'org.controlsfx.fxsampler/fxsampler.FXSampler'
+      javafx_version        = '13'
     }
 
     group = 'org.controlsfx'
@@ -74,30 +57,17 @@ subprojects {
 
     if (JavaVersion.current().isJava11Compatible()) {
         apply plugin: 'org.openjfx.javafxplugin'
-        javafx {
-            version = '13'
-            modules = [ 'javafx.controls', 'javafx.media', 'javafx.web' ]
-        }
     }
 
-    afterEvaluate {
-
-        repositories {
-            mavenCentral()
-        }
-
-        dependencies {
-            testCompile 'junit:junit:[4,)'
-        }
-
-        test {
-            testLogging {
-                // Show that tests are run in the command-line output
-                events 'started', 'passed'
-            }
-        }
+    repositories {
+        mavenCentral()
     }
-    
+
+    compileJava {
+        options.encoding = "UTF-8"
+        options.incremental = true
+    }
+
     javadoc {
         def javaVersion = JavaVersion.current().majorVersion
         if (JavaVersion.current().java11Compatible) {
@@ -125,4 +95,10 @@ subprojects {
         archives javadocJar
     }
 
+    // Used in Travis
+    task getVersion {
+        doLast {
+            println "$project.version"
+        }
+    }
 }

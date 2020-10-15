@@ -23,7 +23,7 @@ public abstract class ControlsFXSample extends SampleBase {
 	}
 	
 	@Override public String getSampleSourceURL() {
-	    return Utils.JAVADOC_BASE + "samples-src/" + getClass().getName().replace('.','/') + ".java";
+	    return Utils.SAMPLES_BASE + getClass().getName().replace('.','/') + ".java";
 	}
 	
 	@Override
@@ -57,6 +57,5 @@ public abstract class ControlsFXSample extends SampleBase {
 			return version;
 		}
 	}
-
 }
 

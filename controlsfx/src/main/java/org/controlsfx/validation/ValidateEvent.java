@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, 2020, ControlsFX
+ * Copyright (c) 2020, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,8 +24,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package fxsampler;
+package org.controlsfx.validation;
 
-public interface FXSamplerConfiguration {
-    String getSceneStylesheet();
+import javafx.event.Event;
+import javafx.event.EventType;
+
+public class ValidateEvent extends Event {
+    private static final long serialVersionUID = 1L;
+
+    public static final EventType<Event> EVENT_TYPE = new EventType<>("VALIDATE_EVENT");
+
+    public ValidateEvent() {
+        super(EVENT_TYPE);
+    }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2020 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 
 public class Translations {
 
-    private static List<Translation> translations = new ArrayList<>();
+    private static final List<Translation> translations = new ArrayList<>();
 
     static {
         // firstly try to read from the controlsfx jar

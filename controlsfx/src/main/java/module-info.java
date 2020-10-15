@@ -3,7 +3,6 @@ module org.controlsfx.controls {
     requires java.desktop;
 
     requires transitive javafx.controls;
-    requires static javafx.web;
     requires static javafx.media;
     requires java.logging;
     requires javafx.base;
@@ -23,8 +22,11 @@ module org.controlsfx.controls {
     exports org.controlsfx.validation;
     exports org.controlsfx.validation.decoration;
 
-    // opens org.controlsfx.glyphfont to org.controlsfx.fxsampler;
-    
+    exports impl.org.controlsfx.skin to org.controlsfx.samples;
+
+    // Required for reading CSS files for the CSS Tab
+    opens org.controlsfx.control to org.controlsfx.fxsampler;
+
     uses org.controlsfx.glyphfont.GlyphFont;
     provides org.controlsfx.glyphfont.GlyphFont with org.controlsfx.glyphfont.FontAwesome;
 }

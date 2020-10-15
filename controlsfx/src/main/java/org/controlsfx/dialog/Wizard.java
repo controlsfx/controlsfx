@@ -80,7 +80,7 @@ import org.controlsfx.validation.ValidationSupport;
  * <pre>{@code // Create pages. Here for simplicity we just create and instance of WizardPane.
  * WizardPane page1 = new WizardPane(); 
  * WizardPane page2 = new WizardPane(); 
- * WizardPane page2 = new WizardPane(); 
+ * WizardPane page3 = new WizardPane(); 
  * 
  * // create wizard
  * Wizard wizard = new Wizard();

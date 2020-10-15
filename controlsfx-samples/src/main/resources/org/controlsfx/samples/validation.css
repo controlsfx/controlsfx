@@ -5,3 +5,7 @@
 .warning {
     -fx-effect: dropshadow(three-pass-box, gold, 14, 0, 0, 0);
 }
+
+.info {
+    -fx-effect: dropshadow(three-pass-box, skyblue, 14, 0, 0, 0);
+}

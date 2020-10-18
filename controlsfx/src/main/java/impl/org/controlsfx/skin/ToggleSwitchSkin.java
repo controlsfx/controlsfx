@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, 2016, 2020 ControlsFX
+ * Copyright (c) 2015, 2020 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -92,7 +92,6 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
     private void selectedStateChanged() {
         // Stop the transition if it was already running, has no effect otherwise.
         transition.stop();
-
         if (getSkinnable().isSelected()) {
             transition.setRate(1.0);
             transition.jumpTo(Duration.ZERO);
@@ -101,7 +100,6 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
             transition.setRate(-1.0);
             transition.jumpTo(transition.getDuration());
         }
-
         transition.play();
     }
 

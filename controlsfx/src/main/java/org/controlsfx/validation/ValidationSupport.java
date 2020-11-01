@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -107,12 +108,12 @@ public class ValidationSupport {
         return value instanceof Boolean? (Boolean)value: false;
     }
 
-    private ObservableSet<Control> controls = FXCollections.observableSet();
-    private ObservableMap<Control,ValidationResult> validationResults = 
-            FXCollections.observableMap(new WeakHashMap<>());
+    private final ObservableSet<Control> controls = FXCollections.observableSet(ConcurrentHashMap.newKeySet());
+    private final ObservableMap<Control,ValidationResult> validationResults = 
+            FXCollections.synchronizedObservableMap(FXCollections.observableMap(new WeakHashMap<>()));
 
     
-    private AtomicBoolean dataChanged = new AtomicBoolean(false);
+    private final AtomicBoolean dataChanged = new AtomicBoolean(false);
     
     /**
      * Creates validation support instance. <br>

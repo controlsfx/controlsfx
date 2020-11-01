@@ -101,4 +101,9 @@ subprojects {
             println "$project.version"
         }
     }
+
+    // Do not publish Gradle modules
+    tasks.withType(GenerateModuleMetadata) {
+        enabled = false
+    }
 }

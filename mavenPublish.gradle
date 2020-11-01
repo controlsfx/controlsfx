@@ -60,7 +60,7 @@ publishing {
                     pomNode.dependencies.'*'.findAll() {
                         it.groupId.text() == 'org.openjfx'
                     }.each {
-                        it.remove(it.classifier)
+                        it.parent().remove(it)
                     }
                 }
             }

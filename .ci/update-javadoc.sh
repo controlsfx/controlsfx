@@ -20,3 +20,6 @@ fi
 git add $1
 git commit -m "Add Javadoc for $1"
 git push https://abhinayagarwal:$GITHUB_PASSWORD@github.com/$REPO_SLUG HEAD:master
+
+# Re-deploy Javadoc Github pages
+curl -u abhinayagarwal:$ACCESS_TOKEN -X POST https://api.github.com/repos/controlsfx/javadoc/pages/builds

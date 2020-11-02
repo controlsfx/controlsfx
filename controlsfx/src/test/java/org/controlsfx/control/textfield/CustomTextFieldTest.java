@@ -105,25 +105,30 @@ public class CustomTextFieldTest extends FxRobot {
     //issue https://github.com/controlsfx/controlsfx/issues/1296
     @Test
     public void clearEventTextField() {
-        clearEvent((CustomTextField) TextFields.createClearableTextField());
+        CustomTextField clearableField = (CustomTextField) TextFields.createClearableTextField();
+        AtomicBoolean clearButtonPressed = new AtomicBoolean(false);
+        clearableField.addEventHandler(ClearEvent.CLEAR_PRESSED, event -> clearButtonPressed.set(true));
+        Node clearablePane = clearableField.getRight();
+        Event.fireEvent(clearablePane, createMouseReleasedEvent());
+
+        Assert.assertTrue(clearButtonPressed.get());
     }
 
     @Test
     public void clearEventPasswordField() {
-        clearEvent((CustomTextField) TextFields.createClearableTextField());
-    }
-
-    private void clearEvent(CustomTextField clearableTextField) {
+        CustomPasswordField clearableField = (CustomPasswordField) TextFields.createClearablePasswordField();
         AtomicBoolean clearButtonPressed = new AtomicBoolean(false);
-        clearableTextField.addEventHandler(ClearEvent.CLEAR_PRESSED, event -> {
-            clearButtonPressed.set(true);
-        });
-        Node clearablePane = clearableTextField.getRight();
-        Event.fireEvent(clearablePane, new MouseEvent(MouseEvent.MOUSE_RELEASED, 0, 0, 0, 0, MouseButton.PRIMARY,
-                1, false, false, false, false, false, false,
-                false, false, false, false, null));
+        clearableField.addEventHandler(ClearEvent.CLEAR_PRESSED, event -> clearButtonPressed.set(true));
+        Node clearablePane = clearableField.getRight();
+        Event.fireEvent(clearablePane, createMouseReleasedEvent());
 
         Assert.assertTrue(clearButtonPressed.get());
+    }
+
+    private MouseEvent createMouseReleasedEvent() {
+        return new MouseEvent(MouseEvent.MOUSE_RELEASED, 0, 0, 0, 0, MouseButton.PRIMARY,
+                1, false, false, false, false, false, false,
+                false, false, false, false, null);
     }
 
 }

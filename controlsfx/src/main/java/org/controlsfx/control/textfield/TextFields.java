@@ -96,10 +96,7 @@ public class TextFields {
         clearButtonPane.getStyleClass().addAll("clear-button"); //$NON-NLS-1$
         clearButtonPane.setOpacity(0.0);
         clearButtonPane.setCursor(Cursor.DEFAULT);
-        clearButtonPane.setOnMouseReleased(e -> {
-            inputField.clear();
-            inputField.fireEvent(new ClearEvent(ClearEvent.CLEAR_PRESSED));
-        });
+        clearButtonPane.setOnMouseReleased(e -> inputField.fireEvent(new ClearEvent(ClearEvent.CLEAR_PRESSED)));
         clearButtonPane.managedProperty().bind(inputField.editableProperty());
         clearButtonPane.visibleProperty().bind(inputField.editableProperty());
 
@@ -127,6 +124,7 @@ public class TextFields {
                 fader.play();
             }
         });
+        inputField.addEventHandler(ClearEvent.CLEAR_PRESSED, event -> inputField.clear());
     }
 
     /***************************************************************************

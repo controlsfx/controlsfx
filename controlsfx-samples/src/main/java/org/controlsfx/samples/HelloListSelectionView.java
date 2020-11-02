@@ -120,7 +120,6 @@ public class HelloListSelectionView extends ControlsFXSample {
         return root;
     }
 
-
     @Override
     public String getSampleDescription() {
         return "A control used to let the user select multiple values from a "

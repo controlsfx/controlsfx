@@ -26,7 +26,6 @@
  */
 package org.controlsfx.control;
 
-import com.sun.javafx.css.converters.EnumConverter;
 import impl.org.controlsfx.skin.SegmentedBarSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -34,7 +33,12 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.css.*;
+import javafx.css.CssMetaData;
+import javafx.css.PseudoClass;
+import javafx.css.Styleable;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
+import javafx.css.converter.EnumConverter;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;

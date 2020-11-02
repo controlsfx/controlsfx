@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2013, ControlsFX
+/*
+ * Copyright (c) 2018, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,18 +24,39 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package impl.org.controlsfx.behavior;
+package impl.org.controlsfx.collections;
 
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.List;
 
-import org.controlsfx.control.Rating;
+class ChangeHelper {
+    
+    static String addRemoveChangeToString(int from, int to, List<?> list, List<?> removed) {
+        
+        StringBuilder b = new StringBuilder();
 
-import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.behavior.KeyBinding;
+        if (removed.isEmpty()) {
+            b.append(list.subList(from, to));
+            b.append(" addition at ").append(from);
+        } else {
+            b.append(removed);
+            if (from == to) {
+                b.append(" removal at ").append(from);
+            } else {
+                b.append(" replaced by ");
+                b.append(list.subList(from, to));
+                b.append(" at ").append(from);
+            }
+        }
+        return b.toString();
+    }
 
-public class RatingBehavior extends BehaviorBase<Rating> {
+    static String permChangeToString(int[] permutation) {
+        return "permutation by " + Arrays.toString(permutation);
+    }
 
-    public RatingBehavior(Rating control) {
-        super(control, Collections.<KeyBinding> emptyList());
+    static String updateChangeToString(int from, int to) {
+        return "update at range [" + from + ", " + to + ")";
     }
 }
+

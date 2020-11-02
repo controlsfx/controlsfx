@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,17 +31,14 @@ import java.util.Collections;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
+import javafx.scene.control.SkinBase;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 
 import org.controlsfx.control.SegmentedButton;
 
-import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.behavior.KeyBinding;
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-
-public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, BehaviorBase<SegmentedButton>> {
+public class SegmentedButtonSkin extends SkinBase<SegmentedButton> {
         
     private static final String ONLY_BUTTON = "only-button"; //$NON-NLS-1$
     private static final String LEFT_PILL   = "left-pill"; //$NON-NLS-1$
@@ -51,7 +48,7 @@ public class SegmentedButtonSkin extends BehaviorSkinBase<SegmentedButton, Behav
     private final HBox container;
 
     public SegmentedButtonSkin(SegmentedButton control) {
-        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
+        super(control);
         
         container = new HBox();
         

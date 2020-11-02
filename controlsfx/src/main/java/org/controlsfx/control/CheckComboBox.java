@@ -28,9 +28,6 @@ package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.CheckComboBoxSkin;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javafx.beans.DefaultProperty;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -44,6 +41,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Skin;
 import javafx.util.StringConverter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple UI control that makes it possible to select zero or more items within

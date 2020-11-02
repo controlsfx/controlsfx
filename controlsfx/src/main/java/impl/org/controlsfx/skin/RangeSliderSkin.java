@@ -45,6 +45,7 @@ import javafx.geometry.Side;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.control.SkinBase;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -53,13 +54,12 @@ import javafx.util.Callback;
 
 import org.controlsfx.control.RangeSlider;
 
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 import com.sun.javafx.scene.traversal.Algorithm;
 import com.sun.javafx.scene.traversal.Direction;
 import com.sun.javafx.scene.traversal.ParentTraversalEngine;
 import com.sun.javafx.scene.traversal.TraversalContext;
 
-public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBehavior> {
+public class RangeSliderSkin extends SkinBase<RangeSlider> {
         
     /** Track if slider is vertical/horizontal and cause re layout */
     private NumberAxis tickLine = null;
@@ -87,21 +87,61 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
     
     private FocusedChild currentFocus = LOW_THUMB;
     
+    private final RangeSliderBehavior rangeSliderBehavior;
+
     public RangeSliderSkin(final RangeSlider rangeSlider) {
-        super(rangeSlider, new RangeSliderBehavior(rangeSlider));
+        super(rangeSlider);
         orientation = getSkinnable().getOrientation();
+        rangeSliderBehavior = new RangeSliderBehavior(rangeSlider);
         initFirstThumb();
         initSecondThumb();
         initRangeBar();
-        registerChangeListener(rangeSlider.lowValueProperty(), "LOW_VALUE"); //$NON-NLS-1$
-        registerChangeListener(rangeSlider.highValueProperty(), "HIGH_VALUE"); //$NON-NLS-1$
-        registerChangeListener(rangeSlider.minProperty(), "MIN"); //$NON-NLS-1$
-        registerChangeListener(rangeSlider.maxProperty(), "MAX"); //$NON-NLS-1$
-        registerChangeListener(rangeSlider.orientationProperty(), "ORIENTATION"); //$NON-NLS-1$
-        registerChangeListener(rangeSlider.showTickMarksProperty(), "SHOW_TICK_MARKS"); //$NON-NLS-1$
-        registerChangeListener(rangeSlider.showTickLabelsProperty(), "SHOW_TICK_LABELS"); //$NON-NLS-1$
-        registerChangeListener(rangeSlider.majorTickUnitProperty(), "MAJOR_TICK_UNIT"); //$NON-NLS-1$
-        registerChangeListener(rangeSlider.minorTickCountProperty(), "MINOR_TICK_COUNT"); //$NON-NLS-1$
+        registerChangeListener(rangeSlider.lowValueProperty(), e -> {
+            positionLowThumb();
+            rangeBar.resizeRelocate(rangeStart, rangeBar.getLayoutY(), 
+            rangeEnd - rangeStart, rangeBar.getHeight());
+        });
+        registerChangeListener(rangeSlider.highValueProperty(), e -> {
+            positionHighThumb();
+            rangeBar.resize(rangeEnd-rangeStart, rangeBar.getHeight());
+        });
+        registerChangeListener(rangeSlider.minProperty(), e -> {
+            if (showTickMarks && tickLine != null) {
+                tickLine.setLowerBound(getSkinnable().getMin());
+            }
+            getSkinnable().requestLayout();
+        });
+        registerChangeListener(rangeSlider.maxProperty(), e -> {
+            if (showTickMarks && tickLine != null) {
+                tickLine.setUpperBound(getSkinnable().getMax());
+            }
+            getSkinnable().requestLayout();
+        });
+        registerChangeListener(rangeSlider.orientationProperty(), e -> {
+            orientation = getSkinnable().getOrientation();
+            if (showTickMarks && tickLine != null) {
+                tickLine.setSide(isHorizontal() ? Side.BOTTOM : Side.RIGHT);
+            }
+            getSkinnable().requestLayout();
+        });
+        registerChangeListener(rangeSlider.showTickMarksProperty(), e -> {
+            setShowTickMarks(getSkinnable().isShowTickMarks(), getSkinnable().isShowTickLabels());
+        });
+        registerChangeListener(rangeSlider.showTickLabelsProperty(), e -> {
+            setShowTickMarks(getSkinnable().isShowTickMarks(), getSkinnable().isShowTickLabels());
+        });
+        registerChangeListener(rangeSlider.majorTickUnitProperty(), e -> {
+            if (tickLine != null) {
+                tickLine.setTickUnit(getSkinnable().getMajorTickUnit());
+                getSkinnable().requestLayout();
+            }
+        });
+        registerChangeListener(rangeSlider.minorTickCountProperty(), e -> {
+            if (tickLine != null) {
+                tickLine.setMinorTickCount(Math.max(getSkinnable().getMinorTickCount(),0) + 1);
+                getSkinnable().requestLayout();
+            }
+        });
         lowThumb.focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean hasFocus) {
                 if (hasFocus) {
@@ -254,7 +294,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
         getSkinnable().addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);  
         // set up a callback on the behavior to indicate which thumb is currently 
         // selected (via enum).
-        getBehavior().setSelectedValue(new Callback<Void, FocusedChild>() {
+        rangeSliderBehavior.setSelectedValue(new Callback<Void, FocusedChild>() {
             @Override public FocusedChild call(Void v) {
                 return currentFocus;
             }
@@ -275,9 +315,9 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
             @Override public void handle(javafx.scene.input.MouseEvent me) {
                 if (!lowThumb.isPressed() && !highThumb.isPressed()) {
                     if (isHorizontal()) {
-                        getBehavior().trackPress(me, (me.getX() / trackLength));
+                        rangeSliderBehavior.trackPress(me, (me.getX() / trackLength));
                     } else {
-                        getBehavior().trackPress(me, (me.getY() / trackLength));
+                        rangeSliderBehavior.trackPress(me, (me.getY() / trackLength));
                     }
                 }
             }
@@ -287,7 +327,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
             @Override public void handle(javafx.scene.input.MouseEvent me) {
                  //Nothing being done with the second param in sliderBehavior
                 //So, passing a dummy value
-                getBehavior().trackRelease(me, 0.0f);
+                rangeSliderBehavior.trackRelease(me, 0.0f);
             }
         });
 
@@ -295,7 +335,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
             @Override public void handle(javafx.scene.input.MouseEvent me) {
                 highThumb.setFocus(false);
                 lowThumb.setFocus(true);
-                getBehavior().lowThumbPressed(me, 0.0f);
+                rangeSliderBehavior.lowThumbPressed(me, 0.0f);
                 preDragThumbPoint = lowThumb.localToParent(me.getX(), me.getY());
                 preDragPos = (getSkinnable().getLowValue() - getSkinnable().getMin()) /
                         (getMaxMinusMinNoZero());
@@ -304,7 +344,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
 
         lowThumb.setOnMouseReleased(new EventHandler<javafx.scene.input.MouseEvent>() {
             @Override public void handle(javafx.scene.input.MouseEvent me) {
-                getBehavior().lowThumbReleased(me);
+                rangeSliderBehavior.lowThumbReleased(me);
             }
         });
 
@@ -313,7 +353,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
                 Point2D cur = lowThumb.localToParent(me.getX(), me.getY());
                 double dragPos = (isHorizontal())?
                     cur.getX() - preDragThumbPoint.getX() : -(cur.getY() - preDragThumbPoint.getY());
-                getBehavior().lowThumbDragged(me, preDragPos + dragPos / trackLength);
+                rangeSliderBehavior.lowThumbDragged(me, preDragPos + dragPos / trackLength);
             }
         });
     }
@@ -330,7 +370,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
             @Override public void handle(MouseEvent e) {
                 lowThumb.setFocus(false);
                 highThumb.setFocus(true);
-                ((RangeSliderBehavior) getBehavior()).highThumbPressed(e, 0.0D);
+                rangeSliderBehavior.highThumbPressed(e, 0.0D);
                 preDragThumbPoint = highThumb.localToParent(e.getX(), e.getY());
                 preDragPos = (((RangeSlider) getSkinnable()).getHighValue() - ((RangeSlider) getSkinnable()).getMin()) / 
                             (getMaxMinusMinNoZero());
@@ -339,7 +379,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
         );
         highThumb.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent e) {
-                ((RangeSliderBehavior) getBehavior()).highThumbReleased(e);
+                rangeSliderBehavior.highThumbReleased(e);
             }
         }
         );
@@ -350,7 +390,7 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
 
                 Point2D point2d = highThumb.localToParent(e.getX(), e.getY());
                 double d = ((RangeSlider) getSkinnable()).getOrientation() != Orientation.HORIZONTAL ? -(point2d.getY() - preDragThumbPoint.getY()) : point2d.getX() - preDragThumbPoint.getX();
-                ((RangeSliderBehavior) getBehavior()).highThumbDragged(e, preDragPos + d / trackLength);
+                rangeSliderBehavior.highThumbDragged(e, preDragPos + d / trackLength);
             }
         });
     }
@@ -376,13 +416,13 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
         rangeBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent e) {
                 double delta = (isHorizontal() ? e.getX() : -e.getY()) - preDragPos;
-                ((RangeSliderBehavior) getBehavior()).moveRange(delta);
+                rangeSliderBehavior.moveRange(delta);
             }
         });
         
          rangeBar.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent e) {
-                ((RangeSliderBehavior) getBehavior()).confirmRange();
+                rangeSliderBehavior.confirmRange();
             }
         });
         
@@ -433,51 +473,6 @@ public class RangeSliderSkin extends BehaviorSkinBase<RangeSlider, RangeSliderBe
         getSkinnable().requestLayout();
     }
 
-    @Override protected void handleControlPropertyChanged(String p) {
-        super.handleControlPropertyChanged(p);
-        if ("ORIENTATION".equals(p)) { //$NON-NLS-1$
-            orientation = getSkinnable().getOrientation();
-            if (showTickMarks && tickLine != null) {
-                tickLine.setSide(isHorizontal() ? Side.BOTTOM : Side.RIGHT);
-            }
-            getSkinnable().requestLayout();
-        } else if ("MIN".equals(p) ) { //$NON-NLS-1$
-            if (showTickMarks && tickLine != null) {
-                tickLine.setLowerBound(getSkinnable().getMin());
-            }
-            getSkinnable().requestLayout();
-        } else if ("MAX".equals(p)) { //$NON-NLS-1$
-            if (showTickMarks && tickLine != null) {
-                tickLine.setUpperBound(getSkinnable().getMax());
-            }
-            getSkinnable().requestLayout();
-        } else if ("SHOW_TICK_MARKS".equals(p) || "SHOW_TICK_LABELS".equals(p)) { //$NON-NLS-1$ //$NON-NLS-2$
-            setShowTickMarks(getSkinnable().isShowTickMarks(), getSkinnable().isShowTickLabels());
-            if (!getChildren().contains(highThumb))
-                getChildren().add(highThumb);
-            if (!getChildren().contains(rangeBar))
-                getChildren().add(rangeBar);
-        }  else if ("MAJOR_TICK_UNIT".equals(p)) { //$NON-NLS-1$
-            if (tickLine != null) {
-                tickLine.setTickUnit(getSkinnable().getMajorTickUnit());
-                getSkinnable().requestLayout();
-            }
-        } else if ("MINOR_TICK_COUNT".equals(p)) { //$NON-NLS-1$
-            if (tickLine != null) {
-                tickLine.setMinorTickCount(Math.max(getSkinnable().getMinorTickCount(),0) + 1);
-                getSkinnable().requestLayout();
-            }
-        } else if ("LOW_VALUE".equals(p)) { //$NON-NLS-1$
-            positionLowThumb();
-            rangeBar.resizeRelocate(rangeStart, rangeBar.getLayoutY(), 
-                    rangeEnd - rangeStart, rangeBar.getHeight());
-        } else if ("HIGH_VALUE".equals(p)) { //$NON-NLS-1$
-            positionHighThumb();
-            rangeBar.resize(rangeEnd-rangeStart, rangeBar.getHeight());
-        }
-        super.handleControlPropertyChanged(p);
-    }
-    
     /**
      *
      * @return the difference between max and min, but if they have the same

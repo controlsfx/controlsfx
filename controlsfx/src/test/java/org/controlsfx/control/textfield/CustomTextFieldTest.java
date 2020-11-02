@@ -26,6 +26,7 @@
  */
 package org.controlsfx.control.textfield;
 
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -94,7 +95,7 @@ public class CustomTextFieldTest extends FxRobot {
         Assert.assertNull(textField.getRight());
         Assert.assertNull(textField.getLeft());
 
-        Assert.assertNull(lookup("#right-label").query());
-        Assert.assertNull(lookup("#left-label").query());
+        Assert.assertEquals(Optional.empty(), lookup("#right-label").tryQuery());
+        Assert.assertEquals(Optional.empty(), lookup("#left-label").tryQuery());
     }
 }

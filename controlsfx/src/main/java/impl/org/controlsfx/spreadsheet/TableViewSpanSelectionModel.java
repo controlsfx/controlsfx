@@ -26,9 +26,10 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import com.sun.javafx.collections.MappingChange;
-import com.sun.javafx.collections.NonIterableChange;
-import com.sun.javafx.scene.control.ReadOnlyUnbackedObservableList;
+import impl.org.controlsfx.collections.MappingChange;
+import impl.org.controlsfx.collections.MappingChange.Map;
+import impl.org.controlsfx.collections.NonIterableChange;
+import impl.org.controlsfx.collections.ReadOnlyUnbackedObservableList;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

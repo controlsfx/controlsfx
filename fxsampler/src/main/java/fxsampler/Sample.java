@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2020, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,58 +36,66 @@ public interface Sample {
     /**
      * A short, most likely single-word, name to show to the user - e.g. "CheckBox"
      */
-    public String getSampleName();
+    String getSampleName();
 
     /**
-     * A short, multiple sentence description of the sample. 
+     * A short, multiple sentence description of the sample.
      */
-    public String getSampleDescription();
-    
+    String getSampleDescription();
+
     /**
      * Returns the name of the project that this sample belongs to (e.g. 'JFXtras'
      * or 'ControlsFX').
      */
-    public String getProjectName();
-    
+    String getProjectName();
+
     /**
      * Returns the version of the project that this sample belongs to (e.g. '1.0.0')
      */
-    public String getProjectVersion();
-    
+    String getProjectVersion();
+
     /**
      * Returns the main sample panel.
      */
-    public Node getPanel(final Stage stage);
+    Node getPanel(final Stage stage);
 
     /**
      * Returns the panel to display to the user that allows for manipulating
      * the sample.
      */
-    public Node getControlPanel();
-    
+    Node getControlPanel();
+
     /**
-     * Returns divider position to use for split between main panel and control panel 
+     * Provides a place to dispose of any resources when sample is deselected
      */
-    public double getControlPanelDividerPosition();
+    void dispose();
+
+
+    /**
+     * Returns divider position to use for split between main panel and control panel
+     */
+    double getControlPanelDividerPosition();
 
     /**
      * A full URL to the javadoc for the API being demonstrated in this sample.
      */
-    public String getJavaDocURL();
-    
+    String getJavaDocURL();
+
     /**
-     * Returns URL for control's stylsheet 
+     * Returns URL for control's stylesheet.
+     * If the CSS resource is available on module-path,
+     * {@link FXSamplerProject#getModuleName() project's} module name should be defined.
      */
-    public String getControlStylesheetURL();
-    
+    String getControlStylesheetURL();
+
     /**
      * A full URL to a sample source code, which is assumed to be in java.
      */
-    public String getSampleSourceURL();
-    
+    String getSampleSourceURL();
+
     /**
      * If true this sample is shown to users, if false it is not.
      */
-    public boolean isVisible();
+    boolean isVisible();
 
 }

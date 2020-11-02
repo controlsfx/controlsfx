@@ -26,11 +26,6 @@
  */
 package org.controlsfx.samples;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.util.stream.Collectors;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -47,10 +42,14 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.PrefixSelectionChoiceBox;
 import org.controlsfx.control.PrefixSelectionComboBox;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class HelloPrefixSelection extends ControlsFXSample {
     
@@ -179,7 +178,7 @@ public class HelloPrefixSelection extends ControlsFXSample {
         combo4.setConverter(new StringConverter<Person>() {
             @Override
             public String toString(Person object) {
-                return String.format("%02d ", personList.indexOf(object)) + object.toString();
+                return String.format("%02d ", personList.indexOf(object)) + (object != null ? object.toString() : "");
             }
 
             @Override

@@ -583,7 +583,8 @@ public class SpreadsheetView extends Control{
         /**
          * Keyboard action, maybe use an accelerator
          */
-        cellsView.setOnKeyPressed(keyPressedHandler);
+        cellsView.addEventFilter(KeyEvent.KEY_PRESSED, keyPressedHandler);
+//        cellsView.setOnKeyPressed(keyPressedHandler);
         /**
          * ContextMenu handling.
          */
@@ -938,14 +939,15 @@ public class SpreadsheetView extends Control{
     }
 
     private int getViewIndex(int sourceIndex) {
-        //FIXME Will be improved in JDK9 with https://bugs.openjdk.java.net/browse/JDK-8139848
-        int max = sortedList.size();
-        for (int i = 0; i < max; i++) {
-            if (sortedList.getSourceIndex(i) == sourceIndex) {
-                return i;
-            }
-        }
-        return -1;
+        //Improved in JDK9 with https://bugs.openjdk.java.net/browse/JDK-8139848
+        return sortedList.getViewIndex(sourceIndex);
+//        int max = sortedList.size();
+//        for (int i = 0; i < max; i++) {
+//            if (sortedList.getSourceIndex(i) == sourceIndex) {
+//                return i;
+//            }
+//        }
+//        return -1;
     }
     
     /**
@@ -2305,7 +2307,7 @@ public class SpreadsheetView extends Control{
             // We don't want to sort the column
             column.setSortable(false);
 
-            column.impl_setReorderable(false);
+            column.setReorderable(false);
 
             // We assign a DataCell for each Cell needed (MODEL).
             column.setCellValueFactory((TableColumn.CellDataFeatures<ObservableList<SpreadsheetCell>, SpreadsheetCell> p) -> {

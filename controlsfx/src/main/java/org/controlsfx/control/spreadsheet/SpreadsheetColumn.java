@@ -216,7 +216,8 @@ public final class SpreadsheetColumn {
     public void setPrefWidth(double width) {
         width = Math.ceil(width);
         if (column.getPrefWidth() == width && column.getWidth() != width) {
-            column.impl_setWidth(width);
+            //FIXME
+//            column.impl_setWidth(width);
         } else {
             column.setPrefWidth(width);
         }

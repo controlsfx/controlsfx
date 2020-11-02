@@ -31,11 +31,9 @@ import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
+import javafx.scene.control.skin.TextFieldSkin;
 import javafx.scene.layout.StackPane;
-
-import com.sun.javafx.scene.control.behavior.TextFieldBehavior;
-import com.sun.javafx.scene.control.skin.TextFieldSkin;
-import com.sun.javafx.scene.text.HitInfo;
+import javafx.scene.text.HitInfo;
 
 public abstract class CustomTextFieldSkin extends TextFieldSkin {
         
@@ -51,26 +49,17 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
     private final TextField control;
     
     public CustomTextFieldSkin(final TextField control) {
-        super(control, new TextFieldBehavior(control));
+        super(control);
         
         this.control = control;
         updateChildren();
         
-        registerChangeListener(leftProperty(), "LEFT_NODE"); //$NON-NLS-1$
-        registerChangeListener(rightProperty(), "RIGHT_NODE"); //$NON-NLS-1$
-        registerChangeListener(control.focusedProperty(), "FOCUSED"); //$NON-NLS-1$
+        registerChangeListener(leftProperty(), e -> updateChildren());
+        registerChangeListener(rightProperty(), e -> updateChildren());
     }
     
     public abstract ObjectProperty<Node> leftProperty();
     public abstract ObjectProperty<Node> rightProperty();
-    
-    @Override protected void handleControlPropertyChanged(String p) {
-        super.handleControlPropertyChanged(p);
-        
-        if (p == "LEFT_NODE" || p == "RIGHT_NODE") { //$NON-NLS-1$ //$NON-NLS-2$
-            updateChildren();
-        }
-    }
     
     private void updateChildren() {
         Node newLeft = leftProperty().get();

@@ -26,8 +26,6 @@
  */
 package impl.org.controlsfx.skin;
 
-import impl.org.controlsfx.behavior.RatingBehavior;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +34,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.control.SkinBase;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -46,12 +45,10 @@ import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.Rating;
 import org.controlsfx.tools.Utils;
 
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-
 /**
  *
  */
-public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
+public class RatingSkin extends SkinBase<Rating> {
         
     /***************************************************************************
      * 
@@ -116,7 +113,7 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
      **************************************************************************/
     
     public RatingSkin(Rating control) {
-        super(control, new RatingBehavior(control));
+        super(control);
         
         this.updateOnHover = control.isUpdateOnHover();
         this.partialRating = control.isPartialRating();
@@ -126,13 +123,23 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
         updateRating();
         // -- end init
         
-        registerChangeListener(control.ratingProperty(), "RATING"); //$NON-NLS-1$
-        registerChangeListener(control.maxProperty(), "MAX"); //$NON-NLS-1$
-        registerChangeListener(control.orientationProperty(), "ORIENTATION"); //$NON-NLS-1$
-        registerChangeListener(control.updateOnHoverProperty(), "UPDATE_ON_HOVER"); //$NON-NLS-1$
-        registerChangeListener(control.partialRatingProperty(), "PARTIAL_RATING"); //$NON-NLS-1$
+        registerChangeListener(control.ratingProperty(), e -> updateRating());
+        registerChangeListener(control.maxProperty(), e -> recreateButtons());
+        registerChangeListener(control.orientationProperty(), e -> recreateButtons());
+        registerChangeListener(control.updateOnHoverProperty(), e -> {
+            this.updateOnHover = getSkinnable().isUpdateOnHover();
+            recreateButtons();
+        });
+        registerChangeListener(control.partialRatingProperty(), e -> {
+            this.partialRating = getSkinnable().isPartialRating();
+            recreateButtons();
+        });
         // added to ensure clip is correctly calculated when control is first shown:
-        registerChangeListener(control.boundsInLocalProperty(), "BOUNDS"); //$NON-NLS-1$
+        registerChangeListener(control.boundsInLocalProperty(), e -> {
+            if (this.partialRating) {
+        		updateClip();
+        	}
+        });
     }
 
     
@@ -142,28 +149,6 @@ public class RatingSkin extends BehaviorSkinBase<Rating, RatingBehavior> {
      * Implementation
      * 
      **************************************************************************/
-    
-    @Override protected void handleControlPropertyChanged(String p) {
-        super.handleControlPropertyChanged(p);
-        
-        if (p == "RATING") { //$NON-NLS-1$
-            updateRating();
-        } else if (p == "MAX") { //$NON-NLS-1$
-            recreateButtons();
-        } else if (p == "ORIENTATION") { //$NON-NLS-1$
-            recreateButtons();
-        } else if (p == "PARTIAL_RATING") { //$NON-NLS-1$
-            this.partialRating = getSkinnable().isPartialRating();
-            recreateButtons();
-        } else if (p == "UPDATE_ON_HOVER") { //$NON-NLS-1$
-            this.updateOnHover = getSkinnable().isUpdateOnHover();
-            recreateButtons();
-        } else if (p == "BOUNDS") { //$NON-NLS-1$
-        	if (this.partialRating) {
-        		updateClip();
-        	}
-        }
-    }
     
     private void recreateButtons() {
         backgroundContainer = null;

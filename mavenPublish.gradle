@@ -49,9 +49,19 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:hg:https://bitbucket.org/controlsfx/controlsfx'
-                    developerConnection = 'scm:hg:ssh://hg@bitbucket.org/controlsfx/controlsfx'
-                    url = 'https://bitbucket.org/controlsfx/controlsfx'
+                    connection = 'scm:git:https://github.com/controlsfx/controlsfx'
+                    developerConnection = 'scm:git:ssh://hg@github.com/controlsfx/controlsfx'
+                    url = 'https://github.com/controlsfx/controlsfx'
+                }
+
+                // Remove classifier for JavaFX dependencies
+                withXml {
+                    Node pomNode = asNode()
+                    pomNode.dependencies.'*'.findAll() {
+                        it.groupId.text() == 'org.openjfx'
+                    }.each {
+                        it.parent().remove(it)
+                    }
                 }
             }
         }

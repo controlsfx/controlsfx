@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,6 @@ import static impl.org.controlsfx.i18n.Localization.asKey;
 import static impl.org.controlsfx.i18n.Localization.localize;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -42,6 +41,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToolBar;
@@ -64,11 +64,7 @@ import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.property.editor.AbstractPropertyEditor;
 import org.controlsfx.property.editor.PropertyEditor;
 
-import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.behavior.KeyBinding;
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-
-public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorBase<PropertySheet>> {
+public class PropertySheetSkin extends SkinBase<PropertySheet> {
     
     /**************************************************************************
      * 
@@ -101,7 +97,7 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      **************************************************************************/
 
     public PropertySheetSkin(final PropertySheet control) {
-        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
+        super(control);
         
         scroller = new ScrollPane();
         scroller.setFitToWidth(true);
@@ -130,13 +126,13 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
               
         
         // setup listeners
-        registerChangeListener(control.modeProperty(), "MODE"); //$NON-NLS-1$
-        registerChangeListener(control.propertyEditorFactory(), "EDITOR-FACTORY"); //$NON-NLS-1$
-        registerChangeListener(control.titleFilter(), "FILTER"); //$NON-NLS-1$
-        registerChangeListener(searchField.textProperty(), "FILTER-UI"); //$NON-NLS-1$
-        registerChangeListener(control.modeSwitcherVisibleProperty(), "TOOLBAR-MODE"); //$NON-NLS-1$
-        registerChangeListener(control.searchBoxVisibleProperty(), "TOOLBAR-SEARCH"); //$NON-NLS-1$
-        registerChangeListener(control.categoryComparatorProperty(), "CATEGORY-COMPARATOR"); //$NON-NLS-1$
+        registerChangeListener(control.modeProperty(), e -> refreshProperties());
+        registerChangeListener(control.propertyEditorFactory(), e -> refreshProperties());
+        registerChangeListener(control.titleFilter(), e -> refreshProperties());
+        registerChangeListener(searchField.textProperty(), e -> getSkinnable().setTitleFilter(searchField.getText()));
+        registerChangeListener(control.modeSwitcherVisibleProperty(), e -> updateToolbar());
+        registerChangeListener(control.searchBoxVisibleProperty(), e -> updateToolbar());
+        registerChangeListener(control.categoryComparatorProperty(), e -> refreshProperties());
         
         control.getItems().addListener((ListChangeListener<Item>) change -> refreshProperties());
         
@@ -152,20 +148,6 @@ public class PropertySheetSkin extends BehaviorSkinBase<PropertySheet, BehaviorB
      * 
      **************************************************************************/
 
-    @Override protected void handleControlPropertyChanged(String p) {
-        super.handleControlPropertyChanged(p);
-        
-        if (p == "MODE" || p == "EDITOR-FACTORY" || p == "FILTER" || p == "CATEGORY-COMPARATOR") { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            refreshProperties();
-        } else if (p == "FILTER-UI") { //$NON-NLS-1$
-            getSkinnable().setTitleFilter(searchField.getText());
-        } else if (p == "TOOLBAR-MODE") { //$NON-NLS-1$
-            updateToolbar();
-        } else if (p == "TOOLBAR-SEARCH") { //$NON-NLS-1$
-            updateToolbar();
-        }
-    }
-    
     @Override protected void layoutChildren(double x, double y, double w, double h) {
         content.resizeRelocate(x, y, w, h);
     }

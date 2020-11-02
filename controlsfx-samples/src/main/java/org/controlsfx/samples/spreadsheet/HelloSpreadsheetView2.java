@@ -30,8 +30,6 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static javafx.application.Application.launch;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -155,7 +153,6 @@ public class HelloSpreadsheetView2 extends ControlsFXSample {
         grid.add(columnHeaderLabel, 0, row);
         columnHeader.setSelected(true);
         spreadSheetView.setShowColumnHeader(true);
-        spreadSheetView.setCellGraphicFactory(new BrowserImpl());
 
         grid.add(columnHeader, 1, row++);
         columnHeader.selectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -327,9 +324,9 @@ public class HelloSpreadsheetView2 extends ControlsFXSample {
 
             final ObservableList<SpreadsheetCell> title = FXCollections.observableArrayList();
 
-            SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, 0, 1, 1, "<font size=\"5\"><font color=\"#e64d4d\">Customer</font> <b>order</b> <i>details</i></font>");
+            SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, 0, 1, 1, "Customer order details");
             cell.setEditable(false);
-            cell.setCellGraphic(true);
+            cell.getStyleClass().add("title");
             title.add(cell);
 
             for (int column = 1; column < grid.getColumnCount(); ++column) {
@@ -458,7 +455,7 @@ public class HelloSpreadsheetView2 extends ControlsFXSample {
                     try {
                         desktop.browse(new URI("http://fxexperience.com/controlsfx/"));
                     } catch (IOException | URISyntaxException ex) {
-                        Logger.getLogger(HelloSpreadsheetView2.class.getName()).log(Level.SEVERE, null, ex);
+//                        Logger.getLogger(HelloSpreadsheetView2.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             });

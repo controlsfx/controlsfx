@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, 2016 ControlsFX
+ * Copyright (c) 2015, 2020 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 
 package impl.org.controlsfx.skin;
 
-import com.sun.javafx.css.converters.SizeConverter;
+import javafx.animation.Animation;
 import javafx.animation.TranslateTransition;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.WritableValue;
@@ -35,6 +35,7 @@ import javafx.css.CssMetaData;
 import javafx.css.Styleable;
 import javafx.css.StyleableDoubleProperty;
 import javafx.css.StyleableProperty;
+import javafx.css.converter.SizeConverter;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
@@ -70,6 +71,7 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         label = new Label();
         labelContainer = new StackPane();
         transition = new TranslateTransition(Duration.millis(getThumbMoveAnimationTime()), thumb);
+        transition.setFromX(0.0);
 
         label.textProperty().bind(control.textProperty());
         getChildren().addAll(labelContainer, thumbArea, thumb);
@@ -88,26 +90,16 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
     }
 
     private void selectedStateChanged() {
-        if(transition != null){
-            transition.stop();
-        }
-        
-        double thumbAreaWidth = snapSize(thumbArea.prefWidth(-1));
-        double thumbWidth = snapSize(thumb.prefWidth(-1));
-        double distance = thumbAreaWidth - thumbWidth;
-        /**
-         * If we are not selected, we need to go from right to left.
-         */
-        if (!getSkinnable().isSelected()) {
-            thumb.setLayoutX(thumbArea.getLayoutX());
-            transition.setFromX(distance);
-            transition.setToX(0);
+        // Stop the transition if it was already running, has no effect otherwise.
+        transition.stop();
+        if (getSkinnable().isSelected()) {
+            transition.setRate(1.0);
+            transition.jumpTo(Duration.ZERO);
         } else {
-            thumb.setTranslateX(thumbArea.getLayoutX());
-            transition.setFromX(0);
-            transition.setToX(distance);
+            // If we are not selected, we need to go from right to left.
+            transition.setRate(-1.0);
+            transition.jumpTo(transition.getDuration());
         }
-        transition.setCycleCount(1);
         transition.play();
     }
 
@@ -155,11 +147,6 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         double thumbWidth = snapSize(thumb.prefWidth(-1));
         double thumbHeight = snapSize(thumb.prefHeight(-1));
         thumb.resize(thumbWidth, thumbHeight);
-        //We must reset the TranslateX otherwise the thumb is mis-aligned when window is resized.
-         if (transition != null) {
-            transition.stop();
-        }
-        thumb.setTranslateX(0);
 
         double thumbAreaY = snapPosition(contentY);
         double thumbAreaWidth = snapSize(thumbArea.prefWidth(-1));
@@ -172,11 +159,23 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         labelContainer.resize(contentWidth - thumbAreaWidth, thumbAreaHeight);
         labelContainer.setLayoutY(thumbAreaY);
 
-        if (!toggleSwitch.isSelected())
-            thumb.setLayoutX(thumbArea.getLayoutX());
-        else
-            thumb.setLayoutX(thumbArea.getLayoutX() + thumbAreaWidth - thumbWidth);
+        // Layout the thumb on the "unselected" position
+        thumb.setLayoutX(thumbArea.getLayoutX());
         thumb.setLayoutY(thumbAreaY + (thumbAreaHeight - thumbHeight) / 2);
+
+        // Each time the layout is done, recompute the thumb "selected" position and apply it to the transition target.
+        final double thumbTarget = thumbAreaWidth - thumbWidth;
+        transition.setToX(thumbTarget);
+
+        if (transition.getStatus() == Animation.Status.RUNNING) {
+            // If the transition is running, it must be restarted for the value to be properly updated.
+            final Duration currentTime = transition.getCurrentTime();
+            transition.stop();
+            transition.playFrom(currentTime);
+        } else {
+            // If the transition is not running, simply apply the translate value.
+            thumb.setTranslateX(toggleSwitch.isSelected() ? thumbTarget : 0.0);
+        }
     }
 
 

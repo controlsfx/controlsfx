@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, ControlsFX
+ * Copyright (c) 2015, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,17 @@
  */
 package impl.org.controlsfx.tools;
 
-import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
+import javafx.event.EventHandler;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
+import javafx.scene.control.ListView;
+import javafx.scene.control.skin.ComboBoxListViewSkin;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import org.controlsfx.control.PrefixSelectionChoiceBox;
+import org.controlsfx.control.PrefixSelectionComboBox;
+
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,17 +45,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
-
-import org.controlsfx.control.PrefixSelectionChoiceBox;
-import org.controlsfx.control.PrefixSelectionComboBox;
-
-import javafx.event.EventHandler;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
-import javafx.scene.control.ListView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 
 /**
  * <p>This utility class can be used to customize a {@link ChoiceBox} or

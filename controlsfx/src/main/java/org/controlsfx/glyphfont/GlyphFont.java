@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015, ControlsFX
+ * Copyright (c) 2013, 2020 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,6 @@
  */
 package org.controlsfx.glyphfont;
 
-import com.sun.javafx.css.StyleManager;
 import javafx.scene.text.Font;
 
 import java.io.InputStream;
@@ -52,11 +51,6 @@ import java.util.Map;
  * <center><img src="glyphFont.png" alt="Screenshot of GlyphFont"></center>
  */
 public class GlyphFont {
-
-    static {
-        StyleManager.getInstance().addUserAgentStylesheet(
-                GlyphFont.class.getResource("glyphfont.css").toExternalForm()); //$NON-NLS-1$
-    }
 
     /***************************************************************************
      *                                                                         *

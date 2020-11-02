@@ -1,45 +1,14 @@
+ext.moduleName = 'org.controlsfx.fxsampler'
+
 version = fxsampler_version
 
-configurations {
-    //samples.extendsFrom mainRuntime
-    jdk
+javafx {
+    version = javafx_version
+    modules = [ 'javafx.controls', 'javafx.web' ]
 }
-
-sourceSets {
-    main {
-        compileClasspath += configurations.jdk
-    }
-}
-
-dependencies {
-    try {
-        jdk files(jfxrtJar)
-    } catch (MissingPropertyException pne) {
-        jdk files("${System.properties['java.home']}/lib/ext/jfxrt.jar")
-    }
-}
-
 
 javadoc {
-    exclude 'impl/*'
-    failOnError = false
-    classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
-    
     options.windowTitle("FXSampler Project ${version}")
-    options.links("http://docs.oracle.com/javase/8/docs/api/");
-    options.links("http://docs.oracle.com/javase/8/javafx/api/");
-    options.addBooleanOption("Xdoclint:none").setValue(true);
-    options.addBooleanOption("javafx").setValue(true);
-    
-    // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy
-    // over the doc-files if they are embedded with the sources. I find this arrangement
-    // somewhat cleaner anyway (never was a fan of mixing javadoc files with the sources)
-    doLast {
-        copy {
-            from "src/main/docs"
-            into "$buildDir/docs/javadoc"
-        }
-    }
 }
 
 

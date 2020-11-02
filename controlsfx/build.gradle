@@ -2,32 +2,31 @@ plugins {
     id 'biz.aQute.bnd.builder'
 }
 
-dependencies {
-    try {
-        jdk files(jfxrtJar)
-    } catch (MissingPropertyException pne) {
-        // javafx plugin will provide in this case
-    }
-}
-
 ext {
+    moduleName    = 'org.controlsfx.controls'
     transifex_api = ""
 }
 
-configurations {
-    jdk
+version = controlsfx_version
 
+dependencies {
+    testCompile 'junit:junit:[4,)'
+    testCompile 'org.testfx:testfx-core:4.0.16-alpha'
+    testRuntime ('org.testfx:openjfx-monocle:jdk-12.0.1+2') {
+        exclude group: 'org.openjfx'
+    }
+}
+
+javafx {
+    version = javafx_version
+    modules = [ 'javafx.controls', 'javafx.media' ]
+}
+
+configurations {
     if (project.hasProperty("transifex.api")) {
         transifex_api = project.getProperty("transifex.api")
     }
 }
-
-sourceSets {
-    main {
-        compileClasspath += configurations.jdk
-    }
-}
-
 
 task downloadTranslations {
     description = "Download translations from Transifex"
@@ -52,36 +51,47 @@ task downloadTranslations {
 
 processResources.finalizedBy(downloadTranslations)
 
-task compileCSS {
-    doLast {
-        ant.delete(includeEmptyDirs: 'true') {
-            fileset(dir: file("build/resources/main"), includes: "**/*.bss")
-        }
-        javaexec {
-            main = "com.sun.javafx.tools.packager.Main"
-            classpath = files("${System.properties['java.home']}/../lib/ant-javafx.jar")
-            args = ["-createbss",
-                    "-srcdir", "src/main/resources",
-                    "-outdir", "build/resources/main"
-            ]
+// Java Packager is not available for Java 11
+if (!JavaVersion.current().isJava11Compatible()) {
+    task compileCSS {
+        doLast {
+            ant.delete(includeEmptyDirs: 'true') {
+                fileset(dir: file("build/resources/main"), includes: "**/*.bss")
+            }
+            javaexec {
+                main = "com.sun.javafx.tools.packager.Main"
+                classpath = files("${System.properties['java.home']}/../lib/ant-javafx.jar")
+                args = ["-createbss",
+                        "-srcdir", "src/main/resources",
+                        "-outdir", "build/resources/main"
+                ]
+            }
         }
     }
+    processResources.finalizedBy(compileCSS)
 }
 
-processResources.finalizedBy(compileCSS)
+compileJava {
+    options.compilerArgs += java9Args
+}
 
 javadoc {
-    exclude 'impl/*'
-    //failOnError = true
-    classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
-
     options.windowTitle("ControlsFX Project ${version}")
-    options.links("http://docs.oracle.com/javase/8/docs/api/");
-    options.links("http://docs.oracle.com/javase/8/javafx/api/");
-    options.addBooleanOption("Xdoclint:none").setValue(true);
-    options.addBooleanOption("javafx").setValue(true);
-    options.overview("${projectDir}/src/main/docs/overview.html");
-
+    options.overview("${projectDir}/src/main/docs/overview.html")
+    options.addStringOption("Xdoclint:none", "-quiet")
+    options.addBooleanOption('html5', true)
+    options.addBooleanOption('javafx', true)
+    options.addMultilineStringsOption('-add-exports').setValue(
+        [
+                "javafx.base/com.sun.javafx.event=org.controlsfx.controls",
+                "javafx.web/com.sun.webkit=org.controlsfx.controls",
+                "javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls",
+                "javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
+                "javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
+                "javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls",
+                "javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls"
+        ]
+)
     // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy
     // over the doc-files if they are embedded with the sources. I find this arrangement
     // somewhat cleaner anyway (never was a fan of mixing javadoc files with the sources)
@@ -93,6 +103,35 @@ javadoc {
     }
 }
 
+ext.java9TestArgs = [
+        "--add-reads=$moduleName=org.testfx",
+        "--add-modules=org.testfx",
+        "--add-exports=javafx.graphics/com.sun.javafx.application=org.testfx",
+        // For Monocle
+        "--add-exports=javafx.graphics/com.sun.glass.ui=org.testfx.monocle",
+        "--add-opens=javafx.graphics/com.sun.glass.ui=org.testfx"
+]
+
+test {
+    doFirst {
+        java9Args.addAll(java9RuntimeArgs)
+        java9Args.addAll(java9TestArgs)
+        jvmArgs = java9Args
+    }
+    if (!project.hasProperty("headless") || project.headless == "true") {
+        // execute TestFX Tests headless -- switch off by using ./gradlew -Pheadless=false
+        systemProperty("testfx.robot", "glass")
+        systemProperty("testfx.headless", "true")
+        systemProperty("prism.order", "sw")
+        systemProperty("prism.text", "t2k")
+        systemProperty("headless.geometry", "1600x1200-32")
+    }
+    testLogging {
+        // Show that tests are run in the command-line output
+        events 'started', 'passed'
+    }
+}
+
 jar {
     //exclude '**/16/*'
     exclude '**/32/*'
@@ -100,26 +139,14 @@ jar {
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
     exclude '**/impl/build/**'
-    if(JavaVersion.current() != JavaVersion.VERSION_1_8){
-        bnd(
-                'Bundle-Name': 'ControlsFX',
-                'Bundle-Description': 'High quality UI controls and other tools to complement the core JavaFX distribution',
-                'Specification-Title': specification_title,
-                'Specification-Version': specification_version,
-                'Implementation-Title': 'ControlsFX',
-                'Import-Package': '', // Javafx is part of the JDK
-                'Export-Package': '!impl.org.controlsfx.*, org.controlsfx.*'
-        )
-    } else {
-        bnd(
-                'Bundle-Name': 'ControlsFX',
-                'Bundle-Description': 'High quality UI controls and other tools to complement the core JavaFX distribution',
-                'Specification-Title': specification_title,
-                'Specification-Version': specification_version,
-                'Implementation-Title': 'ControlsFX',
-                'Export-Package': '!impl.org.controlsfx.*, org.controlsfx.*'
-        )
-    }
+    bnd(
+            'Bundle-Name': 'ControlsFX',
+            'Bundle-Description': 'High quality UI controls and other tools to complement the core JavaFX distribution',
+            'Specification-Title': 'ControlsFX',
+            'Specification-Version': controlsfx_version,
+            'Implementation-Title': 'ControlsFX',
+            'Export-Package': '!impl.org.controlsfx.*, org.controlsfx.*'
+    )
 
 }
 

@@ -26,8 +26,6 @@
  */
 package impl.org.controlsfx.skin;
 
-
-import com.sun.javafx.event.EventHandlerManager;
 import java.util.UUID;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -36,7 +34,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
-import javafx.event.EventDispatchChain;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.NodeOrientation;
@@ -196,15 +193,13 @@ public class AutoCompletePopup<T> extends PopupControl{
      **************************************************************************/
 
 
-    private final EventHandlerManager eventHandlerManager = new EventHandlerManager(this);
-
     public final ObjectProperty<EventHandler<SuggestionEvent<T>>> onSuggestionProperty() { return onSuggestion; }
     public final void setOnSuggestion(EventHandler<SuggestionEvent<T>> value) { onSuggestionProperty().set(value); }
     public final EventHandler<SuggestionEvent<T>> getOnSuggestion() { return onSuggestionProperty().get(); }
     private ObjectProperty<EventHandler<SuggestionEvent<T>>> onSuggestion = new ObjectPropertyBase<EventHandler<SuggestionEvent<T>>>() {
         @SuppressWarnings({ "rawtypes", "unchecked" })
         @Override protected void invalidated() {
-            eventHandlerManager.setEventHandler(SuggestionEvent.SUGGESTION, (EventHandler<SuggestionEvent>)(Object)get());
+            setEventHandler(SuggestionEvent.SUGGESTION, (EventHandler<SuggestionEvent>)(Object)get());
         }
 
         @Override
@@ -217,12 +212,6 @@ public class AutoCompletePopup<T> extends PopupControl{
             return "onSuggestion"; //$NON-NLS-1$
         }
     };
-
-    /**{@inheritDoc}*/
-    @Override public EventDispatchChain buildEventDispatchChain(EventDispatchChain tail) {
-        return super.buildEventDispatchChain(tail).append(eventHandlerManager);
-    } 
-
 
     /***************************************************************************
      *                                                                         *

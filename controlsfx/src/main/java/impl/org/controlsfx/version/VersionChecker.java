@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-import com.sun.javafx.runtime.VersionInfo;
-
 public class VersionChecker {
     
     private static final String javaFXVersion;
@@ -47,7 +45,7 @@ public class VersionChecker {
     static {
         controlsFX = VersionChecker.class.getPackage();
         
-        javaFXVersion         = VersionInfo.getVersion();
+        javaFXVersion         = System.getProperty("javafx.version");
         controlsFXSpecTitle   = getControlsFXSpecificationTitle();
         controlsFXSpecVersion = getControlsFXSpecificationVersion();
         controlsFXImpVersion  = getControlsFXImplementationVersion();
@@ -87,9 +85,11 @@ public class VersionChecker {
             notSupportedVersion = true;
         } else if (splitSpecVersion[0].compareTo(splitJavaVersion[0]) == 0) {
             // Check Minor Version
-            if (splitSpecVersion[1].compareTo(splitJavaVersion[2])>0) {
+            // FIXME: JDK-9
+            // Doesn't work with JDK 9
+            /*if (splitSpecVersion[1].compareTo(splitJavaVersion[2])>0) {
                 notSupportedVersion = true;
-            }
+            }*/
         }
 
         if (notSupportedVersion) {

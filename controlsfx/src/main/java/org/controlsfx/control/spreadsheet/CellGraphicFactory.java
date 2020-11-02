@@ -31,16 +31,16 @@ import javafx.scene.Node;
 import javafx.scene.layout.Background;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
-import javafx.scene.web.WebView;
 
 /**
  *
- * If anyone wants to display a specific Graphic only for visible
- * {@code SpreadsheetCell}, a solution is to provide a Node (for example a
- * {@link WebView}) that will be displayed in the cell.
+ * If anyone wants to display a specific Graphic in a SpreadsheetCell, a
+ * solution is to provide a Node (for example a WebView) that will be
+ * displayed in the cell.
  *
- * Because a Node can consume a lot of memory, this {@code CellGraphicFactory}
- * will recycle the Nodes to only provide them for visible cells.
+ * Because a Node can consume a lot of memory, we need this
+ * {@code CellGraphicFactory} that will recycle the Nodes to only provide them
+ * for visible cells.
  */
 public interface CellGraphicFactory<T extends Node> {
 
@@ -56,11 +56,11 @@ public interface CellGraphicFactory<T extends Node> {
 
     /**
      * When a {@code Node} is reused (transfered from one cell to another for
-     * example), we ask the Node to reload. Beware, only reload when necessary :
-     * This method can be called several times with the same {@code node} and
-     * {@code cell}.
+     * example), we ask the Node to reload. Beware, only reload when necessary!
+     * This method can be called several times with the same {@code Node} and
+     * itemValue.
      *
-     * @param node the {@code Node} affected to the {@code cell}
+     * @param node the considered {@code Node}
      * @param cell the considered SpreadsheetCell
      */
     public void load(T node, SpreadsheetCell cell);

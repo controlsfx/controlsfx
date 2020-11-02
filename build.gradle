@@ -1,53 +1,44 @@
+ext.java9Args = [
+        // For various usages of TraversalEngine
+        "--add-exports=javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",
+        "--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
+        // For various behaviors across controls
+        "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls",
+        // For ReadOnlyUnbackedObservableList across files
+        "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls",
+        // For InputMap used in behavior classes
+        "--add-exports=javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls",
+        // For EventHandlerManager in AutoCompletionBinding
+        "--add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls",
+        // For MappingChange, NonIterableChange across files
+        "--add-exports=javafx.base/com.sun.javafx.collections=org.controlsfx.controls",
+        // For VersionInfo in VersionChecker
+        "--add-exports=javafx.base/com.sun.javafx.runtime=org.controlsfx.controls",
+        //For SpreadsheetView
+        "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior.TableViewBehavior=org.controlsfx.controls",
+        //For SpreadsheetView
+        "--add-exports=javafx.base/com.sun.javafx.event.EventHandlerManager=org.controlsfx.controls"
+]
+
+ext.java9RuntimeArgs = [
+        // For accessing VirtualFlow field from the base class in GridViewSkin
+        "--add-opens=javafx.controls/javafx.scene.control.skin=org.controlsfx.controls",
+        // For accessing getChildren in ImplUtils
+        "--add-opens=javafx.graphics/javafx.scene=org.controlsfx.controls"
+]
+
 subprojects {
 
     apply plugin: 'java'
-    apply plugin: 'eclipse'
-    apply plugin: 'idea'
     apply plugin: 'maven'
+    apply plugin: 'org.openjfx.javafxplugin'
     apply from  : '../mavenPublish.gradle'
 
-    Properties cfg = new Properties()
-    cfg.load(new FileInputStream("$rootDir/controlsfx-build.properties"))
-
-    ext {
-      artifact_suffix       = cfg.artifact_suffix
-      specification_title   = cfg.controlsfx_specification_title  //'Java 8u20'
-      specification_version = cfg.controlsfx_specification_version //'8.20.7'
-      controlsfx_name       = 'controlsfx'
-      fxsampler_name        = 'fxsampler'
-      fxsampler_version     = cfg.fxsampler_specification_version + artifact_suffix
-      fxsampler_mainClass   = 'fxsampler.FXSampler'
-    }
-
-    group = 'org.controlsfx'
-    version = specification_version + artifact_suffix
-
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
-
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
+    
     repositories {
-       mavenCentral()
-    }
-
-    dependencies {
-       testCompile 'junit:junit:[4,)'
-       testCompile 'org.testfx:testfx-core:4.0.10-alpha'
-       testCompile 'de.sandec:JMemoryBuddy:0.1.3'
-       testRuntime 'org.testfx:openjfx-monocle:1.8.0_20'
-    }
-
-    test {
-        if (!project.hasProperty("headless") || project.headless == "true") {
-            // execute TestFX Tests headless -- switch off by using ./gradlew -Pheadless=false
-            systemProperty("testfx.robot", "glass")
-            systemProperty("testfx.headless", "true")
-            systemProperty("prism.order", "sw")
-            systemProperty("prism.text", "t2k")
-        }
-       testLogging {
-        // Show that tests are run in the command-line output
-           events 'started', 'passed'
-       }
+        mavenCentral()
     }
 
     compileJava {
@@ -55,16 +46,26 @@ subprojects {
         options.incremental = true
     }
 
+    javadoc {
+        def javaVersion = JavaVersion.current().majorVersion
+        if (JavaVersion.current().java11Compatible) {
+            options.links("https://openjfx.io/javadoc/"+ javaVersion)
+            options.links("https://docs.oracle.com/en/java/javase/" + javaVersion + "/docs/api")
+        } else {
+            options.links("https://docs.oracle.com/javase/" + javaVersion + "/docs/api")
+        }
+    }
+
     task sourceJar(type: Jar) {
         from sourceSets.main.java
         from sourceSets.main.resources
-        classifier = 'sources'
+        archiveClassifier = 'sources'
     }
 
     task javadocJar(type: Jar) {
         dependsOn javadoc
         from javadoc.destinationDir
-        classifier = 'javadoc'
+        archiveClassifier = 'javadoc'
     }
 
     artifacts {
@@ -77,5 +78,10 @@ subprojects {
         doLast {
             println "$project.version"
         }
+    }
+
+    // Do not publish Gradle modules
+    tasks.withType(GenerateModuleMetadata) {
+        enabled = false
     }
 }

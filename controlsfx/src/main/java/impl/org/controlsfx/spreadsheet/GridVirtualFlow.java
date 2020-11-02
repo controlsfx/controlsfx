@@ -26,7 +26,6 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,6 +43,7 @@ import javafx.scene.Node;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableRow;
+import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -96,6 +96,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
     public GridVirtualFlow(GridViewSkin gridViewSkin) {
         super();
         this.gridViewSkin = gridViewSkin;
+        
         final ChangeListener<Number> listenerY = new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
@@ -170,12 +171,12 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         });
     }
 
-    @Override
-    public void show(int index) {
-        super.show(index);
-        layoutTotal();
-        layoutFixedRows();
-    }
+//    @Override
+//    public void show(int index) {
+//        super.show(index);
+//        layoutTotal();
+//        layoutFixedRows();
+//    }
 
     @Override
     public void scrollTo(int index) {
@@ -195,8 +196,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 }
 
     @Override
-    public double adjustPixels(final double delta) {
-        final double returnValue = super.adjustPixels(delta);
+    public double scrollPixels(final double delta) {
+        final double returnValue = super.scrollPixels(delta);
 
         layoutTotal();
         layoutFixedRows();
@@ -420,7 +421,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
 		//We must have a cell in ViewPort because otherwise
         //we short-circuit the VirtualFlow.
-        if (!VerticalHeader.isFixedRowEmpty(spreadSheetView) && getFirstVisibleCellWithinViewPort() != null) {
+        if (!VerticalHeader.isFixedRowEmpty(spreadSheetView) && getFirstVisibleCellWithinViewport() != null) {
             sortRows();
             /**
              * What I do is just going after the VirtualFlow in order to ADD
@@ -441,7 +442,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 }
                 //Changing the index to viewRow.
                 fixedRowIndex = spreadSheetView.getFilteredRow(fixedRowIndex);
-                T lastCell = getLastVisibleCellWithinViewPort();
+                T lastCell = getLastVisibleCellWithinViewport();
                 //If the fixed row is out of bounds
                 if (lastCell != null && fixedRowIndex > lastCell.getIndex()) {
                     if (row != null) {
@@ -484,11 +485,11 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                      * getAvailableCell is not added our cell to the ViewPort in some cases.
                      * So we need to instantiate it ourselves.
                      */
-                    row = getCreateCell().call(this);
+                    row = getCellFactory().call(this);
                     row.getProperties().put("newcell", null); //$NON-NLS-1$
                 	 
                     setCellIndex(row, fixedRowIndex);
-                    resizeCellSize(row);
+                    resizeCell(row);
                     myFixedCells.add(row);
                 }
                 

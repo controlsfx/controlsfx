@@ -26,15 +26,10 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import static impl.org.controlsfx.spreadsheet.GridViewSkin.DEFAULT_CELL_HEIGHT;
 import java.util.BitSet;
 import java.util.ConcurrentModificationException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -46,6 +41,9 @@ import javafx.event.EventHandler;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.control.skin.NestedTableColumnHeader;
+import javafx.scene.control.skin.TableColumnHeader;
+import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -58,6 +56,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 public class HorizontalHeader extends TableHeaderRow {
 
     final GridViewSkin gridViewSkin;
+    private int lastColumnResized = -1;
 
     // Indicate whether the this HorizontalHeader is activated or not
     private boolean working = true;
@@ -74,7 +73,31 @@ public class HorizontalHeader extends TableHeaderRow {
      **************************************************************************/
     public HorizontalHeader(final GridViewSkin skin) {
         super(skin);
-        gridViewSkin = skin;
+        this.gridViewSkin = skin;
+
+        /**
+         * We want to resize all other selected columns when we resize one.
+         *
+         * I cannot really determine when a resize is finished. Apparently, when
+         * this variable Layout is set to 0, it means the drag is done, so until
+         * a better solution is shown, it will do the trick.
+         */
+        //FIXME Moving it here but this trick is no longer working
+//        reorderingProperty().addListener(new ChangeListener<Boolean>() {
+//            @Override
+//            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
+//                HorizontalHeader headerRow = (HorizontalHeader) gridViewSkin.getHorizontalHeader();
+//                GridViewSkin mySkin = gridViewSkin;
+//                if (!t1 && lastColumnResized >= 0) {
+//                    if (headerRow.selectedColumns.get(lastColumnResized)) {
+//                        double width1 = mySkin.getColumns().get(lastColumnResized).getWidth();
+//                        for (int i = headerRow.selectedColumns.nextSetBit(0); i >= 0; i = headerRow.selectedColumns.nextSetBit(i + 1)) {
+//                            mySkin.getColumns().get(i).setPrefWidth(width1);
+//                        }
+//                    }
+//                }
+//            }
+//        });
     }
 
     /**************************************************************************
@@ -126,11 +149,6 @@ public class HorizontalHeader extends TableHeaderRow {
         });
     }
 
-    @Override
-    public HorizontalHeaderColumn getRootHeader() {
-        return (HorizontalHeaderColumn) super.getRootHeader();
-    }
-
     void clearSelectedColumns(){
         selectedColumns.clear();
     }
@@ -164,13 +182,13 @@ public class HorizontalHeader extends TableHeaderRow {
         
         if (working) {
             requestLayout();
-            getRootHeader().layoutFixedColumns();
+            ((HorizontalHeaderColumn)getRootHeader()).layoutFixedColumns();
         }
     }
 
     @Override
     protected NestedTableColumnHeader createRootHeader() {
-        return new HorizontalHeaderColumn(getTableSkin(), null);
+        return new HorizontalHeaderColumn(null);
     }
 
     /**************************************************************************
@@ -289,7 +307,8 @@ public class HorizontalHeader extends TableHeaderRow {
             removeStyleHeader(gridViewSkin.spreadsheetView.getViewColumn(gridViewSkin.spreadsheetView.getColumns().indexOf(column)));
         } catch (ConcurrentModificationException ex) {
             //It may happen...
-            Logger.getLogger("root").log(Level.WARNING, "", ex);
+            //FIXME
+//            Logger.getLogger("root").log(Level.WARNING, "", ex);
         }
     }
 
@@ -351,7 +370,7 @@ public class HorizontalHeader extends TableHeaderRow {
         } else {
             getStyleClass().remove("invisible"); //$NON-NLS-1$
             requestLayout();
-            getRootHeader().layoutFixedColumns();
+            ((HorizontalHeaderColumn)getRootHeader()).layoutFixedColumns();
             updateHighlightSelection();
         }
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2020 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,14 +29,13 @@ package org.controlsfx.control;
 
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.SelectionMode;
-import org.controlsfx.control.spreadsheet.JavaFXThreadingRule;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
+import org.testfx.api.FxRobot;
+import org.testfx.api.FxToolkit;
 
-public class CheckTreeViewTest {
-    @Rule public JavaFXThreadingRule javafxRule = new JavaFXThreadingRule();
+import java.util.concurrent.TimeoutException;
+
+public class CheckTreeViewTest extends FxRobot {
     
     private CheckTreeView<String> checkTreeView;
     
@@ -44,13 +43,23 @@ public class CheckTreeViewTest {
     private final CheckBoxTreeItem<String> treeItem_Eugene = new CheckBoxTreeItem<>("Eugene");
     private final CheckBoxTreeItem<String> treeItem_Henry = new CheckBoxTreeItem<>("Henry");
     private final CheckBoxTreeItem<String> treeItem_Samir = new CheckBoxTreeItem<>("Samir");
-    
+
+    @BeforeClass
+    public static void setupSpec() throws TimeoutException {
+        FxToolkit.registerPrimaryStage();
+    }
+
+    @AfterClass
+    public static void afterClass() throws TimeoutException {
+        FxToolkit.cleanupStages();
+    }
+
     public CheckTreeViewTest() {
     }
     
     @Before
     public void setUp() {
-        CheckBoxTreeItem<String> root = new CheckBoxTreeItem<String>("Root");
+        CheckBoxTreeItem<String> root = new CheckBoxTreeItem<>("Root");
         root.setExpanded(true);
         root.getChildren().addAll(
                 treeItem_Jonathan,
@@ -65,10 +74,7 @@ public class CheckTreeViewTest {
         checkTreeView = new CheckTreeView<>(root);
         checkTreeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
-    
-    @After
-    public void tearDown() {
-    }
+
 
     /**
      * This is related to https://bitbucket.org/controlsfx/controlsfx/issue/447

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,85 +26,61 @@
  */
 package impl.org.controlsfx.skin;
 
-import java.util.Collections;
-
+import impl.org.controlsfx.ReflectionUtils;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
-import javafx.util.Callback;
-
+import javafx.scene.control.skin.VirtualContainerBase;
+import javafx.scene.control.skin.VirtualFlow;
 import org.controlsfx.control.GridView;
 
-import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.behavior.KeyBinding;
-import com.sun.javafx.scene.control.skin.VirtualContainerBase;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
+public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T>> {
 
-public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, BehaviorBase<GridView<T>>, GridRow<T>> {
-    
-    private final ListChangeListener<T> gridViewItemsListener = new ListChangeListener<T>() {
-        @Override public void onChanged(ListChangeListener.Change<? extends T> change) {
-            updateRowCount();
-            getSkinnable().requestLayout();
-        }
+    private VirtualFlow<GridRow<T>> flow;
+
+    private final ListChangeListener<T> gridViewItemsListener = change -> {
+        updateItemCount();
+        getSkinnable().requestLayout();
     };
 
     private final WeakListChangeListener<T> weakGridViewItemsListener = new WeakListChangeListener<>(gridViewItemsListener);
 
     @SuppressWarnings("rawtypes")
     public GridViewSkin(GridView<T> control) {
-        super(control, new BehaviorBase<>(control, Collections.<KeyBinding>emptyList()));
+        super(control);
         
+        flow = ReflectionUtils.getVirtualFlow(this);
         updateGridViewItems();
 
         flow.setId("virtual-flow"); //$NON-NLS-1$
         flow.setPannable(false);
         flow.setVertical(true);
         flow.setFocusTraversable(getSkinnable().isFocusTraversable());
-        flow.setCreateCell(new Callback<VirtualFlow, GridRow<T>>() {
-            @Override public GridRow<T> call(VirtualFlow flow) {
-                return GridViewSkin.this.createCell();
-            }
-        });
+        flow.setCellFactory(param -> createCell());
         getChildren().add(flow);
 
-        updateRowCount();
+        updateItemCount();
 
         // Register listeners
-        registerChangeListener(control.itemsProperty(), "ITEMS"); //$NON-NLS-1$
-        registerChangeListener(control.cellFactoryProperty(), "CELL_FACTORY"); //$NON-NLS-1$
-        registerChangeListener(control.parentProperty(), "PARENT"); //$NON-NLS-1$
-        registerChangeListener(control.cellHeightProperty(), "CELL_HEIGHT"); //$NON-NLS-1$
-        registerChangeListener(control.cellWidthProperty(), "CELL_WIDTH"); //$NON-NLS-1$
-        registerChangeListener(control.horizontalCellSpacingProperty(), "HORIZONZAL_CELL_SPACING"); //$NON-NLS-1$
-        registerChangeListener(control.verticalCellSpacingProperty(), "VERTICAL_CELL_SPACING"); //$NON-NLS-1$
-        registerChangeListener(control.widthProperty(), "WIDTH_PROPERTY"); //$NON-NLS-1$
-        registerChangeListener(control.heightProperty(), "HEIGHT_PROPERTY"); //$NON-NLS-1$
-    }
-
-    @Override protected void handleControlPropertyChanged(String p) {
-        super.handleControlPropertyChanged(p);
-        if (p == "ITEMS") { //$NON-NLS-1$
-            updateGridViewItems();
-        } else if (p == "CELL_FACTORY") { //$NON-NLS-1$
-            flow.recreateCells();
-        } else if (p == "CELL_HEIGHT") { //$NON-NLS-1$
-            flow.recreateCells();
-        } else if (p == "CELL_WIDTH") { //$NON-NLS-1$
-            updateRowCount();
-            flow.recreateCells();
-        } else if (p == "HORIZONZAL_CELL_SPACING") { //$NON-NLS-1$
-            updateRowCount();
-            flow.recreateCells();
-        } else if (p == "VERTICAL_CELL_SPACING") { //$NON-NLS-1$
-            flow.recreateCells();
-        } else if (p == "PARENT") { //$NON-NLS-1$
+        registerChangeListener(control.itemsProperty(), e -> updateGridViewItems());
+        registerChangeListener(control.cellFactoryProperty(), e ->  ReflectionUtils.recreateCells(flow));
+        registerChangeListener(control.parentProperty(), e -> {
             if (getSkinnable().getParent() != null && getSkinnable().isVisible()) {
                 getSkinnable().requestLayout();
             }
-        } else if (p == "WIDTH_PROPERTY" || p == "HEIGHT_PROPERTY") { //$NON-NLS-1$ //$NON-NLS-2$
-            updateRowCount();
-        }
+        });
+        registerChangeListener(control.cellHeightProperty(), e -> ReflectionUtils.recreateCells(flow));
+        registerChangeListener(control.cellWidthProperty(), e -> {
+            updateItemCount();
+            ReflectionUtils.recreateCells(flow);
+        });
+        registerChangeListener(control.horizontalCellSpacingProperty(), e -> {
+            updateItemCount();
+            ReflectionUtils.recreateCells(flow);
+        });
+        registerChangeListener(control.verticalCellSpacingProperty(), e -> ReflectionUtils.recreateCells(flow));
+        registerChangeListener(control.widthProperty(), e ->  updateItemCount());
+        registerChangeListener(control.heightProperty(), e ->  updateItemCount());
     }
 
     public void updateGridViewItems() {
@@ -116,25 +92,9 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, BehaviorB
             getSkinnable().getItems().addListener(weakGridViewItemsListener);
         }
 
-        updateRowCount();
-        flow.recreateCells();
+        updateItemCount();
+        ReflectionUtils.recreateCells(flow);
         getSkinnable().requestLayout();
-    }
-
-    @Override protected void updateRowCount() {
-        if (flow == null)
-            return;
-
-        int oldCount = flow.getCellCount();
-        int newCount = getItemCount();
-        
-        if (newCount != oldCount) {
-            flow.setCellCount(newCount);
-            flow.rebuildCells();
-        } else {
-            flow.reconfigureCells();
-        }
-        updateRows(newCount);
     }
 
     @Override protected void layoutChildren(double x, double y, double w, double h) {
@@ -144,12 +104,6 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, BehaviorB
         double h1 = getSkinnable().getHeight() - (getSkinnable().getInsets().getTop() + getSkinnable().getInsets().getBottom());
 
         flow.resizeRelocate(x1, y1, w1, h1);
-    }
-
-    @Override public GridRow<T> createCell() {
-        GridRow<T> row = new GridRow<>();
-        row.updateGridView(getSkinnable());
-        return row;
     }
 
     /**
@@ -162,6 +116,24 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, BehaviorB
         // double and ceiled to get the max int of it (as we are looking for
         // the max number of necessary row)
         return items == null ? 0 : (int)Math.ceil((double)items.size() / computeMaxCellsInRow());
+    }
+
+    @Override
+    protected void updateItemCount() {
+        if (flow == null)
+            return;
+
+        int oldCount = flow.getCellCount();
+        int newCount = getItemCount();
+
+        if (newCount != oldCount) {
+            flow.setCellCount(newCount);
+            ReflectionUtils.rebuildCells(flow);
+        } else {
+            ReflectionUtils.reconfigureCells(flow);
+        }
+        updateRows(newCount);
+        getSkinnable().requestLayout();
     }
 
     /**
@@ -198,28 +170,22 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, BehaviorB
         for (int i = 0; i < rowCount; i++) {
             GridRow<T> row = flow.getVisibleCell(i);
             if (row != null) {
-                // FIXME hacky - need to better understand what this is about
-                row.updateIndex(-1);
+                // We do not have to force a change of the index by setting the index to -1
+                // before setting it to its actual value. GridRow will update its cells every
+                // time updateIndex is called even if the index did not change.
                 row.updateIndex(i);
             }
         }
     }
 
-    protected boolean areRowsVisible() {
-        if (flow == null)
-            return false;
-
-        if (flow.getFirstVisibleCell() == null)
-            return false;
-
-        if (flow.getLastVisibleCell() == null)
-            return false;
-
-        return true;
-    }
-    
     @Override protected double computeMinHeight(double height, double topInset, double rightInset, double bottomInset,
             double leftInset) {
         return 0;
+    }
+
+    private GridRow<T> createCell() {
+        GridRow<T> row = new GridRow<>();
+        row.updateGridView(getSkinnable());
+        return row;
     }
 }

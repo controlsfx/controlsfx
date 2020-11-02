@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.control.SkinBase;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -46,13 +47,11 @@ import javafx.scene.shape.StrokeType;
 import org.controlsfx.control.SnapshotView;
 import org.controlsfx.control.SnapshotView.Boundary;
 
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-
 /**
  * View for the {@link SnapshotView}. It displays the node and the selection and manages their positioning. Mouse events
  * are handed over to the {@link SnapshotViewBehavior} which uses them to change the selection.
  */
-public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotViewBehavior> {
+public class SnapshotViewSkin extends SkinBase<SnapshotView> {
 
     /* ************************************************************************
      *                                                                         *
@@ -87,6 +86,11 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
      */
     private final Node mouseNode;
 
+    /**
+     * The behavior of SnapshotView.
+     */
+    private final SnapshotViewBehavior snapshotViewBehavior;
+
     /* ************************************************************************
      *                                                                         *
      * Constructor & Initialization                                            *
@@ -101,7 +105,9 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
      */
     public SnapshotViewSkin(SnapshotView snapshotView) {
 
-        super(snapshotView, new SnapshotViewBehavior(snapshotView));
+        super(snapshotView);
+
+        this.snapshotViewBehavior = new SnapshotViewBehavior(snapshotView);
 
         this.gridPane = createGridPane();
         this.selectedArea = new Rectangle();
@@ -111,19 +117,8 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
         buildSceneGraph();
         initializeAreas();
 
-        registerChangeListener(snapshotView.nodeProperty(), "NODE"); //$NON-NLS-1$
-        registerChangeListener(snapshotView.selectionProperty(), "SELECTION"); //$NON-NLS-1$
-    }
-
-    @Override
-    protected void handleControlPropertyChanged(String p) {
-        super.handleControlPropertyChanged(p);
-
-        if ("NODE".equals(p)) { //$NON-NLS-1$
-            updateNode();
-        } else if ("SELECTION".equals(p)) { //$NON-NLS-1$
-            updateSelection();
-        }
+        registerChangeListener(snapshotView.nodeProperty(), e -> updateNode());
+        registerChangeListener(snapshotView.selectionProperty(), e -> updateSelection());
     }
 
     /**
@@ -312,7 +307,7 @@ public class SnapshotViewSkin extends BehaviorSkinBase<SnapshotView, SnapshotVie
      *            the {@link MouseEvent} to handle
      */
     private void handleMouseEvent(MouseEvent event) {
-        Cursor newCursor = getBehavior().handleMouseEvent(event);
+        Cursor newCursor = snapshotViewBehavior.handleMouseEvent(event);
         mouseNode.setCursor(newCursor);
     }
 

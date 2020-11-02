@@ -31,6 +31,7 @@ import impl.org.controlsfx.skin.PlusMinusSliderSkin;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
@@ -42,6 +43,7 @@ import javafx.css.PseudoClass;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
+import javafx.css.converter.EnumConverter;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
@@ -49,9 +51,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.input.InputEvent;
-
-import com.sun.javafx.css.converters.EnumConverter;
-import java.util.UUID;
 
 /**
  * A plus minus slider allows the user to continously fire an event carrying a

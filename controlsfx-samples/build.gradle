@@ -1,31 +1,55 @@
-import org.apache.tools.ant.filters.*
+ext.moduleName = 'org.controlsfx.samples'
+
 apply plugin: 'application'
 
 applicationName = 'FXSampler'
-mainClassName = fxsampler_mainClass
+mainClassName = 'org.controlsfx.fxsampler/fxsampler.FXSampler'
 
-configurations {
-    jdk
-}
+version = controlsfx_version
 
-sourceSets {
-    main {
-        compileClasspath += configurations.jdk
-    }
+javafx {
+    version = javafx_version
+    modules = [ 'javafx.controls', 'javafx.web' ]
 }
 
 dependencies {
+    implementation project(':controlsfx')
+    implementation project(':fxsampler')
+}
 
-    compile project(':controlsfx')
-    compile project(':fxsampler')
+/** We need Java files as resources for showing them in Source Tab **/
+processResources {
+    from sourceSets.main.allJava
+}
 
-    compile group + ':' + fxsampler_name +':'  + fxsampler_version
-    compile group + ':' + controlsfx_name + ':' + version
+/**
+ * compileJava and javadoc tasks should have controlsfx and fxsampler on module-path
+ */
+compileJava {
+    if (!JavaVersion.current().isJava11Compatible()) {
+        inputs.property("moduleName", moduleName)
+        doFirst {
+            options.compilerArgs += [
+                    '--module-path', classpath.asPath,
+            ]
+            classpath = files()
+        }
+    }
+}
 
-    try {
-        jdk files(jfxrtJar)
-    } catch (MissingPropertyException pne) {
-        // javafx plugin will provide in this case
+javadoc {
+    if (!JavaVersion.current().isJava11Compatible()) {
+        doFirst {
+            options.addStringOption('-module-path', classpath.asPath)
+            classpath = files()
+        }
+    } else {
+        moduleOptions {
+            addModules = [
+                    'org.controlsfx.controls',
+                    'org.controlsfx.fxsampler'
+            ]
+        }
     }
 }
 
@@ -33,12 +57,14 @@ jar {
     manifest {
         attributes  'Implementation-Title':     'ControlsFX-Samples',
                     'Implementation-Version':   project.version,
-                    'Class-Path':               configurations.compile.collect { it.getName() }.join(' '),
-                    'Main-Class':               fxsampler_mainClass
+                    'Class-Path':               configurations.compileClasspath.collect { it.getName() }.join(' '),
+                    'Main-Class':               mainClassName
     }
-    from sourceSets.main.allJava
 }
 
-javadoc {
-    options.encoding = 'UTF-8'
+run {
+    doFirst {
+        java9Args.addAll(java9RuntimeArgs)
+        jvmArgs = java9Args
+    }
 }

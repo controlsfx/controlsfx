@@ -26,9 +26,6 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import com.sun.javafx.scene.control.behavior.CellBehaviorBase;
-import com.sun.javafx.scene.control.behavior.TableRowBehavior;
-import com.sun.javafx.scene.control.skin.CellSkinBase;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -42,12 +39,13 @@ import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableRow;
+import javafx.scene.control.skin.CellSkinBase;
 import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
-public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<SpreadsheetCell>>, CellBehaviorBase<TableRow<ObservableList<SpreadsheetCell>>>> {
+public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<SpreadsheetCell>>> {
 
     private final SpreadsheetHandle handle;
     private final SpreadsheetView spreadsheetView;
@@ -57,21 +55,15 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
     private final List<CellView> cells = new ArrayList<>();
 
     public GridRowSkin(SpreadsheetHandle handle, TableRow<ObservableList<SpreadsheetCell>> gridRow) {
-        super(gridRow, new TableRowBehavior<>(gridRow));
+        super(gridRow);
         this.handle = handle;
         spreadsheetView = handle.getView();
 
         getSkinnable().setPickOnBounds(false);
 
-        registerChangeListener(gridRow.itemProperty(), "ITEM");
-        registerChangeListener(gridRow.indexProperty(), "INDEX");
-    }
-
-    @Override
-    protected void handleControlPropertyChanged(String p) {
-        super.handleControlPropertyChanged(p);
-
-        if ("INDEX".equals(p)) {
+        //Index and Item are registered again. FixedCellSize not, but not used?
+        gridRow.itemProperty().addListener(o -> requestCellUpdate());
+        registerChangeListener(gridRow.indexProperty(), e -> {
             // Fix for RT-36661, where empty table cells were showing content, as they
             // had incorrect table cell indices (but the table row index was correct).
             // Note that we only do the update on empty cells to avoid the issue
@@ -79,13 +71,29 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             if (getSkinnable().isEmpty()) {
                 requestCellUpdate();
             }
-        } else if ("ITEM".equals(p)) {
-            requestCellUpdate();
-        } else if ("FIXED_CELL_SIZE".equals(p)) {
-//            fixedCellSize = fixedCellSizeProperty().get();
-//            fixedCellSizeEnabled = fixedCellSize > 0;
-        }
+        });
+
     }
+
+//    @Override
+//    protected void handleControlPropertyChanged(String p) {
+//        super.handleControlPropertyChanged(p);
+//
+//        if ("INDEX".equals(p)) {
+//            // Fix for RT-36661, where empty table cells were showing content, as they
+//            // had incorrect table cell indices (but the table row index was correct).
+//            // Note that we only do the update on empty cells to avoid the issue
+//            // noted below in requestCellUpdate().
+//            if (getSkinnable().isEmpty()) {
+//                requestCellUpdate();
+//            }
+//        } else if ("ITEM".equals(p)) {
+//            requestCellUpdate();
+//        } else if ("FIXED_CELL_SIZE".equals(p)) {
+////            fixedCellSize = fixedCellSizeProperty().get();
+////            fixedCellSizeEnabled = fixedCellSize > 0;
+//        }
+//    }
 
     private void requestCellUpdate() {
         getSkinnable().requestLayout();

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,6 @@
 
 package impl.org.controlsfx.skin;
 
-import java.util.Collections;
-
 import javafx.animation.Animation.Status;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -47,6 +45,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.SkinBase;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -56,11 +55,7 @@ import javafx.util.Duration;
 
 import org.controlsfx.control.InfoOverlay;
 
-import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.behavior.KeyBinding;
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-
-public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<InfoOverlay>> {
+public class InfoOverlaySkin extends SkinBase<InfoOverlay> {
     
     private final ImageView EXPAND_IMAGE = new ImageView(new Image(InfoOverlay.class.getResource("expand.png").toExternalForm())); //$NON-NLS-1$
     private final ImageView COLLAPSE_IMAGE = new ImageView(new Image(InfoOverlay.class.getResource("collapse.png").toExternalForm())); //$NON-NLS-1$
@@ -81,7 +76,7 @@ public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<
     };
 
     public InfoOverlaySkin(final InfoOverlay control) {
-        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
+        super(control);
 
         // content
         content = control.getContent();
@@ -126,17 +121,11 @@ public class InfoOverlaySkin extends BehaviorSkinBase<InfoOverlay, BehaviorBase<
         // adding everything to the scenegraph
         getChildren().addAll(content, infoPanel);
         
-        registerChangeListener(control.contentProperty(), "CONTENT"); //$NON-NLS-1$
-    }
-    
-    @Override protected void handleControlPropertyChanged(String p) {
-        super.handleControlPropertyChanged(p);
-        
-        if ("CONTENT".equals(p)) { //$NON-NLS-1$
+        registerChangeListener(control.contentProperty(), e -> {
             getChildren().remove(0);
             getChildren().add(0, getSkinnable().getContent());
             getSkinnable().requestLayout();
-        }
+        });
     }
     
     private void doToggle() {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,28 +26,24 @@
  */
 package impl.org.controlsfx.skin;
 
-import java.util.Collections;
-
 import com.sun.javafx.scene.traversal.ParentTraversalEngine;
+import impl.org.controlsfx.ReflectionUtils;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.SkinBase;
 import javafx.scene.shape.Rectangle;
 
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 
-import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.behavior.KeyBinding;
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-
-public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, BehaviorBase<NotificationPane>> {
+public class NotificationPaneSkin extends SkinBase<NotificationPane> {
 
     private NotificationBar notificationBar;
     private Node content;
     private Rectangle clip = new Rectangle();
 
     public NotificationPaneSkin(final NotificationPane control) {
-        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
+        super(control);
 
         notificationBar = new NotificationBar() {
             @Override public void requestContainerLayout() {
@@ -94,47 +90,33 @@ public class NotificationPaneSkin extends BehaviorSkinBase<NotificationPane, Beh
         control.setClip(clip);
         updateContent();
 
-        registerChangeListener(control.heightProperty(), "HEIGHT"); //$NON-NLS-1$
-        registerChangeListener(control.contentProperty(), "CONTENT"); //$NON-NLS-1$
-        registerChangeListener(control.textProperty(), "TEXT"); //$NON-NLS-1$
-        registerChangeListener(control.graphicProperty(), "GRAPHIC"); //$NON-NLS-1$
-        registerChangeListener(control.showingProperty(), "SHOWING"); //$NON-NLS-1$
-        registerChangeListener(control.showFromTopProperty(), "SHOW_FROM_TOP"); //$NON-NLS-1$
-        registerChangeListener(control.closeButtonVisibleProperty(), "CLOSE_BUTTON_VISIBLE"); //$NON-NLS-1$
-
-        // Fix for Issue #522: Prevent NotificationPane from receiving focus
-        ParentTraversalEngine engine = new ParentTraversalEngine(getSkinnable());
-        getSkinnable().setImpl_traversalEngine(engine);
-        engine.setOverriddenFocusTraversability(false);
-    }
-    
-    @Override protected void handleControlPropertyChanged(String p) {
-        super.handleControlPropertyChanged(p);
-        
-        if ("CONTENT".equals(p)) { //$NON-NLS-1$
-            updateContent();
-        } else if ("TEXT".equals(p)) { //$NON-NLS-1$
-            notificationBar.label.setText(getSkinnable().getText());
-        } else if ("GRAPHIC".equals(p)) { //$NON-NLS-1$
-            notificationBar.label.setGraphic(getSkinnable().getGraphic());
-        } else if ("SHOWING".equals(p)) { //$NON-NLS-1$
+        registerChangeListener(control.heightProperty(), e -> {
+            // For resolving https://bitbucket.org/controlsfx/controlsfx/issue/409
+            if (getSkinnable().isShowing() && !getSkinnable().isShowFromTop()) {
+                notificationBar.requestLayout();
+            }
+        });
+        registerChangeListener(control.contentProperty(), e -> updateContent());
+        registerChangeListener(control.textProperty(), e -> notificationBar.label.setText(getSkinnable().getText()));
+        registerChangeListener(control.graphicProperty(), e -> notificationBar.label.setGraphic(getSkinnable().getGraphic()));
+        registerChangeListener(control.showingProperty(), e -> {
             if (getSkinnable().isShowing()) {
                 notificationBar.doShow();
             } else {
                 notificationBar.doHide();
             }
-        } else if ("SHOW_FROM_TOP".equals(p)) { //$NON-NLS-1$
+        });
+        registerChangeListener(control.showFromTopProperty(), e -> {
             if (getSkinnable().isShowing()) {
                 getSkinnable().requestLayout();
             }
-        } else if ("CLOSE_BUTTON_VISIBLE".equals(p)) { //$NON-NLS-1$
-            notificationBar.updatePane();
-        }else if ( "HEIGHT".equals(p)){
-            // For resolving https://bitbucket.org/controlsfx/controlsfx/issue/409
-            if (getSkinnable().isShowing() && !getSkinnable().isShowFromTop()) {
-                notificationBar.requestLayout();
-            }
-        }
+        });
+        registerChangeListener(control.closeButtonVisibleProperty(), e -> notificationBar.updatePane());
+
+        // Fix for Issue #522: Prevent NotificationPane from receiving focus
+        ParentTraversalEngine engine = new ParentTraversalEngine(getSkinnable());
+        ReflectionUtils.setTraversalEngine(control, engine);
+        engine.setOverriddenFocusTraversability(false);
     }
     
     private void updateContent() {

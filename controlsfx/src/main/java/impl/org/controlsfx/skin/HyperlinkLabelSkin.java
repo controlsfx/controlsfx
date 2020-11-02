@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2016 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@
 package impl.org.controlsfx.skin;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javafx.event.ActionEvent;
@@ -36,16 +35,13 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.SkinBase;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.controlsfx.control.HyperlinkLabel;
 
-import com.sun.javafx.scene.control.behavior.BehaviorBase;
-import com.sun.javafx.scene.control.behavior.KeyBinding;
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
-
-public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, BehaviorBase<HyperlinkLabel>> {
+public class HyperlinkLabelSkin extends SkinBase<HyperlinkLabel> {
     
     /***************************************************************************
      * 
@@ -84,13 +80,13 @@ public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, Behavio
      **************************************************************************/
     
     public HyperlinkLabelSkin(HyperlinkLabel control) {
-        super(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
+        super(control);
         
         this.textFlow = new TextFlow();
         getChildren().add(textFlow);
         updateText();
         
-        registerChangeListener(control.textProperty(), "TEXT"); //$NON-NLS-1$
+        registerChangeListener(control.textProperty(), e -> updateText()); //$NON-NLS-1$
     }
 
     
@@ -100,14 +96,6 @@ public class HyperlinkLabelSkin extends BehaviorSkinBase<HyperlinkLabel, Behavio
      * Implementation
      * 
      **************************************************************************/
-    
-    @Override protected void handleControlPropertyChanged(String p) {
-        super.handleControlPropertyChanged(p);
-        
-        if (p == "TEXT") { //$NON-NLS-1$
-            updateText();
-        }
-    }
     
     // splits up the string into Text and Hyperlink nodes, and places them
     // into a TextFlow instance

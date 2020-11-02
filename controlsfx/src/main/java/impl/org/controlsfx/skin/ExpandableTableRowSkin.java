@@ -26,7 +26,7 @@
  */
 package impl.org.controlsfx.skin;
 
-import com.sun.javafx.scene.control.skin.TableRowSkin;
+import javafx.scene.control.skin.TableRowSkin;
 import javafx.scene.Node;
 import javafx.scene.control.TableRow;
 import org.controlsfx.control.table.TableRowExpanderColumn;

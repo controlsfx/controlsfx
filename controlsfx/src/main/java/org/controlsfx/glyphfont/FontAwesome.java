@@ -32,9 +32,8 @@ import java.util.Arrays;
 
 /**
  * Defines a {@link GlyphFont} for the FontAwesome font set (see
- * <a href="http://fortawesome.github.io/Font-Awesome/">the FontAwesome website</a>
- * for more details). Note that at present the FontAwesome font is not distributed
- * with ControlsFX, and is, by default, instead loaded from a CDN at runtime.
+ * <a href="https://fontawesome.com/">the FontAwesome website</a>
+ * for more details).
  *
  * <p>To use FontAwesome (or indeed any glyph font) in your JavaFX application,
  * you firstly have to get access to the FontAwesome glyph font. You do this by

@@ -3,23 +3,23 @@ ext.moduleName = 'org.controlsfx.samples'
 apply plugin: 'application'
 
 applicationName = 'FXSampler'
-mainClassName = fxsampler_mainClass
+mainClassName = 'org.controlsfx.fxsampler/fxsampler.FXSampler'
 
-configurations {
-    jdk
-}
+version = controlsfx_version
 
-sourceSets {
-    main {
-        compileClasspath += configurations.jdk
-        // Gradle application plugin fails to resolve resources with JDK 11
-        output.resourcesDir = "build/classes/java/main"
-    }
+javafx {
+    version = javafx_version
+    modules = [ 'javafx.controls', 'javafx.web' ]
 }
 
 dependencies {
-    compile project(':controlsfx')
-    compile project(':fxsampler')
+    implementation project(':controlsfx')
+    implementation project(':fxsampler')
+}
+
+/** We need Java files as resources for showing them in Source Tab **/
+processResources {
+    from sourceSets.main.allJava
 }
 
 /**
@@ -57,10 +57,9 @@ jar {
     manifest {
         attributes  'Implementation-Title':     'ControlsFX-Samples',
                     'Implementation-Version':   project.version,
-                    'Class-Path':               configurations.compile.collect { it.getName() }.join(' '),
-                    'Main-Class':               fxsampler_mainClass
+                    'Class-Path':               configurations.compileClasspath.collect { it.getName() }.join(' '),
+                    'Main-Class':               mainClassName
     }
-    from sourceSets.main.allJava
 }
 
 run {

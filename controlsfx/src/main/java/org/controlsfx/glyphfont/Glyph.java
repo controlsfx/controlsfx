@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2020 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -233,6 +233,10 @@ public class Glyph extends Label implements Duplicatable<Glyph> {
         }}
                 .fontFamily(getFontFamily())
                 .size(getFontSize());
+    }
+
+    @Override public String getUserAgentStylesheet() {
+        return Glyph.class.getResource("glyphfont.css").toExternalForm();
     }
 
     /***************************************************************************

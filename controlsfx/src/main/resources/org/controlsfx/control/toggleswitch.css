@@ -7,7 +7,7 @@
     -thumb-move-animation-time: 200;
 }
 
-.toggle-switch .text {
+.toggle-switch .label {
     -fx-font-size: 1em;
     -fx-text-fill: -fx-text-base-color;
 }

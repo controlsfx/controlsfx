@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2016 ControlsFX
+ * Copyright (c) 2014, 2016, 2020 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -268,6 +268,19 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
     public final DoubleProperty maxWidthProperty() {
         return autoCompletionPopup.maxWidthProperty();
     }
+    
+    /**
+	 * Get the {@link AutoCompletePopup} used by this binding. Note that this gives access to the
+	 * internal API and should be used with great care (and in the expectation that things may break in
+	 * the future). All relevant methods of the popup are already exposed in this class.
+	 * <p/>
+	 * The only reason this is exposed is to allow custom skins for the popup.
+	 * 
+	 * @return the {@link AutoCompletePopup} used by this binding
+	 */
+    public AutoCompletePopup<T> getAutoCompletionPopup() {
+    	return autoCompletionPopup;
+    }
 
     /***************************************************************************
      *                                                                         *
@@ -411,7 +424,10 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
                 if(!isCancelled()){
                     final Collection<T> fetchedSuggestions = provider.call(this);
                     Platform.runLater(() -> {
-                        if(fetchedSuggestions != null && !fetchedSuggestions.isEmpty()){
+                        // check whether completionTarget is still valid
+                        boolean validNode = completionTarget.getScene() != null
+                                            && completionTarget.getScene().getWindow() != null;
+                        if(fetchedSuggestions != null && !fetchedSuggestions.isEmpty() && validNode){
                             autoCompletionPopup.getSuggestions().setAll(fetchedSuggestions);
                             showPopup();
                         }else{

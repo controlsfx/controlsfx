@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2015, 2020, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -107,12 +108,12 @@ public class ValidationSupport {
         return value instanceof Boolean? (Boolean)value: false;
     }
 
-    private ObservableSet<Control> controls = FXCollections.observableSet();
-    private ObservableMap<Control,ValidationResult> validationResults = 
-            FXCollections.observableMap(new WeakHashMap<>());
+    private final ObservableSet<Control> controls = FXCollections.observableSet(ConcurrentHashMap.newKeySet());
+    private final ObservableMap<Control,ValidationResult> validationResults = 
+            FXCollections.synchronizedObservableMap(FXCollections.observableMap(new WeakHashMap<>()));
 
     
-    private AtomicBoolean dataChanged = new AtomicBoolean(false);
+    private final AtomicBoolean dataChanged = new AtomicBoolean(false);
     
     /**
      * Creates validation support instance. <br>
@@ -157,6 +158,24 @@ public class ValidationSupport {
                 }
             });
         }
+    }
+
+    /**
+     * Triggers validation for all known components.
+     * It is only necessary to call this if it is needed to revalidate even if the value of the control has not changed.
+     */
+    public void revalidate() {
+        for (Control target : getRegisteredControls()) {
+            target.fireEvent(new ValidateEvent());
+        }
+    }
+
+    /**
+     * Triggers validation for the given component.
+     * It is only necessary to call this if it is needed to revalidate even if the value of the control has not changed.
+     */
+    public void revalidate(Control c) {
+        c.fireEvent(new ValidateEvent());
     }
     
     private BooleanProperty errorDecorationEnabledProperty = new SimpleBooleanProperty(true) {
@@ -291,6 +310,7 @@ public class ValidationSupport {
             	dataChanged.set(true);
             	updateResults.accept(newValue);
             });
+            c.addEventHandler(ValidateEvent.EVENT_TYPE, event -> updateResults.accept(observable.getValue()));
             updateResults.accept(observable.getValue());
 
             return e;

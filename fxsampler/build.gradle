@@ -2,15 +2,9 @@ ext.moduleName = 'org.controlsfx.fxsampler'
 
 version = fxsampler_version
 
-configurations {
-    //samples.extendsFrom mainRuntime
-    jdk
-}
-
-sourceSets {
-    main {
-        compileClasspath += configurations.jdk
-    }
+javafx {
+    version = javafx_version
+    modules = [ 'javafx.controls', 'javafx.web' ]
 }
 
 javadoc {

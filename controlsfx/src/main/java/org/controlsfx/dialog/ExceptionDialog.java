@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 ControlsFX
+ * Copyright (c) 2014, 2019 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,9 +52,7 @@ public class ExceptionDialog extends Dialog<ButtonType> {
         dialogPane.getButtonTypes().addAll(ButtonType.OK);
         
         // --- content
-        String contentText = getContentText();
-        dialogPane.setContent(new Label(contentText != null && ! contentText.isEmpty() ? 
-                contentText : exception.getMessage()));
+        setContentText(exception.getLocalizedMessage());
         
         // --- expandable content
         StringWriter sw = new StringWriter();

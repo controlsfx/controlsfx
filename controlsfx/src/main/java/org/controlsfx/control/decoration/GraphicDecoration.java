@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2017 ControlsFX
+ * Copyright (c) 2014, 2020 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -176,7 +176,7 @@ public class GraphicDecoration extends Decoration {
         		y -= decorationNodeHeight / 2.0;
         		break;
         	case BOTTOM:
-        		y += targetHeight - decorationNodeWidth / 2.0;
+        		y += targetHeight - decorationNodeHeight  / 2.0;
         		break;
         	case BASELINE: 
         		y += targetNode.getBaselineOffset() - decorationNode.getBaselineOffset() - decorationNodeHeight / 2.0;

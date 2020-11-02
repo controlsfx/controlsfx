@@ -1,22 +1,32 @@
+plugins {
+    id 'biz.aQute.bnd.builder'
+}
+
 ext {
     moduleName    = 'org.controlsfx.controls'
     transifex_api = ""
 }
 
+version = controlsfx_version
+
+dependencies {
+    testCompile 'junit:junit:[4,)'
+    testCompile 'org.testfx:testfx-core:4.0.16-alpha'
+    testRuntime ('org.testfx:openjfx-monocle:jdk-12.0.1+2') {
+        exclude group: 'org.openjfx'
+    }
+}
+
+javafx {
+    version = javafx_version
+    modules = [ 'javafx.controls', 'javafx.media' ]
+}
+
 configurations {
-    jdk
-    
     if (project.hasProperty("transifex.api")) {
         transifex_api = project.getProperty("transifex.api")
     }
 }
-
-sourceSets {
-    main {
-        compileClasspath += configurations.jdk
-    }
-}
-
 
 task downloadTranslations {
     description = "Download translations from Transifex"
@@ -58,7 +68,6 @@ if (!JavaVersion.current().isJava11Compatible()) {
             }
         }
     }
-
     processResources.finalizedBy(compileCSS)
 }
 
@@ -82,7 +91,7 @@ javadoc {
                 "javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls",
                 "javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls"
         ]
-    )
+)
     // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy
     // over the doc-files if they are embedded with the sources. I find this arrangement
     // somewhat cleaner anyway (never was a fan of mixing javadoc files with the sources)
@@ -94,6 +103,35 @@ javadoc {
     }
 }
 
+ext.java9TestArgs = [
+        "--add-reads=$moduleName=org.testfx",
+        "--add-modules=org.testfx",
+        "--add-exports=javafx.graphics/com.sun.javafx.application=org.testfx",
+        // For Monocle
+        "--add-exports=javafx.graphics/com.sun.glass.ui=org.testfx.monocle",
+        "--add-opens=javafx.graphics/com.sun.glass.ui=org.testfx"
+]
+
+test {
+    doFirst {
+        java9Args.addAll(java9RuntimeArgs)
+        java9Args.addAll(java9TestArgs)
+        jvmArgs = java9Args
+    }
+    if (!project.hasProperty("headless") || project.headless == "true") {
+        // execute TestFX Tests headless -- switch off by using ./gradlew -Pheadless=false
+        systemProperty("testfx.robot", "glass")
+        systemProperty("testfx.headless", "true")
+        systemProperty("prism.order", "sw")
+        systemProperty("prism.text", "t2k")
+        systemProperty("headless.geometry", "1600x1200-32")
+    }
+    testLogging {
+        // Show that tests are run in the command-line output
+        events 'started', 'passed'
+    }
+}
+
 jar {
     //exclude '**/16/*'
     exclude '**/32/*'
@@ -101,29 +139,25 @@ jar {
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
     exclude '**/impl/build/**'
+    bnd(
+            'Bundle-Name': 'ControlsFX',
+            'Bundle-Description': 'High quality UI controls and other tools to complement the core JavaFX distribution',
+            'Specification-Title': 'ControlsFX',
+            'Specification-Version': controlsfx_version,
+            'Implementation-Title': 'ControlsFX',
+            'Export-Package': '!impl.org.controlsfx.*, org.controlsfx.*'
+    )
 
-    manifest { // the manifest of the default jar is of type OsgiManifest
-        attributes (\
-            'Specification-Title': specification_title,\
-            'Specification-Version': specification_version,\
-            'Implementation-Title': 'ControlsFX',\
-            'Implementation-Version': version,\
-            'Bundle-Name': 'ControlsFX'
-        )
-        instruction 'Bundle-Description', 'High quality UI controls and other tools to complement the core JavaFX distribution'
-        instruction 'Import-Package', '!org.controlsfx*', '*'
-        instruction 'Export-Package', '!impl.org.controlsfx.*', 'org.controlsfx.*'
-    }
 }
 
-task native2ascii(type:Copy) {
+task native2ascii(type: Copy) {
     // Files are downloaded with extension utf8, then renamed .properties...
-    from ("$buildDir/resources/main") {
-        include('**/controlsfx_*.utf8') 
+    from("$buildDir/resources/main") {
+        include('**/controlsfx_*.utf8')
         filesMatching("controlsfx_*.utf8") {
             println "  native2ascii: $name"
             name = name[0..-6] + '.properties'
-        } 
+        }
     } into "$buildDir/resources/main"
 }
 

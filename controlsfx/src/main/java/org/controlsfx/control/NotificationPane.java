@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015, ControlsFX
+ * Copyright (c) 2013, 2020, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,8 +43,6 @@ import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.control.Skin;
-import javafx.scene.web.WebView;
-
 import org.controlsfx.control.action.Action;
 
 /**
@@ -247,9 +245,9 @@ public class NotificationPane extends ControlsFXControl {
      * The content property represents what is shown in the scene 
      * <strong>that is not within</strong> the notification bar. In other words,
      * it is what the notification bar should appear on top of. For example, in
-     * the scenario where you are using a {@link WebView} to show to the user
+     * the scenario where you are using a WebView to show to the user
      * websites, and you want to popup up a notification bar to save a password,
-     * the content would be the {@link WebView}. Refer to the 
+     * the content would be the WebView. Refer to the 
      * {@link NotificationPane} class documentation for more details.
      *  
      * @return A property representing the content of this NotificationPane.

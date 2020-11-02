@@ -19,6 +19,8 @@ dist: trusty
 # Do not run travis install step `./gradlew assemble`
 install: true
 
+before_script: chmod +x gradlew
+
 # Assemble jars
 script: ./gradlew clean build -Ptransifex.api=$TRANSIFEX_API
 

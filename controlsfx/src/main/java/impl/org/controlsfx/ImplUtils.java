@@ -55,7 +55,7 @@ public class ImplUtils {
         // Begin Fix Issue #847, see
         // https://bitbucket.org/controlsfx/controlsfx/issues/847/validationsupport-messes-up-layout
         if (injectedParent instanceof Region) {
-            Region region = (Region) originalParent;
+            Region region = (Region) injectedParent;
 
             region.setMaxWidth(Double.MAX_VALUE);
             region.setMaxHeight(Double.MAX_VALUE);

@@ -12,6 +12,7 @@ module org.controlsfx.samples {
     exports org.controlsfx.samples.propertysheet to org.controlsfx.fxsampler;
     exports org.controlsfx.samples.tablefilter to org.controlsfx.fxsampler;
     exports org.controlsfx.samples.tableview to org.controlsfx.fxsampler;
+    exports org.controlsfx.samples.tableview2 to org.controlsfx.fxsampler;
     exports org.controlsfx.samples.textfields to org.controlsfx.fxsampler;
     exports org.controlsfx.samples.spreadsheet to org.controlsfx.fxsampler;
     

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2020, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
     public GridViewSkin(GridView<T> control) {
         super(control);
         
-        flow = ReflectionUtils.getVirtualFlow(this);
+        flow = getVirtualFlow();
         updateGridViewItems();
 
         flow.setId("virtual-flow"); //$NON-NLS-1$

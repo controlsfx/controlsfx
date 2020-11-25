@@ -170,23 +170,6 @@ public class ReflectionUtils {
 
     /****************************************************************************************************
      *
-     * VirtualContainerBase
-     *
-     ****************************************************************************************************/
-
-    public static VirtualFlow getVirtualFlow(VirtualContainerBase virtualContainerBase) {
-        Class<?> clazz = virtualContainerBase.getClass();
-        try {
-            Field field = clazz.getSuperclass().getDeclaredField("flow");
-            field.setAccessible(true);
-            return (VirtualFlow) field.get(virtualContainerBase);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            throw new RuntimeException("Could not fetch VirtualFlow from VirtualContainerBase");
-        }
-    }
-
-    /****************************************************************************************************
-     *
      * TableViewSkinBase
      *
      ****************************************************************************************************/

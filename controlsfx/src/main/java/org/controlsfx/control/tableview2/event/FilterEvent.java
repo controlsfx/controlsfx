@@ -52,16 +52,14 @@ public class FilterEvent<C> extends Event {
 
     private static final EventType<?> FILTER_EVENT = new EventType<>(FilterEvent.ANY, "FILTER_EVENT");
 
-//    /**
-//     * Construct a new {@code Event} with the specified event source, target
-//     * and type. If the source or target is set to {@code null}, it is replaced
-//     * by the {@code NULL_SOURCE_TARGET} value.
-//     *
-//     * @param source the event source which sent the event
-//     * @param target the event source which sent the event
-//     * @param type the event type
-//     * @param target the target of the scroll to operation
-//     */
+    /**
+     * Construct a new {@code Event} with the specified event source and target, with
+     * type {@code FILTER_EVENT}. If the source or target is set to {@code null},
+     * it is replaced by the {@code NULL_SOURCE_TARGET} value.
+     *
+     * @param source the event source which sent the event
+     * @param target the event target to associate with the event
+     */
     public FilterEvent(@NamedArg("source") C source, @NamedArg("target") EventTarget target) {
         super(source, target, filterEvent());
 

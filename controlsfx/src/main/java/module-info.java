@@ -60,6 +60,7 @@ module org.controlsfx.controls {
 
     // Required for reading CSS files for the CSS Tab
     opens org.controlsfx.control to org.controlsfx.fxsampler;
+    opens org.controlsfx.control.tableview2 to org.controlsfx.fxsampler;
 
     uses org.controlsfx.glyphfont.GlyphFont;
     provides org.controlsfx.glyphfont.GlyphFont with org.controlsfx.glyphfont.FontAwesome;

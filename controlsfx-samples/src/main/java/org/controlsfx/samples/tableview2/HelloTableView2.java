@@ -108,7 +108,7 @@ public class HelloTableView2 extends ControlsFXSample {
 
     @Override
     public String getControlStylesheetURL() {
-        return "/org/controlsfx/samples/tableview2.css";
+        return "/org/controlsfx/tableview2/tableview2.css";
     }
 
     @Override

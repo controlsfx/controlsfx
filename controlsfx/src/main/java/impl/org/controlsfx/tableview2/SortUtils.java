@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018, 2020 ControlsFX
+ * Copyright (c) 2013, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,29 +24,45 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-module org.controlsfx.samples {
 
-    requires java.desktop;
-    requires org.controlsfx.controls;
-    requires org.controlsfx.fxsampler;
+package impl.org.controlsfx.tableview2;
 
-    exports org.controlsfx.samples to javafx.graphics;
-    exports org.controlsfx.samples.actions to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.button to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.checked to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.dialogs to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.propertysheet to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.tablefilter to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.tableview to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.tableview2 to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.textfields to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.spreadsheet to org.controlsfx.fxsampler;
+import javafx.beans.NamedArg;
+import javafx.event.EventTarget;
+import javafx.event.EventType;
+import javafx.scene.control.SortEvent;
+
+public class SortUtils {
     
-    opens org.controlsfx.samples;
-    opens org.controlsfx.samples.dialogs;
-    opens org.controlsfx.samples.actions to org.controlsfx.controls;
-    opens org.controlsfx.samples.tableview to javafx.base;
-    opens org.controlsfx.samples.spreadsheet to javafx.graphics;
+    /**
+     * Convenient subclass of SortEvent to create a new SortEvent to indicate
+     * the sorting has started
+     * @param <C> the event source which sent the event
+     */
+    public static class SortStartedEvent<C> extends SortEvent<C> {
+
+        public static final EventType<?> SORT_STARTED_EVENT = new EventType<>(SortEvent.ANY, "SORT_STARTED_EVENT");
+
+        public SortStartedEvent(@NamedArg("source") C source, @NamedArg("target") EventTarget target) {
+            super(source, target);
+            this.eventType = SORT_STARTED_EVENT;
+        }
+
+    }
     
-    provides fxsampler.FXSamplerProject with org.controlsfx.ControlsFXSampler;
+    /**
+     * Convenient subclass of SortEvent to create a new SortEvent to indicate
+     * the sorting has ended
+     * @param <C> the event source which sent the event
+     */
+    public static class SortEndedEvent<C> extends SortEvent<C> {
+
+        public static final EventType<?> SORT_ENDED_EVENT = new EventType<>(SortEvent.ANY, "SORT_ENDED_EVENT");
+
+        public SortEndedEvent(@NamedArg("source") C source, @NamedArg("target") EventTarget target) {
+            super(source, target);
+            this.eventType = SORT_ENDED_EVENT;
+        }
+
+    }
 }

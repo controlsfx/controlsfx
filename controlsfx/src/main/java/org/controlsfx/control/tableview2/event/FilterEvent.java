@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018, 2020 ControlsFX
+ * Copyright (c) 2013, 2018 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,29 +24,51 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-module org.controlsfx.samples {
+package org.controlsfx.control.tableview2.event;
 
-    requires java.desktop;
-    requires org.controlsfx.controls;
-    requires org.controlsfx.fxsampler;
+import javafx.beans.NamedArg;
+import javafx.event.Event;
+import javafx.event.EventTarget;
+import javafx.event.EventType;
+import org.controlsfx.control.tableview2.TableView2;
 
-    exports org.controlsfx.samples to javafx.graphics;
-    exports org.controlsfx.samples.actions to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.button to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.checked to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.dialogs to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.propertysheet to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.tablefilter to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.tableview to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.tableview2 to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.textfields to org.controlsfx.fxsampler;
-    exports org.controlsfx.samples.spreadsheet to org.controlsfx.fxsampler;
+/**
+ * Event related to {@link TableView2} filtering.
+ *
+ * @param <C> The event source
+ */
+public class FilterEvent<C> extends Event {
+
+    /**
+     * Common supertype for all sort event types.
+     */
+    public static final EventType<FilterEvent> ANY =
+            new EventType<FilterEvent>(Event.ANY, "FILTER");
+
+    @SuppressWarnings("unchecked")
+    public static <C> EventType<FilterEvent<C>> filterEvent() {
+        return (EventType<FilterEvent<C>>) FILTER_EVENT;
+    }
+
+    private static final EventType<?> FILTER_EVENT = new EventType<>(FilterEvent.ANY, "FILTER_EVENT");
+
+    /**
+     * Construct a new {@code Event} with the specified event source and target, with
+     * type {@code FILTER_EVENT}. If the source or target is set to {@code null},
+     * it is replaced by the {@code NULL_SOURCE_TARGET} value.
+     *
+     * @param source the event source which sent the event
+     * @param target the event target to associate with the event
+     */
+    public FilterEvent(@NamedArg("source") C source, @NamedArg("target") EventTarget target) {
+        super(source, target, filterEvent());
+
+    }
+
+    /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
+    @Override public C getSource() {
+        return (C) super.getSource();
+    }
     
-    opens org.controlsfx.samples;
-    opens org.controlsfx.samples.dialogs;
-    opens org.controlsfx.samples.actions to org.controlsfx.controls;
-    opens org.controlsfx.samples.tableview to javafx.base;
-    opens org.controlsfx.samples.spreadsheet to javafx.graphics;
-    
-    provides fxsampler.FXSamplerProject with org.controlsfx.ControlsFXSampler;
 }

@@ -58,19 +58,14 @@ public final class ColumnFilter<T,R> {
     private final HashSet<R> unselectedValues = new HashSet<>();
     private final HashMap<CellIdentity<T>,ChangeListener<R>> trackedCells = new HashMap<>();
 
-    private static final Image filterIcon = new Image("/impl/org/controlsfx/table/filter.png");
-    private static final Supplier<ImageView> filterImageView = () -> {
-        ImageView imageView = new ImageView(filterIcon);
-        imageView.setFitHeight(15);
-        imageView.setPreserveRatio(true);
-        return imageView;
-    };
+    private static final Image filterIcon = new Image(ColumnFilter.class.getResource("/impl/org/controlsfx/table/filter.png").toExternalForm());
 
     private boolean bumpedWidth = false;    // Used to determine to add a padding to the filterIcon.
     private boolean lastFilter = false;
     private boolean isDirty = false;
     private BiPredicate<String,String> searchStrategy = (inputString, subjectString) -> subjectString.toLowerCase().contains(inputString.toLowerCase());
     private volatile FilterPanel filterPanel;
+    private ImageView imageView;
 
     private boolean initialized = false;
 
@@ -133,13 +128,14 @@ public final class ColumnFilter<T,R> {
         }
     };
 
-    ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,R> tableColumn) {
+    public ColumnFilter(TableFilter<T> tableFilter, TableColumn<T,R> tableColumn) {
         this.tableFilter = tableFilter;
         this.tableColumn = tableColumn;
 
         this.filterValues = FXCollections.observableArrayList(cb -> new Observable[] { cb.selectedProperty()});
         this.attachContextMenu();
     }
+  
     void setFilterPanel(FilterPanel filterPanel) {
         this.filterPanel = filterPanel;
     }
@@ -153,7 +149,7 @@ public final class ColumnFilter<T,R> {
      */
     void applyFilterIcon() {
         if (hasUnselections()) {
-            tableColumn.setGraphic(filterImageView.get());
+            tableColumn.setGraphic(imageView);
             if (!bumpedWidth) {
                 tableColumn.setPrefWidth(tableColumn.getWidth() + 20);
                 bumpedWidth = true;
@@ -296,6 +292,10 @@ public final class ColumnFilter<T,R> {
     }
 
     private void initializeValues() {
+        imageView = new ImageView(filterIcon);
+        imageView.setFitHeight(15);
+        imageView.setPreserveRatio(true);
+        
         tableFilter.getBackingList()
                 .forEach(t -> addBackingItem(t, tableColumn.getCellObservableValue(t)));
         tableFilter.getTableView().getItems().stream()

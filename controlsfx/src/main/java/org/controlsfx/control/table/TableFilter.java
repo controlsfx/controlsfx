@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, 2019, ControlsFX
+ * Copyright (c) 2015, 2020 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -157,7 +157,6 @@ public final class TableFilter<T> {
 
     /**
      * Programmatically selects all values for the specified TableColumn
-
      */
     public void selectAllValues(TableColumn<?,?> column) {
         columnFilters.stream().filter(c -> c.getTableColumn() == column)
@@ -175,13 +174,22 @@ public final class TableFilter<T> {
         if (columnFilters.stream().anyMatch(ColumnFilter::isFiltered)) {
             filteredList.setPredicate(item -> columnFilters.stream()
                     .allMatch(cf -> cf.evaluate(item)));
-        }
-        else {
+        } else {
             resetFilter();
+        }
+
+        for (ColumnFilter columnFilter : columnFilters) {
+            columnFilter.applyFilterIcon();
         }
     }
     public void resetFilter() {
         filteredList.setPredicate(item -> true);
+    }
+    public void resetAllFilters() {
+        for (ColumnFilter columnFilter : columnFilters) {
+            columnFilter.resetAllFilters();
+            columnFilter.applyFilterIcon();
+        }
     }
     /** 
      * @treatAsPrivate
@@ -233,5 +241,4 @@ public final class TableFilter<T> {
             return new TableFilter<>(tableView, lazyInd);
         }
     }
-    
 }

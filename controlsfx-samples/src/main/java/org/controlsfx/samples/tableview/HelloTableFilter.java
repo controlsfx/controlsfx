@@ -28,8 +28,14 @@ package org.controlsfx.samples.tableview;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.table.TableFilter;
@@ -40,18 +46,23 @@ public class HelloTableFilter extends ControlsFXSample {
         return "TableFilter";
     }
 
+    private TableFilter<Person> tableFilter;
+    private TableColumn<Person, String> firstNameCol;
+    private TableColumn<Person, String> lastNameCol;
+    private TableColumn<Person, String> emailCol;
+
     @Override
     @SuppressWarnings("unchecked")
     public Node getPanel(Stage stage) {
         TableView<Person> tableView = new TableView<>();
 
-        TableColumn<Person, String> firstNameCol = new TableColumn<>("First Name");
+        firstNameCol = new TableColumn<>("First Name");
         firstNameCol.setCellValueFactory(new PropertyValueFactory<>("firstName"));
 
-        TableColumn<Person, String> lastNameCol = new TableColumn<>("Last Name");
+        lastNameCol = new TableColumn<>("Last Name");
         lastNameCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
 
-        TableColumn<Person, String> emailCol = new TableColumn<>("Email");
+        emailCol = new TableColumn<>("Email");
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
 
         tableView.getColumns().addAll(firstNameCol, lastNameCol, emailCol);
@@ -64,9 +75,85 @@ public class HelloTableFilter extends ControlsFXSample {
         tableView.getItems().add(new Person("Isabella", "Smith", "isabella.smith@example.com"));
 
         // apply filter
-        TableFilter.forTableView(tableView).apply();
+        tableFilter = TableFilter.forTableView(tableView).apply();
 
         return tableView;
+    }
+
+    @Override
+    public Node getControlPanel() {
+        VBox controlPane = new VBox(10);
+
+        String sFirstname = "Isabella";
+        Button buttonFilterFirstname = new Button("Filter First Name '" + sFirstname + "'");
+        buttonFilterFirstname.setOnAction(e -> {
+            tableFilter.unSelectAllValues(firstNameCol);
+            tableFilter.selectValue(firstNameCol, sFirstname);
+            tableFilter.executeFilter();
+        });
+        Button buttonFilterFirstnameReset = new Button("\u21BA");
+        buttonFilterFirstnameReset.setOnAction(e -> {
+            tableFilter.selectAllValues(firstNameCol);
+            tableFilter.executeFilter();
+        });
+
+        String sLastname = "Smith";
+        Button buttonFilterLastname = new Button("Filter Last Name '" + sLastname + "'");
+        buttonFilterLastname.setOnAction(e -> {
+            tableFilter.unSelectAllValues(lastNameCol);
+            tableFilter.selectValue(lastNameCol, sLastname);
+            tableFilter.executeFilter();
+        });
+        Button buttonFilterLastnamReset = new Button("\u21BA");
+        buttonFilterLastnamReset.setOnAction(e -> {
+            tableFilter.selectAllValues(lastNameCol);
+            tableFilter.executeFilter();
+        });
+
+        String sEmail = "michael.brown@example.com";
+        Button buttonFilterEmail = new Button("Filter Email '" + sEmail + "'");
+        buttonFilterEmail.setOnAction(e -> {
+            tableFilter.unSelectAllValues(emailCol);
+            tableFilter.selectValue(emailCol, sEmail);
+            tableFilter.executeFilter();
+        });
+        Button buttonFilterEmailReset = new Button("\u21BA");
+        buttonFilterEmailReset.setOnAction(e -> {
+            tableFilter.selectAllValues(emailCol);
+            tableFilter.executeFilter();
+        });
+
+        Button buttonResetAll = new Button("Reset All Filters \u21BA");
+        buttonResetAll.setOnAction(e -> {
+            tableFilter.resetAllFilters();
+        });
+
+        CheckBox cbRegularExpSearchStrategy = new CheckBox("Use regular expressions");
+        cbRegularExpSearchStrategy.selectedProperty().addListener((ov, old_val, new_val) -> {
+            if(cbRegularExpSearchStrategy.isSelected()) {
+                tableFilter.setSearchStrategy((input,target) -> {
+                    try {
+                        return target.matches(input);
+                    } catch (Exception e) {
+                        return false;
+                    }
+                });
+            } else {
+                // fallback to normal
+                tableFilter.setSearchStrategy((inputString, subjectString) -> subjectString.toLowerCase().contains(inputString.toLowerCase()));
+            }
+        });
+
+        controlPane.getChildren().add(new Label("Programmatic Filtering:"));
+        controlPane.getChildren().add(new HBox(10, buttonFilterFirstname, buttonFilterFirstnameReset));
+        controlPane.getChildren().add(new HBox(10,buttonFilterLastname, buttonFilterLastnamReset));
+        controlPane.getChildren().add(new HBox(10,buttonFilterEmail, buttonFilterEmailReset));
+        buttonResetAll.setPrefWidth(Double.MAX_VALUE);
+        controlPane.getChildren().add(buttonResetAll);
+        controlPane.getChildren().add(new Label("Custom Search Strategies (e.g., '.*o.*n' for 'Last Name')"));
+        controlPane.getChildren().add(cbRegularExpSearchStrategy);
+
+        return controlPane;
     }
 
     @Override

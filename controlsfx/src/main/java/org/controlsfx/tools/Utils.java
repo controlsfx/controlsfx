@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2016, ControlsFX
+ * Copyright (c) 2014, 2016, 2020, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,14 +44,16 @@ public class Utils {
      */
     public static Window getWindow(Object owner) throws IllegalArgumentException {
         if (owner == null) {
+            Window window = null;
             // lets just get the focused stage and show the dialog in there
             List<Window> windows = Window.getWindows();
-            for (Window window : windows) {
+            for (Window w : windows) {
+                window = w;
                 if (window.isFocused() && !(window instanceof PopupWindow)) {
                     return window;
                 }
             }
-            return null;
+            return window;
         } else if (owner instanceof Window) {
             return (Window) owner;
         } else if (owner instanceof Node) {

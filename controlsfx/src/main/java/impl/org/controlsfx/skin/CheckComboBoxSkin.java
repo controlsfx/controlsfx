@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@ import impl.org.controlsfx.collections.ReadOnlyUnbackedObservableList;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -100,23 +101,26 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
 
         // installs a custom CheckBoxListCell cell factory
         comboBox.setCellFactory(listView -> {
-            CheckBoxListCell<T> result = new CheckBoxListCell<>(control::getItemBooleanProperty);
-            result.focusedProperty().addListener((o, ov, nv) -> {
+            CheckBoxListCell<T> checkBoxListCell = new CheckBoxListCell<>(control::getItemBooleanProperty);
+            checkBoxListCell.focusedProperty().addListener((o, ov, nv) -> {
                 if (nv) {
-                    result.getParent().requestFocus();
+                    final Parent parent = checkBoxListCell.getParent();
+                    if (parent != null) {
+                        parent.requestFocus();
+                    }
                 }
             });
             //clicking on the label checks/unchecks the item
-            result.setOnMouseClicked(e -> {
-                T item = result.getItem();
+            checkBoxListCell.setOnMouseClicked(e -> {
+                T item = checkBoxListCell.getItem();
                 if (control.getCheckModel().isChecked(item)) {                        
                     control.getCheckModel().clearCheck(item);
                 } else {
                     control.getCheckModel().check(item);                        
                 }
             });
-            result.converterProperty().bind(control.converterProperty());
-            return result;
+            checkBoxListCell.converterProperty().bind(control.converterProperty());
+            return checkBoxListCell;
         });
         
         // we render the selection into a custom button cell, so that it can 

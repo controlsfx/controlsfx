@@ -12,8 +12,6 @@ ext.java9Args = [
         "--add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls",
         // For MappingChange, NonIterableChange across files
         "--add-exports=javafx.base/com.sun.javafx.collections=org.controlsfx.controls",
-        // For VersionInfo in VersionChecker
-        "--add-exports=javafx.base/com.sun.javafx.runtime=org.controlsfx.controls",
         //For SpreadsheetView
         "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior.TableViewBehavior=org.controlsfx.controls",
         //For SpreadsheetView

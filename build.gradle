@@ -21,8 +21,6 @@ ext.java9Args = [
 ]
 
 ext.java9RuntimeArgs = [
-        // For accessing VirtualFlow methods in GridViewSkin
-        "--add-opens=javafx.controls/javafx.scene.control.skin=org.controlsfx.controls",
         // For accessing getChildren in ImplUtils
         "--add-opens=javafx.graphics/javafx.scene=org.controlsfx.controls"
 ]

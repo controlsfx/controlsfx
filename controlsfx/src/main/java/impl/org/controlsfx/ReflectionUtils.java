@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017, 2020, ControlsFX
+ * Copyright (c) 2017, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,18 +28,18 @@ package impl.org.controlsfx;
 
 import javafx.scene.Parent;
 import javafx.scene.control.Control;
-import javafx.scene.control.IndexedCell;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableColumnBase;
-import javafx.scene.control.skin.*;
+import javafx.scene.control.skin.NestedTableColumnHeader;
+import javafx.scene.control.skin.TableHeaderRow;
+import javafx.scene.control.skin.TableViewSkin;
+import javafx.scene.control.skin.TableViewSkinBase;
+import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.layout.Region;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 public class ReflectionUtils {

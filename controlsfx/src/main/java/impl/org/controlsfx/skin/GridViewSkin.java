@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2020, ControlsFX
+ * Copyright (c) 2013, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,11 +29,9 @@ package impl.org.controlsfx.skin;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.skin.VirtualContainerBase;
 import javafx.scene.control.skin.VirtualFlow;
 import org.controlsfx.control.GridView;
-import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 
 public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T>> {
 
@@ -49,7 +47,7 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
     @SuppressWarnings("rawtypes")
     public GridViewSkin(GridView<T> control) {
         super(control);
-        
+
         flow = getVirtualFlow();
         updateGridViewItems();
 
@@ -82,27 +80,6 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
         registerChangeListener(control.verticalCellSpacingProperty(), e -> getFlow().recreateCells());
         registerChangeListener(control.widthProperty(), e ->  updateItemCount());
         registerChangeListener(control.heightProperty(), e ->  updateItemCount());
-    }
-
-    /**
-     * Custom VirtualFlow to grant access to protected methods.
-     */
-    private class GridVirtualFlow extends VirtualFlow<GridRow<T>> {
-        public void recreateCells(){
-            super.recreateCells();
-        }
-
-        public void rebuildCells(){
-            super.rebuildCells();
-        }
-
-        public void reconfigureCells(){
-            super.reconfigureCells();
-        }
-    }
-
-    private GridVirtualFlow getFlow() {
-        return (GridVirtualFlow) getVirtualFlow();
     }
 
     @Override
@@ -214,5 +191,27 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
         GridRow<T> row = new GridRow<>();
         row.updateGridView(getSkinnable());
         return row;
+    }
+
+    private GridVirtualFlow getFlow() {
+        return (GridVirtualFlow) getVirtualFlow();
+    }
+
+    /**
+     * Custom VirtualFlow to grant access to protected methods.
+     */
+    private class GridVirtualFlow extends VirtualFlow<GridRow<T>> {
+
+        public void recreateCells(){
+            super.recreateCells();
+        }
+
+        public void rebuildCells(){
+            super.rebuildCells();
+        }
+
+        public void reconfigureCells(){
+            super.reconfigureCells();
+        }
     }
 }

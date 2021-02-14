@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017, 2020, ControlsFX
+ * Copyright (c) 2017, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,18 +28,18 @@ package impl.org.controlsfx;
 
 import javafx.scene.Parent;
 import javafx.scene.control.Control;
-import javafx.scene.control.IndexedCell;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableColumnBase;
-import javafx.scene.control.skin.*;
+import javafx.scene.control.skin.NestedTableColumnHeader;
+import javafx.scene.control.skin.TableHeaderRow;
+import javafx.scene.control.skin.TableViewSkin;
+import javafx.scene.control.skin.TableViewSkinBase;
+import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.layout.Region;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 public class ReflectionUtils {
@@ -77,92 +77,6 @@ public class ReflectionUtils {
             field.setAccessible(true);
             return Optional.of((Region) field.get(tableColumnHeader));
         } catch (IllegalAccessException | NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
-    }
-
-    /****************************************************************************************************
-     *
-     * VirtualFlow
-     *
-     ****************************************************************************************************/
-
-    public static void recreateCells(VirtualFlow flow) {
-        Class<?> clazz = flow.getClass();
-        try {
-            Method method = clazz.getDeclaredMethod("recreateCells");
-            method.setAccessible(true);
-            method.invoke(flow);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException("Cannot recreate cells on VirtualFlow");
-        }
-    }
-
-     public static void rebuildCells(VirtualFlow flow) {
-        Class<?> clazz = flow.getClass();
-        try {
-            Method method = clazz.getDeclaredMethod("rebuildCells");
-            method.setAccessible(true);
-            method.invoke(flow);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException("Cannot rebuild cells on VirtualFlow");
-        }
-    }
-
-    public static void reconfigureCells(VirtualFlow flow) {
-        Class<?> clazz = flow.getClass();
-        try {
-            Method method = clazz.getDeclaredMethod("reconfigureCells");
-            method.setAccessible(true);
-            method.invoke(flow);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException("Cannot reconfigure cells on VirtualFlow");
-        }
-    }
-
-    public static void resizeCellSize(VirtualFlow flow, IndexedCell cell) {
-        Class<?> clazz = flow.getClass();
-        try {
-            Method method = clazz.getDeclaredMethod("resizeCellSize", cell.getClass());
-            method.setAccessible(true);
-            method.invoke(flow, cell);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException("Cannot resize cell size on VirtualFlow");
-        }
-    }
-
-    public static List getCells(VirtualFlow flow) {
-        Class<? extends VirtualFlow> clazz = flow.getClass();
-        try {
-            Method method = clazz.getDeclaredMethod("getCells");
-            method.setAccessible(true);
-            return (List) method.invoke(flow);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
-    }
-
-    public static Optional<IndexedCell<?>> getCellWithinViewPort(VirtualFlow flow, String methodName) {
-        Class<?> clazz = flow.getClass();
-        try {
-            Method method = clazz.getDeclaredMethod(methodName);
-            method.setAccessible(true);
-            return Optional.of((IndexedCell<?>) method.invoke(flow));
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
-    }
-
-    public static Optional<ScrollBar> getBar(VirtualFlow flow, String methodName) {
-        Class<?> clazz = flow.getClass();
-        try {
-            Method method = clazz.getDeclaredMethod(methodName);
-            method.setAccessible(true);
-            return Optional.of((ScrollBar) method.invoke(flow));
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
         return Optional.empty();

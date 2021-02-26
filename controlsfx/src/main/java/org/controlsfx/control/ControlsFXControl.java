@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,14 +26,9 @@
  */
 package org.controlsfx.control;
 
-import impl.org.controlsfx.version.VersionChecker;
 import javafx.scene.control.Control;
 
 abstract class ControlsFXControl extends Control {
-
-    public ControlsFXControl() {
-        VersionChecker.doVersionCheck();
-    }
 
     private String stylesheet;
 

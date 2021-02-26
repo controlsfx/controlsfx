@@ -27,11 +27,17 @@
 
 package impl.org.controlsfx.skin;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.controlsfx.control.ToggleSwitch;
+
 import com.sun.javafx.css.converters.SizeConverter;
+
 import javafx.animation.Animation;
 import javafx.animation.TranslateTransition;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.value.WritableValue;
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;
 import javafx.css.StyleableDoubleProperty;
@@ -41,11 +47,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
-import org.controlsfx.control.ToggleSwitch;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Basic Skin implementation for the {@link ToggleSwitch}
@@ -148,9 +149,9 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         double thumbHeight = snapSize(thumb.prefHeight(-1));
         thumb.resize(thumbWidth, thumbHeight);
 
-        double thumbAreaY = snapPosition(contentY);
         double thumbAreaWidth = snapSize(thumbArea.prefWidth(-1));
         double thumbAreaHeight = snapSize(thumbArea.prefHeight(-1));
+        double thumbAreaY = snapPosition(contentY + (contentHeight / 2) - (thumbAreaHeight / 2));
 
         thumbArea.resize(thumbAreaWidth, thumbAreaHeight);
         thumbArea.setLayoutX(contentWidth - thumbAreaWidth);
@@ -219,7 +220,7 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
                 @Override
                 public StyleableProperty<Number> getStyleableProperty(ToggleSwitch toggleSwitch) {
                     final ToggleSwitchSkin skin = (ToggleSwitchSkin) toggleSwitch.getSkin();
-                    return (StyleableProperty<Number>) (WritableValue<Number>) skin.thumbMoveAnimationTimeProperty();
+                    return (StyleableProperty<Number>) skin.thumbMoveAnimationTimeProperty();
                 }
             };
 

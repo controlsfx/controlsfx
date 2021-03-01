@@ -84,11 +84,27 @@ public class HelloToggleSwitch extends ControlsFXSample
         toggleSwitch3.setLayoutX(70);
         toggleSwitch3.setLayoutY(250);
         toggleSwitch3.setSelected(true);
+        
+        Label itemTitle4 = new Label("Styled");
+        itemTitle4.getStyleClass().add("item-title");
+        itemTitle4.setLayoutX(70);
+        itemTitle4.setLayoutY(309);
+        
+        ToggleSwitch toggleSwitch4 = new ToggleSwitch("Styled");
+        toggleSwitch4.getStyleClass().add("styled-toggle");
+        toggleSwitch4.setLayoutX(70);
+        toggleSwitch4.setLayoutY(332);
 
         anchorPane.getChildren().addAll(headerLabel, itemTitle1, toggleSwitch1, itemTitle2, toggleSwitch2, itemTitle3, toggleSwitch3);
+        anchorPane.getChildren().addAll(itemTitle4, toggleSwitch4);
 
         anchorPane.getStylesheets().add(getClass().getResource("toggleSwitchSample.css").toExternalForm());
         return anchorPane;
+    }
+    
+    @Override
+    public String getControlStylesheetURL() {
+        return "/org/controlsfx/samples/toggleSwitchSample.css";
     }
 
     @Override

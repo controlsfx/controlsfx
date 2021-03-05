@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, 2020 ControlsFX
+ * Copyright (c) 2015, 2020, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -148,9 +148,9 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         double thumbHeight = snapSize(thumb.prefHeight(-1));
         thumb.resize(thumbWidth, thumbHeight);
 
-        double thumbAreaY = snapPosition(contentY);
         double thumbAreaWidth = snapSize(thumbArea.prefWidth(-1));
         double thumbAreaHeight = snapSize(thumbArea.prefHeight(-1));
+        double thumbAreaY = snapPosition(contentY + (contentHeight / 2) - (thumbAreaHeight / 2));
 
         thumbArea.resize(thumbAreaWidth, thumbAreaHeight);
         thumbArea.setLayoutX(contentWidth - thumbAreaWidth);

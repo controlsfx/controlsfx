@@ -26,6 +26,11 @@
  */
 package fxsampler.util;
 
+import fxsampler.FXSamplerProject;
+import fxsampler.Sample;
+import fxsampler.model.EmptySample;
+import fxsampler.model.Project;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -37,11 +42,6 @@ import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
-
-import fxsampler.FXSamplerProject;
-import fxsampler.Sample;
-import fxsampler.model.EmptySample;
-import fxsampler.model.Project;
 
 /**
  * All the code related to classpath scanning, etc for samples.
@@ -129,7 +129,7 @@ public class SampleScanner {
 
     private Class<?>[] loadFromPathScanning() throws IOException {
         try {
-            List<Class<?>> results = new ArrayList<>();
+            Set<Class<?>> results = new HashSet<>();
 
             Class<?>[] path = loadFromClassPathScanning();
             System.out.println( "Classpath\n--------------------------------" );

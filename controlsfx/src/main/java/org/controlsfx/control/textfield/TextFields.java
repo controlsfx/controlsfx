@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015, ControlsFX
+ * Copyright (c) 2014, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@ import impl.org.controlsfx.autocompletion.SuggestionProvider;
 import java.util.Arrays;
 import java.util.Collection;
 
+import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -109,6 +110,10 @@ public class TextFields {
 
         inputField.textProperty().addListener(new InvalidationListener() {
             @Override public void invalidated(Observable arg0) {
+                if (fader.getStatus() == Animation.Status.RUNNING) {
+                    fader.stop();
+                    fader.getNode().setOpacity(fader.getToValue());
+                }
                 String text = inputField.getText();
                 boolean isTextEmpty = text == null || text.isEmpty();
                 boolean isButtonVisible = fader.getNode().getOpacity() > 0;

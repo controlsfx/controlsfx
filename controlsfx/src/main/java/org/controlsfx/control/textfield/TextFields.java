@@ -32,7 +32,6 @@ import impl.org.controlsfx.autocompletion.SuggestionProvider;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -46,7 +45,6 @@ import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-
 import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest;
 
 /**
@@ -109,23 +107,21 @@ public class TextFields {
         fader.setCycleCount(1);
 
         inputField.textProperty().addListener(new InvalidationListener() {
+
+            private boolean isButtonVisible = false;
+
             @Override public void invalidated(Observable arg0) {
-                if (fader.getStatus() == Animation.Status.RUNNING) {
-                    fader.stop();
-                    fader.getNode().setOpacity(fader.getToValue());
-                }
                 String text = inputField.getText();
                 boolean isTextEmpty = text == null || text.isEmpty();
-                boolean isButtonVisible = fader.getNode().getOpacity() > 0;
 
-                if (isTextEmpty && isButtonVisible) {
-                    setButtonVisible(false);
-                } else if (!isTextEmpty && !isButtonVisible) {
-                    setButtonVisible(true);
+                if (isTextEmpty == isButtonVisible) {
+                    isButtonVisible = !isTextEmpty;
+                    fadeTo(isButtonVisible);
                 }
             }
 
-            private void setButtonVisible( boolean visible ) {
+            private void fadeTo(boolean visible) {
+                fader.stop();
                 fader.setFromValue(visible? 0.0: 1.0);
                 fader.setToValue(visible? 1.0: 0.0);
                 fader.play();

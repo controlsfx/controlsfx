@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019, ControlsFX
+ * Copyright (c) 2019, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,7 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.SearchableComboBoxSkin;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Skin;
@@ -94,12 +95,15 @@ import javafx.scene.control.Skin;
  */
 public class SearchableComboBox<T> extends ComboBox<T> {
 
+    private static final String DEFAULT_STYLE_CLASS = "searchable-combo-box";
+
     public SearchableComboBox() {
-        super();
+        this(FXCollections.observableArrayList());
     }
 
     public SearchableComboBox(ObservableList<T> items) {
         super(items);
+        getStyleClass().add(DEFAULT_STYLE_CLASS);
     }
 
     @Override

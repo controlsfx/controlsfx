@@ -140,7 +140,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
         getChildren().removeIf(n -> n.getId() != null && n.getId().equals("pane-fixed-cell"));
             
         Object o = control.getProperties().get("fixed");
-        boolean fixedRow = o != null && ((Boolean) o).equals(Boolean.TRUE);
+        boolean fixedRow = Boolean.TRUE.equals(o);
 
         final List<? extends TableColumn<S, ?>> columns = tableView.getVisibleLeafColumns();
 
@@ -168,7 +168,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
         control.verticalShift.setValue(tableView.isRowFixingEnabled() ? getFixedRowShift(index) : 0);
 
         double fixedColumnWidth = 0;
-        List<TableCell<S, ?>> fixedCells = new ArrayList();
+        List<TableCell<S, ?>> fixedCells = new ArrayList<>();
 
         //We compute the cells here
         putCellsInCache();
@@ -184,33 +184,39 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
             if (! column.isVisible()) {
                 continue;
             }
-            final TableCell<S, ?> tableCell = getCell(column);
-            if (! isFirstColumn) {
-                tableCell.pseudoClassStateChanged(LEFT_CELL, true);
-                isFirstColumn = true;
-            }
-            
-            TablePosition<S, ?> pos = new TablePosition<>(tableView, tableCell.getIndex(), column);
-        
-            width = snapSize(column.getWidth()) - snapSize(horizontalPadding);
+
+            TablePosition<S, ?> pos = new TablePosition<>(tableView, index, column);
+
+            width = snapSizeX(column.getWidth()) - snapSizeX(horizontalPadding);
             //When setting a new grid with less columns, we may have this situation.
             final int columnSpan = tableView.getColumnSpan(pos);
             boolean isVisible = !isInvisible(x, width, hbarValue, headerWidth, columnSpan);
-            while (column.getParentColumn() != null) {
+            TableColumn<?,?> rootColumn = column;
+            while (rootColumn.getParentColumn() != null) {
                 // on nested columns, we check if the root parent is the one fixed
-                column = (TableColumn<S, ?>) column.getParentColumn();
+                rootColumn = (TableColumn<?, ?>) rootColumn.getParentColumn();
             }
-            
-            if (tableView.isColumnFixingEnabled() && tableView.getFixedColumns().contains(column)) {
+
+            if (tableView.isColumnFixingEnabled() && tableView.getFixedColumns().contains(rootColumn)) {
                 isVisible = true;
             }
 
             if (!isVisible) {
+                TableCell<S, ?> cell = getCellsMap().remove(column);
+                if (cell != null) {
+                    getChildren().remove(cell);
+                }
                 if (firstVisibleCell) {
                     break;
                 }
                 x += width;
                 continue;
+            }
+
+            final TableCell<S, ?> tableCell = getCell(column);
+            if (! isFirstColumn) {
+                tableCell.pseudoClassStateChanged(LEFT_CELL, true);
+                isFirstColumn = true;
             }
             
             cells.add(0, tableCell);

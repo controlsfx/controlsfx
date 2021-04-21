@@ -5,29 +5,30 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.stage.Stage;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.rules.Timeout;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
 
 import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static junit.framework.TestCase.assertNotNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.lessThan;
 
 public class TableView2Test extends FxRobot {
 
@@ -47,29 +48,29 @@ public class TableView2Test extends FxRobot {
     private static final int NUMBER_OF_ROWS = 100;
     private static final int NUMBER_OF_COLUMNS = 500;
     private static final int NUMBER_OF_SELECTION_CHANGES = 20;
-
-    private Stage stage;
+    private static final Duration MAX_DURATION_FOR_SELECTION_CHANGES = Duration.ofSeconds(NUMBER_OF_SELECTION_CHANGES);
 
     private TableView2<Row> tableView;
     private AtomicBoolean allowedToRun;
     private ExecutorService dataManipulators;
     private CountDownLatch dataManipulationCountdown;
 
-    @Rule
-    public Timeout globalTimeout = new Timeout(NUMBER_OF_SELECTION_CHANGES, TimeUnit.SECONDS);
+    @BeforeClass
+    public static void beforeAll() throws TimeoutException {
+        FxToolkit.registerPrimaryStage();
+    }
 
     @Before
     public void beforeEach() throws TimeoutException {
-        stage = FxToolkit.registerPrimaryStage();
-        stage.setMaxHeight(600);
-        stage.setMaxWidth(800);
         tableView = new TableView2<>();
         dataManipulators = Executors.newFixedThreadPool(THREADS);
 
         populateTable();
         setupManipulators();
 
-        this.interact(() -> {
+        FxToolkit.setupStage(stage -> {
+            stage.setMaxHeight(600);
+            stage.setMaxWidth(800);
             stage.setScene(new Scene(tableView));
             stage.show();
             stage.toFront();
@@ -134,10 +135,15 @@ public class TableView2Test extends FxRobot {
     public void shouldNotFreeze_When_SelectionIsChangedUnderLoad() {
         produceUpdateLoad();
 
-        changeSelection();
+        Duration timeTaken = measure(this::changeSelection);
+        assertThat(timeTaken, is(lessThan(MAX_DURATION_FOR_SELECTION_CHANGES)));
+    }
 
-        assertNotNull(tableView.getSelectionModel()
-                .getSelectedItem());
+    private Duration measure(Runnable operation) {
+        LocalTime start = LocalTime.now();
+        operation.run();
+        LocalTime end = LocalTime.now();
+        return Duration.between(start, end);
     }
 
     private void produceUpdateLoad() {
@@ -150,7 +156,7 @@ public class TableView2Test extends FxRobot {
         // back and forth
         for (int i = 0; i < NUMBER_OF_SELECTION_CHANGES; i++) {
             final int selectedIndex = i % 2;
-            this.interact(() -> sm.clearAndSelect(selectedIndex, column));
+            interact(() -> sm.clearAndSelect(selectedIndex, column));
         }
     }
 }

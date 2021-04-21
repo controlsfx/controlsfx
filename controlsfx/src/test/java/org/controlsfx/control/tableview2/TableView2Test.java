@@ -44,6 +44,9 @@ public class TableView2Test extends FxRobot {
         }
     }
 
+    private static final int TABLE_WIDTH = 800;
+    private static final int TABLE_HEIGHT = 600;
+
     private static final int THREADS = 4;
     private static final int NUMBER_OF_ROWS = 100;
     private static final int NUMBER_OF_COLUMNS = 500;
@@ -63,14 +66,17 @@ public class TableView2Test extends FxRobot {
     @Before
     public void beforeEach() throws TimeoutException {
         tableView = new TableView2<>();
+        tableView.setMaxWidth(TABLE_WIDTH);
+        tableView.setMaxHeight(TABLE_HEIGHT);
+        tableView.setPrefSize(TABLE_WIDTH,TABLE_HEIGHT);
         dataManipulators = Executors.newFixedThreadPool(THREADS);
 
         populateTable();
         setupManipulators();
 
         FxToolkit.setupStage(stage -> {
-            stage.setMaxHeight(600);
             stage.setMaxWidth(800);
+            stage.setMaxHeight(600);
             stage.setScene(new Scene(tableView));
             stage.show();
             stage.toFront();

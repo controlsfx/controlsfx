@@ -1,10 +1,19 @@
 package org.controlsfx.control.tableview2;
 
 import impl.org.controlsfx.tableview2.TableRow2;
+import impl.org.controlsfx.tableview2.TableRow2Skin;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.scene.AccessibleAttribute;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.util.Callback;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -23,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -54,9 +64,12 @@ public class TableView2Test extends FxRobot {
     private static final Duration MAX_DURATION_FOR_SELECTION_CHANGES = Duration.ofSeconds(NUMBER_OF_SELECTION_CHANGES);
 
     private TableView2<Row> tableView;
+    private ObservableList<Row> data;
     private AtomicBoolean allowedToRun;
     private ExecutorService dataManipulators;
     private CountDownLatch dataManipulationCountdown;
+    private AtomicLong numberRowChildrenModifications;
+
 
     @BeforeClass
     public static void beforeAll() throws TimeoutException {
@@ -68,15 +81,15 @@ public class TableView2Test extends FxRobot {
         tableView = new TableView2<>();
         tableView.setMaxWidth(TABLE_WIDTH);
         tableView.setMaxHeight(TABLE_HEIGHT);
-        tableView.setPrefSize(TABLE_WIDTH,TABLE_HEIGHT);
+        tableView.setPrefSize(TABLE_WIDTH, TABLE_HEIGHT);
         dataManipulators = Executors.newFixedThreadPool(THREADS);
 
         populateTable();
         setupManipulators();
 
         FxToolkit.setupStage(stage -> {
-            stage.setMaxWidth(800);
-            stage.setMaxHeight(600);
+            stage.setMaxWidth(TABLE_WIDTH);
+            stage.setMaxHeight(TABLE_HEIGHT);
             stage.setScene(new Scene(tableView));
             stage.show();
             stage.toFront();
@@ -84,13 +97,20 @@ public class TableView2Test extends FxRobot {
     }
 
     private void populateTable() {
-        tableView.rowFactoryProperty()
-                .unbind();
-        tableView.setRowFactory(param -> new TableRow2<>(tableView));
-        tableView.getItems()
-                .setAll(IntStream.range(0, NUMBER_OF_ROWS)
-                        .mapToObj((int rowIndex) -> new Row(rowIndex, NUMBER_OF_COLUMNS))
-                        .collect(Collectors.toList()));
+        tableView.skinProperty().addListener(e -> {
+            tableView.rowFactoryProperty()
+                    .unbind();
+            tableView.setRowFactory(param -> {
+                final TableRow2<Row> rowTableRow2 = new TableRow2<>(tableView);
+                rowTableRow2.skinProperty().addListener(observable -> {
+                    final TableRow2Skin<?> skin = (TableRow2Skin<?>) rowTableRow2.getSkin();
+                    skin.getChildren().addListener((ListChangeListener<? super Node>) c -> {
+                        numberRowChildrenModifications.incrementAndGet();
+                    });
+                });
+                return rowTableRow2;
+            });
+        });
         List<TableColumn2<Row, String>> fixed = new ArrayList<>();
         tableView.getColumns()
                 .setAll(IntStream.range(0, NUMBER_OF_COLUMNS)
@@ -102,11 +122,23 @@ public class TableView2Test extends FxRobot {
                             if (index < 3) {
                                 fixed.add(column);
                             }
+                            final Callback<TableColumn<Row, String>, TableCell<Row, String>> cellFactory = column.getCellFactory();
+                            column.setCellFactory(cellFactory);
                             return column;
                         })
                         .collect(Collectors.toList()));
         tableView.getFixedColumns()
                 .setAll(fixed);
+        data = FXCollections.observableArrayList();
+        tableView.setItems(data);
+        numberRowChildrenModifications = new AtomicLong();
+    }
+
+    private void fillTableData() {
+        data
+                .setAll(IntStream.range(0, NUMBER_OF_ROWS)
+                        .mapToObj((int rowIndex) -> new Row(rowIndex, NUMBER_OF_COLUMNS))
+                        .collect(Collectors.toList()));
     }
 
     private void setupManipulators() {
@@ -139,10 +171,27 @@ public class TableView2Test extends FxRobot {
 
     @Test
     public void shouldNotFreeze_When_SelectionIsChangedUnderLoad() {
+        fillTableData();
         produceUpdateLoad();
 
         Duration timeTaken = measure(this::changeSelection);
         assertThat(timeTaken, is(lessThan(MAX_DURATION_FOR_SELECTION_CHANGES)));
+    }
+
+    @Test
+    public void shouldNotFreeze_When_ScrollingVerticallyUnderLoad() {
+        fillTableData();
+        produceUpdateLoad();
+
+        Duration timeTaken = measure(this::scrollVertical);
+        assertThat(timeTaken, is(lessThan(MAX_DURATION_FOR_SELECTION_CHANGES)));
+    }
+
+    @Test
+    public void shouldReuseItems_When_ScrollingVertically() {
+        fillTableData();
+        measure(this::scrollVertical);
+        assertThat(numberRowChildrenModifications.get(), is(0L));
     }
 
     private Duration measure(Runnable operation) {
@@ -163,6 +212,28 @@ public class TableView2Test extends FxRobot {
         for (int i = 0; i < NUMBER_OF_SELECTION_CHANGES; i++) {
             final int selectedIndex = i % 2;
             interact(() -> sm.clearAndSelect(selectedIndex, column));
+        }
+    }
+
+    private void scrollVertical() {
+        ScrollBar scrollBar = (ScrollBar) tableView.queryAccessibleAttribute(AccessibleAttribute.VERTICAL_SCROLLBAR);
+        // scroll down
+        for (int i = 0; i < NUMBER_OF_SELECTION_CHANGES; i++) {
+            final double value = i * 0.01;
+            interact(() -> {
+                scrollBar.setValue(value);
+            });
+        }
+
+        // clear creation count
+        numberRowChildrenModifications.set(0);
+
+        // scroll up
+        for (int i = NUMBER_OF_SELECTION_CHANGES; i >=0; i--) {
+            final double value = i * 0.01;
+            interact(() -> {
+                scrollBar.setValue(value);
+            });
         }
     }
 }

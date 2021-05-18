@@ -442,26 +442,6 @@ public class Notifications {
                 }
 
                 @Override
-                protected double computeMinWidth(double height) {
-                    String text = getText();
-                    Node graphic = getGraphic();
-                    if ((text == null || text.isEmpty()) && (graphic != null)) {
-                        return graphic.minWidth(height);
-                    }
-                    return 400;
-                }
-
-                @Override
-                protected double computeMinHeight(double width) {
-                    String text = getText();
-                    Node graphic = getGraphic();
-                    if ((text == null || text.isEmpty()) && (graphic != null)) {
-                        return graphic.minHeight(width);
-                    }
-                    return 100;
-                }
-
-                @Override
                 public boolean isShowFromTop() {
                     return NotificationPopupHandler.this.isShowFromTop(notificationToShow.position);
                 }

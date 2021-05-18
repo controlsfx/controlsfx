@@ -484,6 +484,7 @@ public class Notifications {
                 }
             };
 
+            notificationBar.setMinWidth(400);
             notificationBar.getStyleClass().addAll(notificationToShow.styleClass);
 
             notificationBar.setOnMouseClicked(e -> {

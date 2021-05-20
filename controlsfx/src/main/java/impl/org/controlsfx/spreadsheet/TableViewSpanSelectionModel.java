@@ -313,6 +313,11 @@ public class TableViewSpanSelectionModel extends
 
         old = posFinal;
 
+        // prevent NullPointerException in case that the selected cell is spanning multiple columns at the end of the row
+        if (posFinal.getTableColumn() == null) {
+            return;
+        }
+
         //If it's a click, we register everything.
         if (!key) {
             oldRow = old.getRow();

@@ -7,3 +7,17 @@
     -fx-font-size: 1em;
     -fx-text-fill: black;
 }
+
+.styled-toggle .thumb {
+	-fx-background-radius: 17;
+	-fx-padding: 17;
+}
+
+.styled-toggle .thumb-area{
+    -fx-background-radius: 5;
+    -fx-padding: 5 50 5 50; /* describes length: 50+50 = 100 width, 5+5=10 height */
+}
+
+.styled-toggle .label {
+    -fx-padding: 0 90 0 0; //label belonging to the toggle at the left side of the toggle with 90 between them
+}

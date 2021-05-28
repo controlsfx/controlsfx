@@ -30,7 +30,6 @@ import impl.org.controlsfx.collections.ReadOnlyUnbackedObservableList;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -102,14 +101,6 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
         // installs a custom CheckBoxListCell cell factory
         comboBox.setCellFactory(listView -> {
             CheckBoxListCell<T> checkBoxListCell = new CheckBoxListCell<>(control::getItemBooleanProperty);
-            checkBoxListCell.focusedProperty().addListener((o, ov, nv) -> {
-                if (nv) {
-                    final Parent parent = checkBoxListCell.getParent();
-                    if (parent != null) {
-                        parent.requestFocus();
-                    }
-                }
-            });
             //clicking on the label checks/unchecks the item
             checkBoxListCell.setOnMouseClicked(e -> {
                 T item = checkBoxListCell.getItem();
@@ -252,6 +243,7 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
             } else if (e.getCode() == KeyCode.TAB ||
                     new KeyCodeCombination(KeyCode.TAB, KeyCombination.SHIFT_ANY).match(e)) {
                 e.consume();
+                listView.requestFocus();
                 hide();
                 control.fireEvent(e);
             }  else if (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.RIGHT) {

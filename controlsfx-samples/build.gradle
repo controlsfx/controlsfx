@@ -3,9 +3,12 @@ ext.moduleName = 'org.controlsfx.samples'
 apply plugin: 'application'
 
 applicationName = 'FXSampler'
-mainClassName = fxsampler_mainClass
+mainClassName = 'org.controlsfx.fxsampler/fxsampler.FXSampler'
+
+version = controlsfx_version
 
 javafx {
+    version = javafx_version
     modules = [ 'javafx.controls', 'javafx.web' ]
 }
 
@@ -54,8 +57,8 @@ jar {
     manifest {
         attributes  'Implementation-Title':     'ControlsFX-Samples',
                     'Implementation-Version':   project.version,
-                    'Class-Path':               configurations.compile.collect { it.getName() }.join(' '),
-                    'Main-Class':               fxsampler_mainClass
+                    'Class-Path':               configurations.compileClasspath.collect { it.getName() }.join(' '),
+                    'Main-Class':               mainClassName
     }
 }
 

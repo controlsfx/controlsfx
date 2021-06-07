@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -100,23 +100,18 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
 
         // installs a custom CheckBoxListCell cell factory
         comboBox.setCellFactory(listView -> {
-            CheckBoxListCell<T> result = new CheckBoxListCell<>(control::getItemBooleanProperty);
-            result.focusedProperty().addListener((o, ov, nv) -> {
-                if (nv) {
-                    result.getParent().requestFocus();
-                }
-            });
+            CheckBoxListCell<T> checkBoxListCell = new CheckBoxListCell<>(control::getItemBooleanProperty);
             //clicking on the label checks/unchecks the item
-            result.setOnMouseClicked(e -> {
-                T item = result.getItem();
+            checkBoxListCell.setOnMouseClicked(e -> {
+                T item = checkBoxListCell.getItem();
                 if (control.getCheckModel().isChecked(item)) {                        
                     control.getCheckModel().clearCheck(item);
                 } else {
                     control.getCheckModel().check(item);                        
                 }
             });
-            result.converterProperty().bind(control.converterProperty());
-            return result;
+            checkBoxListCell.converterProperty().bind(control.converterProperty());
+            return checkBoxListCell;
         });
         
         // we render the selection into a custom button cell, so that it can 
@@ -248,6 +243,7 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
             } else if (e.getCode() == KeyCode.TAB ||
                     new KeyCodeCombination(KeyCode.TAB, KeyCombination.SHIFT_ANY).match(e)) {
                 e.consume();
+                listView.requestFocus();
                 hide();
                 control.fireEvent(e);
             }  else if (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.RIGHT) {

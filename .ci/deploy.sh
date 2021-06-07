@@ -19,15 +19,18 @@ fi
 
 # Update to next development version
 newVersion=${TRAVIS_TAG%.*}.$((${TRAVIS_TAG##*.} + 1))
-sed -i "0,/^controlsfx_specification_version=$TRAVIS_TAG/s//controlsfx_specification_version=$newVersion/" controlsfx-build.properties
-sed -i "0,/^artifact_suffix=/s//artifact_suffix=-SNAPSHOT/" controlsfx-build.properties
+sed -i "0,/^controlsfx_version = $TRAVIS_TAG/s//controlsfx_version = $newVersion-SNAPSHOT/" gradle.properties
 
-branch="master"
-if [[ $TRAVIS_TAG != 8* ]]; then
+branch="jfx-13"
+if [[ $TRAVIS_TAG = 8* ]]; then
+  branch="master"
+elif [[ $TRAVIS_TAG = 11.0.* ]]; then
   branch="9.0.0"
 fi
-git commit controlsfx-build.properties -m "Upgrade version to $newVersion-SNAPSHOT"
+git commit gradle.properties -m "Upgrade version to $newVersion-SNAPSHOT"
 git push https://abhinayagarwal:$GITHUB_PASSWORD@github.com/$TRAVIS_REPO_SLUG HEAD:$branch
 
 # Update Javadoc
-bash .ci/update-javadoc.sh "$TRAVIS_TAG"
+if [[ $branch = "jfx-13" ]]; then
+  bash .ci/update-javadoc.sh "$TRAVIS_TAG"
+fi

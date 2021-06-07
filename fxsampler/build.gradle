@@ -3,6 +3,7 @@ ext.moduleName = 'org.controlsfx.fxsampler'
 version = fxsampler_version
 
 javafx {
+    version = javafx_version
     modules = [ 'javafx.controls', 'javafx.web' ]
 }
 

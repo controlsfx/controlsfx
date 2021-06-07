@@ -1,0 +1,252 @@
+/* NORMAL CELL */
+.table-view2 > .virtual-flow > .clipped-container > .sheet > .table-row-cell > .tableview2-cell {
+    -fx-padding: 0 0 0 0.166667em;
+    -fx-background-color: -fx-table-cell-border-color, -fx-background;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-text-fill: -fx-text-background-color;
+}
+
+/* ROW-SELECTION */
+.table-view2:focused:row-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell:focused > .tableview2-cell {
+    -fx-background-color: -fx-background, -fx-cell-focus-inner-border, -fx-background;
+    -fx-background-insets: 0, 1 0 1 0, 2 0 2 0;
+}
+
+.table-view2:focused:row-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell:focused > .tableview2-cell:left {
+    -fx-background-insets: 0, 1 0 1 1, 2 0 2 2;
+}
+
+.table-view2:focused:row-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell:focused > .tableview2-cell:right {
+    -fx-background-insets: 0, 1 1 1 0, 2 2 2 0;
+}
+
+.table-view2:focused:row-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell:focused > .tableview2-cell:single {
+    -fx-background-insets: 0, 1, 2;
+}
+
+/* ROWHEADER AND TABLECOLUMNHEADERS */
+.table-view2 .column-header-background {
+    -fx-background-color: -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 0, 1 1 0 1;
+}
+
+.table-view2 .column-header-background.south-header.south {
+    -fx-body-color: linear-gradient(to bottom,
+            -fx-color,
+            derive(-fx-color,-8%));
+    -fx-inner-border: linear-gradient(to bottom, 
+        ladder(-fx-color,
+                derive(-fx-color,15%) 0%,
+                derive(-fx-color,10%) 40%,
+                derive(-fx-color,13%) 60%,
+                derive(-fx-color,28%) 80%,
+                derive(-fx-color,28%) 90%,
+                derive(-fx-color,38%) 100%
+            ),
+        ladder(-fx-color,
+                derive(-fx-color,20%) 0%,
+                derive(-fx-color,10%) 20%,
+                derive(-fx-color,5%) 40%,
+                derive(-fx-color,-2%) 60%,
+                derive(-fx-color,-5%) 100%
+            ));
+    -fx-background-color: -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 0, 0 1 1 1;
+}
+
+.table-view2 .column-header.leaf-header.south {
+    -fx-body-color: linear-gradient(to bottom,
+            ladder(
+                -fx-color,
+                derive(-fx-color,8%) 75%,
+                derive(-fx-color,10%) 80%
+            ),
+            -fx-color);
+    -fx-inner-border: linear-gradient(to bottom, 
+        ladder(-fx-color,
+                derive(-fx-color,30%) 0%,
+                derive(-fx-color,20%) 40%,
+                derive(-fx-color,25%) 60%,
+                derive(-fx-color,55%) 80%,
+                derive(-fx-color,55%) 90%,
+                derive(-fx-color,75%) 100%
+            ), ladder(-fx-color,
+                derive(-fx-color,15%) 0%,
+                derive(-fx-color,10%) 40%,
+                derive(-fx-color,13%) 60%,
+                derive(-fx-color,28%) 80%,
+                derive(-fx-color,28%) 90%,
+                derive(-fx-color,38%) 100%
+            ));
+    -fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 0, 0 1 0 0, 1 2 0 1;
+}
+
+.table-view2 .column-header.south-header.south {
+    -fx-body-color: linear-gradient(to bottom,
+            -fx-color,
+            derive(-fx-color,-8%));
+    -fx-inner-border: linear-gradient(to bottom, 
+        ladder(-fx-color,
+                derive(-fx-color,15%) 0%,
+                derive(-fx-color,10%) 40%,
+                derive(-fx-color,13%) 60%,
+                derive(-fx-color,28%) 80%,
+                derive(-fx-color,28%) 90%,
+                derive(-fx-color,38%) 100%
+            ),
+        ladder(-fx-color,
+                derive(-fx-color,20%) 0%,
+                derive(-fx-color,10%) 20%,
+                derive(-fx-color,5%) 40%,
+                derive(-fx-color,-2%) 60%,
+                derive(-fx-color,-5%) 100%
+            ));
+    -fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 0, 0 1 1 0, 0 2 2 1;
+}
+
+.table-view2 .column-header.south-header.selected,
+.nested-column-header > .column-header.table-column.selected,
+.nested-column-header > .column-header.table-column.selected > .label {
+    -fx-color: #8FB1E8;
+    -fx-text-fill :white;
+}  
+
+.table-view2 .column-header.south-header.fixed,
+.nested-column-header > .column-header.table-column.fixed {
+    -fx-color: lightgray;
+}
+
+.table-view2 .column-header.south-header.fixed.selected,
+.nested-column-header > .column-header.table-column.fixed.selected {
+    -fx-color: derive(#8FB1E8, -10%);
+}
+
+.row-header > .table-view2 {
+    -fx-background-color: null;
+    -fx-padding: 0;
+    -fx-insets: 0;
+}
+
+.row-header > .table-view2 > .virtual-flow > .scroll-bar:vertical,
+.row-header > .table-view2 > .virtual-flow > .scroll-bar:horizontal {
+    -fx-background-color: null;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.row-header > .table-view2 > .virtual-flow > .scroll-bar:horizontal .track,
+.row-header > .table-view2 > .virtual-flow > .scroll-bar:vertical .track,
+.row-header > .table-view2 > .virtual-flow > .scroll-bar:horizontal .increment-button,
+.row-header > .table-view2 > .virtual-flow > .scroll-bar:horizontal .decrement-button,
+.row-header > .table-view2 > .virtual-flow > .scroll-bar:vertical .increment-button,
+.row-header > .table-view2 > .virtual-flow > .scroll-bar:vertical .decrement-button,
+.row-header > .table-view2 > .virtual-flow > .scroll-bar:horizontal .thumb,
+.row-header > .table-view2 > .virtual-flow > .scroll-bar:vertical .thumb {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0em;
+    -fx-border-radius: 0em;
+    -fx-padding: 0;
+}
+
+.row-header > .table-view2 > .virtual-flow > .scroll-bar .increment-arrow,
+.row-header > .table-view2 > .virtual-flow > .scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
+}
+
+.row-header > .table-view2 > .virtual-flow > .clipped-container > .sheet > .table-row-cell > .tableview2-cell {
+    -fx-background-color: -fx-box-border, -fx-inner-border-horizontal, -fx-body-color-to-right;
+    -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
+    -fx-font-weight: bold;
+    -fx-size: 2em;
+    -fx-text-fill: -fx-selection-bar-text;
+    -fx-alignment: center;
+    -fx-font-style : normal;
+} 
+
+.row-header > .table-view2 > .virtual-flow > .clipped-container > .sheet > .table-row-cell:selected > .tableview2-cell {
+    -fx-background-color: #8FB1E8;
+    -fx-text-fill: white;
+}
+
+.row-header > .table-view2 > .virtual-flow > .clipped-container > .sheet > .table-row-cell > .tableview2-cell:fixed {
+    -fx-background-color: -fx-box-border, lightgray;
+}
+
+.row-header > .table-view2 > .virtual-flow > .clipped-container > .sheet > .table-row-cell:selected > .tableview2-cell:fixed {
+    -fx-background-color: derive(#8FB1E8, -10%);
+    -fx-text-fill: white;
+}
+
+.row-header > .hbar  {
+    -fx-background-color: -fx-box-border, -fx-inner-border-horizontal, -fx-body-color-to-right;
+    -fx-background-insets: 0, 1 1 0 0, 2 2 1 1;
+}
+
+/* FILTER */
+.table-view2 .column-header > .label > .button.filter {
+    -fx-background-color: transparent;
+    -fx-background-image: url("filter-off.png");
+    -fx-background-size: 16 16;
+    -fx-background-position: center center;
+    -fx-background-repeat: stretch;
+    -fx-padding: 0 8 0 8;
+}
+
+.table-view2 .column-header > .label > .button.filter:filtered {
+    -fx-background-image: url("filter.png");
+}
+
+.south-filter {
+    -fx-alignment: center;
+    -fx-spacing: 0;
+    -fx-padding: 0 3 0 1;
+}
+
+.south-filter > .filter-editor.combo-box-base > .arrow-button {
+    -fx-background-radius: 0 2 2 0, 0 1 1 0, 0;
+    -fx-padding: 2 4 2 4;
+    -fx-background-color: transparent;
+}
+
+.south-filter > .filter-editor.combo-box-base > .text-field:error {
+    -fx-text-fill: red;
+}
+
+.south-filter > .filter-menu-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.south-filter .filter-menu-button:hover{
+    -fx-cursor:hand;
+}
+
+.south-filter .filter-menu-button > .label {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.south-filter .filter-menu-button > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 1 0 1;
+}
+
+.south-filter .filter-menu-button.menu-button > .arrow-button > .operator {
+    -fx-background-radius: 1;
+    -fx-border-radius: 1;
+    -fx-padding: 2 1 2 1;  
+    -fx-border-color: transparent;
+}
+
+.south-filter .filter-menu-button.menu-button > .arrow-button > .operator:hover {
+    -fx-border-color: -fx-box-border;
+}
+
+.south-filter .filter-menu-button.menu-button > .arrow-button > .operator > .symbol {
+    -fx-font-size: 1.1em;
+    -fx-text-fill: -fx-mark-color;
+}

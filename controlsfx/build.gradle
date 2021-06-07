@@ -7,16 +7,18 @@ ext {
     transifex_api = ""
 }
 
+version = controlsfx_version
+
 dependencies {
     testCompile 'junit:junit:[4,)'
     testCompile 'org.testfx:testfx-core:4.0.16-alpha'
-    testRuntime ('org.testfx:openjfx-monocle:jdk-11+26') {
+    testRuntime ('org.testfx:openjfx-monocle:jdk-12.0.1+2') {
         exclude group: 'org.openjfx'
     }
 }
 
 javafx {
-    version = "11.0.2"
+    version = javafx_version
     modules = [ 'javafx.controls', 'javafx.media' ]
 }
 
@@ -137,26 +139,14 @@ jar {
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
     exclude '**/impl/build/**'
-    if(JavaVersion.current() != JavaVersion.VERSION_1_8){
-        bnd(
-                'Bundle-Name': 'ControlsFX',
-                'Bundle-Description': 'High quality UI controls and other tools to complement the core JavaFX distribution',
-                'Specification-Title': specification_title,
-                'Specification-Version': specification_version,
-                'Implementation-Title': 'ControlsFX',
-                'Import-Package': '', // Javafx is part of the JDK
-                'Export-Package': '!impl.org.controlsfx.*, org.controlsfx.*'
-        )
-    } else {
-        bnd(
-                'Bundle-Name': 'ControlsFX',
-                'Bundle-Description': 'High quality UI controls and other tools to complement the core JavaFX distribution',
-                'Specification-Title': specification_title,
-                'Specification-Version': specification_version,
-                'Implementation-Title': 'ControlsFX',
-                'Export-Package': '!impl.org.controlsfx.*, org.controlsfx.*'
-        )
-    }
+    bnd(
+            'Bundle-Name': 'ControlsFX',
+            'Bundle-Description': 'High quality UI controls and other tools to complement the core JavaFX distribution',
+            'Specification-Title': 'ControlsFX',
+            'Specification-Version': controlsfx_version,
+            'Implementation-Title': 'ControlsFX',
+            'Export-Package': '!impl.org.controlsfx.*, org.controlsfx.*'
+    )
 
 }
 

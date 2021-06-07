@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,6 @@
  */
 package impl.org.controlsfx.skin;
 
-import impl.org.controlsfx.ReflectionUtils;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
@@ -48,8 +47,8 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
     @SuppressWarnings("rawtypes")
     public GridViewSkin(GridView<T> control) {
         super(control);
-        
-        flow = ReflectionUtils.getVirtualFlow(this);
+
+        flow = getVirtualFlow();
         updateGridViewItems();
 
         flow.setId("virtual-flow"); //$NON-NLS-1$
@@ -63,24 +62,29 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
 
         // Register listeners
         registerChangeListener(control.itemsProperty(), e -> updateGridViewItems());
-        registerChangeListener(control.cellFactoryProperty(), e ->  ReflectionUtils.recreateCells(flow));
+        registerChangeListener(control.cellFactoryProperty(), e ->  getFlow().recreateCells());
         registerChangeListener(control.parentProperty(), e -> {
             if (getSkinnable().getParent() != null && getSkinnable().isVisible()) {
                 getSkinnable().requestLayout();
             }
         });
-        registerChangeListener(control.cellHeightProperty(), e -> ReflectionUtils.recreateCells(flow));
+        registerChangeListener(control.cellHeightProperty(), e -> getFlow().recreateCells());
         registerChangeListener(control.cellWidthProperty(), e -> {
             updateItemCount();
-            ReflectionUtils.recreateCells(flow);
+            getFlow().recreateCells();
         });
         registerChangeListener(control.horizontalCellSpacingProperty(), e -> {
             updateItemCount();
-            ReflectionUtils.recreateCells(flow);
+            getFlow().recreateCells();
         });
-        registerChangeListener(control.verticalCellSpacingProperty(), e -> ReflectionUtils.recreateCells(flow));
+        registerChangeListener(control.verticalCellSpacingProperty(), e -> getFlow().recreateCells());
         registerChangeListener(control.widthProperty(), e ->  updateItemCount());
         registerChangeListener(control.heightProperty(), e ->  updateItemCount());
+    }
+
+    @Override
+    protected VirtualFlow<GridRow<T>> createVirtualFlow() {
+        return new GridVirtualFlow();
     }
 
     public void updateGridViewItems() {
@@ -93,7 +97,7 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
         }
 
         updateItemCount();
-        ReflectionUtils.recreateCells(flow);
+        getFlow().recreateCells();
         getSkinnable().requestLayout();
     }
 
@@ -128,9 +132,9 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
 
         if (newCount != oldCount) {
             flow.setCellCount(newCount);
-            ReflectionUtils.rebuildCells(flow);
+            getFlow().rebuildCells();
         } else {
-            ReflectionUtils.reconfigureCells(flow);
+            getFlow().reconfigureCells();
         }
         updateRows(newCount);
         getSkinnable().requestLayout();
@@ -187,5 +191,27 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
         GridRow<T> row = new GridRow<>();
         row.updateGridView(getSkinnable());
         return row;
+    }
+
+    private GridVirtualFlow getFlow() {
+        return (GridVirtualFlow) getVirtualFlow();
+    }
+
+    /**
+     * Custom VirtualFlow to grant access to protected methods.
+     */
+    private class GridVirtualFlow extends VirtualFlow<GridRow<T>> {
+
+        public void recreateCells(){
+            super.recreateCells();
+        }
+
+        public void rebuildCells(){
+            super.rebuildCells();
+        }
+
+        public void reconfigureCells(){
+            super.reconfigureCells();
+        }
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015, ControlsFX
+ * Copyright (c) 2013, 2021 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -189,11 +189,15 @@ public class Action implements EventHandler<ActionEvent> {
      * Sets selected state of the Action
      * @param selected
      */
-    public final void setSelected( boolean selected ) {
-    	selectedProperty.set(selected);
+    public final void setSelected(boolean selected) {
+        if (isSelected() != selected) {
+            selectedProperty.set(selected);
+            if (getClass().isAnnotationPresent(ActionCheck.class)) {
+                eventHandler.accept(null);
+            }
+        }
     }
-    
-    
+
     // --- text
     private final StringProperty textProperty = new SimpleLocalizedStringProperty(this, "text"){ //$NON-NLS-1$
     	@Override public void set(String value) {

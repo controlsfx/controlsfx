@@ -1,0 +1,31 @@
+.pop-up-filter {
+    -fx-background-color: lightgray;
+    -fx-border-width: 1;
+    -fx-border-color: black;
+    -fx-pref-width: 300px;
+    -fx-spacing: 2;
+    -fx-padding: 2;
+}
+
+.pop-up-filter > VBox > FlowPane > .label.operation {
+    -fx-background-color: lightsteelblue;
+    -fx-background-radius: 8;
+    -fx-padding: 1 2 1 2;
+}
+
+.pop-up-filter > VBox > HBox > .text-field:error {
+    -fx-background-color:
+        red,
+        -fx-control-inner-background,
+        #FF450022,
+        linear-gradient(from 0px 0px to 0px 5px, derive(-fx-control-inner-background, -9%), -fx-control-inner-background);
+}
+
+.pop-up-filter > VBox > HBox {
+    -fx-spacing: 2;
+    -fx-alignment: center-left;
+}
+
+.pop-up-filter > VBox > HBox > .toggle-button {
+    -fx-padding: 0.16666em 0.33333em 0.16666em 0.33333em; /* 2 4 2 4 */
+}

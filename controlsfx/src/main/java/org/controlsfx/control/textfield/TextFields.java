@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2020, ControlsFX
+ * Copyright (c) 2014, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -106,19 +106,21 @@ public class TextFields {
         fader.setCycleCount(1);
 
         inputField.textProperty().addListener(new InvalidationListener() {
+
+            private boolean isButtonVisible = false;
+
             @Override public void invalidated(Observable arg0) {
                 String text = inputField.getText();
                 boolean isTextEmpty = text == null || text.isEmpty();
-                boolean isButtonVisible = fader.getNode().getOpacity() > 0;
 
-                if (isTextEmpty && isButtonVisible) {
-                    setButtonVisible(false);
-                } else if (!isTextEmpty && !isButtonVisible) {
-                    setButtonVisible(true);
+                if (isTextEmpty == isButtonVisible) {
+                    isButtonVisible = !isTextEmpty;
+                    fadeTo(isButtonVisible);
                 }
             }
 
-            private void setButtonVisible( boolean visible ) {
+            private void fadeTo(boolean visible) {
+                fader.stop();
                 fader.setFromValue(visible? 0.0: 1.0);
                 fader.setToValue(visible? 1.0: 0.0);
                 fader.play();

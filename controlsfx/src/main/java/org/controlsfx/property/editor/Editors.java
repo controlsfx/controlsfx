@@ -98,6 +98,7 @@ public class Editors {
 
             @Override public void setValue(Number value) {
                 sourceClass = (Class<? extends Number>) value.getClass();
+                ((NumericField)getEditor()).setValue(value);
                 getEditor().setText(value.toString());
             }
             

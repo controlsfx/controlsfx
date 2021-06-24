@@ -77,6 +77,10 @@ class NumericField extends TextField {
         }
     }
 
+    protected void setValue(Number v) {
+        value.setValue(v);
+    }
+    
     private Boolean replaceValid(int start, int end, String fragment) {
         try {
         	String newText = getText().substring(0, start) + fragment + getText().substring(end);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2019, ControlsFX
+ * Copyright (c) 2014, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -442,26 +442,6 @@ public class Notifications {
                 }
 
                 @Override
-                protected double computeMinWidth(double height) {
-                    String text = getText();
-                    Node graphic = getGraphic();
-                    if ((text == null || text.isEmpty()) && (graphic != null)) {
-                        return graphic.minWidth(height);
-                    }
-                    return 400;
-                }
-
-                @Override
-                protected double computeMinHeight(double width) {
-                    String text = getText();
-                    Node graphic = getGraphic();
-                    if ((text == null || text.isEmpty()) && (graphic != null)) {
-                        return graphic.minHeight(width);
-                    }
-                    return 100;
-                }
-
-                @Override
                 public boolean isShowFromTop() {
                     return NotificationPopupHandler.this.isShowFromTop(notificationToShow.position);
                 }
@@ -504,6 +484,7 @@ public class Notifications {
                 }
             };
 
+            notificationBar.setMinWidth(400);
             notificationBar.getStyleClass().addAll(notificationToShow.styleClass);
 
             notificationBar.setOnMouseClicked(e -> {

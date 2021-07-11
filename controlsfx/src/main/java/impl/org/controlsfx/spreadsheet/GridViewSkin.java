@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2021 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -495,7 +495,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             if (spc != null && spc.getColumn() == viewColumn && 
                     ((cell.getText() != null && !cell.getText().isEmpty()) || cell.getGraphic() != null)) {
                 cell.setWrapText(true);
-
+                cell.applyCss();
                 maxHeight = Math.max(maxHeight, cell.prefHeight(width));
             }
         }

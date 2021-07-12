@@ -77,8 +77,12 @@ class NumericField extends TextField {
         }
     }
 
-    protected void setValue(Number v) {
-        value.setValue(v);
+    /**
+     * Sets the value of the numeric value property.
+     * @param value The new value to assign.
+     */
+    protected void setValue(Number value) {
+        this.value.setValue(value);
     }
     
     private Boolean replaceValid(int start, int end, String fragment) {

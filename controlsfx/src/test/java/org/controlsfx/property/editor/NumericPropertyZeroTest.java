@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 20121, ControlsFX
+ * Copyright (c) 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

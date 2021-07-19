@@ -15,6 +15,8 @@ dependencies {
     testRuntime ('org.testfx:openjfx-monocle:jdk-12.0.1+2') {
         exclude group: 'org.openjfx'
     }
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'org.hamcrest:hamcrest-library:2.2'
 }
 
 javafx {
@@ -109,7 +111,8 @@ ext.java9TestArgs = [
         "--add-exports=javafx.graphics/com.sun.javafx.application=org.testfx",
         // For Monocle
         "--add-exports=javafx.graphics/com.sun.glass.ui=org.testfx.monocle",
-        "--add-opens=javafx.graphics/com.sun.glass.ui=org.testfx"
+        "--add-opens=javafx.graphics/com.sun.glass.ui=org.testfx",
+        "--add-reads=$moduleName=org.hamcrest",
 ]
 
 test {

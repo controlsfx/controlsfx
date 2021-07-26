@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2021 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@
 package impl.org.controlsfx.spreadsheet;
 
 import impl.org.controlsfx.collections.MappingChange;
-import impl.org.controlsfx.collections.MappingChange.Map;
 import impl.org.controlsfx.collections.NonIterableChange;
 import impl.org.controlsfx.collections.ReadOnlyUnbackedObservableList;
 import java.util.ArrayList;
@@ -41,7 +40,6 @@ import javafx.beans.NamedArg;
 import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.WeakListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
@@ -56,6 +54,8 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
+import com.sun.javafx.scene.control.SelectedCellsMap;
+import java.util.Collection;
 
 /**
  *
@@ -70,14 +70,14 @@ public class TableViewSpanSelectionModel extends
     private boolean drag = false; // register if we are dragging (no
     // edition)
     private MouseEvent mouseEvent;
-    private boolean makeAtomic;
+    private int atomicityCount = 0;
     private SpreadsheetGridView cellsView;
 
     private SpreadsheetView spreadsheetView;
     // the only 'proper' internal data structure, selectedItems and
     // selectedIndices
     // are both 'read-only and unbacked'.
-    private final SelectedCellsMapTemp<TablePosition<ObservableList<SpreadsheetCell>, ?>> selectedCellsMap;
+    private final SelectedCellsMap<TablePosition<ObservableList<SpreadsheetCell>, ?>> selectedCellsMap;
 
     // we create a ReadOnlyUnbackedObservableList of selectedCells here so
     // that we can fire custom list change events.
@@ -166,8 +166,6 @@ public class TableViewSpanSelectionModel extends
         mouseEvent = e;
     };
 
-    private final ListChangeListener<TablePosition<ObservableList<SpreadsheetCell>, ?>> listChangeListener = this::handleSelectedCellsListChangeEvent;
-
     /**
      * *********************************************************************
      *
@@ -194,7 +192,12 @@ public class TableViewSpanSelectionModel extends
 
         cellsView.setOnMouseDragged(new WeakEventHandler<>(onMouseDragEventHandler));
 
-        selectedCellsMap = new SelectedCellsMapTemp<>(new WeakListChangeListener<>(listChangeListener));
+        selectedCellsMap = new SelectedCellsMap<TablePosition<ObservableList<SpreadsheetCell>, ?>>(this::fireCustomSelectedCellsListChangeEvent) {
+            @Override
+            public boolean isCellSelectionEnabled() {
+                return TableViewSpanSelectionModel.this.isCellSelectionEnabled();
+            }
+        };
 
         selectedCellsSeq = new ReadOnlyUnbackedObservableList<TablePosition<ObservableList<SpreadsheetCell>, ?>>() {
             @Override
@@ -209,9 +212,9 @@ public class TableViewSpanSelectionModel extends
         };
     }
 
-    private void handleSelectedCellsListChangeEvent(
-            ListChangeListener.Change<? extends TablePosition<ObservableList<SpreadsheetCell>, ?>> c) {
-        if (makeAtomic) {
+    private void fireCustomSelectedCellsListChangeEvent(ListChangeListener.Change<? extends TablePosition<ObservableList<SpreadsheetCell>, ?>> c) {
+
+        if (isAtomic()) {
             return;
         }
 
@@ -219,6 +222,16 @@ public class TableViewSpanSelectionModel extends
         c.reset();
     }
 
+    boolean isAtomic() {
+            return atomicityCount > 0;
+        }
+        void startAtomic() {
+            atomicityCount++;
+        }
+        void stopAtomic() {
+            atomicityCount = Math.max(0, atomicityCount - 1);
+        }
+    
     /**
      * *********************************************************************
      * * Public selection API * *
@@ -502,7 +515,7 @@ public class TableViewSpanSelectionModel extends
 
                 @Override
                 public void invalidated(Observable observable) {
-                    handleSelectedCellsListChangeEvent(new NonIterableChange.SimpleAddChange<>(0,
+                    fireCustomSelectedCellsListChangeEvent(new NonIterableChange.SimpleAddChange<>(0,
                             selectedCellsMap.size(), selectedCellsSeq));
                     getCellsViewSkin().lastRowLayout.removeListener(this);
                 }
@@ -521,7 +534,7 @@ public class TableViewSpanSelectionModel extends
         }
         SpreadsheetCell cell;
 
-        makeAtomic = true;
+        startAtomic();
 
         final int itemCount = getItemCount();
 
@@ -576,7 +589,7 @@ public class TableViewSpanSelectionModel extends
                 // end copy/paste
             }
         }
-        makeAtomic = false;
+        stopAtomic();
 
         // Then we update visuals just once
         getSpreadsheetViewSkin().getSelectedRows().addAll(selectedRows);
@@ -606,7 +619,7 @@ public class TableViewSpanSelectionModel extends
         if (startChangeIndex > -1 && endChangeIndex > -1) {
             final int startIndex = Math.min(startChangeIndex, endChangeIndex);
             final int endIndex = Math.max(startChangeIndex, endChangeIndex);
-            handleSelectedCellsListChangeEvent(new NonIterableChange.SimpleAddChange<>(startIndex,
+            fireCustomSelectedCellsListChangeEvent(new NonIterableChange.SimpleAddChange<>(startIndex,
                     endIndex + 1, selectedCellsSeq));
         }
     }
@@ -750,7 +763,7 @@ public class TableViewSpanSelectionModel extends
          * if (getSelectedCells().size() == 1 && isSelected(row, column)) {
          * return; }
          */
-        makeAtomic = true;
+       startAtomic();
         // firstly we make a copy of the selection, so that we can send out
         // the correct details in the selection change event
         List<TablePosition<ObservableList<SpreadsheetCell>, ?>> previousSelection = new ArrayList<>(
@@ -762,7 +775,7 @@ public class TableViewSpanSelectionModel extends
         // and select the new row
         select(row, column);
 
-        makeAtomic = false;
+        stopAtomic();
 
         // fire off a single add/remove/replace notification (rather than
         // individual remove and add notifications) - see RT-33324
@@ -773,7 +786,7 @@ public class TableViewSpanSelectionModel extends
                     columnFinal));
             NonIterableChange.GenericAddRemoveChange<TablePosition<ObservableList<SpreadsheetCell>, ?>> change = new NonIterableChange.GenericAddRemoveChange<>(
                     changeIndex, changeIndex + 1, previousSelection, selectedCellsSeq);
-            handleSelectedCellsListChangeEvent(change);
+            fireCustomSelectedCellsListChangeEvent(change);
         }
     }
 
@@ -837,23 +850,42 @@ public class TableViewSpanSelectionModel extends
 
     }
 
+    private void updateSelectedIndex(int row) {
+        setSelectedIndex(row);
+        setSelectedItem(getModelItem(row));
+    }
+
     @Override
     public void clearSelection() {
-        if (!makeAtomic) {
-            setSelectedIndex(-1);
-            setSelectedItem(getModelItem(-1));
-            focus(-1);
-        }
+        final List<TablePosition<ObservableList<SpreadsheetCell>, ?>> removed = new ArrayList<>((Collection) getSelectedCells());
+
         quietClearSelection();
+
+        if (!isAtomic()) {
+            updateSelectedIndex(-1);
+            focus(-1);
+
+            if (!removed.isEmpty()) {
+                ListChangeListener.Change<TablePosition<ObservableList<SpreadsheetCell>, ?>> c = new NonIterableChange<TablePosition<ObservableList<SpreadsheetCell>, ?>>(0, 0, selectedCellsSeq) {
+                    @Override
+                    public List<TablePosition<ObservableList<SpreadsheetCell>, ?>> getRemoved() {
+                        return removed;
+                    }
+                };
+                fireCustomSelectedCellsListChangeEvent(c);
+            }
+        }
     }
 
     private void quietClearSelection() {
+        startAtomic();
         selectedCellsMap.clear();
         GridViewSkin skin = getSpreadsheetViewSkin();
         if (skin != null) {
             skin.getSelectedRows().clear();
             skin.getSelectedColumns().clear();
         }
+        stopAtomic();
     }
 
     @SuppressWarnings("unchecked")

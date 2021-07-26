@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2019 ControlsFX
+ * Copyright (c) 2013, 2021 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -2337,7 +2337,7 @@ public class SpreadsheetView extends Control{
         for (int row = 0; row < gridBase.getRowCount(); ++row) {
             ObservableList<SpreadsheetCell> currentRow = FXCollections.observableArrayList();
             for (int column = 0; column < gridBase.getColumnCount(); ++column) {
-                currentRow.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, "toto"));
+                currentRow.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, ""));
             }
             rows.add(currentRow);
         }

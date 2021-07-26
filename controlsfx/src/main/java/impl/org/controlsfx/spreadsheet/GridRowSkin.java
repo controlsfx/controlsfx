@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2021 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -74,26 +74,6 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         });
 
     }
-
-//    @Override
-//    protected void handleControlPropertyChanged(String p) {
-//        super.handleControlPropertyChanged(p);
-//
-//        if ("INDEX".equals(p)) {
-//            // Fix for RT-36661, where empty table cells were showing content, as they
-//            // had incorrect table cell indices (but the table row index was correct).
-//            // Note that we only do the update on empty cells to avoid the issue
-//            // noted below in requestCellUpdate().
-//            if (getSkinnable().isEmpty()) {
-//                requestCellUpdate();
-//            }
-//        } else if ("ITEM".equals(p)) {
-//            requestCellUpdate();
-//        } else if ("FIXED_CELL_SIZE".equals(p)) {
-////            fixedCellSize = fixedCellSizeProperty().get();
-////            fixedCellSizeEnabled = fixedCellSize > 0;
-//        }
-//    }
 
     private void requestCellUpdate() {
         getSkinnable().requestLayout();
@@ -192,11 +172,11 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         boolean rowHeightChange = false;
         boolean isFixed;
         for (int indexColumn = 0; indexColumn < columns.size(); indexColumn++) {
-            //FIXME Problem qwith column span
+            //FIXME Problem with column span
             if(!skin.getSkinnable().getColumns().get(indexColumn).isVisible()){
                 continue;
             }
-            width = snapSize(columns.get(indexColumn).getWidth()) - snapSize(horizontalPadding);
+            width = snapSizeX(columns.get(indexColumn).getWidth()) - snapSizeX(horizontalPadding);
             //When setting a new grid with less columns, we may have this situation.
             if (row.size() <= indexColumn) {
                 break;
@@ -258,156 +238,154 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                 }
             }
 
-            if (isVisible) {
-                spanType = spanType == null ? spreadsheetView.getSpanType(index, indexColumn) : spanType;
-                switch (spanType) {
-                    case ROW_SPAN_INVISIBLE:
-                    case BOTH_INVISIBLE:
-                        fixedCells.remove(tableCell);
-                        getChildren().remove(tableCell);
-                        x += width;
-                        continue; // we don't want to fall through
-                    case COLUMN_SPAN_INVISIBLE:
-                        fixedCells.remove(tableCell);
-                        getChildren().remove(tableCell);
-                        continue; // we don't want to fall through
-                    case ROW_VISIBLE:
-                    case NORMAL_CELL: // fall through and carry on
-                        if (tableCell.getIndex() != index) {
-                            tableCell.updateIndex(index);
-                        } else {
-                            tableCell.updateItem(spreadsheetCell, false);
-                        }
+            spanType = spanType == null ? spreadsheetView.getSpanType(index, indexColumn) : spanType;
+            switch (spanType) {
+                case ROW_SPAN_INVISIBLE:
+                case BOTH_INVISIBLE:
+                    fixedCells.remove(tableCell);
+                    getChildren().remove(tableCell);
+                    x += width;
+                    continue; // we don't want to fall through
+                case COLUMN_SPAN_INVISIBLE:
+                    fixedCells.remove(tableCell);
+                    getChildren().remove(tableCell);
+                    continue; // we don't want to fall through
+                case ROW_VISIBLE:
+                case NORMAL_CELL:
+                default: // fall through and carry on
+                    if (tableCell.getIndex() != index) {
+                        tableCell.updateIndex(index);
+                    } else {
+                        tableCell.updateItem(spreadsheetCell, false);
+                    }
+                    /**
+                     * Here we need to add the cells on the first position
+                     * because this row may contain some deported cells from
+                     * other rows in order to be on top in term of z-order.
+                     * So the cell we're currently adding must not recover
+                     * them. We must check that the parent is indeed the
+                     * getSkinnable because of the deportedCells.
+                     */
+                    if (!tableCell.isEditing() && tableCell.getParent() != getSkinnable()) {
                         /**
-                         * Here we need to add the cells on the first position
-                         * because this row may contain some deported cells from
-                         * other rows in order to be on top in term of z-order.
-                         * So the cell we're currently adding must not recover
-                         * them. We must check that the parent is indeed the
-                         * getSkinnable because of the deportedCells.
+                         * If this cell is eligible to be put into the
+                         * deportedCell, no need to add it in this row.
+                         * Prevent constant layout when WebView are
+                         * contained in frozen row and columns, and
+                         * horizontal scollbar is scrolled.
                          */
-                        if (!tableCell.isEditing() && tableCell.getParent() != getSkinnable()) {
-                            /**
-                             * If this cell is eligible to be put into the
-                             * deportedCell, no need to add it in this row.
-                             * Prevent constant layout when WebView are
-                             * contained in frozen row and columns, and
-                             * horizontal scollbar is scrolled.
-                             */
-                            if (!spreadsheetCell.isCellGraphic() || !skin.rowToLayout.get(index) || !fixedCells.contains(tableCell)) {
-                                getChildren().add(0, tableCell);
-                            }
-                        }
-                }
-
-                if (columnSpan > 1) {
-                    /**
-                     * we need to span multiple columns, so we sum up the width
-                     * of the additional columns, adding it to the width
-                     * variable
-                     */
-                    final int max = skin.getSkinnable().getVisibleLeafColumns().size() - viewColumn;
-                    for (int i = 1; i < columnSpan && i < max; i++) {
-                        double tempWidth = snapSize(skin.getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
-                        width += tempWidth;
-                        if (increaseFixedWidth) {
-                            fixedColumnWidth += tempWidth;
+                        if (!spreadsheetCell.isCellGraphic() || !skin.rowToLayout.get(index) || !fixedCells.contains(tableCell)) {
+                            getChildren().add(0, tableCell);
                         }
                     }
-                }
-                 
-                /**
-                 * If we are in autofit and the prefHeight of this cell is
-                 * superior to the default cell height. Then we will use this
-                 * new height for row's height.
-                 *
-                 * We then need to apply the value to previous cell, and also
-                 * layout the children because since we are layouting upward,
-                 * next rows needs to know that this row is bigger than usual.
-                 */
-                if (controlHeight == Grid.AUTOFIT && !tableCell.isEditing()) {
-                    //We have the problem when we are just one pixel short in height..
-                    double tempHeight = tableCell.prefHeight(width) + tableCell.snappedTopInset() + tableCell.snappedBottomInset();
-                    if (tempHeight > customHeight) {
-                        rowHeightChange = true;
-                        skin.rowHeightMap.put(spreadsheetCell.getRow(), tempHeight);
-                        for (CellView cell : cells) {
-                            /**
-                             * We need to add the difference between the
-                             * previous height and the new height. If we were
-                             * just setting the new height, the row spanning
-                             * cell would be shorter. That's why we need to use
-                             * the cell height.
-                             */
-                            cell.resize(cell.getWidth(), cell.getHeight() + (tempHeight - customHeight));
-                        }
-                        customHeight = tempHeight;
-                        skin.getFlow().layoutChildren();
-                    }
-                }
-
-                height = customHeight;
-                height = snapSize(height) - snapSize(verticalPadding);
-                /**
-                 * We need to span multiple rows, so we sum up the height of all
-                 * the rows. The height of the current row is ignored and the
-                 * whole value is computed.
-                 */
-                if (spreadsheetCell.getRowSpan() > 1) {
-                    int rowSpan = spreadsheetView.getRowSpan(spreadsheetCell, index);
-                    height = 0;
-                    /**
-                     * If the cell is displaying an Image with Span, we must
-                     * compute the total height possible otherwise the image
-                     * will be shrinking when scrolling down.
-                     */
-                    int reverseRowSpan = spreadsheetView.getReverseRowSpan(spreadsheetCell, index);
-                    int newIndex = index - reverseRowSpan;
-                    final int maxRow = newIndex + reverseRowSpan + rowSpan;
-                    for (int i = newIndex + 1; i < maxRow; ++i) {
-                        height += snapSize(skin.getRowHeight(i));
-                    }
-                }
-
-                //Fix for JDK-8146406
-                needToBeShifted = false;
-                /**
-                 * If the current cell has no left border, and the previous cell
-                 * had no right border. We may have the problem where there is a
-                 * tiny gap between the cells when scrolling horizontally. Thus
-                 * we must enlarge this cell a bit, and shift it a bit in order
-                 * to mask that gap. If the cell has a border defined, the
-                 * problem seems not to happen. If the cell is not added to its
-                 * parent, it has no border by default so we must not check it.
-                 */
-                if (lastCell != null
-                        && !hasRightBorder(lastCell)
-                        && !hasLeftBorder(tableCell)) {
-                    tableCell.resize(width + 1, height);
-                    needToBeShifted = true;
-                } else {
-                    tableCell.resize(width, height);
-                }
-                lastCell = tableCell;
-                // We want to place the layout always at the starting cell.
-                double spaceBetweenTopAndMe = 0;
-                /**
-                 * In case we have a rowSpan and an image, we will shift the
-                 * cell up so that it will always be displayed in full height.
-                 */
-                if (spreadsheetCell.getRowSpan() > 1) {
-                    int reverseRowSpan = spreadsheetView.getReverseRowSpan(spreadsheetCell, index);
-                    int newIndex = index - reverseRowSpan;
-                    for (int p = newIndex + 1; p < index; ++p) {
-                        spaceBetweenTopAndMe += skin.getRowHeight(p);
-                    }
-                }
-
-                tableCell.relocate(x + tableCellX + (needToBeShifted ? -1 : 0), snappedTopInset()
-                        - spaceBetweenTopAndMe + ((GridRow) getSkinnable()).verticalShift.get());
-            } else {
-                getChildren().remove(tableCell);
             }
+
+            if (columnSpan > 1) {
+                /**
+                 * we need to span multiple columns, so we sum up the width
+                 * of the additional columns, adding it to the width
+                 * variable
+                 */
+                final int max = skin.getSkinnable().getVisibleLeafColumns().size() - viewColumn;
+                for (int i = 1; i < columnSpan && i < max; i++) {
+                    double tempWidth = snapSizeX(skin.getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
+                    width += tempWidth;
+                    if (increaseFixedWidth) {
+                        fixedColumnWidth += tempWidth;
+                    }
+                }
+            }
+
+            /**
+             * If we are in autofit and the prefHeight of this cell is
+             * superior to the default cell height. Then we will use this
+             * new height for row's height.
+             *
+             * We then need to apply the value to previous cell, and also
+             * layout the children because since we are layouting upward,
+             * next rows needs to know that this row is bigger than usual.
+             */
+            if (controlHeight == Grid.AUTOFIT && !tableCell.isEditing()) {
+                //We have the problem when we are just one pixel short in height..
+                double tempHeight = tableCell.prefHeight(width) + tableCell.snappedTopInset() + tableCell.snappedBottomInset();
+                if (tempHeight > customHeight) {
+                    rowHeightChange = true;
+                    skin.rowHeightMap.put(spreadsheetCell.getRow(), tempHeight);
+                    for (CellView cell : cells) {
+                        /**
+                         * We need to add the difference between the
+                         * previous height and the new height. If we were
+                         * just setting the new height, the row spanning
+                         * cell would be shorter. That's why we need to use
+                         * the cell height.
+                         */
+                        cell.resize(cell.getWidth(), cell.getHeight() + (tempHeight - customHeight));
+                    }
+                    customHeight = tempHeight;
+                    skin.getFlow().layoutChildren();
+                }
+            }
+
+            height = customHeight;
+            height = snapSizeY(height) - snapSizeY(verticalPadding);
+            /**
+             * We need to span multiple rows, so we sum up the height of all
+             * the rows. The height of the current row is ignored and the
+             * whole value is computed.
+             */
+            if (spreadsheetCell.getRowSpan() > 1) {
+                int rowSpan = spreadsheetView.getRowSpan(spreadsheetCell, index);
+                height = 0;
+                /**
+                 * If the cell is displaying an Image with Span, we must
+                 * compute the total height possible otherwise the image
+                 * will be shrinking when scrolling down.
+                 */
+                int reverseRowSpan = spreadsheetView.getReverseRowSpan(spreadsheetCell, index);
+                int newIndex = index - reverseRowSpan;
+                final int maxRow = newIndex + reverseRowSpan + rowSpan;
+                for (int i = newIndex + 1; i < maxRow; ++i) {
+                    height += snapSizeY(skin.getRowHeight(i));
+                }
+            }
+
+            //Fix for JDK-8146406
+            needToBeShifted = false;
+            /**
+             * If the current cell has no left border, and the previous cell
+             * had no right border. We may have the problem where there is a
+             * tiny gap between the cells when scrolling horizontally. Thus
+             * we must enlarge this cell a bit, and shift it a bit in order
+             * to mask that gap. If the cell has a border defined, the
+             * problem seems not to happen. If the cell is not added to its
+             * parent, it has no border by default so we must not check it.
+             */
+            if (lastCell != null
+                    && !hasRightBorder(lastCell)
+                    && !hasLeftBorder(tableCell)) {
+                tableCell.resize(width + 1, height);
+                needToBeShifted = true;
+            } else {
+                tableCell.resize(width, height);
+            }
+            lastCell = tableCell;
+            // We want to place the layout always at the starting cell.
+            double spaceBetweenTopAndMe = 0;
+            /**
+             * In case we have a rowSpan and an image, we will shift the
+             * cell up so that it will always be displayed in full height.
+             */
+            if (spreadsheetCell.getRowSpan() > 1) {
+                int reverseRowSpan = spreadsheetView.getReverseRowSpan(spreadsheetCell, index);
+                int newIndex = index - reverseRowSpan;
+                for (int p = newIndex + 1; p < index; ++p) {
+                    spaceBetweenTopAndMe += skin.getRowHeight(p);
+                }
+            }
+
+            tableCell.relocate(x + tableCellX + (needToBeShifted ? -1 : 0), snappedTopInset()
+                    - spaceBetweenTopAndMe + ((GridRow) getSkinnable()).verticalShift.get());
+
             x += width;
         }
         skin.fixedColumnWidth = fixedColumnWidth;

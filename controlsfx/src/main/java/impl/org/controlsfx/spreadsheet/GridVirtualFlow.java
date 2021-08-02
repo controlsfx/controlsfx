@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2013, 2021 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -171,15 +171,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         });
     }
 
-//    @Override
-//    public void show(int index) {
-//        super.show(index);
-//        layoutTotal();
-//        layoutFixedRows();
-//    }
-
     @Override
-    public void scrollTo(int index) {
+    public void scrollToTop(int index) {
         //If we have some fixedRows, we check if the selected row is not below them
         if (!getCells().isEmpty() && !VerticalHeader.isFixedRowEmpty(spreadSheetView)) {
             double offset = gridViewSkin.getFixedRowHeight();
@@ -193,7 +186,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
         layoutTotal();
         layoutFixedRows();
-                }
+    }
 
     @Override
     public double scrollPixels(final double delta) {

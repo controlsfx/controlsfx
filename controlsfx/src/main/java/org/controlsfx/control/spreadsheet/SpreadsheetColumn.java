@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2013, 2021 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,6 +43,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.WeakEventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
@@ -99,6 +100,11 @@ public final class SpreadsheetColumn {
     private MenuItem fixItem;
     //The current filter applied on this column if any.
     private final ObjectProperty<Filter> filterProperty = new SimpleObjectProperty<>();
+    // Hold the eventHandler and the weakEventHandler to avoid memory leak
+    private EventHandler showingEventHandler;
+    private WeakEventHandler weakShowingHandler;
+    private EventHandler onActionHandler;
+    private WeakEventHandler weakOnActionHandler;
 
     /***************************************************************************
      * * Constructor * *
@@ -365,7 +371,7 @@ public final class SpreadsheetColumn {
             final ContextMenu contextMenu = new ContextMenu();
 
             this.fixItem = new MenuItem(localize(asKey("spreadsheet.column.menu.fix"))); //$NON-NLS-1$
-            contextMenu.setOnShowing(new EventHandler<WindowEvent>() {
+            showingEventHandler = new EventHandler<WindowEvent>() {
 
                 @Override
                 public void handle(WindowEvent event) {
@@ -373,20 +379,20 @@ public final class SpreadsheetColumn {
                         fixItem.setText(localize(asKey("spreadsheet.column.menu.fix"))); //$NON-NLS-1$
                     } else {
                         fixItem.setText(localize(asKey("spreadsheet.column.menu.unfix"))); //$NON-NLS-1$
-                }
-                }
-            });
-            fixItem.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("pinSpreadsheetView.png")))); //$NON-NLS-1$
-            fixItem.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent arg0) {
-                    if (!isFixed()) {
-                        setFixed(true);
-                    } else {
-                        setFixed(false);
                     }
                 }
-            });
+            };
+            weakShowingHandler = new WeakEventHandler(showingEventHandler);
+            contextMenu.setOnShowing(weakShowingHandler);
+            fixItem.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("pinSpreadsheetView.png")))); //$NON-NLS-1$
+            onActionHandler = new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent arg0) {
+                    setFixed(!isFixed());
+                }
+            };
+            weakOnActionHandler = new WeakEventHandler(onActionHandler);
+            fixItem.setOnAction(weakOnActionHandler);
             contextMenu.getItems().addAll(fixItem);
 
             return contextMenu;

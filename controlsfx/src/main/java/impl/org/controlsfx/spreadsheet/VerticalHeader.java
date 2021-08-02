@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2021 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,9 +31,11 @@ import static impl.org.controlsfx.i18n.Localization.localize;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
@@ -45,6 +47,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.WeakEventHandler;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.Cursor;
 import javafx.scene.control.ContextMenu;
@@ -108,8 +111,11 @@ public class VerticalHeader extends StackPane {
     private GridViewSkin skin;
     private boolean resizing = false;
 
-    private final Stack<Label> pickerPile;
-    private final Stack<Label> pickerUsed;
+    private final LinkedList<Label> pickerPile;
+    private final LinkedList<Label> pickerUsed;
+    // Store the weakEventHandler to avoid memoryLeak
+    private Map<Integer, WeakEventHandler> onShowingHandlers = new HashMap<>();
+    private Map<Integer, WeakEventHandler> onActionHandler = new HashMap<>();
 
     /**
      * This BitSet keeps track of the selected rows (when clicked on their
@@ -127,8 +133,8 @@ public class VerticalHeader extends StackPane {
     public VerticalHeader(final SpreadsheetHandle handle) {
         this.handle = handle;
         this.spreadsheetView = handle.getView();
-        pickerPile = new Stack<>();
-        pickerUsed = new Stack<>();
+        pickerPile = new LinkedList<>();
+        pickerUsed = new LinkedList<>();
     }
 
     /**
@@ -635,7 +641,7 @@ public class VerticalHeader extends StackPane {
             return dragRects.get(dragRectCount++);
         }
     }
-
+        
     /**
      * Return a contextMenu for fixing a row if possible.
      *
@@ -647,7 +653,7 @@ public class VerticalHeader extends StackPane {
             final ContextMenu contextMenu = new ContextMenu();
 
             MenuItem fixItem = new MenuItem(localize(asKey("spreadsheet.verticalheader.menu.fix"))); //$NON-NLS-1$
-            contextMenu.setOnShowing(new EventHandler<WindowEvent>() {
+            WeakEventHandler handler = new WeakEventHandler(new EventHandler<WindowEvent>() {
 
                 @Override
                 public void handle(WindowEvent event) {
@@ -658,9 +664,11 @@ public class VerticalHeader extends StackPane {
                     }
                 }
             });
+            onShowingHandlers.put(row, handler);
+            contextMenu.setOnShowing(handler);
             fixItem.setGraphic(new ImageView(pinImage));
 
-            fixItem.setOnAction(new EventHandler<ActionEvent>() {
+            WeakEventHandler handler2 = new WeakEventHandler(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent arg0) {
                     Integer modelRow = spreadsheetView.getFilteredSourceIndex(row);
@@ -671,6 +679,8 @@ public class VerticalHeader extends StackPane {
                     }
                 }
             });
+            onActionHandler.put(row, handler2);
+            fixItem.setOnAction(handler2);
             contextMenu.getItems().add(fixItem);
 
             return contextMenu;

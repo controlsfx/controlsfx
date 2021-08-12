@@ -28,8 +28,10 @@ package impl.org.controlsfx.skin;
 
 import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.When;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
@@ -122,6 +124,11 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
      * The search field shown when the popup is shown.
      */
     private final CustomTextField searchField;
+    
+    /**
+     * Label for prompt text display.
+     */
+    private final Label promptLabel;
 
     /**
      * Used when pressing ESC
@@ -138,8 +145,13 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
         // and the search field
         searchField = createSearchField();
         getChildren().add(searchField);
+        
+        // then the prompt label
+        promptLabel = createPromptLabel();
+        getChildren().add(promptLabel);
 
         bindSearchFieldAndFilteredComboBox();
+        bindPromptLabelAndSearchField();
         preventDefaultComboBoxKeyListener();
 
         // open the popup on Cursor Down and up
@@ -152,6 +164,7 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
         // ensure filteredComboBox and searchField have the same size as the field
         filteredComboBox.resizeRelocate(x, y, w, h);
         searchField.resizeRelocate(x, y, w, h);
+        promptLabel.resizeRelocate(x, y, w, h);
     }
 
     private CustomTextField createSearchField() {
@@ -192,6 +205,21 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
         box.valueProperty().bindBidirectional(getSkinnable().valueProperty());
 
         return box;
+    }
+    
+    private Label createPromptLabel() {
+        Label label = new Label();
+        label.setStyle("-fx-padding: 0.333333em 0.666667em 0.333333em 0.666667em;");
+        label.setMouseTransparent(true);
+        label.textProperty().bind(new When(getSkinnable().promptTextProperty().isNotNull())
+                                  .then(getSkinnable().promptTextProperty())
+                                  .otherwise(""));
+        return label;
+    }
+    
+    private void bindPromptLabelAndSearchField() {
+        promptLabel.visibleProperty().bind(searchField.visibleProperty().not()
+                                            .and(getSkinnable().valueProperty().isNull()));
     }
 
     private void bindSearchFieldAndFilteredComboBox() {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015 ControlsFX
+ * Copyright (c) 2015, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -77,6 +77,14 @@ class NumericField extends TextField {
         }
     }
 
+    /**
+     * Sets the value of the numeric value property.
+     * @param value The new value to assign.
+     */
+    protected void setValue(Number value) {
+        this.value.setValue(value);
+    }
+    
     private Boolean replaceValid(int start, int end, String fragment) {
         try {
         	String newText = getText().substring(0, start) + fragment + getText().substring(end);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 ControlsFX
+ * Copyright (c) 2014, 2021 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,10 +26,16 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Stack;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.event.EventHandler;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.skin.TableColumnHeader;
 import javafx.scene.input.MouseEvent;
@@ -51,11 +57,11 @@ public class HorizontalPicker extends StackPane {
     private static final String PICKER_INDEX = "PickerIndex"; //$NON-NLS-1$
 
     private final HorizontalHeader horizontalHeader;
-
     private final SpreadsheetView spv;
+    // Labels representing pickers that are ready to be re-used
     private final Stack<Label> pickerPile;
-    private final Stack<Label> pickerUsed;
-
+    // Labels reprenting pickers that are currently used (key is the column index)
+    private final Map<Integer, Label> pickerUsed;
     private final InnerHorizontalPicker innerPicker = new InnerHorizontalPicker();
 
     public HorizontalPicker(HorizontalHeader horizontalHeader, SpreadsheetView spv) {
@@ -63,7 +69,7 @@ public class HorizontalPicker extends StackPane {
         this.spv = spv;
 
         pickerPile = new Stack<>();
-        pickerUsed = new Stack<>();
+        pickerUsed = new HashMap<>();
 
         //Clip this StackPane just like the TableHeaderRow.
         Rectangle clip = new Rectangle();
@@ -83,7 +89,7 @@ public class HorizontalPicker extends StackPane {
         //Just relocate the inner for sliding.
         innerPicker.relocate(horizontalHeader.getRootHeader().getLayoutX(), snappedTopInset());
         //We must turn off pickers that are behind fixed columns
-        for (Label label : pickerUsed) {
+        for (Label label : pickerUsed.values()) {
             label.setVisible(label.getLayoutX() + innerPicker.getLayoutX() + label.getWidth() > horizontalHeader.gridViewSkin.fixedColumnWidth);
         }
     }
@@ -95,26 +101,10 @@ public class HorizontalPicker extends StackPane {
         requestLayout();
     }
 
-    private Label getPicker(Picker picker) {
-        Label pickerLabel;
-        if (pickerPile.isEmpty()) {
-            pickerLabel = new Label();
-            pickerLabel.getStyleClass().addListener(layoutListener);
-            pickerLabel.setOnMouseClicked(pickerMouseEvent);
-        } else {
-            pickerLabel = pickerPile.pop();
-        }
-        pickerUsed.push(pickerLabel);
-        pickerLabel.getStyleClass().setAll(picker.getStyleClass());
-        pickerLabel.getProperties().put(PICKER_INDEX, picker);
-        return pickerLabel;
+    @Override
+    public void requestLayout() {
+        super.requestLayout(); //To change body of generated methods, choose Tools | Templates.
     }
-
-    private final EventHandler<MouseEvent> pickerMouseEvent = (MouseEvent mouseEvent) -> {
-        Label picker = (Label) mouseEvent.getSource();
-
-        ((Picker) picker.getProperties().get(PICKER_INDEX)).onClick();
-    };
 
     /**
      * Inner class that will lay out all the pickers.
@@ -122,30 +112,86 @@ public class HorizontalPicker extends StackPane {
     private class InnerHorizontalPicker extends Region {
 
         @Override
-        protected void layoutChildren() {
-            pickerPile.addAll(pickerUsed.subList(0, pickerUsed.size()));
-            //Unbind every picker used before setting new ones.
-            for (Label label : pickerUsed) {
-                label.layoutXProperty().unbind();
-                label.setVisible(true);
-            }
-            pickerUsed.clear();
+        public void requestLayout() {
+            super.requestLayout(); //To change body of generated methods, choose Tools | Templates.
+        }
 
-            getChildren().clear();
+        @Override
+        protected void layoutChildren() {
+            int columnSize = horizontalHeader.getRootHeader().getColumnHeaders().size();
+            List<Integer> list = new ArrayList<>();
+            // Clean all pickers
+            for (Entry<Integer, Label> entry : pickerUsed.entrySet()) {
+                Label label = entry.getValue();
+
+                // Add picker that are out of bounds to the pile
+                if (entry.getKey() >= columnSize) {
+                    list.add(entry.getKey());
+                    pickerPile.push(label);
+                    getChildren().remove(label);
+                }
+
+                label.getStyleClass().removeListener(layoutListener);
+                label.getStyleClass().clear();
+                label.getProperties().remove(PICKER_INDEX);
+            }
+            pickerUsed.keySet().removeAll(list);
+
             int index = 0;
             int modelColumn;
             for (TableColumnHeader column : horizontalHeader.getRootHeader().getColumnHeaders()) {
                 modelColumn = spv.getModelColumn(index);
-                if (spv.getColumnPickers().containsKey(modelColumn)) {
-                    Label label = getPicker(spv.getColumnPickers().get(modelColumn));
+                Picker picker = spv.getColumnPickers().get(modelColumn);
+                if (picker != null) {
+                    Label label = getPicker(picker, index);
                     label.resize(column.getWidth(), VerticalHeader.PICKER_SIZE);
                     label.layoutXProperty().bind(column.layoutXProperty());
-
-                    getChildren().add(0, label);
+                } else {
+                    // Picker in place no longer used, add it to the pile
+                    Label pickerLabel = pickerUsed.remove(index);
+                    if (pickerLabel != null) {
+                        pickerLabel.layoutXProperty().unbind();
+                        pickerPile.add(pickerLabel);
+                        getChildren().remove(pickerLabel);
+                    }
                 }
-                index++;
+                ++index;
             }
         }
+
+        /**
+         * Return a Label representing the given Picker for the given column
+         * index.
+         *
+         * @param picker the picker as defined in the Grid
+         * @param column the column index
+         * @return a label ready to be displayed
+         */
+        private Label getPicker(Picker picker, int column) {
+            // Try to re-use a picker that are already placed for the column
+            Label pickerLabel = pickerUsed.get(column);
+            if (pickerLabel == null) {
+                if (pickerPile.isEmpty()) {
+                    pickerLabel = new Label();
+                    pickerLabel.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                    pickerLabel.setOnMouseClicked(pickerMouseEvent);
+                } else {
+                    pickerLabel = pickerPile.pop();
+                }
+                pickerUsed.put(column, pickerLabel);
+                getChildren().add(0, pickerLabel);
+            }
+
+            pickerLabel.getStyleClass().addAll(picker.getStyleClass());
+            pickerLabel.getStyleClass().addListener(layoutListener);
+            pickerLabel.getProperties().put(PICKER_INDEX, picker);
+            return pickerLabel;
+        }
+
+        private final EventHandler<MouseEvent> pickerMouseEvent = (MouseEvent mouseEvent) -> {
+            Label picker = (Label) mouseEvent.getSource();
+            ((Picker) picker.getProperties().get(PICKER_INDEX)).onClick();
+        };
     }
 
     private final InvalidationListener layoutListener = (Observable arg0) -> {

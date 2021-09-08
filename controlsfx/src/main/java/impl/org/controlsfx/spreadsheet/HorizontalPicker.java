@@ -101,20 +101,10 @@ public class HorizontalPicker extends StackPane {
         requestLayout();
     }
 
-    @Override
-    public void requestLayout() {
-        super.requestLayout(); //To change body of generated methods, choose Tools | Templates.
-    }
-
     /**
      * Inner class that will lay out all the pickers.
      */
     private class InnerHorizontalPicker extends Region {
-
-        @Override
-        public void requestLayout() {
-            super.requestLayout(); //To change body of generated methods, choose Tools | Templates.
-        }
 
         @Override
         protected void layoutChildren() {

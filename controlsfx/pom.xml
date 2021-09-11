@@ -125,6 +125,7 @@
                 <version>3.8.1</version>
                 <configuration>
                     <compilerArgs>
+                        <!-- For EventHandlerManager in AutoCompletionBinding-->
                         <arg>--add-exports</arg>
                         <arg>javafx.base/com.sun.javafx.event=org.controlsfx.controls</arg>
                         <!-- For various usages of TraversalEngine-->
@@ -141,18 +142,9 @@
                         <!-- For InputMap used in behavior classes-->
                         <arg>--add-exports</arg>
                         <arg>javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls</arg>
-                        <!-- For EventHandlerManager in AutoCompletionBinding-->
-                        <arg>--add-exports</arg>
-                        <arg>javafx.base/com.sun.javafx.event=org.controlsfx.controls</arg>
                         <!-- For MappingChange, NonIterableChange across files-->
                         <arg>--add-exports</arg>
                         <arg>javafx.base/com.sun.javafx.collections=org.controlsfx.controls</arg>
-                        <!--For SpreadsheetView-->
-                        <arg>--add-exports</arg>
-                        <arg>javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls</arg>
-                        <!--For SpreadsheetView-->
-                        <arg>--add-exports</arg>
-                        <arg>javafx.base/com.sun.javafx.event=org.controlsfx.controls</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>

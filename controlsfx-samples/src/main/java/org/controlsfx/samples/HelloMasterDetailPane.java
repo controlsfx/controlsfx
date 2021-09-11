@@ -34,7 +34,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.MasterDetailPane;
 
 public class HelloMasterDetailPane extends ControlsFXSample {

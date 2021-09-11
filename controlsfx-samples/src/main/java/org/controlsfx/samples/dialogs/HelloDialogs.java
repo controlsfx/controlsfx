@@ -61,7 +61,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
-import org.controlsfx.ControlsFXSample;
+import org.controlsfx.samples.ControlsFXSample;
 import org.controlsfx.dialog.CommandLinksDialog;
 import org.controlsfx.dialog.CommandLinksDialog.CommandLinksButtonType;
 import org.controlsfx.dialog.WizardPane;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2013, 2020, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,33 +24,36 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.controlsfx.fxsampler;
 
-package fxsampler.model;
+import org.controlsfx.fxsampler.model.WelcomePage;
 
-import javafx.scene.Node;
+public interface FXSamplerProject {
 
-public class WelcomePage {
-    private String title;
-    private Node content;
-    
-    public WelcomePage(String title, Node content) {
-        this.title = title;
-        this.content = content;
-    }
+    /**
+     * Returns the pretty name of the project, e.g. 'JFXtras' or 'ControlsFX'
+     */
+    String getProjectName();
 
-    public String getTitle() {
-        return title;
-    }
+    /**
+     * All samples should be beneath this base package. For example, in ControlsFX,
+     * this may be 'org.controlsfx.samples'.
+     */
+    String getSampleBasePackage();
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    /**
+     * Node that will be displayed in welcome tab, when project's root is
+     * selected in the tree. If this method returns null, default page will 
+     * be used
+     */
+    WelcomePage getWelcomePage();
 
-    public Node getContent() {
-        return content;
-    }
-
-    public void setContent(Node content) {
-        this.content = content;
+    /**
+     * Module name of the project for which the sampler is to be used.
+     * For example, in case of ControlsFX this is "org.controlsfx.controls".
+     * Can be left blank if the sampler application is running on classpath.
+     */
+    default String getModuleName() {
+        return "";
     }
 }

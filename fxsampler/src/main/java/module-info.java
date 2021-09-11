@@ -3,9 +3,10 @@ module org.controlsfx.fxsampler {
     requires transitive javafx.controls;
     requires transitive javafx.web;
 
-    exports fxsampler;
-    exports fxsampler.model;
+    opens org.controlsfx.fxsampler;
+    exports org.controlsfx.fxsampler.model;
+    exports org.controlsfx.fxsampler;
 
-    uses fxsampler.FXSamplerProject;
-    uses fxsampler.FXSamplerConfiguration;
+    uses org.controlsfx.fxsampler.FXSamplerProject;
+    uses org.controlsfx.fxsampler.FXSamplerConfiguration;
 }

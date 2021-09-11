@@ -73,7 +73,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import org.controlsfx.ControlsFXSample;
+import org.controlsfx.samples.ControlsFXSample;
 import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.tableview2.FilteredTableColumn;
 import org.controlsfx.control.tableview2.FilteredTableView;

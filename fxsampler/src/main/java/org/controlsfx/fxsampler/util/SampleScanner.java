@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package fxsampler.util;
+package org.controlsfx.fxsampler.util;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -40,10 +40,10 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import fxsampler.FXSamplerProject;
-import fxsampler.Sample;
-import fxsampler.model.EmptySample;
-import fxsampler.model.Project;
+import org.controlsfx.fxsampler.FXSamplerProject;
+import org.controlsfx.fxsampler.Sample;
+import org.controlsfx.fxsampler.model.EmptySample;
+import org.controlsfx.fxsampler.model.Project;
 
 /**
  * All the code related to classpath scanning, etc for samples.

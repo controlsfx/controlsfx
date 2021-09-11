@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, 2020, ControlsFX
+ * Copyright (c) 2014, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,8 +24,33 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package fxsampler;
 
-public interface FXSamplerConfiguration {
-    String getSceneStylesheet();
+package org.controlsfx.fxsampler.model;
+
+import javafx.scene.Node;
+
+public class WelcomePage {
+    private String title;
+    private Node content;
+    
+    public WelcomePage(String title, Node content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Node getContent() {
+        return content;
+    }
+
+    public void setContent(Node content) {
+        this.content = content;
+    }
 }

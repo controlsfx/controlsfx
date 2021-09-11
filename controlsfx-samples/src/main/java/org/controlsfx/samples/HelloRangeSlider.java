@@ -36,7 +36,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.RangeSlider;
 
 public class HelloRangeSlider extends ControlsFXSample {

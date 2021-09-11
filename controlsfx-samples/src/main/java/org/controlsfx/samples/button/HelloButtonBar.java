@@ -46,7 +46,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.controlsfx.ControlsFXSample;
+import org.controlsfx.samples.ControlsFXSample;
 import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.samples.Utils;
 

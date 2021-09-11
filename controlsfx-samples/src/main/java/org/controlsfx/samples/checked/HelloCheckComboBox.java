@@ -43,7 +43,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
-import org.controlsfx.ControlsFXSample;
+import org.controlsfx.samples.ControlsFXSample;
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.IndexedCheckModel;
 import org.controlsfx.samples.Utils;

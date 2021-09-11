@@ -31,7 +31,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.ToggleSwitch;
 
 public class HelloToggleSwitch extends ControlsFXSample

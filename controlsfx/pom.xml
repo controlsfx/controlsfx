@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>controlsfx</artifactId>
+    <version>17.0-SNAPSHOT</version>
+
+    <parent>
+        <groupId>org.controlsfx</groupId>
+        <artifactId>parent</artifactId>
+        <version>17.0-SNAPSHOT</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-core</artifactId>
+            <version>4.0.16-alpha</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>--add-exports</arg>
+                        <arg>javafx.base/com.sun.javafx.event=org.controlsfx.controls</arg>
+                        <!-- For various usages of TraversalEngine-->
+                        <arg>--add-exports</arg>
+                        <arg>javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls</arg>
+                        <arg>--add-exports</arg>
+                        <arg>javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls</arg>
+                        <!-- For various behaviors across controls-->
+                        <arg>--add-exports</arg>
+                        <arg>javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls</arg>
+                        <!-- For ReadOnlyUnbackedObservableList across files-->
+                        <arg>--add-exports</arg>
+                        <arg>javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls</arg>
+                        <!-- For InputMap used in behavior classes-->
+                        <arg>--add-exports</arg>
+                        <arg>javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls</arg>
+                        <!-- For EventHandlerManager in AutoCompletionBinding-->
+                        <arg>--add-exports</arg>
+                        <arg>javafx.base/com.sun.javafx.event=org.controlsfx.controls</arg>
+                        <!-- For MappingChange, NonIterableChange across files-->
+                        <arg>--add-exports</arg>
+                        <arg>javafx.base/com.sun.javafx.collections=org.controlsfx.controls</arg>
+                        <!--For SpreadsheetView-->
+                        <arg>--add-exports</arg>
+                        <arg>javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls</arg>
+                        <!--For SpreadsheetView-->
+                        <arg>--add-exports</arg>
+                        <arg>javafx.base/com.sun.javafx.event=org.controlsfx.controls</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

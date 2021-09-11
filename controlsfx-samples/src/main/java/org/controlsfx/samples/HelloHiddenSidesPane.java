@@ -35,7 +35,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.HiddenSidesPane;
 
 public class HelloHiddenSidesPane extends ControlsFXSample {

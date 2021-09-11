@@ -41,7 +41,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.StatusBar;
 
 public class HelloStatusBar extends ControlsFXSample {

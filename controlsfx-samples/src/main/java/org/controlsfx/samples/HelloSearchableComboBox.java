@@ -35,7 +35,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.SearchableComboBox;
 
 public class HelloSearchableComboBox extends ControlsFXSample {

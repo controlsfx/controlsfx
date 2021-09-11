@@ -44,7 +44,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.SegmentedBar;
 
 public class HelloSegmentedBar extends ControlsFXSample {

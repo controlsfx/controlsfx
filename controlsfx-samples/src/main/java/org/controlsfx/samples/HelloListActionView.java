@@ -39,7 +39,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.ListActionView;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;

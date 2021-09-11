@@ -31,7 +31,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.tools.Borders;
 
 public class HelloBorders extends ControlsFXSample {

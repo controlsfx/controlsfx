@@ -26,7 +26,6 @@
  */
 package org.controlsfx.samples;
 
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -42,9 +41,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.GridCell;
-import org.controlsfx.control.GridView;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 import org.controlsfx.glyphfont.GlyphFont;

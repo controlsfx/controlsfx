@@ -33,7 +33,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.SegmentedButton;
 

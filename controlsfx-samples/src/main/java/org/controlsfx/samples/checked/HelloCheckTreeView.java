@@ -28,8 +28,6 @@ package org.controlsfx.samples.checked;
 
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -41,9 +39,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.CheckModel;
-import org.controlsfx.control.IndexedCheckModel;
+import org.controlsfx.samples.ControlsFXSample;
 import org.controlsfx.control.CheckTreeView;
 import org.controlsfx.samples.Utils;
 

@@ -37,7 +37,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 

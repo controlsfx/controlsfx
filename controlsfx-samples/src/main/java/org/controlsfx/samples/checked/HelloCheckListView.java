@@ -37,7 +37,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import org.controlsfx.ControlsFXSample;
+import org.controlsfx.samples.ControlsFXSample;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.IndexedCheckModel;
 import org.controlsfx.samples.Utils;

@@ -36,7 +36,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.InfoOverlay;
 
 public class HelloInfoOverlay extends ControlsFXSample {

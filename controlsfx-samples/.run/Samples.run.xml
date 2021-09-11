@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Samples" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="org.controlsfx.fxsampler.FXSampler" />
+    <module name="samples" />
+    <option name="VM_PARAMETERS" value="--add-exports=javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls --add-exports=javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls --add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls --add-exports=javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls --add-exports=javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls --add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls --add-exports=javafx.base/com.sun.javafx.collections=org.controlsfx.controls --add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls --add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

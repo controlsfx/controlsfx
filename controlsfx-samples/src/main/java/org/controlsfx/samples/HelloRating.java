@@ -38,7 +38,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.Rating;
 
 public class HelloRating extends ControlsFXSample {

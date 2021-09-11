@@ -49,7 +49,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.decoration.GraphicDecoration;
 import org.controlsfx.control.decoration.StyleClassDecoration;
 

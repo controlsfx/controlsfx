@@ -42,7 +42,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.TaskProgressView;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.FontAwesome.Glyph;

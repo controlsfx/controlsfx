@@ -36,7 +36,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.PlusMinusSlider;
 import org.controlsfx.control.PlusMinusSlider.PlusMinusEvent;
 

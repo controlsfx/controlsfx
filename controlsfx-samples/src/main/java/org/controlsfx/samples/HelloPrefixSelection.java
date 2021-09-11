@@ -42,7 +42,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.PrefixSelectionChoiceBox;
 import org.controlsfx.control.PrefixSelectionComboBox;
 

@@ -65,7 +65,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 
-import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.SnapshotView;
 import org.controlsfx.control.SnapshotView.Boundary;
 

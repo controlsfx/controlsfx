@@ -6,18 +6,18 @@
 
     <groupId>org.controlsfx</groupId>
     <artifactId>parent</artifactId>
-    <version>17.0-SNAPSHOT</version>
+    <version>18.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx</artifactId>
-        <version>17</version>
+        <version>18-ea+2</version>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.release>18</maven.compiler.release>
     </properties>
 
 </project>

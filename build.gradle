@@ -1,13 +1,8 @@
 ext.java9Args = [
-        // For various usages of TraversalEngine
-        "--add-exports=javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",
-        "--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
         // For various behaviors across controls
         "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls",
         // For ReadOnlyUnbackedObservableList across files
         "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls",
-        // For InputMap used in behavior classes
-        "--add-exports=javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls",
         // For EventHandlerManager in AutoCompletionBinding
         "--add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls",
         // For MappingChange, NonIterableChange across files

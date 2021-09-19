@@ -26,6 +26,7 @@
  */
 package impl.org.controlsfx.skin;
 
+import impl.org.controlsfx.ImplUtils;
 import javafx.animation.Animation.Status;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -36,7 +37,6 @@ import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -46,12 +46,10 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.*;
 import javafx.util.Duration;
-
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
@@ -73,44 +71,44 @@ public abstract class NotificationBar extends Region {
             requestContainerLayout();
         }
     };
-    
-    
+
     public void requestContainerLayout() {
         layoutChildren();
     }
-    
+
     public String getTitle() {
         return ""; //$NON-NLS-1$
     }
-    
+
     public boolean isCloseButtonVisible() {
         return true;
     }
-    
+
     public abstract String getText();
     public abstract Node getGraphic();
     public abstract ObservableList<Action> getActions();
     public abstract void hide();
     public abstract boolean isShowing();
     public abstract boolean isShowFromTop();
-    
+
     public abstract double getContainerHeight();
     public abstract void relocateInParent(double x, double y);
-    
+
     public NotificationBar() {
         getStyleClass().add("notification-bar"); //$NON-NLS-1$
-        
+
         setVisible(isShowing());
-        
+
         pane = new GridPane();
         pane.getStyleClass().add("pane"); //$NON-NLS-1$
         pane.setAlignment(Pos.BASELINE_LEFT);
         getChildren().setAll(pane);
-        
+
         // initialise title area, if one is set
         String titleStr = getTitle();
         if (titleStr != null && ! titleStr.isEmpty()) {
             title = new Label();
+            title.setFocusTraversable(false);
             title.getStyleClass().add("title"); //$NON-NLS-1$
             title.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             GridPane.setHgrow(title, Priority.ALWAYS);
@@ -118,9 +116,10 @@ public abstract class NotificationBar extends Region {
             title.setText(titleStr);
             title.opacityProperty().bind(transition);
         }
-        
+
         // initialise label area
         label = new Label();
+        label.setFocusTraversable(false);
         label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         GridPane.setVgrow(label, Priority.ALWAYS);
         GridPane.setHgrow(label, Priority.ALWAYS);
@@ -138,54 +137,83 @@ public abstract class NotificationBar extends Region {
 
         // initialise close button area
         closeBtn = new Button();
-        closeBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent arg0) {
-                hide();
-            }
-        });
+        closeBtn.setFocusTraversable(false);
+        closeBtn.setOnAction(arg0 -> hide());
         closeBtn.getStyleClass().setAll("close-button"); //$NON-NLS-1$
         StackPane graphic = new StackPane();
         graphic.getStyleClass().setAll("graphic"); //$NON-NLS-1$
         closeBtn.setGraphic(graphic);
         closeBtn.setMinSize(17, 17);
         closeBtn.setPrefSize(17, 17);
-        closeBtn.setFocusTraversable(false);
         closeBtn.opacityProperty().bind(transition);
         GridPane.setMargin(closeBtn, new Insets(0, 0, 0, 8));
 
         GridPane.setValignment(closeBtn, VPos.TOP);
-        
+
         // put it all together
         updatePane();
+
+        focusedProperty().addListener((o, ov, hasFocus) -> {
+            if (hasFocus) {
+                actionsBar.requestFocus();
+            }
+        });
+
+        EventHandler<KeyEvent> keyPressEventHandler = event -> {
+            if (KeyCode.TAB.equals(event.getCode())) {
+                handleTraversal(event);
+            }
+            event.consume();
+        };
+        addEventHandler(KeyEvent.KEY_PRESSED, keyPressEventHandler);
     }
 
     void updatePane() {
         actionsBar = ActionUtils.createButtonBar(getActions());
         actionsBar.opacityProperty().bind(transition);
+        actionsBar.focusedProperty().addListener((o, ov, hasFocus) -> {
+            if (!actionsBar.getButtons().isEmpty()) {
+                actionsBar.getButtons().get(0).requestFocus();
+            }
+        });
         GridPane.setHgrow(actionsBar, Priority.SOMETIMES);
         pane.getChildren().clear();
-        
+
         int row = 0;
-        
+
         if (title != null) {
             pane.add(title, 0, row++);
         }
-        
+
         pane.add(label, 0, row);
         pane.add(actionsBar, 1, row);
-        
+
         if (isCloseButtonVisible()) {
             pane.add(closeBtn, 2, 0, 1, row+1);
+        }
+    }
+    
+    public void handleTraversal(KeyEvent event) {
+        if (actionsBar != null && actionsBar.getButtons().size() > 0) {
+            if (event.isShiftDown()) {
+                if (actionsBar.getButtons().get(0).isFocused()) {
+                    ImplUtils.focusPreviousSibling(getParent());
+                }
+            } else {
+                if (actionsBar.getButtons().get(actionsBar.getButtons().size() - 1).isFocused()) {
+                    ImplUtils.focusNextSibling(getParent());
+                }
+            }
         }
     }
 
     @Override protected void layoutChildren() {
         final double w = getWidth();
         final double h = computePrefHeight(-1);
-        
+
         final double notificationBarHeight = prefHeight(w);
         final double notificationMinHeight = minHeight(w);
-        
+
         if (isShowFromTop()) {
             // place at top of area
             pane.resize(w, h);
@@ -215,8 +243,6 @@ public abstract class NotificationBar extends Region {
         doAnimationTransition();
     }
 
-
-
     // --- animation timeline code
     private final Duration TRANSITION_DURATION = new Duration(350.0);
     private Timeline timeline;
@@ -244,60 +270,39 @@ public abstract class NotificationBar extends Region {
         KeyFrame k1, k2;
 
         if (isShowing()) {
-            k1 = new KeyFrame(
-                    Duration.ZERO,
-                    new EventHandler<ActionEvent>() {
-                        @Override public void handle(ActionEvent event) {
-                            // start expand
-                            setCache(true);
-                            setVisible(true);
-
-                            pane.fireEvent(new Event(NotificationPane.ON_SHOWING));
-                        }
+            k1 = new KeyFrame(Duration.ZERO, event -> {
+                        // start expand
+                        setCache(true);
+                        setVisible(true);
+                        pane.fireEvent(new Event(NotificationPane.ON_SHOWING));
                     },
                     new KeyValue(transition, transitionStartValue)
-                    );
+            );
 
-            k2 = new KeyFrame(
-                    duration,
-                    new EventHandler<ActionEvent>() {
-                        @Override public void handle(ActionEvent event) {
-                            // end expand
-                            pane.setCache(false);
-
-                            pane.fireEvent(new Event(NotificationPane.ON_SHOWN));
-                        }
+            k2 = new KeyFrame(duration, event -> {
+                        // end expand
+                        pane.setCache(false);
+                        pane.fireEvent(new Event(NotificationPane.ON_SHOWN));
                     },
                     new KeyValue(transition, 1, Interpolator.EASE_OUT)
-
-                    );
+            );
         } else {
-            k1 = new KeyFrame(
-                    Duration.ZERO,
-                    new EventHandler<ActionEvent>() {
-                        @Override public void handle(ActionEvent event) {
-                            // Start collapse
-                            pane.setCache(true);
-
-                            pane.fireEvent(new Event(NotificationPane.ON_HIDING));
-                        }
+            k1 = new KeyFrame(Duration.ZERO, event -> {
+                        // Start collapse
+                        pane.setCache(true);
+                        pane.fireEvent(new Event(NotificationPane.ON_HIDING));
                     },
                     new KeyValue(transition, transitionStartValue)
-                    );
+            );
 
-            k2 = new KeyFrame(
-                    duration,
-                    new EventHandler<ActionEvent>() {
-                        @Override public void handle(ActionEvent event) {
-                            // end collapse
-                            setCache(false);
-                            setVisible(false);
-
-                            pane.fireEvent(new Event(NotificationPane.ON_HIDDEN));
-                        }
+            k2 = new KeyFrame(duration, event -> {
+                        // end collapse
+                        setCache(false);
+                        setVisible(false);
+                        pane.fireEvent(new Event(NotificationPane.ON_HIDDEN));
                     },
                     new KeyValue(transition, 0, Interpolator.EASE_IN)
-                    );
+            );
         }
 
         timeline.getKeyFrames().setAll(k1, k2);

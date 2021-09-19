@@ -26,6 +26,7 @@
  */
 package impl.org.controlsfx.skin;
 
+import impl.org.controlsfx.ImplUtils;
 import javafx.beans.binding.ObjectBinding;
 import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
@@ -155,7 +156,7 @@ public class RangeSliderSkin extends SkinBase<RangeSlider> {
             if (KeyCode.TAB.equals(event.getCode())) {
                 if (lowThumb.isFocused()) {
                     if (event.isShiftDown()) {
-                        focusPreviousChild();
+                        ImplUtils.focusPreviousSibling(getSkinnable());
                     } else {
                         lowThumb.setFocus(false);
                         highThumb.setFocus(true);
@@ -166,7 +167,7 @@ public class RangeSliderSkin extends SkinBase<RangeSlider> {
                         highThumb.setFocus(false);
                         lowThumb.setFocus(true);
                     } else {
-                        focusNextChild();
+                        ImplUtils.focusNextSibling(getSkinnable());
                     }
                     event.consume();
                 }
@@ -201,24 +202,6 @@ public class RangeSliderSkin extends SkinBase<RangeSlider> {
         getSkinnable().addEventHandler(KeyEvent.KEY_RELEASED, keyReleaseEventHandler);
         // set up a callback to indicate which thumb is currently selected (via enum).
         setSelectedValue(v -> currentFocus);
-    }
-    
-    private void focusPreviousChild() {
-        final int index = getSkinnable().getParent().getChildrenUnmodifiable().indexOf(getSkinnable());
-        if (index != 0) {
-            getSkinnable().getParent().getChildrenUnmodifiable().get(index - 1).requestFocus();
-        } else {
-            getSkinnable().getParent().requestFocus();
-        }
-    }
-
-    private void focusNextChild() {
-        final int index = getSkinnable().getParent().getChildrenUnmodifiable().indexOf(getSkinnable());
-        if (index < getSkinnable().getParent().getChildrenUnmodifiable().size() - 1) {
-            getSkinnable().getParent().getChildrenUnmodifiable().get(index + 1).requestFocus();
-        } else {
-            getSkinnable().getParent().requestFocus();
-        }
     }
     
     private void initFirstThumb() {

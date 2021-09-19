@@ -26,8 +26,6 @@
  */
 package org.controlsfx.samples;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -36,7 +34,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import org.controlsfx.ControlsFXSample;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
@@ -78,16 +75,14 @@ public class HelloNotificationPane extends ControlsFXSample {
                 
                 // then hide...
                 notificationPane.hide();
-        }));
+        }), new Action("New"));
         
         Button showBtn = new Button("Show / Hide");
-        showBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent arg0) {
-                if (notificationPane.isShowing()) {
-                    notificationPane.hide();
-                } else {
-                    notificationPane.show();
-                }
+        showBtn.setOnAction(e -> {
+            if (notificationPane.isShowing()) {
+                notificationPane.hide();
+            } else {
+                notificationPane.show();
             }
         });
         
@@ -97,27 +92,15 @@ public class HelloNotificationPane extends ControlsFXSample {
         
         cbUseDarkTheme = new CheckBox("Use dark theme");
         cbUseDarkTheme.setSelected(false);
-        cbUseDarkTheme.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent arg0) {
-                updateBar();
-            }
-        });
+        cbUseDarkTheme.setOnAction(e -> updateBar());
         
         cbHideCloseBtn = new CheckBox("Hide close button");
         cbHideCloseBtn.setSelected(false);
-        cbHideCloseBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent arg0) {
-                notificationPane.setCloseButtonVisible(!cbHideCloseBtn.isSelected());
-            }
-        });
+        cbHideCloseBtn.setOnAction(e -> notificationPane.setCloseButtonVisible(!cbHideCloseBtn.isSelected()));
         
         textField = new TextField();
         textField.setPromptText("Type text to display and press Enter");
-        textField.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent arg0) {
-                notificationPane.show(textField.getText());
-            }
-        });
+        textField.setOnAction(e -> notificationPane.show(textField.getText()));
         
         VBox root = new VBox(10);
         root.setPadding(new Insets(50, 0, 0, 10));

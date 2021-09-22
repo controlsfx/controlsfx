@@ -35,9 +35,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.scene.Cursor;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.skin.NestedTableColumnHeader;
 import javafx.scene.control.skin.TableColumnHeader;
+import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 
 /**
  * A cell column header.
@@ -87,7 +90,17 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
     @Override
     protected TableColumnHeader createTableColumnHeader(final TableColumnBase col) {
         if (col == null || col.getColumns().isEmpty()) {
-            final TableColumnHeader columnHeader = new TableColumnHeader(col);
+            final TableColumnHeader columnHeader = new TableColumnHeader(col) {
+                @Override
+                protected void resizeColumnToFitContent(int maxRows) {
+                    /**
+                     * Directly call the method even if column is not resizable. 
+                     * At initialization, autofit is called by the system for 30 rows, let it go.
+                     * If column is not resizable, the resize cursor between the columns will not appear and this method cannot be called.
+                     */
+                    ((GridViewSkin) getTableSkin()).resizeColumnToFitContent((TableColumn<ObservableList<SpreadsheetCell>, ?>) getTableColumn(), maxRows);
+                }
+            };
             /**
              * When the user double click on a header, we want to resize the
              * column to fit the content.

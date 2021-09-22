@@ -26,6 +26,7 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import com.sun.javafx.scene.control.TableColumnBaseHelper;
 import java.time.LocalDate;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -207,7 +208,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          * When we are changing the grid we re-instantiate the rowToLayout because
          * spans and fixedRow may have changed.
          */
-        handle.getView().gridProperty().addListener(rowToLayoutListener);
+        // When the grid is changed, items of TableView are not yet updated, so base on that instead.
+        handle.getGridView().itemsProperty().addListener(rowToLayoutListener);
         handle.getView().hiddenRowsProperty().addListener(rowToLayoutListener);
         handle.getView().hiddenColumnsProperty().addListener(rowToLayoutListener);
         
@@ -559,7 +561,6 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
      * use an editor that display a little icon on the right. Thus, that icon is
      * reducing the visibility of the date string.
      */
-//    @Override
     public void resizeColumnToFitContent(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, int maxRows) {
         
         final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tc;
@@ -694,10 +695,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          * column with his mouse, we must force the column to resize because
          * setting the prefWidth again will not trigger the listeners.
          */
-        widthMax = snapSize(widthMax);
+        widthMax = snapSizeX(widthMax);
         if (col.getPrefWidth() == widthMax && col.getWidth() != widthMax) {
-            //FIXME
-//            col.impl_setWidth(widthMax);
+            TableColumnBaseHelper.setWidth(col, widthMax);
         } else {
             col.setPrefWidth(widthMax);
         }

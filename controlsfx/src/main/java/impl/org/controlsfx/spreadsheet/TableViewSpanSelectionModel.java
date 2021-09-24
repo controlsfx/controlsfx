@@ -142,14 +142,18 @@ public class TableViewSpanSelectionModel extends
         }
     };
 
+    /**
+     * We retain that a key is being pressed in order to make the selected cell
+     * visible by scrolling. This is not necessary when a cell is being clicked.
+     */
     private final EventHandler<KeyEvent> keyPressedEventHandler = (KeyEvent keyEvent) -> {
         key = true;
         shift = keyEvent.isShiftDown();
     };
 
-    private final EventHandler<MouseEvent> mousePressedEventHandler = (MouseEvent mouseEvent1) -> {
+    private final EventHandler<KeyEvent> keyReleasedEventHandler = (KeyEvent keyEvent) -> {
         key = false;
-        shift = mouseEvent1.isShiftDown();
+        shift = keyEvent.isShiftDown();
     };
 
     private final EventHandler<MouseEvent> onDragDetectedEventHandler = new EventHandler<MouseEvent>() {
@@ -173,6 +177,8 @@ public class TableViewSpanSelectionModel extends
      *
      *********************************************************************
      */
+    private WeakEventHandler weakKeyPressed = new WeakEventHandler<>(keyPressedEventHandler);
+    private WeakEventHandler weakKeyReleased = new WeakEventHandler<>(keyReleasedEventHandler);
     /**
      * Constructor
      *
@@ -185,9 +191,10 @@ public class TableViewSpanSelectionModel extends
         this.spreadsheetView = spreadsheetView;
 
         timer = new Timeline(new KeyFrame(Duration.millis(100), new WeakEventHandler<>((timerEventHandler))));
-        cellsView.addEventHandler(KeyEvent.KEY_PRESSED, new WeakEventHandler<>(keyPressedEventHandler));
+        cellsView.addEventHandler(KeyEvent.KEY_PRESSED, weakKeyPressed);
+        cellsView.addEventHandler(KeyEvent.KEY_RELEASED, weakKeyReleased);
 
-        cellsView.addEventFilter(MouseEvent.MOUSE_PRESSED, new WeakEventHandler<>(mousePressedEventHandler));
+        cellsView.addEventFilter(MouseEvent.MOUSE_PRESSED, weakKeyReleased);
         cellsView.setOnDragDetected(new WeakEventHandler<>(onDragDetectedEventHandler));
 
         cellsView.setOnMouseDragged(new WeakEventHandler<>(onMouseDragEventHandler));
@@ -378,17 +385,19 @@ public class TableViewSpanSelectionModel extends
         /**
          * We don't want to do any scroll when dragging or selecting with click.
          * Only keyboard action arrow action.
+         * FIXME Going up with the keyboard does not seems to work with that algorithm
          */
         if (!drag && key && getCellsViewSkin().getCellsSize() != 0 && !VerticalHeader.isFixedRowEmpty(spreadsheetView)) {
 
             int start = getCellsViewSkin().getRow(0).getIndex();
             double posFinalOffset = 0;
+            double fixedRowHeight = getCellsViewSkin().getFixedRowHeight();
             for (int j = start; j < posFinal.getRow(); ++j) {
                 posFinalOffset += getSpreadsheetViewSkin().getRowHeight(j);
-            }
-
-            if (getCellsViewSkin().getFixedRowHeight() > posFinalOffset) {
-                cellsView.scrollTo(posFinal.getRow());
+                if (fixedRowHeight > posFinalOffset) {
+                    cellsView.scrollTo(posFinal.getRow());
+                    break;
+                }
             }
         }
     }

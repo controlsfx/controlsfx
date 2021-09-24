@@ -194,7 +194,6 @@ public class TableViewSpanSelectionModel extends
         cellsView.addEventHandler(KeyEvent.KEY_PRESSED, weakKeyPressed);
         cellsView.addEventHandler(KeyEvent.KEY_RELEASED, weakKeyReleased);
 
-        cellsView.addEventFilter(MouseEvent.MOUSE_PRESSED, weakKeyReleased);
         cellsView.setOnDragDetected(new WeakEventHandler<>(onDragDetectedEventHandler));
 
         cellsView.setOnMouseDragged(new WeakEventHandler<>(onMouseDragEventHandler));

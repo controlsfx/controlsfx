@@ -306,6 +306,11 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
              * next rows needs to know that this row is bigger than usual.
              */
             if (controlHeight == Grid.AUTOFIT && !tableCell.isEditing()) {
+                // Force the css to be applied for autofit (once). 
+                if (tableCell.getProperties().get("CSS_APPLIED") == null) { //$NON-NLS-1$
+                    tableCell.applyCss();
+                    tableCell.getProperties().put("CSS_APPLIED", true); //$NON-NLS-1$
+                }
                 //We have the problem when we are just one pixel short in height..
                 double tempHeight = tableCell.prefHeight(width) + tableCell.snappedTopInset() + tableCell.snappedBottomInset();
                 if (tempHeight > customHeight) {

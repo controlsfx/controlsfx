@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
@@ -135,7 +136,7 @@ public class VerticalHeader extends StackPane {
         this.handle = handle;
         this.spreadsheetView = handle.getView();
         pickerPile = new LinkedList<>();
-        pickerUsed = new HashMap<>();
+        pickerUsed = new ConcurrentHashMap<>();
     }
 
     /**

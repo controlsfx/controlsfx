@@ -87,7 +87,8 @@ javadoc {
         [
                 "javafx.base/com.sun.javafx.event=org.controlsfx.controls",
                 "javafx.web/com.sun.webkit=org.controlsfx.controls",
-                "javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls"
+                "javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls",
+                "javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls"
         ]
 )
     // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy

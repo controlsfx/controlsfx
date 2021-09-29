@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -75,7 +75,7 @@ public class HelloNotificationPane extends ControlsFXSample {
                 
                 // then hide...
                 notificationPane.hide();
-        }), new Action("New"));
+        }));
         
         Button showBtn = new Button("Show / Hide");
         showBtn.setOnAction(e -> {

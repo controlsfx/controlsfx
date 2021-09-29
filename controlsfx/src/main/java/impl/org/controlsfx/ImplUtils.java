@@ -159,18 +159,20 @@ public class ImplUtils {
     }
 
     public static void focusPreviousSibling(Node node) {
-        final int index = node.getParent().getChildrenUnmodifiable().indexOf(node);
-        if (index != 0) {
-            node.getParent().getChildrenUnmodifiable().get(index - 1).requestFocus();
+        final ObservableList<Node> children = node.getParent().getChildrenUnmodifiable();
+        final int index = children.indexOf(node);
+        if (index > 0) {
+            children.get(index - 1).requestFocus();
         } else {
             node.getParent().requestFocus();
         }
     }
 
     public static void focusNextSibling(Node node) {
-        final int index = node.getParent().getChildrenUnmodifiable().indexOf(node);
-        if (index < node.getParent().getChildrenUnmodifiable().size() - 1) {
-            node.getParent().getChildrenUnmodifiable().get(index + 1).requestFocus();
+        final ObservableList<Node> children = node.getParent().getChildrenUnmodifiable();
+        final int index = children.indexOf(node);
+        if (index < children.size() - 1) {
+            children.get(index + 1).requestFocus();
         } else {
             focusNextSibling(node.getParent());
         }

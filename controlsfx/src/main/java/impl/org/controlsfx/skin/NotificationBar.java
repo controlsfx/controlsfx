@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2021 ControlsFX
+ * Copyright (c) 2014, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
@@ -48,7 +47,10 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
@@ -129,11 +131,7 @@ public abstract class NotificationBar extends Region {
         label.opacityProperty().bind(transition);
 
         // initialise actions area
-        getActions().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable arg0) {
-                updatePane();
-            }
-        });
+        getActions().addListener((InvalidationListener) o -> updatePane());
 
         // initialise close button area
         closeBtn = new Button();

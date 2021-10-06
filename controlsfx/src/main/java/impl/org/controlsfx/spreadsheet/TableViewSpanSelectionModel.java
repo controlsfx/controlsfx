@@ -48,7 +48,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Duration;
 import javafx.util.Pair;
@@ -56,6 +55,8 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import com.sun.javafx.scene.control.SelectedCellsMap;
 import java.util.Collection;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 /**
  *
@@ -65,8 +66,8 @@ public class TableViewSpanSelectionModel extends
         TableView.TableViewSelectionModel<ObservableList<SpreadsheetCell>> {
 
     private boolean shift = false; // Register state of 'shift' key
-    private boolean key = false; // Register if we last touch the keyboard
-    // or the mouse
+    private boolean mousePressed = false; // True if the mouse is being pressed
+    private boolean verticalMovement = false;// True if the current key being pressed is the up or down arrow
     private boolean drag = false; // register if we are dragging (no
     // edition)
     private MouseEvent mouseEvent;
@@ -90,7 +91,6 @@ public class TableViewSpanSelectionModel extends
      * starting column of the spanning cell but on the same column we arrived
      * previously.
      */
-//    private int oldCol = -1;
     private TableColumn oldTableColumn = null;
     private int oldRow = -1;
     public Pair<Integer, Integer> direction;
@@ -143,16 +143,29 @@ public class TableViewSpanSelectionModel extends
     };
 
     /**
-     * We retain that a key is being pressed in order to make the selected cell
-     * visible by scrolling. This is not necessary when a cell is being clicked.
+     * We retain that a vertical movement is being done in order to make the
+     * selected cell visible by scrolling. This is not necessary when a cell is
+     * being clicked.
      */
-    private final EventHandler<KeyEvent> keyPressedEventHandler = (KeyEvent keyEvent) -> {
-        key = true;
-        shift = keyEvent.isShiftDown();
+    private final EventHandler<MouseEvent> mousePressedEventHandler = (MouseEvent mouseEvent) -> {
+        mousePressed = true;
+        verticalMovement = false;
+        shift = mouseEvent.isShiftDown();
     };
 
+    private final EventHandler<MouseEvent> mouseReleasedEventHandler = (MouseEvent mouseEvent) -> {
+        mousePressed = false;
+        verticalMovement = false;
+        shift = mouseEvent.isShiftDown();
+    };
+    private final EventHandler<KeyEvent> keyPressedEventHandler = (KeyEvent keyEvent) -> {
+        mousePressed = false;
+        verticalMovement = keyEvent.getCode() == KeyCode.UP || keyEvent.getCode() == KeyCode.DOWN;
+        shift = keyEvent.isShiftDown();
+    };
     private final EventHandler<KeyEvent> keyReleasedEventHandler = (KeyEvent keyEvent) -> {
-        key = false;
+        mousePressed = false;
+        verticalMovement = false;
         shift = keyEvent.isShiftDown();
     };
 
@@ -166,9 +179,7 @@ public class TableViewSpanSelectionModel extends
         }
     };
 
-    private final EventHandler<MouseEvent> onMouseDragEventHandler = (MouseEvent e) -> {
-        mouseEvent = e;
-    };
+    private final EventHandler<MouseEvent> onMouseDragEventHandler = (MouseEvent e) -> mouseEvent = e;
 
     /**
      * *********************************************************************
@@ -177,6 +188,8 @@ public class TableViewSpanSelectionModel extends
      *
      *********************************************************************
      */
+    private WeakEventHandler weakMousePressed = new WeakEventHandler<>(mousePressedEventHandler);
+    private WeakEventHandler weakMouseReleased = new WeakEventHandler<>(mouseReleasedEventHandler);
     private WeakEventHandler weakKeyPressed = new WeakEventHandler<>(keyPressedEventHandler);
     private WeakEventHandler weakKeyReleased = new WeakEventHandler<>(keyReleasedEventHandler);
     /**
@@ -191,8 +204,10 @@ public class TableViewSpanSelectionModel extends
         this.spreadsheetView = spreadsheetView;
 
         timer = new Timeline(new KeyFrame(Duration.millis(100), new WeakEventHandler<>((timerEventHandler))));
-        cellsView.addEventHandler(KeyEvent.KEY_PRESSED, weakKeyPressed);
-        cellsView.addEventHandler(KeyEvent.KEY_RELEASED, weakKeyReleased);
+        cellsView.addEventFilter(KeyEvent.KEY_PRESSED, weakKeyPressed);
+        cellsView.addEventFilter(KeyEvent.KEY_RELEASED, weakKeyReleased);
+        cellsView.addEventFilter(MouseEvent.MOUSE_PRESSED, weakMousePressed);
+        cellsView.addEventHandler(MouseEvent.MOUSE_RELEASED, weakMouseReleased);
 
         cellsView.setOnDragDetected(new WeakEventHandler<>(onDragDetectedEventHandler));
 
@@ -314,7 +329,7 @@ public class TableViewSpanSelectionModel extends
                     posFinal = getVisibleCell(row, column);
                 }
             default:
-                if (direction != null && key) {
+                if (direction != null && !mousePressed) {
                     /**
                      * If I'm going up or down, and the previous cell had a
                      * column span, then we take the column used before instead
@@ -338,15 +353,13 @@ public class TableViewSpanSelectionModel extends
         }
 
         //If it's a click, we register everything.
-        if (!key) {
+        if (mousePressed) {
             oldRow = old.getRow();
-//            oldCol = old.getColumn();
             oldTableColumn = old.getTableColumn();
         } else //If we're going up or down, we register the row changing, not the column.
          if (direction != null && direction.getKey() != 0) {
                 oldRow = old.getRow();
             } else if (direction != null && direction.getValue() != 0) {
-//            oldCol = old.getColumn();
                 oldTableColumn = old.getTableColumn();
             }
         if (getSelectionMode() == SelectionMode.SINGLE) {
@@ -386,8 +399,7 @@ public class TableViewSpanSelectionModel extends
          * Only keyboard action arrow action.
          * FIXME Going up with the keyboard does not seems to work with that algorithm
          */
-        if (!drag && key && getCellsViewSkin().getCellsSize() != 0 && !VerticalHeader.isFixedRowEmpty(spreadsheetView)) {
-
+        if (!drag && verticalMovement && getCellsViewSkin().getCellsSize() != 0 && !VerticalHeader.isFixedRowEmpty(spreadsheetView)) {
             int start = getCellsViewSkin().getRow(0).getIndex();
             double posFinalOffset = 0;
             double fixedRowHeight = getCellsViewSkin().getFixedRowHeight();

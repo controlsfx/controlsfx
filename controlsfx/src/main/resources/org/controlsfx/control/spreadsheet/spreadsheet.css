@@ -44,14 +44,14 @@ VerticalHeader > Label.fixed{
     -fx-font-style : italic;
 }
 
-HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.fixed{
+.column-header.table-column.fixed{
     -fx-background-color: -fx-box-border, lightgray;
     -fx-font-style : italic;
 }
 
 /* HORIZONTAL AND VERTICAL HEADER SELECTION */
 VerticalHeader > Label ,
-HorizontalHeaderColumn > TableColumnHeader.column-header.table-column{
+.column-header.table-column{
     -fx-background-color: -fx-box-border, #F3F3F3;
     -fx-background-insets: 0, 0 1 1 0, 1 2 2 1;
     -fx-font-weight: bold;
@@ -66,8 +66,8 @@ VerticalHeader > Label.selected{
     -fx-text-fill :white;
 }
 
-HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected,
-HorizontalHeaderColumn > TableColumnHeader.column-header.table-column.selected > Label
+.column-header.table-column.selected,
+.column-header.table-column.selected > Label
 {
     -fx-background-color:#8FB1E8;
      -fx-text-fill :white;

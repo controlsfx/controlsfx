@@ -216,12 +216,12 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         if (!sheetChildren.isEmpty()) {
             /**
              * When scrolling with mouse wheel, some row are present but will
-             * not be lay out. Thus we only consider the row with children as
-             * really available.
+             * not be lay out. Using children size is somehow not working when
+             * doing setGrid. Using the visibility property instead.
              */
             try {
                 int i = sheetChildren.size() - 1;
-                while (i >= sheetChildren.size() || (((GridRow) sheetChildren.get(i)).getChildrenUnmodifiable().isEmpty() && i > 0)) {
+                while (i >= sheetChildren.size() || (!sheetChildren.get(i).isVisible() && i > 0)) {
                     --i;
                 }
                 return (GridRow) sheetChildren.get(i);

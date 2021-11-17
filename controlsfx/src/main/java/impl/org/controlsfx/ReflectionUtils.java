@@ -26,8 +26,6 @@
  */
 package impl.org.controlsfx;
 
-import javafx.scene.Parent;
-import javafx.scene.control.Control;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.skin.NestedTableColumnHeader;
 import javafx.scene.control.skin.TableHeaderRow;
@@ -131,23 +129,6 @@ public class ReflectionUtils {
             e.printStackTrace();
         }
         return -1;
-    }
-
-    /****************************************************************************************************
-     *
-     * TraversalEngine
-     *
-     ****************************************************************************************************/
-
-    public static void setTraversalEngine(Control control, Object engine) {
-        try {
-            Class<?> parentHelper = Class.forName("com.sun.javafx.scene.ParentHelper");
-            Method method = parentHelper.getMethod("setTraversalEngine", Parent.class, engine.getClass());
-            method.setAccessible(true);
-            method.invoke(parentHelper, control, engine);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
-            throw new RuntimeException("Cannot set Traversal Engine");
-        }
     }
 
     /****************************************************************************************************

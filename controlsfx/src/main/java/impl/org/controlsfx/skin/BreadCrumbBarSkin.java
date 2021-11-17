@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2020 ControlsFX
+ * Copyright (c) 2014, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,15 +26,6 @@
  */
 package impl.org.controlsfx.skin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import impl.org.controlsfx.ReflectionUtils;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -44,15 +35,13 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.util.Callback;
-
 import org.controlsfx.control.BreadCrumbBar;
-import org.controlsfx.control.BreadCrumbBar.BreadCrumbButton;
 import org.controlsfx.control.BreadCrumbBar.BreadCrumbActionEvent;
+import org.controlsfx.control.BreadCrumbBar.BreadCrumbButton;
 
-import com.sun.javafx.scene.traversal.Algorithm;
-import com.sun.javafx.scene.traversal.Direction;
-import com.sun.javafx.scene.traversal.ParentTraversalEngine;
-import com.sun.javafx.scene.traversal.TraversalContext;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Basic Skin implementation for the {@link BreadCrumbBar}
@@ -67,57 +56,6 @@ public class BreadCrumbBarSkin<T> extends SkinBase<BreadCrumbBar<T>> {
         super(control);
         control.selectedCrumbProperty().addListener(selectedPathChangeListener);
         updateSelectedPath(getSkinnable().selectedCrumbProperty().get(), null);
-        fixFocusTraversal();
-    }
-
-    // https://bitbucket.org/controlsfx/controlsfx/issue/453/breadcrumbbar-keyboard-focus-traversal-is
-    // ContainerTabOrder will fail with LEFT/RIGHT navigation, since the buttons in bread crumb overlap
-    private void fixFocusTraversal() {
-
-        ParentTraversalEngine engine = new ParentTraversalEngine(getSkinnable(), new Algorithm() {
-
-            @Override
-            public Node select(Node owner, Direction dir, TraversalContext context) {
-                Node node = null;
-                int idx = getChildren().indexOf(owner);
-                switch(dir) {
-                    case NEXT:
-                    case NEXT_IN_LINE:
-                    case RIGHT:
-                        if (idx < getChildren().size() - 1) {
-                            node = getChildren().get(idx+1);
-                        }
-                    break;
-                    case PREVIOUS:
-                    case LEFT:
-                        if (idx > 0) {
-                            node = getChildren().get(idx-1);
-                        }
-                        break;
-                }
-                return node;
-            }
-
-            @Override
-            public Node selectFirst(TraversalContext context) {
-                Node first = null;
-                if (!getChildren().isEmpty()) {
-                    first = getChildren().get(0);
-                }
-                return first;
-            }
-
-            @Override
-            public Node selectLast(TraversalContext context) {
-                Node last = null;
-                if (!getChildren().isEmpty()) {
-                    last = getChildren().get(getChildren().size()-1);
-                }
-                return last;
-            }
-        });
-        engine.setOverriddenFocusTraversability(false);
-        ReflectionUtils.setTraversalEngine(getSkinnable(), engine);
     }
 
     private final ChangeListener<TreeItem<T>> selectedPathChangeListener =
@@ -171,13 +109,13 @@ public class BreadCrumbBarSkin<T> extends SkinBase<BreadCrumbBar<T>> {
         for (int i = 0; i < getChildren().size(); i++) {
             Node n = getChildren().get(i);
             
-            double nw = snapSize(n.prefWidth(h));
-            double nh = snapSize(n.prefHeight(-1));
+            double nw = snapSizeX(n.prefWidth(h));
+            double nh = snapSizeY(n.prefHeight(-1));
             
             if (i > 0) {
                 // We have to position the bread crumbs slightly overlapping
                 double ins = n instanceof BreadCrumbButton ?  ((BreadCrumbButton)n).getArrowWidth() : 0;
-                x = snapPosition(x - ins);
+                x = snapPositionX(x - ins);
             }
 
             n.resize(nw, nh);
@@ -214,7 +152,7 @@ public class BreadCrumbBarSkin<T> extends SkinBase<BreadCrumbBar<T>> {
 
         // We want all buttons to have the same height
         // so we bind their preferred height to the enclosing container
-//        crumb.prefHeightProperty().bind(getSkinnable().heightProperty());
+        // crumb.prefHeightProperty().bind(getSkinnable().heightProperty());
 
         // listen to the action event of each bread crumb
         crumb.setOnAction(ae -> onBreadCrumbAction(selectedCrumb));

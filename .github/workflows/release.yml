@@ -65,8 +65,8 @@ jobs:
       - name: Commit next development version
         if: steps.deploy.outputs.exit_code == 0
         run: |
-          git config user.name "Abhinay Agarwal"
-          git config user.email "abhinayagarwal@live.com"
+          git config --global user.name "abhinayagarwal"
+          git config --global user.email "abhinayagarwal@live.com"
           TAG=${GITHUB_REF/refs\/tags\//}
           newVersion=${TAG%.*}.$((${TAG##*.} + 1)) # Update version by 1
           sed -i "0,/^controlsfx_version = $TAG/s//controlsfx_version = $newVersion-SNAPSHOT/" gradle.properties

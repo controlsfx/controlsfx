@@ -26,10 +26,6 @@
  */
 package impl.org.controlsfx;
 
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
@@ -41,6 +37,10 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
 
 public class ImplUtils {
 
@@ -156,5 +156,25 @@ public class ImplUtils {
         }
 
         return children;
+    }
+
+    public static void focusPreviousSibling(Node node) {
+        final ObservableList<Node> children = node.getParent().getChildrenUnmodifiable();
+        final int index = children.indexOf(node);
+        if (index > 0) {
+            children.get(index - 1).requestFocus();
+        } else {
+            node.getParent().requestFocus();
+        }
+    }
+
+    public static void focusNextSibling(Node node) {
+        final ObservableList<Node> children = node.getParent().getChildrenUnmodifiable();
+        final int index = children.indexOf(node);
+        if (index < children.size() - 1) {
+            children.get(index + 1).requestFocus();
+        } else {
+            focusNextSibling(node.getParent());
+        }
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015 ControlsFX
+ * Copyright (c) 2015, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -98,6 +98,7 @@ public class Editors {
 
             @Override public void setValue(Number value) {
                 sourceClass = (Class<? extends Number>) value.getClass();
+                getEditor().setValue(value);
                 getEditor().setText(value.toString());
             }
             

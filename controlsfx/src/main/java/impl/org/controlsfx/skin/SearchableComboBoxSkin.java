@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019, ControlsFX
+ * Copyright (c) 2019, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -180,6 +180,7 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
         box.placeholderProperty().bind(getSkinnable().placeholderProperty());
         box.disableProperty().bind(getSkinnable().disableProperty());
         box.visibleRowCountProperty().bind(getSkinnable().visibleRowCountProperty());
+        box.promptTextProperty().bind(getSkinnable().promptTextProperty());
         getSkinnable().showingProperty().addListener((obs, oldVal, newVal) ->
         {
             if (newVal)

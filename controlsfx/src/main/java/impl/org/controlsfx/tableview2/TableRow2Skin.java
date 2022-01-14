@@ -57,20 +57,20 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
     private static final PseudoClass RIGHT_CELL = PseudoClass.getPseudoClass("right");
     private static final PseudoClass SINGLE_CELL = PseudoClass.getPseudoClass("single");
     private static final PseudoClass FIXED_CELL = PseudoClass.getPseudoClass("fixed");
-            
+
     private final TableView2<S> tableView;
     private final TableView2Skin<S> skin;
 
     private Reference<HashMap<TableColumnBase, TableCell<S, ?>>> cellsMap;
 
     private final List<TableCell<S, ?>> cells = new ArrayList<>();
-    
+
     private final TableView2<S> parentTableView;
-    
+
     public TableRow2Skin(TableView2<S> tableView, TableRow<S> tableRow) {
         super(tableRow);
         this.tableView = tableView;
-        
+
         getSkinnable().setPickOnBounds(false);
 
         registerChangeListener(tableRow.itemProperty(), t -> requestCellUpdate());
@@ -83,7 +83,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
                 requestCellUpdate();
             }
         });
-        
+
         if (tableView.getParent() != null && tableView.getParent() instanceof RowHeader) {
             parentTableView = ((RowHeader) tableView.getParent()).getParentTableView();
             this.skin = (TableView2Skin<S>) parentTableView.getSkin();
@@ -103,11 +103,6 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
         // issue highlighted in JDK-8115269, where the table cell had the correct
         // item whilst the row had the old item.
         final int newIndex = getSkinnable().getIndex();
-        /**
-         * When the index is changing, we need to clear out all the children
-         * because we may end up with useless cell in the row.
-         */
-        getChildren().clear();
         for (int i = 0, max = cells.size(); i < max; i++) {
             cells.get(i).updateIndex(newIndex);
         }
@@ -136,11 +131,11 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
             putCellsInCache();
             return;
         }
-        
+
         getChildren().removeIf(n -> n.getId() != null && n.getId().equals("pane-fixed-cell"));
-            
+
         Object o = control.getProperties().get("fixed");
-        boolean fixedRow = o != null && ((Boolean) o).equals(Boolean.TRUE);
+        boolean fixedRow = Boolean.TRUE.equals(o);
 
         final List<? extends TableColumn<S, ?>> columns = tableView.getVisibleLeafColumns();
 
@@ -168,7 +163,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
         control.verticalShift.setValue(tableView.isRowFixingEnabled() ? getFixedRowShift(index) : 0);
 
         double fixedColumnWidth = 0;
-        List<TableCell<S, ?>> fixedCells = new ArrayList();
+        List<TableCell<S, ?>> fixedCells = new ArrayList<>();
 
         //We compute the cells here
         putCellsInCache();
@@ -184,35 +179,41 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
             if (! column.isVisible()) {
                 continue;
             }
-            final TableCell<S, ?> tableCell = getCell(column);
-            if (! isFirstColumn) {
-                tableCell.pseudoClassStateChanged(LEFT_CELL, true);
-                isFirstColumn = true;
-            }
-            
-            TablePosition<S, ?> pos = new TablePosition<>(tableView, tableCell.getIndex(), column);
-        
-            width = snapSize(column.getWidth()) - snapSize(horizontalPadding);
+
+            TablePosition<S, ?> pos = new TablePosition<>(tableView, index, column);
+
+            width = snapSizeX(column.getWidth()) - snapSizeX(horizontalPadding);
             //When setting a new grid with less columns, we may have this situation.
             final int columnSpan = tableView.getColumnSpan(pos);
             boolean isVisible = !isInvisible(x, width, hbarValue, headerWidth, columnSpan);
-            while (column.getParentColumn() != null) {
+            TableColumn<?,?> rootColumn = column;
+            while (rootColumn.getParentColumn() != null) {
                 // on nested columns, we check if the root parent is the one fixed
-                column = (TableColumn<S, ?>) column.getParentColumn();
+                rootColumn = (TableColumn<?, ?>) rootColumn.getParentColumn();
             }
-            
-            if (tableView.isColumnFixingEnabled() && tableView.getFixedColumns().contains(column)) {
+
+            if (tableView.isColumnFixingEnabled() && tableView.getFixedColumns().contains(rootColumn)) {
                 isVisible = true;
             }
 
             if (!isVisible) {
+                TableCell<S, ?> cell = getCellsMap().remove(column);
+                if (cell != null) {
+                    getChildren().remove(cell);
+                }
                 if (firstVisibleCell) {
                     break;
                 }
                 x += width;
                 continue;
             }
-            
+
+            final TableCell<S, ?> tableCell = getCell(column);
+            if (! isFirstColumn) {
+                tableCell.pseudoClassStateChanged(LEFT_CELL, true);
+                isFirstColumn = true;
+            }
+
             cells.add(0, tableCell);
 
             // In case the node was treated previously
@@ -245,174 +246,170 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
                 if (hbarValue + fixedColumnWidth > x) {
                     increaseFixedWidth = true;
                     tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
-//                	 tableCell.toFront();
+//                	tableCell.toFront();
                     fixedColumnWidth += width;
-//                    isVisible = true; // If in fixedColumn, it's obviously visible
+//                  isVisible = true; // If in fixedColumn, it's obviously visible
                     fixedCells.add(tableCell);
                 }
             }
-            
-            if (isVisible) {
-                final TableView2.SpanType spanType = tableView.getSpanType(index, indexColumn);
 
-                switch (spanType) {
-                    case ROW_SPAN_INVISIBLE:
-                    case BOTH_INVISIBLE:
-                        fixedCells.remove(tableCell);
-                        getChildren().remove(tableCell);
-//                        cells.remove(tableCell);
-                        x += width;
-                        continue; // we don't want to fall through
-                    case COLUMN_SPAN_INVISIBLE:
-                        fixedCells.remove(tableCell);
-                        getChildren().remove(tableCell);
-//                        cells.remove(tableCell);
-                        continue; // we don't want to fall through
-                    case ROW_VISIBLE:
-                    case NORMAL_CELL: // fall through and carry on
-                        if (tableCell.getIndex() != index) {
-                            tableCell.updateIndex(index);
-                        } else {
-//                            tableCell.updateItem(tableCell.getItem(), false); 
-                            tableCell.updateIndex(index);
-                            tableCell.requestLayout();
-                        }
-                        /**
-                         * Here we need to add the cells on the first position
-                         * because this row may contain some deported cells from
-                         * other rows in order to be on top in term of z-order.
-                         * So the cell we're currently adding must not recover
-                         * them. We must check that the parent is indeed the
-                         * getSkinnable because of the deportedCells.
-                         */
-                        if (!tableCell.isEditing() && tableCell.getParent() != getSkinnable()) {
-                            getChildren().add(0, tableCell);
-                        }
-                }
+            final TableView2.SpanType spanType = tableView.getSpanType(index, indexColumn);
 
-                /**
-                 * Check selection. 
-                 * Fixes a bug in cell selection after a column is hidden 
-                 */
-                if (tableView.getSelectionModel() != null && tableView.getSelectionModel().isCellSelectionEnabled()) {
-                    final int ic = indexColumn;
-                    boolean select = ! tableView.getSelectionModel().getSelectedCells().stream()
-                                .noneMatch(cell -> cell.getRow() == index && cell.getColumn() == ic);
-                    tableCell.pseudoClassStateChanged(SELECTED, select);
-                }
-                
-                if (columnSpan > 1) {
+            switch (spanType) {
+                case ROW_SPAN_INVISIBLE:
+                case BOTH_INVISIBLE:
+                    fixedCells.remove(tableCell);
+                    getChildren().remove(tableCell);
+//                  cells.remove(tableCell);
+                    x += width;
+                    continue; // we don't want to fall through
+                case COLUMN_SPAN_INVISIBLE:
+                    fixedCells.remove(tableCell);
+                    getChildren().remove(tableCell);
+//                  cells.remove(tableCell);
+                    continue; // we don't want to fall through
+                case ROW_VISIBLE:
+                case NORMAL_CELL: // fall through and carry on
+                    if (tableCell.getIndex() != index) {
+                        tableCell.updateIndex(index);
+                    } else {
+//                      tableCell.updateItem(tableCell.getItem(), false);
+                        tableCell.updateIndex(index);
+                        tableCell.requestLayout();
+                    }
                     /**
-                     * we need to span multiple columns, so we sum up the width
-                     * of the additional columns, adding it to the width
-                     * variable
+                     * Here we need to add the cells on the first position
+                     * because this row may contain some deported cells from
+                     * other rows in order to be on top in term of z-order.
+                     * So the cell we're currently adding must not recover
+                     * them. We must check that the parent is indeed the
+                     * getSkinnable because of the deportedCells.
                      */
-                    int viewColumn = skin.getViewColumn(indexColumn);
-                    final int max = tableView.getVisibleLeafColumns().size() - viewColumn;
-                    for (int i = 1, colSpan = columnSpan; i < colSpan && i < max; i++) {
-                        double tempWidth = snapSize(tableView.getVisibleLeafColumn(viewColumn + i).getWidth());
-                        width += tempWidth;
-                        if (increaseFixedWidth) {
-                            fixedColumnWidth += tempWidth;
-                        }
+                    if (!tableCell.isEditing() && tableCell.getParent() != getSkinnable()) {
+                        getChildren().add(0, tableCell);
                     }
-                }
-                    
-                /**
-                 * If we are in autofit and the prefHeight of this cell is
-                 * superior to the default cell height. Then we will use this
-                 * new height for row's height.
-                 *
-                 * We then need to apply the value to previous cell, and also
-                 * layout the children because since we are layouting upward,
-                 * next rows needs to know that this row is bigger than usual.
-                 */
-                if (!tableCell.isEditing()) {
-                    //We have the problem when we are just one pixel short in height..
-                    double tempHeight = tableCell.prefHeight(width) + tableCell.snappedTopInset() + tableCell.snappedBottomInset();
-                    if (parentTableView != null) {
-                        // for the row header take the height from the max tempHeight from the parent TableRow
-                        if (control.getIndex() < skin.getItemCount()) {
-                            tempHeight = skin.rowHeightMap.getOrDefault(control.getIndex(), tempHeight);
-                        }
-                    }
-            
-                    if (tempHeight > customHeight) {
-                        rowHeightChange = true;
-                        skin.rowHeightMap.put(control.getIndex(), tempHeight);
-                        for (TableCell<S, ?> cell : cells) {
-                            /**
-                             * We need to add the difference between the
-                             * previous height and the new height. If we were
-                             * just setting the new height, the row spanning
-                             * cell would be shorter. That's why we need to use
-                             * the cell height.
-                             */
-                            cell.resize(cell.getWidth(), cell.getHeight() + (tempHeight - customHeight));
-                        }
-                        customHeight = tempHeight;
-                        if (parentTableView != null) {
-                            ((TableView2Skin<S>) tableView.getSkin()).getFlow().layoutChildren();
-                        } else {
-                            ((TableView2Skin<S>) skin).getFlow().layoutChildren();
-                        }
-                    }
-                }
-
-                height = customHeight;
-                height = snapSize(height) - snapSize(verticalPadding);
-                /**
-                 * We need to span multiple rows, so we sum up the height of all
-                 * the rows. The height of the current row is ignored and the
-                 * whole value is computed.
-                 */
-                int rowSpan = tableView.getRowSpan(pos, index);
-                if (rowSpan > 1) {
-                    height = 0;
-                    final int maxRow = index + rowSpan;
-                    for (int i = index; i < maxRow; ++i) {
-                        height += snapSize(skin.getRowHeight(i));
-                    }
-                }
-
-                //Fix for JDK-8146406
-                needToBeShifted = false;
-                /**
-                 * If the current cell has no left border, and the previous cell
-                 * had no right border. We may have the problem
-                 * where there is a tiny gap between the cells when scrolling
-                 * horizontally. Thus we must enlarge this cell a bit, and shift
-                 * it a bit in order to mask that gap. If the cell has a border
-                 * defined, the problem seems not to happen.
-                 * If the cell is not added to its parent, it has no border by default so we must not check it.
-                 */
-                if (/*tableView.getFixedRows().contains(tableView2Cell.getRow())
-                        && */lastCell != null
-                        && !hasRightBorder(lastCell)
-                        && !hasLeftBorder(tableCell)) {
-                    tableCell.resize(width + 1, height);
-                    needToBeShifted = true;
-                } else {
-                    tableCell.resize(width, height);
-                }
-                lastCell = tableCell;
-                // We want to place the layout always at the starting cell.
-                double spaceBetweenTopAndMe = 0;
-//                for (int p = tableView2Cell.getRow(); p < index; ++p) {
-//                    spaceBetweenTopAndMe += skin.getRowHeight(p);
-//                }
-
-                tableCell.relocate(x + tableCellX + (needToBeShifted? -1 : 0), snappedTopInset()
-                        - spaceBetweenTopAndMe + control.verticalShift.get());
-
-                // Request layout is here as (partial) fix for JDK-8118040
-//                 tableCell.requestLayout();
-            } else {
-                getChildren().remove(tableCell);
             }
+
+            /**
+             * Check selection.
+             * Fixes a bug in cell selection after a column is hidden
+             */
+            if (tableView.getSelectionModel() != null && tableView.getSelectionModel().isCellSelectionEnabled()) {
+                final int ic = indexColumn;
+                boolean select = ! tableView.getSelectionModel().getSelectedCells().stream()
+                        .noneMatch(cell -> cell.getRow() == index && cell.getColumn() == ic);
+                tableCell.pseudoClassStateChanged(SELECTED, select);
+            }
+
+            if (columnSpan > 1) {
+                /**
+                 * we need to span multiple columns, so we sum up the width
+                 * of the additional columns, adding it to the width
+                 * variable
+                 */
+                int viewColumn = skin.getViewColumn(indexColumn);
+                final int max = tableView.getVisibleLeafColumns().size() - viewColumn;
+                for (int i = 1, colSpan = columnSpan; i < colSpan && i < max; i++) {
+                    double tempWidth = snapSize(tableView.getVisibleLeafColumn(viewColumn + i).getWidth());
+                    width += tempWidth;
+                    if (increaseFixedWidth) {
+                        fixedColumnWidth += tempWidth;
+                    }
+                }
+            }
+
+            /**
+             * If we are in autofit and the prefHeight of this cell is
+             * superior to the default cell height. Then we will use this
+             * new height for row's height.
+             *
+             * We then need to apply the value to previous cell, and also
+             * layout the children because since we are layouting upward,
+             * next rows needs to know that this row is bigger than usual.
+             */
+            if (!tableCell.isEditing()) {
+                //We have the problem when we are just one pixel short in height..
+                double tempHeight = tableCell.prefHeight(width) + tableCell.snappedTopInset() + tableCell.snappedBottomInset();
+                if (parentTableView != null) {
+                    // for the row header take the height from the max tempHeight from the parent TableRow
+                    if (control.getIndex() < skin.getItemCount()) {
+                        tempHeight = skin.rowHeightMap.getOrDefault(control.getIndex(), tempHeight);
+                    }
+                }
+
+                if (tempHeight > customHeight) {
+                    rowHeightChange = true;
+                    skin.rowHeightMap.put(control.getIndex(), tempHeight);
+                    for (TableCell<S, ?> cell : cells) {
+                        /**
+                         * We need to add the difference between the
+                         * previous height and the new height. If we were
+                         * just setting the new height, the row spanning
+                         * cell would be shorter. That's why we need to use
+                         * the cell height.
+                         */
+                        cell.resize(cell.getWidth(), cell.getHeight() + (tempHeight - customHeight));
+                    }
+                    customHeight = tempHeight;
+                    if (parentTableView != null) {
+                        ((TableView2Skin<S>) tableView.getSkin()).getFlow().layoutChildren();
+                    } else {
+                        ((TableView2Skin<S>) skin).getFlow().layoutChildren();
+                    }
+                }
+            }
+
+            height = customHeight;
+            height = snapSize(height) - snapSize(verticalPadding);
+            /**
+             * We need to span multiple rows, so we sum up the height of all
+             * the rows. The height of the current row is ignored and the
+             * whole value is computed.
+             */
+            int rowSpan = tableView.getRowSpan(pos, index);
+            if (rowSpan > 1) {
+                height = 0;
+                final int maxRow = index + rowSpan;
+                for (int i = index; i < maxRow; ++i) {
+                    height += snapSize(skin.getRowHeight(i));
+                }
+            }
+
+            //Fix for JDK-8146406
+            needToBeShifted = false;
+            /**
+             * If the current cell has no left border, and the previous cell
+             * had no right border. We may have the problem
+             * where there is a tiny gap between the cells when scrolling
+             * horizontally. Thus we must enlarge this cell a bit, and shift
+             * it a bit in order to mask that gap. If the cell has a border
+             * defined, the problem seems not to happen.
+             * If the cell is not added to its parent, it has no border by default so we must not check it.
+             */
+            if (/*tableView.getFixedRows().contains(tableView2Cell.getRow())
+                    && */lastCell != null
+                    && !hasRightBorder(lastCell)
+                    && !hasLeftBorder(tableCell)) {
+                tableCell.resize(width + 1, height);
+                needToBeShifted = true;
+            } else {
+                tableCell.resize(width, height);
+            }
+            lastCell = tableCell;
+            // We want to place the layout always at the starting cell.
+            double spaceBetweenTopAndMe = 0;
+//          for (int p = tableView2Cell.getRow(); p < index; ++p) {
+//              spaceBetweenTopAndMe += skin.getRowHeight(p);
+//          }
+
+            tableCell.relocate(x + tableCellX + (needToBeShifted? -1 : 0), snappedTopInset()
+                    - spaceBetweenTopAndMe + control.verticalShift.get());
+
+            // Request layout is here as (partial) fix for JDK-8118040
+//          tableCell.requestLayout();
             x += width;
         }
-        
+
         // When the table is wider than the columns, the empty space to the
         // right is visible and can be part of the row selection or scrolled. 
         double paneWidth = tableView.getWidth() - x - tableView.snappedLeftInset() - tableView.snappedRightInset();
@@ -422,7 +419,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
         if (skin.getVBar().isVisible()) {
             paneWidth -= skin.getVBar().getWidth();
         }
-        
+
         final int paneBorderInset = 1; // selection border inset in pane
         final boolean paneBorderVisible = paneWidth > paneBorderInset;
         final boolean singleColumn = columns.size() == 1;
@@ -438,8 +435,8 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
             pane.pseudoClassStateChanged(RIGHT_CELL, paneBorderVisible);
             pane.resizeRelocate(x, snappedTopInset() + control.verticalShift.get(), paneWidth, height);
             getChildren().add(pane);
-        } 
-        
+        }
+
         if (lastCell != null) {
             // In case of row selection, when the table is wider than the columns, 
             // the cells don't require a right selection border: the tableRow 
@@ -447,12 +444,12 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
             // pane will provide it in case of fixed rows.
             lastCell.pseudoClassStateChanged(RIGHT_CELL, ! singleColumn && ! paneBorderVisible);
             lastCell.pseudoClassStateChanged(SINGLE_CELL, singleColumn && ! paneBorderVisible);
-         
+
             if (parentTableView != null) {
                 lastCell.pseudoClassStateChanged(FIXED_CELL, fixedRow && control.getIndex() < skin.getItemCount());
             }
         }
-        
+
         skin.fixedColumnWidth = fixedColumnWidth;
         handleFixedCell(fixedCells, index);
         removeUselessCell(index);
@@ -525,7 +522,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
      * @param fixedCells
      * @param index
      */
-     private void handleFixedCell(List<TableCell<S, ?>> fixedCells, int index) {
+    private void handleFixedCell(List<TableCell<S, ?>> fixedCells, int index) {
         removeDeportedCells();
         if (fixedCells.isEmpty()) {
             return;
@@ -624,18 +621,18 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
             cell.updateTableColumn(tableColumn);
             cell.updateTableView(tableColumn.getTableView());
             cell.updateTableRow(getSkinnable());
-        
+
             if (parentTableView != null) {
                 cell.setOnContextMenuRequested(e -> {
                     BiFunction<Integer, S, ContextMenu> cmFactory = parentTableView.getRowHeaderContextMenuFactory();
                     if (tableView.getItems() != null && cmFactory != null) {
                         ContextMenu contextMenu = cmFactory.apply(getSkinnable().getIndex(), getSkinnable().getItem());
                         contextMenu.show(tableView.getScene().getWindow(), e.getScreenX(), e.getScreenY());
-                    } 
+                    }
                 });
             }
         }
-        
+
         cell.pseudoClassStateChanged(LEFT_CELL, false);
         cell.pseudoClassStateChanged(RIGHT_CELL, false);
         cell.pseudoClassStateChanged(SINGLE_CELL, false);

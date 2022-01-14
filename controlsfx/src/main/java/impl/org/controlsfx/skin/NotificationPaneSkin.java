@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2013, 2021, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,13 +26,14 @@
  */
 package impl.org.controlsfx.skin;
 
-import com.sun.javafx.scene.traversal.ParentTraversalEngine;
-import impl.org.controlsfx.ReflectionUtils;
+import impl.org.controlsfx.ImplUtils;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.shape.Rectangle;
-
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 
@@ -75,7 +76,7 @@ public class NotificationPaneSkin extends SkinBase<NotificationPane> {
             }
 
             @Override public boolean isCloseButtonVisible() {
-                    return control.isCloseButtonVisible();
+                return control.isCloseButtonVisible();
             }
 
             @Override public double getContainerHeight() {
@@ -112,20 +113,27 @@ public class NotificationPaneSkin extends SkinBase<NotificationPane> {
             }
         });
         registerChangeListener(control.closeButtonVisibleProperty(), e -> notificationBar.updatePane());
+        
+        getSkinnable().focusedProperty().addListener((o, ov, hasFocus) -> {
+            if (hasFocus) {
+                if (getChildren().size() > 0) {
+                    getChildren().get(0).requestFocus();
+                }
+            }
+        });
 
-        // Fix for Issue #522: Prevent NotificationPane from receiving focus
-        ParentTraversalEngine engine = new ParentTraversalEngine(getSkinnable());
-        ReflectionUtils.setTraversalEngine(control, engine);
-        engine.setOverriddenFocusTraversability(false);
+        EventHandler<KeyEvent> keyPressEventHandler = event -> {
+            if (KeyCode.TAB.equals(event.getCode())) {
+                if (content != null && content.isFocused() && event.isShiftDown()) {
+                    ImplUtils.focusPreviousSibling(getSkinnable());
+                }
+            }
+        };
+        getSkinnable().addEventHandler(KeyEvent.KEY_PRESSED, keyPressEventHandler);
     }
     
     private void updateContent() {
-        if (content != null) {
-            getChildren().remove(content);
-        }
-        
         content = getSkinnable().getContent();
-        
         if (content == null) {
             getChildren().setAll(notificationBar);
         } else {

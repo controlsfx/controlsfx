@@ -419,6 +419,9 @@ public class SpreadsheetView extends Control{
     private SortedList<ObservableList<SpreadsheetCell>> sortedList;
     private CellGraphicFactory cellGraphicFactory;
 
+    //Cache the stylesheet as lookup takes time and the getUserAgentStylesheet is called repeatedly
+    private String stylesheet;
+
     /**
      * Since the default with applied to TableColumn is 80. If a user sets a
      * width of 80, the column will be detected as having the default with and
@@ -464,6 +467,19 @@ public class SpreadsheetView extends Control{
      */
     final SpreadsheetGridView getCellsView() {
         return cellsView;
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        /*
+         * For more information please see RT-40658
+         */
+        if (stylesheet == null) {
+            stylesheet = SpreadsheetView.class.getResource("spreadsheet.css") //$NON-NLS-1$
+                    .toExternalForm();
+        }
+
+        return stylesheet;
     }
     
     /**

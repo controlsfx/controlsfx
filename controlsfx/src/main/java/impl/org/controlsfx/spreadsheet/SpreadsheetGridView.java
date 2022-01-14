@@ -36,11 +36,6 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCell>> {
     private final SpreadsheetHandle handle;
 
-    /*
-     * cache the stylesheet as lookup takes time and the getUserAgentStylesheet is called repeatedly
-     */
-    private String stylesheet;
-
     /**
      * We don't want to show the current value in the TextField when we are
      * editing by typing a key. We want directly to take those typed letters
@@ -52,14 +47,7 @@ public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCel
 
     @Override
     public String getUserAgentStylesheet() {
-        /*
-         * For more information please see RT-40658
-         */
-        if (stylesheet == null) {
-            stylesheet = SpreadsheetView.class.getResource("spreadsheet.css") //$NON-NLS-1$
-                    .toExternalForm();
-        }
-        return stylesheet;
+        return handle.getView().getUserAgentStylesheet();
     }
 
     @Override

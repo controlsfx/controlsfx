@@ -379,6 +379,8 @@ public class Notifications {
             // Stylesheets which are added to the scene of a popup aren't
             // considered for styling. For this reason, we need to find the next
             // window in the hierarchy which isn't a popup.
+            // This is also used as an owner for a new popup
+            // to avoid using previous popups as owners.
             Window ownerWindow = owner;
             while (ownerWindow instanceof PopupWindow) {
                 ownerWindow = ((PopupWindow) ownerWindow).getOwnerWindow();
@@ -498,7 +500,7 @@ public class Notifications {
             });
 
             popup.getContent().add(notificationBar);
-            popup.show(owner, 0, 0);
+            popup.show(ownerWindow, 0, 0);
 
             // determine location for the popup
             double anchorX = 0, anchorY = 0;

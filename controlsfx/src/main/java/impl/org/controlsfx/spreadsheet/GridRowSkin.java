@@ -129,7 +129,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
          * we are in layout and the columns are set in SpreadsheetView, but not
          * in TableView (yet). Then just return and wait for next calling.
          */
-        if (columns.size() != tableViewColumns.size()) {
+        if (row == null || columns.size() != tableViewColumns.size()) {
             return;
         }
 

@@ -171,11 +171,12 @@ public final class SpreadsheetColumn {
                         setFilter(null);
                         return;
                     }
-                    SpreadsheetCell cell = spreadsheetView.getGrid().getRows().get(spreadsheetView.getFilteredRow()).get(indexColumn);
-                    if (cell.getColumnSpan() > 1) {
+                     // Authorize to add a filter on a cell that span on column (should not add more than one)
+                    //SpreadsheetCell cell = spreadsheetView.getGrid().getRows().get(spreadsheetView.getFilteredRow()).get(indexColumn);
+                    /*if (cell.getColumnSpan() > 1) {
                         setFilter(null);
                         return;
-                    }
+                    }*/
                 }
                 Event.fireEvent(column, new Event(CellViewSkin.FILTER_EVENT_TYPE));
             }

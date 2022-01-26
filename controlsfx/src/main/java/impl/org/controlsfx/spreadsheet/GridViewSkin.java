@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2021 ControlsFX
+ * Copyright (c) 2013, 2022 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -421,6 +421,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                 resizeRowToFitContent(row);
             }
         }
+        // Scrollbars are not resized properly otherwise
+	handle.getGridView().refresh();
     }
     
     /**
@@ -523,6 +525,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             }
         }
         rectangleSelection.updateRectangle();
+        // Scrollbars are not resized properly otherwise
+	handle.getGridView().refresh();
     }
     
     public void resizeRowsToDefault() {
@@ -543,18 +547,16 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             }
         }
 
-        //Fixing https://bitbucket.org/controlsfx/controlsfx/issue/358/
-        getFlow().layoutChildren();
-
         for (GridRow row : (List<GridRow>) getFlow().getCells()) {
-            double height = getRowHeight(spreadsheetView.getModelRow(row.getIndex()));
-            if (row.getHeight() != height) {
-                if (grid.isRowResizable(spreadsheetView.getModelRow(row.getIndex()))) {
-                    row.setRowHeight(height);
-                }
+            int modelRow = spreadsheetView.getModelRow(row.getIndex());
+            double height = getRowHeight(modelRow);
+            if (row.getHeight() != height && grid.isRowResizable(modelRow)) {
+                row.setRowHeight(height);
             }
         }
         rectangleSelection.updateRectangle();
+        // Scrollbars are not resized properly otherwise
+	handle.getGridView().refresh();
     }
     /**
      * We want to have extra space when displaying LocalDate because they will

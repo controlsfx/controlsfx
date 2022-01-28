@@ -121,7 +121,7 @@ and textArea. We want it to be transparent just like Excel.
 
 Also we need to shift to the left the editor a bit*/
 CellView > .text-input.text-field{
-    -fx-padding : 0 0 0 -0.2em;
+    -fx-padding : 0 0 0 0;
     -fx-background-color: transparent;
 }
 CellView > .text-input.text-area,
@@ -132,7 +132,7 @@ CellView > TextArea .scroll-pane > .viewport{
 /* I shift by 3px, it's not clean but it works for normal row (24px) as it 
 centers the textArea.*/
 CellView > TextArea .scroll-pane{
-    -fx-padding : 3px 0 0 -0.15em;
+    -fx-padding : 3px 0 0 0;
 }
 
 CellView > TextArea .scroll-pane > .viewport .content{

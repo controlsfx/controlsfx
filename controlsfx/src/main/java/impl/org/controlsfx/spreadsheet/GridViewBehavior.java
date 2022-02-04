@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, 2021 ControlsFX All rights reserved.
+ * Copyright (c) 2015, 2022 ControlsFX All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: *
@@ -33,6 +33,7 @@ import javafx.scene.control.TableFocusModel;
 import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableSelectionModel;
 import javafx.scene.control.TableView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Pair;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
@@ -498,7 +499,7 @@ public class GridViewBehavior extends TableViewBehavior<ObservableList<Spreadshe
     @Override
     protected void activate(KeyEvent e) {
         // If we are currently editing, do not trigger another edition (for enter, cell below will start edition otherwise)
-        if (skin.getSkinnable().getEditingCell() != null) {
+        if (!KeyCode.ENTER.equals(e.getCode()) && skin.getSkinnable().getEditingCell() == null) {
             super.activate(e);
         }
     }

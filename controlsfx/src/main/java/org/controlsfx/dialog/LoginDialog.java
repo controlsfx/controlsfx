@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2022 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,10 @@ import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 
+/**
+ * User login {@link Dialog} with a username and a password field.<br>
+ * The input fields are clearable by default (can be emptied with a button).
+ */
 public class LoginDialog extends Dialog<Pair<String,String>> {
     
     private final ButtonType loginButtonType;

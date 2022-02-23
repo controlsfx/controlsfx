@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2022 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,10 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+/**
+ * Progress {@link Dialog} to report on the progress of any background {@link Worker}.<br>
+ * After the given {@link Worker} finishes, the Progress Dialog automatically closes.
+ */
 public class ProgressDialog extends Dialog<Void> {
     
 

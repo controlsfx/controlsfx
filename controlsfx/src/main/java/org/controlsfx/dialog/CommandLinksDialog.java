@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2022 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,8 +49,31 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 
+/**
+ * <p>{@link Dialog} containing command links.</p>
+ * Command links are similar to radio buttons. They are used to select
+ * from a set of mutually exclusive, related choices.<br>
+ * Like radio buttons, command links are always presented in sets, never individually.<br>
+ * Usage example:
+ * <ol>
+ * <li>Create a list of {@link CommandLinksButtonType command link buttons} that represent the different choices:
+ * <pre>{@code CommandLinksButtonType restartLink = new CommandLinksButtonType("Restart the program", false);
+ * CommandLinksButtonType closeLink = new CommandLinksButtonType("Close the program", false);
+ * CommandLinksButtonType waitLink = new CommandLinksButtonType("Wait for the program to respond",
+ * "This is the default option", true);
+ * List<CommandLinksButtonType> links = Arrays.asList(restartLink, closeLink, waitLink);}</pre></li>
+ * <li>Initialize the dialog with the list of command link buttons:
+ * <pre>{@code CommandLinksDialog dialog = new CommandLinksDialog(links);}</pre></li>
+ * <li>Add dialog title and header content text as appropriate:
+ * <pre>{@code dialog.setTitle("Microsoft Windows");
+ * dialog.getDialogPane().setContentText("Windows Explorer is not responding");}</pre></li>
+ * </ol>
+ */
 public class CommandLinksDialog extends Dialog<ButtonType> {
     
+    /**
+     * <p>Command link type buttons to be used in {@link CommandLinksDialog}s.</p>
+     */
     public static class CommandLinksButtonType {
         private final ButtonType buttonType;
         private final String longText;

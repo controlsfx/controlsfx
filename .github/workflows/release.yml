@@ -52,13 +52,14 @@ jobs:
       - name: Release to Maven Central
         id: deploy
         run: |
-          ./gradlew publish --info -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD \
+          ./gradlew publish -i -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.api=$TRANSIFEX_API\
           -Psigning.keyId=$GPG_KEYNAME -Psigning.password=$GPG_PASSPHRASE -Psigning.secretKeyRingFile=$HOME/.gnupg/secring.gpg \
           -Dorg.gradle.internal.publish.checksums.insecure=true
           echo ::set-output name=exit_code::$?
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          TRANSIFEX_API: ${{ secrets.TRANSIFEX_API }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           GPG_KEYNAME: ${{ secrets.GPG_KEYNAME }}
 
@@ -66,7 +67,7 @@ jobs:
         if: steps.deploy.outputs.exit_code == 0
         run: |
           git config --global user.name "abhinayagarwal"
-          git config --global user.email "abhinayagarwal@live.com"
+          git config --global user.email "abhinay_agarwal@live.com"
           TAG=${GITHUB_REF/refs\/tags\//}
           newVersion=${TAG%.*}.$((${TAG##*.} + 1)) # Update version by 1
           sed -i "0,/^controlsfx_version = $TAG/s//controlsfx_version = $newVersion-SNAPSHOT/" gradle.properties

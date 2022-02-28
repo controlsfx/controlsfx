@@ -47,12 +47,13 @@ jobs:
           # deploy if SNAPSHOT
           if [[ $ver == *"SNAPSHOT"* ]]
           then
-          ./gradlew publish -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD
+          ./gradlew publish -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.api=$TRANSIFEX_API
           fi
         shell: bash
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          TRANSIFEX_API: ${{ secrets.TRANSIFEX_API }}
 
       - name: Draft release
         if: github.ref == 'refs/heads/master'

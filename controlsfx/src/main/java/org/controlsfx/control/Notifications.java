@@ -30,13 +30,7 @@ import impl.org.controlsfx.skin.NotificationBar;
 
 import java.lang.ref.WeakReference;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -229,6 +223,14 @@ public class Notifications {
     }
 
     /**
+     * Specify the style classes to add to the {@link NotificationBar}.
+     */
+    public Notifications styleClass(String... styleClasses) {
+        styleClass.addAll(Arrays.asList(styleClasses));
+        return this;
+    }
+
+    /**
      * Specify that the close button in the top-right corner of the notification
      * should not be shown.
      */
@@ -303,6 +305,10 @@ public class Notifications {
      */
     public void show() {
         NotificationPopupHandler.getInstance().show(this);
+    }
+
+    public List<String> getStyleClass() {
+        return styleClass;
     }
 
     /***************************************************************************

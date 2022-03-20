@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 ControlsFX
+ * Copyright (c) 2014, 2022 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,6 +61,11 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 
+/**
+ * {@link Dialog} for selecting and previewing fonts.<br>
+ * The list of fonts will contain all the font families installed on the user's system,
+ * as per JavaFX {@link Font#getFamilies()}.
+ */
 public class FontSelectorDialog extends Dialog<Font> {
     
     private FontPanel fontPanel;

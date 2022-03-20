@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2021, ControlsFX
+ * Copyright (c) 2014, 2022, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -655,7 +655,7 @@ public class Notifications {
                 final Popup _popup = popups.get(i);
                 _popup.setAnchorX(changedPopup.getAnchorX());
                 final double anchorYTarget = targetAnchors[i];
-                if (anchorYTarget < 0) {
+                if (anchorYTarget < startY) {
                     _popup.hide();
                 }
                 final double oldAnchorY = getFinalAnchorY(_popup);

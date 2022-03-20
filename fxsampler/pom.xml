@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>fxsampler</artifactId>
-    <version>18.0-SNAPSHOT</version>
+    <version>19.0-SNAPSHOT</version>
 
     <parent>
         <groupId>org.controlsfx</groupId>
         <artifactId>parent</artifactId>
-        <version>18.0-SNAPSHOT</version>
+        <version>19.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>

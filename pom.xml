@@ -6,13 +6,13 @@
 
     <groupId>org.controlsfx</groupId>
     <artifactId>parent</artifactId>
-    <version>18.0-SNAPSHOT</version>
+    <version>19.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx</artifactId>
-        <version>18-ea+2</version>
+        <version>19-ea+2</version>
     </parent>
 
     <properties>

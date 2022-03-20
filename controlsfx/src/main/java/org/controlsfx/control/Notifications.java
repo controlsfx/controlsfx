@@ -30,7 +30,14 @@ import impl.org.controlsfx.skin.NotificationBar;
 
 import java.lang.ref.WeakReference;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Optional;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -146,7 +153,7 @@ public class Notifications {
     }
 
     /**
-     * Specify the text to show in the notification.
+     * Specifies the text to show in the notification.
      */
     public Notifications text(String text) {
         this.text = text;
@@ -154,7 +161,7 @@ public class Notifications {
     }
 
     /**
-     * Specify the title to show in the notification.
+     * Specifies the title to show in the notification.
      */
     public Notifications title(String title) {
         this.title = title;
@@ -162,7 +169,7 @@ public class Notifications {
     }
 
     /**
-     * Specify the graphic to show in the notification.
+     * Specifies the graphic to show in the notification.
      */
     public Notifications graphic(Node graphic) {
         this.graphic = graphic;
@@ -170,7 +177,7 @@ public class Notifications {
     }
 
     /**
-     * Specify the position of the notification on screen, by default it is
+     * Specifies the position of the notification on screen, by default it is
      * {@link Pos#BOTTOM_RIGHT bottom-right}.
      */
     public Notifications position(Pos position) {
@@ -194,7 +201,7 @@ public class Notifications {
     }
 
     /**
-     * Specify the duration that the notification should show, after which it
+     * Specifies the duration that the notification should show, after which it
      * will be hidden.
      */
     public Notifications hideAfter(Duration duration) {
@@ -203,7 +210,7 @@ public class Notifications {
     }
 
     /**
-     * Specify what to do when the user clicks on the notification (in addition
+     * Specifies what to do when the user clicks on the notification (in addition
      * to the notification hiding, which happens whenever the notification is
      * clicked on).
      */
@@ -213,7 +220,7 @@ public class Notifications {
     }
 
     /**
-     * Specify that the notification should use the built-in dark styling,
+     * Specifies that the notification should use the built-in dark styling,
      * rather than the default 'modena' notification style (which is a
      * light-gray).
      */
@@ -223,7 +230,7 @@ public class Notifications {
     }
 
     /**
-     * Specify the style classes to add to the {@link NotificationBar}.
+     * Specifies the style classes to add to the {@link NotificationBar}.
      */
     public Notifications styleClass(String... styleClasses) {
         styleClass.addAll(Arrays.asList(styleClasses));
@@ -231,7 +238,7 @@ public class Notifications {
     }
 
     /**
-     * Specify that the close button in the top-right corner of the notification
+     * Specifies that the close button in the top-right corner of the notification
      * should not be shown.
      */
     public Notifications hideCloseButton() {
@@ -240,7 +247,7 @@ public class Notifications {
     }
 
     /**
-     * Specify the actions that should be shown in the notification as buttons.
+     * Specifies the actions that should be shown in the notification as buttons.
      */
     public Notifications action(Action... actions) {
         this.actions = actions == null ? FXCollections.<Action> observableArrayList() : FXCollections
@@ -307,6 +314,9 @@ public class Notifications {
         NotificationPopupHandler.getInstance().show(this);
     }
 
+    /**
+     * Gets the style classes that would be added to the {@link NotificationBar}.
+     */
     public List<String> getStyleClass() {
         return styleClass;
     }

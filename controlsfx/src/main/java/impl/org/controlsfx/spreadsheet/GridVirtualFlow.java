@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2021 ControlsFX
+ * Copyright (c) 2013, 2022 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -244,7 +244,20 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 /*&& (spreadSheetView.getEditingCell() == null || spreadSheetView
                         .getEditingCell().getRow() == -1)*/) {
             sortRows();
+            
+            /**
+             * Constant layout can happen when zooming, because we are modifying the layout of the bars. So I make them
+             * unmanaged temporarily to prevent that.
+             */
+            if (scale.getX() != 1) {
+                getHbar().setManaged(false);
+                getVbar().setManaged(false);
+                if (corner != null) {
+                    corner.setManaged(false);
+                }
+            }
             super.layoutChildren();
+            
             layoutTotal();
             layoutFixedRows();
             
@@ -260,51 +273,55 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 getVbar().setVisibleAmount(getCells().size() / (float) getCellCount());
             }
         }
-        /**
-         * If we have modify the Scale, the scrollBars will be smaller or
-         * bigger. But we want to have them the same size as before, so we
-         * reverse the effect of the scale applied, and place the bar to the
-         * proper space.
-         */
-        Pos pos = Pos.TOP_LEFT;
-        double width = getWidth();
-        double height = getHeight();
-        double top = getInsets().getTop();
-        double right = getInsets().getRight();
-        double left = getInsets().getLeft();
-        double bottom = getInsets().getBottom();
-        double scaleX = scale.getX();
-        double shift = 1 - scaleX;
-        double contentWidth = (width / scaleX) - left - right - getVbar().getWidth();
-        double contentHeight = (height / scaleX) - top - bottom - getHbar().getHeight();
+        if (scale.getX() != 1) {
+            /**
+             * If we have modify the Scale, the scrollBars will be smaller or bigger. But we want to have them the same
+             * size as before, so we reverse the effect of the scale applied, and place the bar to the proper space.
+             */
+            Pos pos = Pos.TOP_LEFT;
+            double width = getWidth();
+            double height = getHeight();
+            double top = getInsets().getTop();
+            double right = getInsets().getRight();
+            double left = getInsets().getLeft();
+            double bottom = getInsets().getBottom();
+            double scaleX = scale.getX();
+            double shift = 1 - scaleX;
+            double contentWidth = (width / scaleX) - left - right - getVbar().getWidth();
+            double contentHeight = (height / scaleX) - top - bottom - getHbar().getHeight();
 
-        //HBAR
-        /**
-         * Magic numbers coming out of nowhere but I don't understand why
-         * the bar are shifting away when zooming...
-         */
-        layoutInArea(getHbar(), 0 - shift * 10,
-                height - (getHbar().getHeight() * scaleX),
-                contentWidth, contentHeight,
-                0, null,
-                pos.getHpos(),
-                pos.getVpos());
-        //VBAR
-        layoutInArea(getVbar(), width - getVbar().getWidth() + shift,
-                0,
-                contentWidth, contentHeight,
-                0, null,
-                pos.getHpos(),
-                pos.getVpos());
-
-        //CORNER
-        if (corner != null) {
-            layoutInArea(corner, width - getVbar().getWidth() + shift,
-                    getHeight() - (getHbar().getHeight() * scaleX),
-                    corner.getWidth(), corner.getHeight(),
+            //HBAR
+            /**
+             * Magic numbers coming out of nowhere but I don't understand why the bar are shifting away when zooming...
+             */
+            layoutInArea(getHbar(), 0 - shift * 10,
+                    height - (getHbar().getHeight() * scaleX),
+                    contentWidth, contentHeight,
                     0, null,
                     pos.getHpos(),
                     pos.getVpos());
+            //VBAR
+            layoutInArea(getVbar(), width - getVbar().getWidth() + shift,
+                    0,
+                    contentWidth, contentHeight,
+                    0, null,
+                    pos.getHpos(),
+                    pos.getVpos());
+
+            //CORNER
+            if (corner != null) {
+                layoutInArea(corner, width - getVbar().getWidth() + shift,
+                        getHeight() - (getHbar().getHeight() * scaleX),
+                        corner.getWidth(), corner.getHeight(),
+                        0, null,
+                        pos.getHpos(),
+                        pos.getVpos());
+            }
+            getHbar().setManaged(true);
+            getVbar().setManaged(true);
+            if (corner != null) {
+                corner.setManaged(true);
+            }
         }
     }
 

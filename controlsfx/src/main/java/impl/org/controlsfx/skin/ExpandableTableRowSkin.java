@@ -26,6 +26,8 @@
  */
 package impl.org.controlsfx.skin;
 
+import static java.util.Objects.requireNonNullElse;
+
 import javafx.scene.control.skin.TableRowSkin;
 import javafx.scene.Node;
 import javafx.scene.control.TableRow;
@@ -83,7 +85,7 @@ public class ExpandableTableRowSkin<S> extends TableRowSkin<S> {
      * @return A boolean indicating the expanded state of this row
      */
     private Boolean isExpanded() {
-        return getSkinnable().getItem() != null && expander.getCellData(getSkinnable().getIndex());
+        return getSkinnable().getItem() != null && requireNonNullElse(expander.getCellData(getSkinnable().getIndex()), false);
     }
 
     /**

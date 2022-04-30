@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, 2020, 2021, ControlsFX
+ * Copyright (c) 2015, 2022, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,8 @@ import javafx.css.converter.SizeConverter;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import org.controlsfx.control.ToggleSwitch;
@@ -50,8 +52,8 @@ import java.util.List;
 /**
  * Basic Skin implementation for the {@link ToggleSwitch}
  */
-public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
-{
+public class ToggleSwitchSkin extends SkinBase<ToggleSwitch> {
+
     private final StackPane thumb;
     private final StackPane thumbArea;
     private final Label label;
@@ -81,8 +83,13 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         thumb.getStyleClass().setAll("thumb");
         thumbArea.getStyleClass().setAll("thumb-area");
 
-        thumbArea.setOnMouseReleased(event -> mousePressedOnToggleSwitch(control));
-        thumb.setOnMouseReleased(event -> mousePressedOnToggleSwitch(control));
+        control.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.SPACE) {
+                toggle(control);
+            }
+        });
+        thumbArea.setOnMouseReleased(event -> toggle(control));
+        thumb.setOnMouseReleased(event -> toggle(control));
         control.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.booleanValue() != oldValue.booleanValue())
                 selectedStateChanged();
@@ -103,7 +110,7 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
         transition.play();
     }
 
-    private void mousePressedOnToggleSwitch(ToggleSwitch toggleSwitch) {
+    private void toggle(ToggleSwitch toggleSwitch) {
         toggleSwitch.setSelected(!toggleSwitch.isSelected());
     }
 
@@ -112,11 +119,20 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
      * How many milliseconds it should take for the thumb to go from
      * one edge to the other
      */
-    private DoubleProperty thumbMoveAnimationTime = null;
+    private DoubleProperty thumbMoveAnimationTime;
 
     private DoubleProperty thumbMoveAnimationTimeProperty() {
         if (thumbMoveAnimationTime == null) {
             thumbMoveAnimationTime = new StyleableDoubleProperty(200) {
+
+                @Override
+                protected void invalidated() {
+                    double newValue = get();
+                    if (newValue <= 0) {
+                        newValue = 1; // set min duration as 1 for transition to play
+                    }
+                    transition.setDuration(Duration.millis(newValue));
+                }
 
                 @Override
                 public Object getBean() {
@@ -144,13 +160,13 @@ public class ToggleSwitchSkin extends SkinBase<ToggleSwitch>
     @Override
     protected void layoutChildren(double contentX, double contentY, double contentWidth, double contentHeight) {
         ToggleSwitch toggleSwitch = getSkinnable();
-        double thumbWidth = snapSize(thumb.prefWidth(-1));
-        double thumbHeight = snapSize(thumb.prefHeight(-1));
+        double thumbWidth = snapSizeX(thumb.prefWidth(-1));
+        double thumbHeight = snapSizeY(thumb.prefHeight(-1));
         thumb.resize(thumbWidth, thumbHeight);
 
-        double thumbAreaWidth = snapSize(thumbArea.prefWidth(-1));
-        double thumbAreaHeight = snapSize(thumbArea.prefHeight(-1));
-        double thumbAreaY = snapPosition(contentY + (contentHeight / 2) - (thumbAreaHeight / 2));
+        double thumbAreaWidth = snapSizeX(thumbArea.prefWidth(-1));
+        double thumbAreaHeight = snapSizeY(thumbArea.prefHeight(-1));
+        double thumbAreaY = snapPositionY(contentY + (contentHeight / 2) - (thumbAreaHeight / 2));
 
         thumbArea.resize(thumbAreaWidth, thumbAreaHeight);
         thumbArea.setLayoutX(contentWidth - thumbAreaWidth);

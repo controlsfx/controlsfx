@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2022, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -99,6 +99,17 @@ import java.util.Map;
  */
 @DefaultProperty("items")
 public class CheckComboBox<T> extends ControlsFXControl {
+
+    /***************************************************************************
+     *                                                                         *
+     * Static fields                                                           *
+     *                                                                         *
+     **************************************************************************/
+
+    // By default, we measure the width of all cells in the ListView. If this
+    // is too burdensome, the developer may set a property in the CheckComboBox
+    // properties map with this key to specify the number of rows to measure.
+    public static final String COMBO_BOX_ROWS_TO_MEASURE_WIDTH_KEY = "comboBoxRowsToMeasureWidth";
     
     /**************************************************************************
      * 

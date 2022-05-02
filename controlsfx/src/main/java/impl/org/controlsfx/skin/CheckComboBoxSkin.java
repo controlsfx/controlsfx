@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2021, ControlsFX
+ * Copyright (c) 2013, 2022, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,8 @@ import javafx.scene.input.KeyCombination;
 import org.controlsfx.control.CheckComboBox;
 
 import org.controlsfx.control.IndexedCheckModel;
+
+import static org.controlsfx.control.CheckComboBox.COMBO_BOX_ROWS_TO_MEASURE_WIDTH_KEY;
 
 public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
     
@@ -126,7 +128,11 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
         };
         comboBox.setButtonCell(buttonCell);
         comboBox.setValue((T)getTextString());
-        
+
+        if (control.getProperties().containsKey(COMBO_BOX_ROWS_TO_MEASURE_WIDTH_KEY)) {
+            comboBox.getProperties().put(COMBO_BOX_ROWS_TO_MEASURE_WIDTH_KEY, control.getProperties().get(COMBO_BOX_ROWS_TO_MEASURE_WIDTH_KEY));
+        }
+
         // The zero is a dummy value - it just has to be legally within the bounds of the
         // item count for the CheckComboBox items list.
         selectedIndices.addListener((ListChangeListener<Integer>) c -> buttonCell.updateIndex(0));

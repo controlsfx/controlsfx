@@ -29,6 +29,7 @@ package impl.org.controlsfx.skin;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -70,6 +71,7 @@ public class HyperlinkLabelSkin extends SkinBase<HyperlinkLabel> {
             }
         }
     };
+    private final ChangeListener<Boolean> focusChangeListener;
 
     /***************************************************************************
      * 
@@ -85,11 +87,12 @@ public class HyperlinkLabelSkin extends SkinBase<HyperlinkLabel> {
         hyperlink.setPadding(new Insets(0, 0, 0, 0));
         hyperlink.setOnAction(eventHandler);
         hyperlink.focusTraversableProperty().bind(control.focusTraversableProperty());
-        control.focusedProperty().addListener((o, ov, nv) -> {
+        focusChangeListener = (o, ov, nv) -> {
             if (nv) {
                 hyperlink.requestFocus();
             }
-        });
+        };
+        getSkinnable().focusedProperty().addListener(focusChangeListener);
 
         getChildren().add(textFlow);
         updateText();
@@ -97,6 +100,12 @@ public class HyperlinkLabelSkin extends SkinBase<HyperlinkLabel> {
         registerChangeListener(control.textProperty(), e -> updateText()); //$NON-NLS-1$
     }
 
+    @Override
+    public void dispose() {
+        hyperlink.focusTraversableProperty().unbind();
+        getSkinnable().focusedProperty().removeListener(focusChangeListener);
+        super.dispose();
+    }
 
     /***************************************************************************
      * 

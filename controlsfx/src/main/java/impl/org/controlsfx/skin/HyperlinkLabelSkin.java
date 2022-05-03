@@ -29,7 +29,6 @@ package impl.org.controlsfx.skin;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -61,17 +60,12 @@ public class HyperlinkLabelSkin extends SkinBase<HyperlinkLabel> {
      **************************************************************************/
 
     private final TextFlow textFlow;
-    private final Hyperlink hyperlink;
-
-    private final EventHandler<ActionEvent> eventHandler = new EventHandler<ActionEvent>() {
-        @Override public void handle(final ActionEvent event) {
-            EventHandler<ActionEvent> onActionHandler = getSkinnable().getOnAction();
-            if (onActionHandler != null) {
-                onActionHandler.handle(event);
-            }
+    private final EventHandler<ActionEvent> eventHandler = event -> {
+        EventHandler<ActionEvent> onActionHandler = getSkinnable().getOnAction();
+        if (onActionHandler != null) {
+            onActionHandler.handle(event);
         }
     };
-    private final ChangeListener<Boolean> focusChangeListener;
 
     /***************************************************************************
      * 
@@ -83,28 +77,27 @@ public class HyperlinkLabelSkin extends SkinBase<HyperlinkLabel> {
         super(control);
 
         textFlow = new TextFlow();
-        hyperlink = new Hyperlink();
-        hyperlink.setPadding(new Insets(0, 0, 0, 0));
-        hyperlink.setOnAction(eventHandler);
-        hyperlink.focusTraversableProperty().bind(control.focusTraversableProperty());
-        focusChangeListener = (o, ov, nv) -> {
-            if (nv) {
-                hyperlink.requestFocus();
-            }
-        };
-        getSkinnable().focusedProperty().addListener(focusChangeListener);
-
         getChildren().add(textFlow);
-        updateText();
 
-        registerChangeListener(control.textProperty(), e -> updateText()); //$NON-NLS-1$
+        updateText();
+        updateFocusTraversable(getSkinnable().isFocusTraversable());
+
+        registerChangeListener(control.focusedProperty(), e -> {
+            if (getSkinnable().isFocused()) {
+                textFlow.getChildren().stream()
+                        .filter(Node::isFocusTraversable)
+                        .findFirst()
+                        .ifPresent(Node::requestFocus);
+            }
+        });
+        registerChangeListener(control.focusTraversableProperty(), e -> updateFocusTraversable(getSkinnable().isFocusTraversable()));
+        registerChangeListener(control.textProperty(), e -> updateText());
     }
 
-    @Override
-    public void dispose() {
-        hyperlink.focusTraversableProperty().unbind();
-        getSkinnable().focusedProperty().removeListener(focusChangeListener);
-        super.dispose();
+    private void updateFocusTraversable(Boolean nv) {
+        textFlow.getChildren().stream()
+                .filter(node -> node instanceof Hyperlink)
+                .forEach(node -> node.setFocusTraversable(nv));
     }
 
     /***************************************************************************
@@ -143,11 +136,13 @@ public class HyperlinkLabelSkin extends SkinBase<HyperlinkLabel> {
             }
 
             // firstly, create a label from start to startPos
-            Text label = new Text(text.substring(start, startPos));
+            Label label = new Label(text.substring(start, startPos));
             nodes.add(label);
 
             // if endPos is greater than startPos, create a hyperlink
-            hyperlink.setText(text.substring(startPos + 1, endPos));
+            Hyperlink hyperlink = new Hyperlink(text.substring(startPos + 1, endPos));
+            hyperlink.setPadding(new Insets(0, 0, 0, 0));
+            hyperlink.setOnAction(eventHandler);
             nodes.add(hyperlink);
 
             start = endPos + 1;

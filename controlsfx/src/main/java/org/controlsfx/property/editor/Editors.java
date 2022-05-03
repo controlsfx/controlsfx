@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, 2021, ControlsFX
+ * Copyright (c) 2015, 2022, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,8 @@ package org.controlsfx.property.editor;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
@@ -87,6 +89,24 @@ public class Editors {
             }
 
             @Override public Number getValue() {
+                if (sourceClass == Byte.class) {
+                    return Byte.valueOf(getEditor().getText());
+                } else if (sourceClass == Short.class) {
+                    return Short.valueOf(getEditor().getText());
+                } else if (sourceClass == Integer.class) {
+                    return Integer.valueOf(getEditor().getText());
+                } else if (sourceClass == Long.class) {
+                    return Long.valueOf(getEditor().getText());
+                } else if (sourceClass == Float.class) {
+                    return Float.valueOf(getEditor().getText());
+                } else if (sourceClass == Double.class) {
+                    return Double.valueOf(getEditor().getText());
+                } else if (sourceClass == BigInteger.class) {
+                    return new BigInteger(getEditor().getText());
+                } else if (sourceClass == BigDecimal.class) {
+                    return new BigDecimal(getEditor().getText());
+                }
+
                 try {
                     return sourceClass.getConstructor(String.class).newInstance(getEditor().getText());
                 } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException

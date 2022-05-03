@@ -1648,7 +1648,7 @@ public class SpreadsheetView extends Control{
     }
 
     /**
-     * This DoubleProperty represents the with of the rowHeader. This is just
+     * This DoubleProperty represents the width of the rowHeader. This is just
      * representing the width of the Labels, not the pickers.
      *
      * @return A DoubleProperty.

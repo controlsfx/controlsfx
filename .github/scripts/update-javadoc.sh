@@ -2,12 +2,12 @@
 
 REPO_SLUG=controlsfx/javadoc
 
-cd $TRAVIS_BUILD_DIR
+cd $HOME
 git clone https://github.com/$REPO_SLUG
 cd javadoc
 
 mkdir $1
-cp -r $TRAVIS_BUILD_DIR/controlsfx/build/docs/javadoc/* $1
+cp -r $GITHUB_WORKSPACE/controlsfx/build/docs/javadoc/* $1
 
 # If tag is not 8.x.x
 if [[ $1 != 8* ]]
@@ -19,7 +19,7 @@ fi
 
 git add $1
 git commit -m "Add Javadoc for $1"
-git push https://abhinayagarwal:$GITHUB_PASSWORD@github.com/$REPO_SLUG HEAD:master
+git push https://abhinayagarwal:$PAT@github.com/$REPO_SLUG HEAD:master
 
 # Re-deploy Javadoc Github pages
-curl -u abhinayagarwal:$ACCESS_TOKEN -X POST https://api.github.com/repos/controlsfx/javadoc/pages/builds
+curl -u abhinayagarwal:$PAT -X POST https://api.github.com/repos/controlsfx/javadoc/pages/builds

@@ -1,0 +1,85 @@
+name: ControlsFX Release
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install packages (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install xvfb tigervnc-standalone-server tigervnc-common
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 5
+
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Import GPG keys
+        run: |
+          gpg --import --batch <(echo "$GPG_PRIVATE_KEY") &> /dev/null
+          # Gradle doesn't support GPG 2.1 and later: https://github.com/gradle/gradle/issues/888
+          gpg --export-secret-keys --pinentry-mode loopback --passphrase="$GPG_PASSPHRASE" > ~/.gnupg/secring.gpg
+          rm -rf /tmp/secret
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Run Tests (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          export DISPLAY=:90
+          mkdir /home/runner/.vnc
+          echo 123456 | vncpasswd -f > /home/runner/.vnc/passwd
+          chmod -v 600 /home/runner/.vnc/passwd
+          vncserver :90 -localhost -nolisten tcp
+          ./gradlew build test
+          vncserver -kill :90
+
+      - name: Release to Maven Central
+        id: deploy
+        run: |
+          ./gradlew publish -i -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.api=$TRANSIFEX_API\
+          -Psigning.keyId=$GPG_KEYNAME -Psigning.password=$GPG_PASSPHRASE -Psigning.secretKeyRingFile=$HOME/.gnupg/secring.gpg \
+          -Dorg.gradle.internal.publish.checksums.insecure=true
+          echo ::set-output name=exit_code::$?
+        env:
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          TRANSIFEX_API: ${{ secrets.TRANSIFEX_API }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEYNAME: ${{ secrets.GPG_KEYNAME }}
+
+      - name: Commit next development version
+        if: steps.deploy.outputs.exit_code == 0
+        run: |
+          git config --global user.name "abhinayagarwal"
+          git config --global user.email "abhinay_agarwal@live.com"
+          TAG=${GITHUB_REF/refs\/tags\//}
+          newVersion=${TAG%.*}.$((${TAG##*.} + 1)) # Update version by 1
+          sed -i "0,/^controlsfx_version = $TAG/s//controlsfx_version = $newVersion-SNAPSHOT/" gradle.properties
+          git commit gradle.properties -m "Prepare development of $newVersion"
+          git push https://abhinayagarwal:$PAT@github.com/$GITHUB_REPOSITORY HEAD:master
+        env:
+          PAT: ${{ secrets.PAT }}
+
+      - name: Update Javadocs
+        if: steps.deploy.outputs.exit_code == 0
+        run: |
+          TAG=${GITHUB_REF/refs\/tags\//}
+          bash .github/scripts/update-javadoc.sh "$TAG"
+        env:
+          PAT: ${{ secrets.PAT }}

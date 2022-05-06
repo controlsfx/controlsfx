@@ -35,10 +35,21 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.TransformationList;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.SortEvent;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumnBase;
+import javafx.scene.control.TablePosition;
+import javafx.scene.control.TableView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.tableview2.FilteredTableColumn;
@@ -46,10 +57,14 @@ import org.controlsfx.control.tableview2.FilteredTableView;
 import org.controlsfx.control.tableview2.TableColumn2;
 import org.controlsfx.control.tableview2.TableView2;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static impl.org.controlsfx.tableview2.SortUtils.SortEndedEvent.SORT_ENDED_EVENT;
-import static impl.org.controlsfx.tableview2.SortUtils.SortStartedEvent.SORT_STARTED_EVENT;
 
 /**
  * Display the row header on the left of the cells (view), where the user can
@@ -79,12 +94,7 @@ public class RowHeader<S> extends StackPane {
     private final DoubleProperty innerRowHeaderWidth = new SimpleDoubleProperty();
     private Rectangle clip; // Ensure that children do not go out of bounds
 
-    // used for column resizing
-
-    private ListChangeListener<Integer> tableSelectionListener;
-    private ListChangeListener<Integer> rowHeaderSelectionListener;
-
-    private boolean sorting;
+    private boolean shiftDown;
 
     /**
      * ****************************************************************
@@ -133,7 +143,7 @@ public class RowHeader<S> extends StackPane {
 
         // Clip property to stay within bounds
         clip = new Rectangle(getRowHeaderWidth(),
-                snapSize(tableView.getHeight() - tableView.snappedTopInset() - tableView.snappedBottomInset()));
+                snapSizeY(tableView.getHeight() - tableView.snappedTopInset() - tableView.snappedBottomInset()));
         clip.relocate(snappedTopInset(), snappedLeftInset());
         clip.setSmooth(false);
         clip.heightProperty().bind(Bindings.createDoubleBinding(() ->
@@ -173,10 +183,8 @@ public class RowHeader<S> extends StackPane {
         innerTableView.itemsProperty().bind(tableView.itemsProperty());
 
         // sync fixed rows
-        innerTableView.getFixedRows().setAll(tableView.getFixedRows().stream().collect(Collectors.toList()));
-        tableView.getFixedRows().addListener((Observable o) -> {
-            innerTableView.getFixedRows().setAll(tableView.getFixedRows().stream().collect(Collectors.toList()));
-        });
+        Bindings.bindContent(innerTableView.getFixedRows(), tableView.getFixedRows());
+
 
         // sync scrolling between tableViews
         innerTableView.skinProperty().addListener(new InvalidationListener() {
@@ -189,31 +197,11 @@ public class RowHeader<S> extends StackPane {
         });
 
         // sync selection between two selection models
-        innerTableView.getSelectionModel().selectionModeProperty().bind(tableView.getSelectionModel().selectionModeProperty());
-        rowHeaderSelectionListener = (ListChangeListener.Change<? extends Integer> c) -> {
-            skin.getSelectedRows().removeListener(tableSelectionListener);
-            while (c.next()) {
-                c.getRemoved().forEach(i -> {
-                        if (tableView.getSelectionModel().isCellSelectionEnabled()) {
-                            tableView.getVisibleLeafColumns().forEach(col -> tableView.getSelectionModel().clearSelection(i, col));
-                        } else {
-                            tableView.getSelectionModel().clearSelection(i);
-                        }
-                    });
-                c.getAddedSubList().forEach(i -> tableView.getSelectionModel().select(i));
-            }
-            skin.getSelectedRows().addListener(tableSelectionListener);
-        };
-        tableSelectionListener = (ListChangeListener.Change<? extends Integer> c) -> {
-            innerTableView.getSelectionModel().getSelectedIndices().removeListener(rowHeaderSelectionListener);
-            while (c.next()) {
-                c.getRemoved().forEach(i -> innerTableView.getSelectionModel().clearSelection(i));
-                c.getAddedSubList().forEach(i -> innerTableView.getSelectionModel().select(i));
-            }
-            if (! sorting) {
-                innerTableView.getSelectionModel().getSelectedIndices().addListener(rowHeaderSelectionListener);
-            }
-        };
+        tableView.selectionModelProperty().addListener((observable, oldValue, newValue) -> {
+            TableView.TableViewSelectionModel<S> value = new ForwardSelectionModel(newValue);
+            innerTableView.setSelectionModel(value);
+        });
+        this.innerTableView.setSelectionModel(new ForwardSelectionModel(tableView.getSelectionModel()));
 
         final ChangeListener<Boolean> focusListener = (obs, ov, nv) -> {
             if (! tableView.isFocused() && ! innerTableView.isFocused()) {
@@ -224,27 +212,27 @@ public class RowHeader<S> extends StackPane {
                 tableView.setStyle("-fx-selection-bar-non-focused: -fx-accent;");
             }
         };
-        innerTableView.getSelectionModel().getSelectedIndices().addListener(rowHeaderSelectionListener);
-        skin.getSelectedRows().addListener(tableSelectionListener);
+
+        final EventHandler<KeyEvent> keyListener = keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.SHIFT) {
+               var eventType = keyEvent.getEventType();
+                if (eventType == KeyEvent.KEY_PRESSED) {
+                    shiftDown = true;
+                } else if (eventType == KeyEvent.KEY_RELEASED) {
+                    shiftDown = false;
+                }
+            }
+        };
 
         // When sorting, the external TableView fires add/remove selection events.
         // These change the innerTableView selected rows. To avoid firing new
         // events back to the TableView, we have to remove rowHeaderSelectionListener
         // while sorting.
         tableView.addEventHandler(SortEvent.ANY, e -> {
-            if (e != null && SORT_STARTED_EVENT.equals(e.getEventType())) {
-                sorting = true;
-                innerTableView.getSelectionModel().getSelectedIndices().removeListener(rowHeaderSelectionListener);
-            } else if (e != null && SORT_ENDED_EVENT.equals(e.getEventType())) {
-                sorting = false;
+            if (e != null && SORT_ENDED_EVENT.equals(e.getEventType())) {
                 if (innerSkin != null) {
                     innerSkin.getFlow().rebuildFixedCells();
                 }
-                innerTableView.getSelectionModel().clearSelection();
-                if (innerTableView.getItems() != null) {
-                    skin.getSelectedRows().forEach(i -> innerTableView.getSelectionModel().select(i));
-                }
-                innerTableView.getSelectionModel().getSelectedIndices().addListener(rowHeaderSelectionListener);
             }
         });
 
@@ -254,6 +242,8 @@ public class RowHeader<S> extends StackPane {
         // keep focus on both tableViews
         tableView.focusedProperty().addListener(focusListener);
         innerTableView.focusedProperty().addListener(focusListener);
+
+        tableView.addEventFilter(KeyEvent.ANY, keyListener);
 
     }
 
@@ -292,7 +282,7 @@ public class RowHeader<S> extends StackPane {
             }
             final ScrollBar hBar = skin.getHBar();
             double hBarHeight = hBar.isVisible() && tableView.getItems() != null && ! tableView.getItems().isEmpty() ?
-                    snapSize(hBar.getHeight()) : 0;
+                    snapSizeY(hBar.getHeight()) : 0;
             innerTableView.resizeRelocate(x, 0, innerRowHeaderWidth.get(), tableView.getHeight() - hBarHeight -
                     tableView.snappedTopInset() - tableView.snappedBottomInset());
             if (! innerTableView.getColumns().isEmpty()) {
@@ -333,9 +323,9 @@ public class RowHeader<S> extends StackPane {
         if (tableView instanceof FilteredTableView) {
             column = new FilteredTableColumn<>();
             // default option: reset filter on main tableView
-            ((FilteredTableColumn) column).setOnFilterAction(e -> {
-                    if (((FilteredTableView) tableView).getPredicate() != null) {
-                        ((FilteredTableView) tableView).resetFilter();
+            ((FilteredTableColumn<?,?>) column).setOnFilterAction(e -> {
+                    if (((FilteredTableView<?>) tableView).getPredicate() != null) {
+                        ((FilteredTableView<?>) tableView).resetFilter();
                     }
                 });
         } else {
@@ -364,4 +354,229 @@ public class RowHeader<S> extends StackPane {
      * ************************************************************************
      */
     private final InvalidationListener layout = (Observable o) -> requestLayout();
+
+    private class ForwardSelectionModel extends TableView.TableViewSelectionModel<S> {
+        private final TableView.TableViewSelectionModel<S> baseSelectionModel;
+
+        private final TransformationList<TablePosition, TablePosition> transformationList;
+
+        private final Set<Integer> selectedIndices;
+
+        private int lastSelected = 0;
+
+        public ForwardSelectionModel(TableView.TableViewSelectionModel<S> baseSelectionModel) {
+            super(innerTableView);
+            selectedIndices = new HashSet<>();
+            baseSelectionModel.selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+                selectedIndices.clear();
+                selectedIndices.addAll(baseSelectionModel.getSelectedIndices());
+                updateRowHeader();
+            });
+            this.baseSelectionModel = baseSelectionModel;
+
+            final Function<TablePosition, TablePosition> mappingFunction = tablePosition -> new TablePosition(innerTableView, tablePosition.getRow(), null);
+            this.transformationList = new MappedList(baseSelectionModel.getSelectedCells(), mappingFunction);
+        }
+
+        @Override
+        public ObservableList<Integer> getSelectedIndices() {
+            return this.baseSelectionModel.getSelectedIndices();
+        }
+
+        @Override
+        public ObservableList<TablePosition> getSelectedCells() {
+            return this.transformationList;
+        }
+
+        @Override
+        public ObservableList<S> getSelectedItems() {
+            return baseSelectionModel.getSelectedItems();
+        }
+
+        @Override
+        public boolean isSelected(int index) {
+            return selectedIndices.contains(index);
+        }
+
+        @Override
+        public boolean isSelected(int row, TableColumn<S, ?> column) {
+            return isSelected(row);
+        }
+
+        @Override
+        public void selectRange(int start, int end) {
+            var visibleLeafColumns = tableView.getVisibleLeafColumns();
+            if (!visibleLeafColumns.isEmpty()) {
+                this.baseSelectionModel.clearAndSelect(start, visibleLeafColumns.get(0));
+                if (visibleLeafColumns.size() > 1) {
+                    baseSelectionModel.selectRange(start, tableView.getVisibleLeafColumn(0), end, tableView.getVisibleLeafColumn(visibleLeafColumns.size() - 1));
+                }
+            }
+            updateRowHeader();
+        }
+
+        @Override
+        public void selectRange(int minRow, TableColumnBase<S, ?> minColumn, int maxRow, TableColumnBase<S, ?> maxColumn) {
+            selectRange(minRow, maxRow);
+        }
+
+        @Override
+        public void select(int row, TableColumn<S, ?> column) {
+            selectRange(row, row);
+        }
+
+        @Override
+        public void clearAndSelect(int row, TableColumn<S, ?> column) {
+            var columns = tableView.getColumns();
+            if (!columns.isEmpty()) {
+                var start = row;
+                if (shiftDown) {
+                    start = lastSelected;
+                } else {
+                    this.baseSelectionModel.clearAndSelect(row, columns.get(0));
+                }
+                lastSelected = row;
+                if (columns.size() > 1) {
+                    selectRange(start, row);
+                    return;
+                }
+            }
+            updateRowHeader();
+        }
+
+        private void updateRowHeader() {
+            if (tableView.isRowHeaderVisible()) {
+                innerSkin.getSelectedRows().setAll(selectedIndices);
+            }
+        }
+
+        @Override
+        public void clearSelection(int row, TableColumn<S, ?> column) {
+            var columns = tableView.getColumns();
+            if (!columns.isEmpty()) {
+                selectedIndices.remove(row);
+                this.baseSelectionModel.clearSelection(row);
+            }
+            updateRowHeader();
+        }
+
+        @Override
+        public void selectLeftCell() {
+            throw generateExceptionForUnexpectedCall();
+        }
+
+        @Override
+        public void selectRightCell() {
+            throw generateExceptionForUnexpectedCall();
+        }
+
+        @Override
+        public void selectAboveCell() {
+            throw generateExceptionForUnexpectedCall();
+        }
+
+        @Override
+        public void selectBelowCell() {
+            throw generateExceptionForUnexpectedCall();
+        }
+
+        private RuntimeException generateExceptionForUnexpectedCall() {
+            return new IllegalStateException("should not be called, as it is just forwarding");
+        }
+    }
+
+    private static final class MappedList<M, B> extends TransformationList<M, B> {
+        private final Function<B, M> mappingFunction;
+
+        public MappedList(ObservableList<B> baseList, Function<B, M> mappingFunction) {
+            super(baseList);
+            this.mappingFunction = mappingFunction;
+        }
+
+        @Override
+        protected void sourceChanged(ListChangeListener.Change c) {
+            ObservableList<M> mapped = FXCollections.observableList(asMappedStream(c.getList()).collect(Collectors.toList()));
+            this.fireChange(new ListChangeListener.Change<>(mapped) {
+                @Override
+                public boolean next() {
+                    return c.next();
+                }
+
+                @Override
+                public void reset() {
+                    c.reset();
+                }
+
+                @Override
+                public int getFrom() {
+                    return c.getFrom();
+                }
+
+                @Override
+                public int getTo() {
+                    return c.getTo();
+                }
+
+                @Override
+                public List<M> getRemoved() {
+                    return asMappedStream(c.getRemoved()).collect(Collectors.toList());
+                }
+
+                @Override
+                public boolean wasAdded() {
+                    return c.wasAdded();
+                }
+
+                @Override
+                public boolean wasPermutated() {
+                    return c.wasPermutated();
+                }
+
+                @Override
+                public boolean wasRemoved() {
+                    return c.wasRemoved();
+                }
+
+                @Override
+                public boolean wasReplaced() {
+                    return c.wasReplaced();
+                }
+
+                @Override
+                public boolean wasUpdated() {
+                    return c.wasUpdated();
+                }
+
+                @Override
+                protected int[] getPermutation() {
+                    throw new IllegalStateException("call error");
+                }
+            });
+        }
+
+        private Stream<M> asMappedStream(List<?> list) {
+            return list.stream().map(a -> (B) a).map(mappingFunction);
+        }
+
+        @Override
+        public int getSourceIndex(int index) {
+            return index;
+        }
+
+        @Override
+        public int getViewIndex(int index) {
+            return index;
+        }
+
+        @Override
+        public M get(int index) {
+            var position = getSource().get(index);
+            return mappingFunction.apply(position);
+        }
+
+        @Override
+        public int size() {
+            return getSource().size();
+        }
+    }
 }

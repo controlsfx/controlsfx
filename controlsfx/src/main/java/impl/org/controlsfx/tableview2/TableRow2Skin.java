@@ -296,8 +296,8 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
              */
             if (tableView.getSelectionModel() != null && tableView.getSelectionModel().isCellSelectionEnabled()) {
                 final int ic = indexColumn;
-                boolean select = ! tableView.getSelectionModel().getSelectedCells().stream()
-                        .noneMatch(cell -> cell.getRow() == index && cell.getColumn() == ic);
+                boolean select = tableView.getSelectionModel().getSelectedCells().stream()
+                        .anyMatch(cell -> cell.getRow() == index && cell.getColumn() == ic);
                 tableCell.pseudoClassStateChanged(SELECTED, select);
             }
 

@@ -23,7 +23,6 @@ import org.testfx.service.query.NodeQuery;
 import org.testfx.util.WaitForAsyncUtils;
 
 import java.time.Duration;
-import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -57,6 +56,9 @@ public class TableView2SelectionTest extends FxRobot {
             return "RowItem{" + "values=" + Arrays.toString(values) + '}';
         }
     }
+
+    // needs to be removed once https://github.com/TestFX/TestFX/issues/566 is resolved
+    private static final boolean HEADLESS_TEST_FX_BUG_NOT_FIXED = Boolean.parseBoolean(System.getProperty("testfx.headless", "false"));
 
     private static final int TABLE_WIDTH = 800;
     private static final int TABLE_HEIGHT = 600;
@@ -120,7 +122,8 @@ public class TableView2SelectionTest extends FxRobot {
     }
 
     @After
-    public void afterEach() {
+    public void afterEach() throws TimeoutException {
+        FxToolkit.cleanupStages();
         WaitForAsyncUtils.clearExceptions();
     }
 
@@ -214,10 +217,15 @@ public class TableView2SelectionTest extends FxRobot {
         waitForProcessingInDisplayThread();
 
         interact(() -> {
-            selectCellWithMouse(1, 1);
-            press(KeyCode.SHIFT);
-            selectCellWithMouse(2, 2);
-            release(KeyCode.SHIFT);
+            if (HEADLESS_TEST_FX_BUG_NOT_FIXED) {
+                var selectionModel = tableView.getSelectionModel();
+                selectionModel.selectRange(1, tableView.getColumns().get(1), 2, tableView.getColumns().get(2));
+            } else {
+                selectCellWithMouse(1, 1);
+                press(KeyCode.SHIFT);
+                selectCellWithMouse(2, 2);
+                release(KeyCode.SHIFT);
+            }
         });
 
         var selectedColumnHeaders = findSelectedColumnHeaders();

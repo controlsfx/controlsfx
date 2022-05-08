@@ -115,6 +115,14 @@ public class PopOver extends PopupControl {
             }
         });
 
+        ownerWindowProperty().addListener((o) -> {
+            if (getOwnerWindow() != null) {
+                getOwnerWindow().setOnCloseRequest((t) -> {
+                    hide(Duration.ZERO);
+                });
+            }
+        });
+        
         /*
          * Create some initial content.
          */

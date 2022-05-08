@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2022, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -68,7 +68,9 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>> {
         int rowIndex = getSkinnable().getIndex();
         if (rowIndex >= 0) {
             GridView<T> gridView = getSkinnable().getGridView();
-            int maxCellsInRow = ((GridViewSkin<?>)gridView.getSkin()).computeMaxCellsInRow();
+            GridViewSkin<?> gridViewSkin = (GridViewSkin<?>) gridView.getSkin();
+            if (gridViewSkin == null) return;
+            int maxCellsInRow = gridViewSkin.computeMaxCellsInRow();
             int totalCellsInGrid = gridView.getItems().size();
             int startCellIndex = rowIndex * maxCellsInRow;
             int endCellIndex = startCellIndex + maxCellsInRow - 1;

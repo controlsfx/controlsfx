@@ -115,14 +115,8 @@ public class PopOver extends PopupControl {
             }
         });
 
-        ownerWindowProperty().addListener((o) -> {
-            if (getOwnerWindow() != null) {
-                getOwnerWindow().setOnCloseRequest((t) -> {
-                    hide(Duration.ZERO);
-                });
-            }
-        });
-        
+        setUpOwnerCloseBehaviour();
+
         /*
          * Create some initial content.
          */
@@ -156,6 +150,22 @@ public class PopOver extends PopupControl {
         });
 
         setAutoHide(true);
+    }
+
+    /**
+     *
+     *
+     */
+    private void setUpOwnerCloseBehaviour() {
+        ownerWindowProperty().addListener((o) -> {
+            if (getOwnerWindow() != null) {
+                getOwnerWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, closePopOverOnOwnerWindowCloseLambda);
+                getOwnerWindow().addEventFilter(WindowEvent.WINDOW_HIDING, closePopOverOnOwnerWindowCloseLambda);
+            }else{
+                getOwnerWindow().removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, closePopOverOnOwnerWindowCloseLambda);
+                getOwnerWindow().removeEventFilter(WindowEvent.WINDOW_HIDING, closePopOverOnOwnerWindowCloseLambda);
+            }
+        });
     }
 
     /**

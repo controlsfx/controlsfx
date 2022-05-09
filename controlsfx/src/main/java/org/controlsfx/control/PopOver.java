@@ -531,10 +531,6 @@ public class PopOver extends PopupControl {
                     closePopOverOnOwnerWindowClose);
             ownerWindow.removeEventFilter(WindowEvent.WINDOW_HIDING,
                 closePopOverOnOwnerWindowClose);
-            ownerWindow.removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
-                    closePopOverOnOwnerWindowCloseLambda);
-            ownerWindow.removeEventFilter(WindowEvent.WINDOW_HIDING,
-                    closePopOverOnOwnerWindowCloseLambda);
         }
         if (fadeOutDuration == null) {
             fadeOutDuration = DEFAULT_FADE_DURATION;

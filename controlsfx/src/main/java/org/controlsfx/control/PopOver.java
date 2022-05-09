@@ -153,8 +153,11 @@ public class PopOver extends PopupControl {
     }
 
     /**
+     * Adds the EventFilter when the WindowProperty changes.
+     * Solves the issue (#1441) that leads to an exception, when closing the window (using the "x"-button) while the PopOver is visible.
      *
-     *
+     * Hint: This seems to be needed additional to filters that are already implemented in {@link #show(Window)}, {@link #hide(Duration)}...
+     * It also doesn't work when using the WeakEventHandler instead. Replacing the Handlers in the other positions also doesn't lead to success.
      */
     private void setUpOwnerCloseBehaviour() {
         ownerWindowProperty().addListener((o) -> {

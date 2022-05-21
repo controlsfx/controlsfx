@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2013, 2022, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,80 +42,89 @@ import javafx.scene.text.TextFlow;
 import org.controlsfx.control.HyperlinkLabel;
 
 public class HyperlinkLabelSkin extends SkinBase<HyperlinkLabel> {
-    
+
     /***************************************************************************
      * 
      * Static fields
      * 
      **************************************************************************/
-    
+
     // The strings used to delimit the hyperlinks
     private static final String HYPERLINK_START = "["; //$NON-NLS-1$
     private static final String HYPERLINK_END = "]"; //$NON-NLS-1$
-    
-    
-    
+
     /***************************************************************************
      * 
      * Private fields
      * 
      **************************************************************************/
-    
+
     private final TextFlow textFlow;
-    private final EventHandler<ActionEvent> eventHandler = new EventHandler<ActionEvent>() {
-        @Override public void handle(final ActionEvent event) {
-            EventHandler<ActionEvent> onActionHandler = getSkinnable().getOnAction();
-            if (onActionHandler != null) {
-                onActionHandler.handle(event);
-            }
+    private final EventHandler<ActionEvent> eventHandler = event -> {
+        EventHandler<ActionEvent> onActionHandler = getSkinnable().getOnAction();
+        if (onActionHandler != null) {
+            onActionHandler.handle(event);
         }
     };
-    
-    
 
     /***************************************************************************
      * 
      * Constructors
      * 
      **************************************************************************/
-    
+
     public HyperlinkLabelSkin(HyperlinkLabel control) {
         super(control);
-        
-        this.textFlow = new TextFlow();
+
+        textFlow = new TextFlow();
         getChildren().add(textFlow);
+
         updateText();
-        
-        registerChangeListener(control.textProperty(), e -> updateText()); //$NON-NLS-1$
+        updateFocusTraversable(getSkinnable().isFocusTraversable());
+
+        registerChangeListener(control.focusedProperty(), e -> {
+            if (getSkinnable().isFocused()) {
+                textFlow.getChildren().stream()
+                        .filter(Node::isFocusTraversable)
+                        .findFirst()
+                        .ifPresent(Node::requestFocus);
+            }
+        });
+        registerChangeListener(control.focusTraversableProperty(), e -> updateFocusTraversable(getSkinnable().isFocusTraversable()));
+        registerChangeListener(control.textProperty(), e -> updateText());
     }
 
-    
-    
+    private void updateFocusTraversable(Boolean nv) {
+        textFlow.getChildren().stream()
+                .filter(node -> node instanceof Hyperlink)
+                .forEach(node -> node.setFocusTraversable(nv));
+    }
+
     /***************************************************************************
      * 
      * Implementation
      * 
      **************************************************************************/
-    
+
     // splits up the string into Text and Hyperlink nodes, and places them
     // into a TextFlow instance
     private void updateText() {
         final String text = getSkinnable().getText();
-        
+
         if (text == null || text.isEmpty()) {
             textFlow.getChildren().clear();
             return;
         }
-        
+
         // parse the text and put it into an array list
         final List<Node> nodes = new ArrayList<>();
-        
+
         int start = 0;
         final int textLength = text.length();
         while (start != -1 && start < textLength) {
             int startPos = text.indexOf(HYPERLINK_START, start);
             int endPos = text.indexOf(HYPERLINK_END, startPos);
-            
+
             // if the startPos is -1, there are no more hyperlinks...
             if (startPos == -1 || endPos == -1) {
                 if (textLength > start) {
@@ -125,20 +134,19 @@ public class HyperlinkLabelSkin extends SkinBase<HyperlinkLabel> {
                     break;
                 }
             }
-            
+
             // firstly, create a label from start to startPos
-            Text label = new Text(text.substring(start, startPos));
+            Label label = new Label(text.substring(start, startPos));
             nodes.add(label);
-            
+
             // if endPos is greater than startPos, create a hyperlink
             Hyperlink hyperlink = new Hyperlink(text.substring(startPos + 1, endPos));
             hyperlink.setPadding(new Insets(0, 0, 0, 0));
             hyperlink.setOnAction(eventHandler);
             nodes.add(hyperlink);
-            
+
             start = endPos + 1;
         }
-        
         textFlow.getChildren().setAll(nodes);
     }
 }

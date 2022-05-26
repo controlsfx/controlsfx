@@ -47,6 +47,7 @@ import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -474,6 +475,17 @@ public class ListSelectionView<T> extends ControlsFXControl {
             super.setEventHandler(eventHandler);
         }
     }
+    
+    private Comparator<T> comparator;
+    public void setComparator(Comparator<T> comparator) {
+        this.comparator = comparator;
+    }
+    private void sortItems(ListView<T> sourceListView, ListView<T> targetListView) {
+        if (comparator != null) {
+            sourceListView.getItems().sort(comparator);
+            targetListView.getItems().sort(comparator);
+        }
+    }
 
     /**
      * Action use to move the selected items from the
@@ -492,7 +504,10 @@ public class ListSelectionView<T> extends ControlsFXControl {
         @Override
         public void initialize(ListView<T> sourceListView, ListView<T> targetListView) {
             disabledProperty().bind(Bindings.isEmpty(sourceListView.getSelectionModel().getSelectedItems()));
-            setEventHandler(ae -> moveToTarget(sourceListView, targetListView));
+            setEventHandler(ae -> {
+                moveToTarget(sourceListView, targetListView);
+                sortItems(sourceListView, targetListView);
+            });
         }
     }
 
@@ -513,7 +528,10 @@ public class ListSelectionView<T> extends ControlsFXControl {
         @Override
         public void initialize(ListView<T> sourceListView, ListView<T> targetListView) {
             disabledProperty().bind(Bindings.isEmpty(sourceListView.getItems()));
-            setEventHandler(ae -> moveToTargetAll(sourceListView, targetListView));
+            setEventHandler(ae -> {
+                moveToTargetAll(sourceListView, targetListView);
+                sortItems(sourceListView, targetListView);
+            });
         }
     }
 
@@ -534,7 +552,10 @@ public class ListSelectionView<T> extends ControlsFXControl {
         @Override
         public void initialize(ListView<T> sourceListView, ListView<T> targetListView) {
             disabledProperty().bind(Bindings.isEmpty(targetListView.getSelectionModel().getSelectedItems()));
-            setEventHandler(ae -> moveToSource(sourceListView, targetListView));
+            setEventHandler(ae -> {
+                moveToSource(sourceListView, targetListView);
+                sortItems(sourceListView, targetListView);
+            });
         }
     }
 
@@ -555,7 +576,10 @@ public class ListSelectionView<T> extends ControlsFXControl {
         @Override
         public void initialize(ListView<T> sourceListView, ListView<T> targetListView) {
             disabledProperty().bind(Bindings.isEmpty(targetListView.getItems()));
-            setEventHandler(ae -> moveToSourceAll(sourceListView, targetListView));
+            setEventHandler(ae -> {
+                moveToSourceAll(sourceListView, targetListView);
+                sortItems(sourceListView, targetListView);
+            });
         }
     }
 

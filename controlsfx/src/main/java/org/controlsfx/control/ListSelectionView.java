@@ -477,6 +477,11 @@ public class ListSelectionView<T> extends ControlsFXControl {
     }
     
     private Comparator<T> comparator;
+    
+    /**
+     * Set a comparator to ensure that the source and target items list is sorted
+     * @param comparator the comparator to use to sort the source and target items.
+     */
     public void setComparator(Comparator<T> comparator) {
         this.comparator = comparator;
     }

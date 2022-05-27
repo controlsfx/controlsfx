@@ -160,10 +160,14 @@ public class PopOver extends PopupControl {
      * It also doesn't work when using the WeakEventHandler instead. Replacing the Handlers in the other positions also doesn't lead to success.
      */
     private void setUpOwnerCloseBehaviour() {
-        ownerWindowProperty().addListener((o) -> {
-            if (getOwnerWindow() != null) {
-                getOwnerWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, closePopOverOnOwnerWindowCloseLambda);
-                getOwnerWindow().addEventFilter(WindowEvent.WINDOW_HIDING, closePopOverOnOwnerWindowCloseLambda);
+        ownerWindowProperty().addListener((o, oldVal, newVal) -> {
+            if (oldVal != null) {
+                oldVal.removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, closePopOverOnOwnerWindowCloseLambda);
+                oldVal.removeEventFilter(WindowEvent.WINDOW_HIDING, closePopOverOnOwnerWindowCloseLambda);
+            }
+            if (newVal != null) {
+                newVal.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, closePopOverOnOwnerWindowCloseLambda);
+                newVal.addEventFilter(WindowEvent.WINDOW_HIDING, closePopOverOnOwnerWindowCloseLambda);
             }
         });
     }

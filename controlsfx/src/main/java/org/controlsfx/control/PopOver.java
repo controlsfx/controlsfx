@@ -293,7 +293,6 @@ public class PopOver extends PopupControl {
 
     private Window ownerWindow;
     private final EventHandler<WindowEvent> closePopOverOnOwnerWindowCloseLambda = event -> ownerWindowClosing();
-    private final WeakEventHandler<WindowEvent> closePopOverOnOwnerWindowClose = new WeakEventHandler<>(closePopOverOnOwnerWindowCloseLambda);
 
     /**
      * Shows the pop over in a position relative to the edges of the given owner
@@ -364,15 +363,10 @@ public class PopOver extends PopupControl {
     public final void show(Window owner) {
         super.show(owner);
         ownerWindow = owner;
-
         if (isAnimated()) {
             showFadeInAnimation(getFadeInDuration());
         }
 
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
-                closePopOverOnOwnerWindowClose);
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING,
-                closePopOverOnOwnerWindowClose);
     }
 
     /** {@inheritDoc} */
@@ -385,10 +379,6 @@ public class PopOver extends PopupControl {
             showFadeInAnimation(getFadeInDuration());
         }
 
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
-                closePopOverOnOwnerWindowClose);
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING,
-                closePopOverOnOwnerWindowClose);
     }
 
     /**
@@ -488,11 +478,6 @@ public class PopOver extends PopupControl {
             showFadeInAnimation(fadeInDuration);
         }
 
-        // Bug fix - close popup when owner window is closing
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
-                closePopOverOnOwnerWindowClose);
-        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING,
-                closePopOverOnOwnerWindowClose);
     }
 
     private void showFadeInAnimation(Duration fadeInDuration) {
@@ -530,12 +515,6 @@ public class PopOver extends PopupControl {
      */
     public final void hide(Duration fadeOutDuration) {
         //We must remove EventFilter in order to prevent memory leak.
-        if (ownerWindow != null){
-            ownerWindow.removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,
-                    closePopOverOnOwnerWindowClose);
-            ownerWindow.removeEventFilter(WindowEvent.WINDOW_HIDING,
-                closePopOverOnOwnerWindowClose);
-        }
         if (fadeOutDuration == null) {
             fadeOutDuration = DEFAULT_FADE_DURATION;
         }

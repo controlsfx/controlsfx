@@ -115,8 +115,6 @@ public class PopOver extends PopupControl {
             }
         });
 
-        setUpOwnerCloseBehaviour();
-
         /*
          * Create some initial content.
          */
@@ -150,26 +148,6 @@ public class PopOver extends PopupControl {
         });
 
         setAutoHide(true);
-    }
-
-    /**
-     * Adds the EventFilter when the WindowProperty changes.
-     * Solves the issue (#1441) that leads to an exception, when closing the window (using the "x"-button) while the PopOver is visible.
-     *
-     * Hint: This seems to be needed additional to filters that are already implemented in {@link #show(Window)}, {@link #hide(Duration)}...
-     * It also doesn't work when using the WeakEventHandler instead. Replacing the Handlers in the other positions also doesn't lead to success.
-     */
-    private void setUpOwnerCloseBehaviour() {
-        ownerWindowProperty().addListener((o, oldVal, newVal) -> {
-            if (oldVal != null) {
-                oldVal.removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, closePopOverOnOwnerWindowCloseLambda);
-                oldVal.removeEventFilter(WindowEvent.WINDOW_HIDING, closePopOverOnOwnerWindowCloseLambda);
-            }
-            if (newVal != null) {
-                newVal.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, closePopOverOnOwnerWindowCloseLambda);
-                newVal.addEventFilter(WindowEvent.WINDOW_HIDING, closePopOverOnOwnerWindowCloseLambda);
-            }
-        });
     }
 
     /**
@@ -292,7 +270,8 @@ public class PopOver extends PopupControl {
             yListener);
 
     private Window ownerWindow;
-    private final EventHandler<WindowEvent> closePopOverOnOwnerWindowCloseLambda = event -> ownerWindowClosing();
+    private final EventHandler<WindowEvent> closePopOverOnOwnerWindowCloseLambda = event -> ownerWindowHiding();
+    private final WeakEventHandler<WindowEvent> closePopOverOnOwnerWindowClose = new WeakEventHandler<>(closePopOverOnOwnerWindowCloseLambda);
 
     /**
      * Shows the pop over in a position relative to the edges of the given owner
@@ -363,10 +342,12 @@ public class PopOver extends PopupControl {
     public final void show(Window owner) {
         super.show(owner);
         ownerWindow = owner;
+
         if (isAnimated()) {
             showFadeInAnimation(getFadeInDuration());
         }
 
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING, closePopOverOnOwnerWindowClose);
     }
 
     /** {@inheritDoc} */
@@ -379,6 +360,7 @@ public class PopOver extends PopupControl {
             showFadeInAnimation(getFadeInDuration());
         }
 
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING, closePopOverOnOwnerWindowClose);
     }
 
     /**
@@ -478,6 +460,8 @@ public class PopOver extends PopupControl {
             showFadeInAnimation(fadeInDuration);
         }
 
+        // Bug fix - close popup when owner window is closing
+        ownerWindow.addEventFilter(WindowEvent.WINDOW_HIDING, closePopOverOnOwnerWindowClose);
     }
 
     private void showFadeInAnimation(Duration fadeInDuration) {
@@ -491,8 +475,12 @@ public class PopOver extends PopupControl {
         fadeIn.play();
     }
 
-    private void ownerWindowClosing() {
+    private void ownerWindowHiding() {
         hide(Duration.ZERO);
+        if (ownerWindow != null) {
+            // remove EventFilter to prevent memory leak
+            ownerWindow.removeEventFilter(WindowEvent.WINDOW_HIDING, closePopOverOnOwnerWindowClose);
+        }
     }
 
     /**
@@ -514,7 +502,6 @@ public class PopOver extends PopupControl {
      * @since 1.0
      */
     public final void hide(Duration fadeOutDuration) {
-        //We must remove EventFilter in order to prevent memory leak.
         if (fadeOutDuration == null) {
             fadeOutDuration = DEFAULT_FADE_DURATION;
         }

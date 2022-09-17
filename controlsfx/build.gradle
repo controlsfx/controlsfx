@@ -10,9 +10,9 @@ ext {
 version = controlsfx_version
 
 dependencies {
-    testCompile 'junit:junit:[4,)'
-    testCompile 'org.testfx:testfx-core:4.0.16-alpha'
-    testRuntime ('org.testfx:openjfx-monocle:jdk-12.0.1+2') {
+    testImplementation 'junit:junit:[4,)'
+    testImplementation 'org.testfx:testfx-core:4.0.16-alpha'
+    testRuntimeOnly ('org.testfx:openjfx-monocle:jdk-12.0.1+2') {
         exclude group: 'org.openjfx'
     }
     testImplementation 'org.hamcrest:hamcrest:2.2'

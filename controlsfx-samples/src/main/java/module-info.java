@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018, 2020 ControlsFX
+ * Copyright (c) 2018, 2022, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,5 +52,5 @@ module org.controlsfx.samples {
     opens org.controlsfx.samples.tableview to javafx.base;
     opens org.controlsfx.samples.spreadsheet to javafx.graphics;
     
-    provides fxsampler.FXSamplerProject with org.controlsfx.ControlsFXSampler;
+    provides fxsampler.FXSamplerProject with org.controlsfx.ControlsFXSamplerProject;
 }

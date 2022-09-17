@@ -21,7 +21,7 @@ ext.java9RuntimeArgs = [
 subprojects {
 
     apply plugin: 'java'
-    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
     apply plugin: 'org.openjfx.javafxplugin'
     apply from  : '../mavenPublish.gradle'
 

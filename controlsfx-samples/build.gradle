@@ -2,8 +2,10 @@ ext.moduleName = 'org.controlsfx.samples'
 
 apply plugin: 'application'
 
-applicationName = 'FXSampler'
-mainClassName = 'org.controlsfx.fxsampler/fxsampler.FXSampler'
+application {
+    mainModule = 'org.controlsfx.samples'
+    mainClass = 'org.controlsfx.ControlsFXSampler'
+}
 
 version = controlsfx_version
 
@@ -58,7 +60,7 @@ jar {
         attributes  'Implementation-Title':     'ControlsFX-Samples',
                     'Implementation-Version':   project.version,
                     'Class-Path':               configurations.compileClasspath.collect { it.getName() }.join(' '),
-                    'Main-Class':               mainClassName
+                    'Main-Class':               application.mainClass
     }
 }
 

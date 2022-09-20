@@ -8,11 +8,6 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Install packages (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get install xvfb tigervnc-standalone-server tigervnc-common
-
       - name: Checkout
         uses: actions/checkout@v2
         with:
@@ -42,12 +37,8 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           export DISPLAY=:90
-          mkdir /home/runner/.vnc
-          echo 123456 | vncpasswd -f > /home/runner/.vnc/passwd
-          chmod -v 600 /home/runner/.vnc/passwd
-          vncserver :90 -localhost -nolisten tcp
+          Xvfb -ac :90 -screen 0 1280x1024x24 > /dev/null 2>&1 &
           ./gradlew build test
-          vncserver -kill :90
 
       - name: Release to Maven Central
         id: deploy

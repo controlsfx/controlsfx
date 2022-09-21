@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2021 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,6 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
 import javafx.event.EventHandler;
@@ -35,36 +33,74 @@ import javafx.scene.control.TableColumnBase;
 import javafx.scene.input.MouseEvent;
 
 import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
+import javafx.scene.Cursor;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.skin.NestedTableColumnHeader;
 import javafx.scene.control.skin.TableColumnHeader;
-import javafx.scene.control.skin.TableViewSkinBase;
+import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 
 /**
  * A cell column header.
  */
 public class HorizontalHeaderColumn extends NestedTableColumnHeader {
 
+    // The last column index being resized
+    int lastColumnResized = -1;
 
-
-   public HorizontalHeaderColumn(TableColumnBase<?, ?> tc) {
+    public HorizontalHeaderColumn(TableColumnBase<?, ?> tc) {
         super(tc);
 
         /**
-         * Resolve https://bitbucket.org/controlsfx/controlsfx/issue/395
-         * and https://bitbucket.org/controlsfx/controlsfx/issue/434
+         * Resolve https://bitbucket.org/controlsfx/controlsfx/issue/395 and
+         * https://bitbucket.org/controlsfx/controlsfx/issue/434
          */
         widthProperty().addListener((Observable observable) -> {
-               ((GridViewSkin)  getTableSkin()).hBarValue.clear();
-               ((GridViewSkin)  getTableSkin()).rectangleSelection.updateRectangle();
+            ((GridViewSkin) getTableSkin()).hBarValue.clear();
+            ((GridViewSkin) getTableSkin()).rectangleSelection.updateRectangle();
+        });
 
-       });
+        /**
+         * We want to resize all other selected columns when we resize one.
+         *
+         * I cannot really determine when a resize is finished. Apparently, when
+         * this cursor moves back from H_RESIZE to null, it means the drag is
+         * done, so until a better solution is shown, it will do the trick.
+         */
+        cursorProperty().addListener(new ChangeListener<Cursor>() {
+            @Override
+            public void changed(ObservableValue<? extends Cursor> ov, Cursor oldCursor, Cursor newCursor) {
+
+                if (newCursor == null && oldCursor == Cursor.H_RESIZE && lastColumnResized >= 0) {
+                    GridViewSkin gridViewSkin = ((GridViewSkin) getTableSkin());
+                    HorizontalHeader headerRow = gridViewSkin.getHorizontalHeader();
+                    if (headerRow.selectedColumns.get(lastColumnResized)) {
+                        double width1 = gridViewSkin.getColumns().get(lastColumnResized).getWidth();
+                        for (int i = headerRow.selectedColumns.nextSetBit(0); i >= 0; i = headerRow.selectedColumns.nextSetBit(i + 1)) {
+                            gridViewSkin.getColumns().get(i).setPrefWidth(width1);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @Override
     protected TableColumnHeader createTableColumnHeader(final TableColumnBase col) {
-//        TableViewSkinBase<?,?,?,?,?,TableColumnBase<?,?>> tableViewSkin = getTableViewSkin();
         if (col == null || col.getColumns().isEmpty()) {
-            final TableColumnHeader columnHeader = new TableColumnHeader(col);
+            final TableColumnHeader columnHeader = new TableColumnHeader(col) {
+                @Override
+                protected void resizeColumnToFitContent(int maxRows) {
+                    /**
+                     * Directly call the method even if column is not resizable. 
+                     * At initialization, autofit is called by the system for 30 rows, let it go.
+                     * If column is not resizable, the resize cursor between the columns will not appear and this method cannot be called.
+                     */
+                    ((GridViewSkin) getTableSkin()).resizeColumnToFitContent((TableColumn<ObservableList<SpreadsheetCell>, ?>) getTableColumn(), maxRows);
+                }
+            };
             /**
              * When the user double click on a header, we want to resize the
              * column to fit the content.
@@ -108,7 +144,7 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
         max = max > spreadsheetView.getColumns().size() ? spreadsheetView.getColumns().size() : max;
         for (int j = 0; j < max; j++) {
             final TableColumnHeader n = getColumnHeaders().get(j);
-            final double prefWidth = snapSize(n.prefWidth(-1));
+            final double prefWidth = snapSizeX(n.prefWidth(-1));
             n.setPrefHeight(24.0);
             //If the column is fixed
             if (spreadsheetView.getColumns().get(spreadsheetView.getModelColumn(j)).isFixed()) {

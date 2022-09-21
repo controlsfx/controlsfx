@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2021 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -190,6 +190,10 @@ public class GridCellEditor {
         
         if (editor != null) {
             viewCell.setGraphic(editor);
+            // If the Control has not its skin, we force it. Otherwise the pressed key that triggers edition is not considered
+            if (editor.getSkin() == null) {
+                editor.applyCss();
+            }
             editor.setMaxHeight(maxHeight);
             editor.setPrefWidth(viewCell.getWidth());
         }

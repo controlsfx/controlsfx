@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015 ControlsFX
+ * Copyright (c) 2013, 2021 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,9 +31,12 @@ import static impl.org.controlsfx.i18n.Localization.localize;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
@@ -45,6 +48,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.WeakEventHandler;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.Cursor;
 import javafx.scene.control.ContextMenu;
@@ -108,8 +112,12 @@ public class VerticalHeader extends StackPane {
     private GridViewSkin skin;
     private boolean resizing = false;
 
-    private final Stack<Label> pickerPile;
-    private final Stack<Label> pickerUsed;
+    private final LinkedList<Label> pickerPile;
+    // Map between the row and the label-picker associated to it.
+    private final Map<Integer, Label> pickerUsed;
+    // Store the weakEventHandler to avoid memoryLeak
+    private Map<Integer, WeakEventHandler> onShowingHandlers = new HashMap<>();
+    private Map<Integer, WeakEventHandler> onActionHandler = new HashMap<>();
 
     /**
      * This BitSet keeps track of the selected rows (when clicked on their
@@ -127,8 +135,8 @@ public class VerticalHeader extends StackPane {
     public VerticalHeader(final SpreadsheetHandle handle) {
         this.handle = handle;
         this.spreadsheetView = handle.getView();
-        pickerPile = new Stack<>();
-        pickerUsed = new Stack<>();
+        pickerPile = new LinkedList<>();
+        pickerUsed = new ConcurrentHashMap<>();
     }
 
     /**
@@ -221,10 +229,12 @@ public class VerticalHeader extends StackPane {
 
             double x = snappedLeftInset();
             /**
-             * Pickers
+             * Mark all the current used picker.
              */
-            pickerPile.addAll(pickerUsed.subList(0, pickerUsed.size()));
-            pickerUsed.clear();
+            for (Label label : pickerUsed.values()) {
+                label.getProperties().put("mark", false);
+            }
+
             //We reset our counter for Label and dragRects.
             labelCount = 0;
             dragRectCount = 0;
@@ -279,6 +289,13 @@ public class VerticalHeader extends StackPane {
                 label.setContextMenu(blankContextMenu);
                 getChildren().add(label);
             }
+            
+            // If any old used picker is not used anymore, put it back to the pile.
+            pickerUsed.entrySet().stream().filter((entry) -> !(boolean) entry.getValue().getProperties().get("mark")).forEach((entry) -> {
+                pickerUsed.remove(entry.getKey());
+                pickerPile.push(entry.getValue());
+            });
+
         } else {
             getChildren().clear();
         }
@@ -325,7 +342,7 @@ public class VerticalHeader extends StackPane {
                         : snappedTopInset() + spaceUsedByFixedRows;
 
                 if (spreadsheetView.getRowPickers().containsKey(modelRow)) {
-                    Label picker = getPicker(spreadsheetView.getRowPickers().get(modelRow));
+                    Label picker = getPicker(spreadsheetView.getRowPickers().get(modelRow), modelRow);
                     picker.resize(PICKER_SIZE, rowHeight);
                     picker.layoutYProperty().unbind();
                     picker.setLayoutY(y);
@@ -401,7 +418,7 @@ public class VerticalHeader extends StackPane {
              */
             modelRow = spreadsheetView.getFilteredSourceIndex(rowIndex);
             if (row.getLayoutY() >= fixedRowHeight && spreadsheetView.getRowPickers().containsKey(modelRow)) {
-                Label picker = getPicker(spreadsheetView.getRowPickers().get(modelRow));
+                Label picker = getPicker(spreadsheetView.getRowPickers().get(modelRow), modelRow);
                 picker.resize(PICKER_SIZE, height);
                 picker.layoutYProperty().bind(row.layoutYProperty().add(horizontalHeaderHeight));
                 getChildren().add(picker);
@@ -585,19 +602,30 @@ public class VerticalHeader extends StackPane {
         }
     }
 
-    private Label getPicker(Picker picker) {
-        Label pickerLabel;
-        if (pickerPile.isEmpty()) {
-            pickerLabel = new Label();
-            picker.getStyleClass().addListener(layout);
-            pickerLabel.setOnMouseClicked(pickerMouseEvent);
-        } else {
-            pickerLabel = pickerPile.pop();
+    /**
+     * Return a Label to use for the given picker at the given row. We try to re-use picker for the same rows between
+     * layout to avoid infinite layout loop.
+     * @param picker the considered row {@link Picker}
+     * @param row the considered row
+     */
+    private Label getPicker(Picker picker, int row) {
+        Label pickerLabel = pickerUsed.get(row);
+        if (pickerLabel == null) {
+            if (pickerPile.isEmpty()) {
+                pickerLabel = new Label();
+                pickerLabel.setOnMouseClicked(pickerMouseEvent);
+            } else {
+                pickerLabel = pickerPile.pop();
+            }
+            pickerUsed.put(row, pickerLabel);
         }
-        pickerUsed.push(pickerLabel);
 
+        picker.getStyleClass().removeListener(layout);
         pickerLabel.getStyleClass().setAll(picker.getStyleClass());
+        picker.getStyleClass().addListener(layout);
         pickerLabel.getProperties().put(PICKER_INDEX, picker);
+        // Tag this picker as currently used
+        pickerLabel.getProperties().put("mark", true);
         return pickerLabel;
     }
 
@@ -635,7 +663,7 @@ public class VerticalHeader extends StackPane {
             return dragRects.get(dragRectCount++);
         }
     }
-
+        
     /**
      * Return a contextMenu for fixing a row if possible.
      *
@@ -647,7 +675,7 @@ public class VerticalHeader extends StackPane {
             final ContextMenu contextMenu = new ContextMenu();
 
             MenuItem fixItem = new MenuItem(localize(asKey("spreadsheet.verticalheader.menu.fix"))); //$NON-NLS-1$
-            contextMenu.setOnShowing(new EventHandler<WindowEvent>() {
+            WeakEventHandler handler = new WeakEventHandler(new EventHandler<WindowEvent>() {
 
                 @Override
                 public void handle(WindowEvent event) {
@@ -658,9 +686,11 @@ public class VerticalHeader extends StackPane {
                     }
                 }
             });
+            onShowingHandlers.put(row, handler);
+            contextMenu.setOnShowing(handler);
             fixItem.setGraphic(new ImageView(pinImage));
 
-            fixItem.setOnAction(new EventHandler<ActionEvent>() {
+            WeakEventHandler handler2 = new WeakEventHandler(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent arg0) {
                     Integer modelRow = spreadsheetView.getFilteredSourceIndex(row);
@@ -671,6 +701,8 @@ public class VerticalHeader extends StackPane {
                     }
                 }
             });
+            onActionHandler.put(row, handler2);
+            fixItem.setOnAction(handler2);
             contextMenu.getItems().add(fixItem);
 
             return contextMenu;

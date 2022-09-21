@@ -61,12 +61,11 @@ public class SpreadsheetGridView extends TableView<ObservableList<SpreadsheetCel
     
     @Override
     public boolean resizeColumn(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, double delta) {
-        //FIXME Reactivate that
-//        handle.getCellsViewSkin().getHorizontalHeader().getRootHeader().lastColumnResized = getColumns().indexOf(tc);
+        ((HorizontalHeaderColumn) handle.getCellsViewSkin().getHorizontalHeader().getRootHeader()).lastColumnResized = getColumns().indexOf(tc);
         boolean returnedValue = super.resizeColumn(tc, delta);
-        if(returnedValue){
+        if (returnedValue) {
             Event.fireEvent(handle.getView(), new SpreadsheetView.ColumnWidthEvent(getColumns().indexOf(tc), tc.getWidth()));
         }
         return returnedValue;
     }
-};
+}

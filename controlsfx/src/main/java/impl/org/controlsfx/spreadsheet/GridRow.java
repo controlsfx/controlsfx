@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2013, 2022 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakMapChangeListener;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.WeakEventHandler;
@@ -82,17 +83,7 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
         /**
          * When the height is changing elsewhere, we need to update ourself if necessary.
          */
-        handle.getCellsViewSkin().rowHeightMap.addListener(new MapChangeListener<Integer, Double>() {
-
-            @Override
-            public void onChanged(MapChangeListener.Change<? extends Integer, ? extends Double> change) {
-                if (change.wasAdded() && change.getKey() == handle.getView().getModelRow(getIndex())) {
-                    setRowHeight(change.getValueAdded());
-                } else if (change.wasRemoved() && change.getKey() == handle.getView().getModelRow(getIndex())) {
-                    setRowHeight(computePrefHeight(-1));
-                }
-            }
-        });
+        handle.getCellsViewSkin().rowHeightMap.addListener(weakRowHeightListener);
         /**
          * When we are adding deported cells (fixed in columns) into a row via
          * addCell. The cell is not receiving the DRAG_DETECTED eventHandler
@@ -131,7 +122,20 @@ public class GridRow extends TableRow<ObservableList<SpreadsheetCell>> {
     protected Skin<?> createDefaultSkin() {
         return new GridRowSkin(handle, this);
     }
-    
+ 
+    private final MapChangeListener<Integer, Double> rowHeightListener = new MapChangeListener<Integer, Double>() {
+
+        @Override
+        public void onChanged(MapChangeListener.Change<? extends Integer, ? extends Double> change) {
+            if (change.wasAdded() && change.getKey() == handle.getView().getModelRow(getIndex())) {
+                setRowHeight(change.getValueAdded());
+            } else if (change.wasRemoved() && change.getKey() == handle.getView().getModelRow(getIndex())) {
+                setRowHeight(computePrefHeight(-1));
+            }
+        }
+    };
+    private final WeakMapChangeListener weakRowHeightListener = new WeakMapChangeListener<>(rowHeightListener);
+
     private final InvalidationListener setPrefHeightListener = new InvalidationListener() {
 
         @Override

@@ -400,6 +400,7 @@ public abstract class SpreadsheetCellEditor {
          * ************************************************************************
          */
         private final TextArea textArea;
+        private EventHandler keyPressedHandler;
 
         /**
          * *************************************************************************
@@ -442,7 +443,7 @@ public abstract class SpreadsheetCellEditor {
 
         @Override
         public void end() {
-            textArea.setOnKeyPressed(null);
+            textArea.removeEventFilter(KeyEvent.KEY_PRESSED, keyPressedHandler);
         }
 
         @Override
@@ -461,8 +462,8 @@ public abstract class SpreadsheetCellEditor {
          * ************************************************************************
          */
         private void attachEnterEscapeEventHandler() {
-            
-            textArea.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            // Using EventFilter because SHIFT-TAB is otherwise caught by the TableView itself
+            keyPressedHandler = new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent keyEvent) {
                     if (keyEvent.getCode() == KeyCode.ENTER) {
@@ -484,7 +485,8 @@ public abstract class SpreadsheetCellEditor {
                         }
                     }
                 }
-            });
+            };
+            textArea.addEventFilter(KeyEvent.KEY_PRESSED, keyPressedHandler);
         }
     }
     

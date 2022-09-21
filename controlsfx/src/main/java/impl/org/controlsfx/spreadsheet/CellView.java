@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2019 ControlsFX
+ * Copyright (c) 2013, 2021 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -300,6 +300,8 @@ public class CellView extends TableCell<ObservableList<SpreadsheetCell>, Spreads
         if (dirtyStyle && getItem().isCellGraphic()) {
             CellGraphicFactory browserImpl = handle.getView().getCellGraphicFactory();
             if (browserImpl != null) {
+                // When cell is re-used, the style does not seemed to be updated so we force it.
+                super.applyCss();
                 //Send the graphic only if it's the right type, otherwise send null.
                 Node node = getGraphic() != null && browserImpl.getType().isAssignableFrom(getGraphic().getClass()) ? getGraphic() : null;
                 browserImpl.loadStyle(node, getItem(), getFont(), getTextFill(), getAlignment(), getBackground());

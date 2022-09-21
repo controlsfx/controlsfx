@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016 ControlsFX
+ * Copyright (c) 2013, 2022 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -171,15 +171,8 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         });
     }
 
-//    @Override
-//    public void show(int index) {
-//        super.show(index);
-//        layoutTotal();
-//        layoutFixedRows();
-//    }
-
     @Override
-    public void scrollTo(int index) {
+    public void scrollToTop(int index) {
         //If we have some fixedRows, we check if the selected row is not below them
         if (!getCells().isEmpty() && !VerticalHeader.isFixedRowEmpty(spreadSheetView)) {
             double offset = gridViewSkin.getFixedRowHeight();
@@ -193,7 +186,7 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
 
         layoutTotal();
         layoutFixedRows();
-                }
+    }
 
     @Override
     public double scrollPixels(final double delta) {
@@ -223,12 +216,12 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
         if (!sheetChildren.isEmpty()) {
             /**
              * When scrolling with mouse wheel, some row are present but will
-             * not be lay out. Thus we only consider the row with children as
-             * really available.
+             * not be lay out. Using children size is somehow not working when
+             * doing setGrid. Using the visibility property instead.
              */
             try {
                 int i = sheetChildren.size() - 1;
-                while (i >= sheetChildren.size() || (((GridRow) sheetChildren.get(i)).getChildrenUnmodifiable().isEmpty() && i > 0)) {
+                while (i >= sheetChildren.size() || (!sheetChildren.get(i).isVisible() && i > 0)) {
                     --i;
                 }
                 return (GridRow) sheetChildren.get(i);
@@ -251,7 +244,20 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 /*&& (spreadSheetView.getEditingCell() == null || spreadSheetView
                         .getEditingCell().getRow() == -1)*/) {
             sortRows();
+            
+            /**
+             * Constant layout can happen when zooming, because we are modifying the layout of the bars. So I make them
+             * unmanaged temporarily to prevent that.
+             */
+            if (scale.getX() != 1) {
+                getHbar().setManaged(false);
+                getVbar().setManaged(false);
+                if (corner != null) {
+                    corner.setManaged(false);
+                }
+            }
             super.layoutChildren();
+            
             layoutTotal();
             layoutFixedRows();
             
@@ -267,51 +273,55 @@ final class GridVirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<T> {
                 getVbar().setVisibleAmount(getCells().size() / (float) getCellCount());
             }
         }
-        /**
-         * If we have modify the Scale, the scrollBars will be smaller or
-         * bigger. But we want to have them the same size as before, so we
-         * reverse the effect of the scale applied, and place the bar to the
-         * proper space.
-         */
-        Pos pos = Pos.TOP_LEFT;
-        double width = getWidth();
-        double height = getHeight();
-        double top = getInsets().getTop();
-        double right = getInsets().getRight();
-        double left = getInsets().getLeft();
-        double bottom = getInsets().getBottom();
-        double scaleX = scale.getX();
-        double shift = 1 - scaleX;
-        double contentWidth = (width / scaleX) - left - right - getVbar().getWidth();
-        double contentHeight = (height / scaleX) - top - bottom - getHbar().getHeight();
+        if (scale.getX() != 1) {
+            /**
+             * If we have modify the Scale, the scrollBars will be smaller or bigger. But we want to have them the same
+             * size as before, so we reverse the effect of the scale applied, and place the bar to the proper space.
+             */
+            Pos pos = Pos.TOP_LEFT;
+            double width = getWidth();
+            double height = getHeight();
+            double top = getInsets().getTop();
+            double right = getInsets().getRight();
+            double left = getInsets().getLeft();
+            double bottom = getInsets().getBottom();
+            double scaleX = scale.getX();
+            double shift = 1 - scaleX;
+            double contentWidth = (width / scaleX) - left - right - getVbar().getWidth();
+            double contentHeight = (height / scaleX) - top - bottom - getHbar().getHeight();
 
-        //HBAR
-        /**
-         * Magic numbers coming out of nowhere but I don't understand why
-         * the bar are shifting away when zooming...
-         */
-        layoutInArea(getHbar(), 0 - shift * 10,
-                height - (getHbar().getHeight() * scaleX),
-                contentWidth, contentHeight,
-                0, null,
-                pos.getHpos(),
-                pos.getVpos());
-        //VBAR
-        layoutInArea(getVbar(), width - getVbar().getWidth() + shift,
-                0,
-                contentWidth, contentHeight,
-                0, null,
-                pos.getHpos(),
-                pos.getVpos());
-
-        //CORNER
-        if (corner != null) {
-            layoutInArea(corner, width - getVbar().getWidth() + shift,
-                    getHeight() - (getHbar().getHeight() * scaleX),
-                    corner.getWidth(), corner.getHeight(),
+            //HBAR
+            /**
+             * Magic numbers coming out of nowhere but I don't understand why the bar are shifting away when zooming...
+             */
+            layoutInArea(getHbar(), 0 - shift * 10,
+                    height - (getHbar().getHeight() * scaleX),
+                    contentWidth, contentHeight,
                     0, null,
                     pos.getHpos(),
                     pos.getVpos());
+            //VBAR
+            layoutInArea(getVbar(), width - getVbar().getWidth() + shift,
+                    0,
+                    contentWidth, contentHeight,
+                    0, null,
+                    pos.getHpos(),
+                    pos.getVpos());
+
+            //CORNER
+            if (corner != null) {
+                layoutInArea(corner, width - getVbar().getWidth() + shift,
+                        getHeight() - (getHbar().getHeight() * scaleX),
+                        corner.getWidth(), corner.getHeight(),
+                        0, null,
+                        pos.getHpos(),
+                        pos.getVpos());
+            }
+            getHbar().setManaged(true);
+            getVbar().setManaged(true);
+            if (corner != null) {
+                corner.setManaged(true);
+            }
         }
     }
 

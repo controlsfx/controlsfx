@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2021 ControlsFX
+ * Copyright (c) 2013, 2022 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
  */
 package impl.org.controlsfx.spreadsheet;
 
+import com.sun.javafx.scene.control.TableColumnBaseHelper;
 import java.time.LocalDate;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -53,7 +54,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableFocusModel;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
@@ -82,7 +82,7 @@ import javafx.scene.control.skin.VirtualFlow;
  * TableViewBehavior.
  *
  */
-public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCell>,ObservableList<SpreadsheetCell>,TableView<ObservableList<SpreadsheetCell>>,TableRow<ObservableList<SpreadsheetCell>>,TableColumn<ObservableList<SpreadsheetCell>,?>> {
+public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCell>,ObservableList<SpreadsheetCell>,TableView<ObservableList<SpreadsheetCell>>, GridRow,TableColumn<ObservableList<SpreadsheetCell>,?>> {
         
     /***************************************************************************
      * * STATIC FIELDS * *
@@ -194,12 +194,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         TableView<ObservableList<SpreadsheetCell>> tableView = handle.getGridView();
 
         //Set a new row factory, useful when handling row height.
-        tableView.setRowFactory(new Callback<TableView<ObservableList<SpreadsheetCell>>, TableRow<ObservableList<SpreadsheetCell>>>() {
-            @Override
-            public TableRow<ObservableList<SpreadsheetCell>> call(TableView<ObservableList<SpreadsheetCell>> p) {
-                return new GridRow(handle);
-            }
-        });
+        tableView.setRowFactory((TableView<ObservableList<SpreadsheetCell>> p) -> new GridRow(handle));
         getVirtualFlow().setCellFactory(param -> createCell());
 
         tableView.getStyleClass().add("cell-spreadsheet"); //$NON-NLS-1$
@@ -213,7 +208,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          * When we are changing the grid we re-instantiate the rowToLayout because
          * spans and fixedRow may have changed.
          */
-        handle.getView().gridProperty().addListener(rowToLayoutListener);
+        // When the grid is changed, items of TableView are not yet updated, so base on that instead.
+        handle.getGridView().itemsProperty().addListener(rowToLayoutListener);
         handle.getView().hiddenRowsProperty().addListener(rowToLayoutListener);
         handle.getView().hiddenColumnsProperty().addListener(rowToLayoutListener);
         
@@ -262,11 +258,11 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         });
     }
 
-    private TableRow<ObservableList<SpreadsheetCell>> createCell() {
-        TableRow<ObservableList<SpreadsheetCell>> row = null;
+    private GridRow createCell() {
+        GridRow row = null;
 
         TableView<ObservableList<SpreadsheetCell>> tableView = getSkinnable();
-        row = tableView.getRowFactory().call(tableView);
+        row = (GridRow) tableView.getRowFactory().call(tableView);
 
         row.updateTableView(tableView);
         return row;
@@ -425,6 +421,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                 resizeRowToFitContent(row);
             }
         }
+        // Scrollbars are not resized properly otherwise
+	handle.getGridView().refresh();
     }
     
     /**
@@ -527,6 +525,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             }
         }
         rectangleSelection.updateRectangle();
+        // Scrollbars are not resized properly otherwise
+	handle.getGridView().refresh();
     }
     
     public void resizeRowsToDefault() {
@@ -547,25 +547,22 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
             }
         }
 
-        //Fixing https://bitbucket.org/controlsfx/controlsfx/issue/358/
-        getFlow().layoutChildren();
-
         for (GridRow row : (List<GridRow>) getFlow().getCells()) {
-            double height = getRowHeight(spreadsheetView.getModelRow(row.getIndex()));
-            if (row.getHeight() != height) {
-                if (grid.isRowResizable(spreadsheetView.getModelRow(row.getIndex()))) {
-                    row.setRowHeight(height);
-                }
+            int modelRow = spreadsheetView.getModelRow(row.getIndex());
+            double height = getRowHeight(modelRow);
+            if (row.getHeight() != height && grid.isRowResizable(modelRow)) {
+                row.setRowHeight(height);
             }
         }
         rectangleSelection.updateRectangle();
+        // Scrollbars are not resized properly otherwise
+	handle.getGridView().refresh();
     }
     /**
      * We want to have extra space when displaying LocalDate because they will
      * use an editor that display a little icon on the right. Thus, that icon is
      * reducing the visibility of the date string.
      */
-//    @Override
     public void resizeColumnToFitContent(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, int maxRows) {
         
         final TableColumn<ObservableList<SpreadsheetCell>, ?> col = tc;
@@ -700,10 +697,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          * column with his mouse, we must force the column to resize because
          * setting the prefWidth again will not trigger the listeners.
          */
-        widthMax = snapSize(widthMax);
+        widthMax = snapSizeX(widthMax);
         if (col.getPrefWidth() == widthMax && col.getWidth() != widthMax) {
-            //FIXME
-//            col.impl_setWidth(widthMax);
+            TableColumnBaseHelper.setWidth(col, widthMax);
         } else {
             col.setPrefWidth(widthMax);
         }
@@ -832,16 +828,9 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          ****************************************************************
          */
         final int row = fm.getFocusedIndex();
-        // We try to make visible the rows that may be hidden by Fixed rows
-//        if (!getFlow().getCells().isEmpty()
-//                //FIXME
-//                && getFlow().getCells().get(getFixedRowSize()).getIndex() > row
-//                && !spreadsheetView.getFixedRows().contains(spreadsheetView.getModelRow(row))) {
-//            getFlow().scrollTo(row);
-//        } else {
-            // FIXME flow.show() has been removed so ScrollTo is the only method left
-            getFlow().scrollTo(row);
-//        }
+
+        // flow.show() has been removed so ScrollTo is the only method left
+        getFlow().scrollTo(row);
         scrollHorizontally();
         /**
          * ***************************************************************
@@ -863,7 +852,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     }
 
     @Override
-    protected VirtualFlow<TableRow<ObservableList<SpreadsheetCell>>> createVirtualFlow() {
+    protected VirtualFlow<GridRow> createVirtualFlow() {
         return new GridVirtualFlow<>(this);
     }
 
@@ -874,15 +863,6 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
     
     public HorizontalHeader getHorizontalHeader(){
         return (HorizontalHeader) getTableHeaderRow();
-    }
-
-//    BooleanProperty getTableMenuButtonVisibleProperty() {
-//        return tableMenuButtonVisibleProperty();
-//    }
-
-    @Override
-    public void scrollHorizontally(){
-        super.scrollHorizontally();
     }
     
     @Override
@@ -953,8 +933,8 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         verticalHeader.requestLayout();
     }
 
-    GridVirtualFlow<?> getFlow() {
-        return (GridVirtualFlow<?>) getVirtualFlow();
+    GridVirtualFlow<GridRow> getFlow() {
+        return (GridVirtualFlow<GridRow>) getVirtualFlow();
     }
 
     /**
@@ -1072,102 +1052,6 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
         }
     };
 
-//    @Override
-//    protected TableSelectionModel<ObservableList<SpreadsheetCell>> getSelectionModel() {
-//        return getSkinnable().getSelectionModel();
-//    }
-//
-//    @Override
-//    protected TableFocusModel<ObservableList<SpreadsheetCell>, TableColumn<ObservableList<SpreadsheetCell>, ?>> getFocusModel() {
-//        return getSkinnable().getFocusModel();
-//    }
-//
-//    @Override
-//    protected TablePositionBase<? extends TableColumn<ObservableList<SpreadsheetCell>, ?>> getFocusedCell() {
-//        return getSkinnable().getFocusModel().getFocusedCell();
-//    }
-//
-//    @Override
-//    protected ObservableList<? extends TableColumn<ObservableList<SpreadsheetCell>, ?>> getVisibleLeafColumns() {
-//        return getSkinnable().getVisibleLeafColumns();
-//    }
-//
-//    @Override
-//    protected int getVisibleLeafIndex(TableColumn<ObservableList<SpreadsheetCell>, ?> tc) {
-//        return getSkinnable().getVisibleLeafIndex(tc);
-//    }
-//
-//    @Override
-//    protected TableColumn<ObservableList<SpreadsheetCell>, ?> getVisibleLeafColumn(int col) {
-//        return getSkinnable().getVisibleLeafColumn(col);
-//    }
-//
-//    @Override
-//    protected ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> getColumns() {
-//        return getSkinnable().getColumns();
-//    }
-//
-//    @Override
-//    protected ObservableList<TableColumn<ObservableList<SpreadsheetCell>, ?>> getSortOrder() {
-//        return getSkinnable().getSortOrder();
-//    }
-//
-//    @Override
-//    protected ObjectProperty<ObservableList<ObservableList<SpreadsheetCell>>> itemsProperty() {
-//        return getSkinnable().itemsProperty();
-//    }
-//
-//    @Override
-//    protected ObjectProperty<Callback<TableView<ObservableList<SpreadsheetCell>>, TableRow<ObservableList<SpreadsheetCell>>>> rowFactoryProperty() {
-//        return getSkinnable().rowFactoryProperty();
-//    }
-//
-//    @Override
-//    protected ObjectProperty<Node> placeholderProperty() {
-//        return getSkinnable().placeholderProperty();
-//    }
-//
-//    @Override
-//    protected BooleanProperty tableMenuButtonVisibleProperty() {
-//        return getSkinnable().tableMenuButtonVisibleProperty();
-//    }
-//
-//    @Override
-//    protected ObjectProperty<Callback<ResizeFeaturesBase, Boolean>> columnResizePolicyProperty() {
-//        return (ObjectProperty<Callback<ResizeFeaturesBase, Boolean>>) (Object)getSkinnable().columnResizePolicyProperty();
-//    }
-//
-//    @Override
-//    protected boolean resizeColumn(TableColumn<ObservableList<SpreadsheetCell>, ?> tc, double delta) {
-//        getHorizontalHeader().getRootHeader().lastColumnResized = getColumns().indexOf(tc);
-//        boolean returnedValue = getSkinnable().resizeColumn(tc, delta);
-//        if(returnedValue){
-                //FIXME Reactivate that
-//            Event.fireEvent(spreadsheetView, new SpreadsheetView.ColumnWidthEvent(getColumns().indexOf(tc), tc.getWidth()));
-//        }
-//        return returnedValue;
-//    }
-//
-//    @Override
-//    protected void edit(int index, TableColumn<ObservableList<SpreadsheetCell>, ?> column) {
-//        getSkinnable().edit(index, column);
-//    }
-//
-//    @Override
-//    public TableRow<ObservableList<SpreadsheetCell>> createCell() {
-//        TableRow<ObservableList<SpreadsheetCell>> cell;
-//
-//        if (getSkinnable().getRowFactory() != null) {
-//            cell = getSkinnable().getRowFactory().call(getSkinnable());
-//        } else {
-//            cell = new TableRow<>();
-//        }
-//
-//        cell.updateTableView(getSkinnable());
-//        return cell;
-//    }
-
-    @Override
     public final int getItemCount() {
         return getSkinnable().getItems() == null ? 0 : getSkinnable().getItems().size();
     }

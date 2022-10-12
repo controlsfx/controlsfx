@@ -1,3 +1,8 @@
+plugins {
+    id 'org.openjfx.javafxplugin' version '0.0.13' apply false
+    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+}
+
 ext.java9Args = [
         // For various behaviors across controls
         "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls",
@@ -21,7 +26,6 @@ ext.java9RuntimeArgs = [
 subprojects {
 
     apply plugin: 'java'
-    apply plugin: 'maven-publish'
     apply plugin: 'org.openjfx.javafxplugin'
     apply from  : '../mavenPublish.gradle'
 
@@ -74,5 +78,14 @@ subprojects {
     // Do not publish Gradle modules
     tasks.withType(GenerateModuleMetadata) {
         enabled = false
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            username = project.hasProperty('sonatypeUsername') ? project.property('sonatypeUsername') : ''
+            password = project.hasProperty('sonatypePassword') ? project.property('sonatypePassword') : ''
+        }
     }
 }

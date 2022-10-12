@@ -1,8 +1,5 @@
-import java.time.Duration
-
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
-apply plugin: 'io.github.gradle-nexus.publish-plugin'
 
 signing {
     required = { !version.endsWith("SNAPSHOT") }
@@ -64,15 +61,6 @@ publishing {
                     }
                 }
             }
-        }
-    }
-}
-
-nexusPublishing {
-    repositories {
-        sonatype {
-            username = project.hasProperty('sonatypeUsername') ? project.property('sonatypeUsername') : ''
-            password = project.hasProperty('sonatypePassword') ? project.property('sonatypePassword') : ''
         }
     }
 }

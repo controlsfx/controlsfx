@@ -14,6 +14,6 @@ buildscript {
     }
     dependencies {
         classpath 'org.openjfx:javafx-plugin:0.0.13'
-        classpath 'de.marcphilipp.gradle:nexus-publish-plugin:0.4.0'
+        classpath 'io.github.gradle-nexus:publish-plugin:1.1.0'
     }
 }

@@ -43,7 +43,8 @@ jobs:
       - name: Release to Maven Central
         id: deploy
         run: |
-          ./gradlew publish -i -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.api=$TRANSIFEX_API\
+          ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -i \
+          -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.api=$TRANSIFEX_API \
           -Psigning.keyId=$GPG_KEYNAME -Psigning.password=$GPG_PASSPHRASE -Psigning.secretKeyRingFile=$HOME/.gnupg/secring.gpg \
           -Dorg.gradle.internal.publish.checksums.insecure=true
           echo ::set-output name=exit_code::$?

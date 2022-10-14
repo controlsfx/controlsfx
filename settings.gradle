@@ -12,8 +12,4 @@ buildscript {
             id 'biz.aQute.bnd.builder' version '6.3.1'
         }
     }
-    dependencies {
-        classpath 'org.openjfx:javafx-plugin:0.0.13'
-        classpath 'de.marcphilipp.gradle:nexus-publish-plugin:0.4.0'
-    }
 }

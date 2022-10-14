@@ -51,8 +51,6 @@ task downloadTranslations {
     }
 }
 
-processResources.finalizedBy(downloadTranslations)
-
 // Java Packager is not available for Java 11
 if (!JavaVersion.current().isJava11Compatible()) {
     task compileCSS {
@@ -147,7 +145,6 @@ jar {
             'Implementation-Title': 'ControlsFX',
             'Export-Package': '!impl.org.controlsfx.*, org.controlsfx.*'
     )
-
 }
 
 task native2ascii(type: Copy) {
@@ -165,5 +162,6 @@ task deleteUtf8Files(type: Delete) {
     delete fileTree(dir: "$buildDir/resources/main", include: "**/controlsfx_*.utf8")
 }
 
-downloadTranslations.finalizedBy(native2ascii)
-native2ascii.finalizedBy(deleteUtf8Files)
+processResources.dependsOn(downloadTranslations)
+downloadTranslations.dependsOn(native2ascii)
+native2ascii.dependsOn(deleteUtf8Files)

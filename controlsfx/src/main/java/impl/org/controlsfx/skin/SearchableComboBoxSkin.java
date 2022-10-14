@@ -148,7 +148,6 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
 
     @Override
     protected void layoutChildren(double x, double y, double w, double h) {
-        super.layoutChildren(x, y, w, h);
         // ensure filteredComboBox and searchField have the same size as the field
         filteredComboBox.resizeRelocate(x, y, w, h);
         searchField.resizeRelocate(x, y, w, h);

@@ -34,12 +34,7 @@ jobs:
       - name: Release Snapshots
         if: github.ref == 'refs/heads/master'
         run: |
-          ver=$(./gradlew -q :controlsfx:getVersion | tail -n 1)
-          # deploy if SNAPSHOT
-          if [[ $ver == *"SNAPSHOT"* ]]
-          then
           ./gradlew publish -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.api=$TRANSIFEX_API
-          fi
         shell: bash
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}

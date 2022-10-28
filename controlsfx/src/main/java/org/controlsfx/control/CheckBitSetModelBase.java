@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2022, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,15 +30,18 @@ import impl.org.controlsfx.collections.MappingChange;
 import impl.org.controlsfx.collections.NonIterableChange;
 import impl.org.controlsfx.collections.ReadOnlyUnbackedObservableList;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 // not public API
 abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> { 
@@ -50,11 +53,12 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
      **********************************************************************/
 
     private final Map<T, BooleanProperty> itemBooleanMap;
-    
+
     private final BitSet checkedIndices;
-    private final ReadOnlyUnbackedObservableList<Integer> checkedIndicesList;
+    private final BitSetReadOnlyUnbackedObservableList checkedIndicesList;
     private final ReadOnlyUnbackedObservableList<T> checkedItemsList;
-    
+
+    private AtomicBoolean listenerFlag = new AtomicBoolean();
     
 
     /***********************************************************************
@@ -65,39 +69,9 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
 
     CheckBitSetModelBase(final Map<T, BooleanProperty> itemBooleanMap) {
         this.itemBooleanMap = itemBooleanMap;
-        
+
         this.checkedIndices = new BitSet();
-        
-        this.checkedIndicesList = new ReadOnlyUnbackedObservableList<Integer>() {
-            @Override public Integer get(int index) {
-                if (index < 0 || index >= getItemCount()) return -1;
-
-                for (int pos = 0, val = checkedIndices.nextSetBit(0);
-                    val >= 0 || pos == index;
-                    pos++, val = checkedIndices.nextSetBit(val+1)) {
-                        if (pos == index) return val;
-                }
-
-                return -1;
-            }
-
-            @Override public int size() {
-                return checkedIndices.cardinality();
-            }
-
-            @Override public boolean contains(Object o) {
-                if (o instanceof Number) {
-                    Number n = (Number) o;
-                    int index = n.intValue();
-
-                    return index >= 0 && index < checkedIndices.length() &&
-                            checkedIndices.get(index);
-                }
-
-                return false;
-            }
-        };
-        
+        this.checkedIndicesList = new BitSetReadOnlyUnbackedObservableList(checkedIndices);
         this.checkedItemsList = new ReadOnlyUnbackedObservableList<T>() {
             @Override public T get(int i) {
                 int pos = checkedIndicesList.get(i);
@@ -134,27 +108,29 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
             while (c.next()) {
                 if (c.wasAdded()) {
                     for (T item : c.getAddedSubList()) {
-                        BooleanProperty p = getItemBooleanProperty(item);
-                        if (p != null) {
-                            p.set(true);
-                        }
+                        updateBooleanProperty(item, true);
                     }
                 } 
                 
                 if (c.wasRemoved()) {
                     for (T item : c.getRemoved()) {
-                        BooleanProperty p = getItemBooleanProperty(item);
-                        if (p != null) {
-                            p.set(false);
-                        }
+                        updateBooleanProperty(item, false);
                     }
                 }
             }
         });
     }
-    
-    
-    
+
+    private void updateBooleanProperty(T item, boolean value) {
+        BooleanProperty p = getItemBooleanProperty(item);
+        if (p != null) {
+            listenerFlag.set(true);
+            p.set(value);
+            listenerFlag.set(false);
+        }
+    }
+
+
     /***********************************************************************
      *                                                                     *
      * Abstract API                                                        *
@@ -208,9 +184,11 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
     /** {@inheritDoc} */
     @Override
     public void checkIndices(int... indices) {
-        for (int i = 0; i < indices.length; i++) {
-            check(indices[i]);
+        for (int index : indices) {
+            checkedIndices.set(index);
         }
+        ListChangeListener.Change<Integer> change = createRangeChange(checkedIndicesList, Arrays.stream(indices).boxed().collect(Collectors.toList()), false);
+        checkedIndicesList.callObservers(change);
     }
     
     /** {@inheritDoc} */
@@ -222,18 +200,18 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
     /** {@inheritDoc} */
     @Override
     public void clearChecks() {
-        for( int index = 0; index < checkedIndices.length(); index++) {
-            clearCheck(index);
-        }
+        List<Integer> removed = new BitSetReadOnlyUnbackedObservableList((BitSet) checkedIndices.clone());
+        checkedIndices.clear();
+        checkedIndicesList.callObservers(
+                new NonIterableChange.GenericAddRemoveChange<>(0, 0, removed, checkedIndicesList));
     }
 
     /** {@inheritDoc} */
     @Override
     public void clearCheck(int index) {
         if (index < 0 || index >= getItemCount()) return;
-        checkedIndices.clear(index);
-        
         final int changeIndex = checkedIndicesList.indexOf(index);
+        checkedIndices.clear(index);
         checkedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<>(changeIndex, changeIndex, index, checkedIndicesList));
     }
     
@@ -300,26 +278,170 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
         for (int i = 0; i < getItemCount(); i++) {
             final int index = i;
             final T item = getItem(index);
-            
+
             final BooleanProperty booleanProperty = new SimpleBooleanProperty(item, "selected", false); //$NON-NLS-1$
             itemBooleanMap.put(item, booleanProperty);
-            
+
             // this is where we listen to changes to the boolean properties,
             // updating the selected indices list (and therefore indirectly
             // the selected items list) when the checkbox is toggled
-            booleanProperty.addListener(new InvalidationListener() {
-                @Override public void invalidated(Observable o) {
+            booleanProperty.addListener(o -> {
+                if (!listenerFlag.get()) {
                     if (booleanProperty.get()) {
-                        checkedIndices.set(index);
-                        final int changeIndex = checkedIndicesList.indexOf(index);
-                        checkedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<>(changeIndex, changeIndex+1, checkedIndicesList));                            
+                        check(index);
                     } else {
-                        final int changeIndex = checkedIndicesList.indexOf(index);
-                        checkedIndices.clear(index);
-                        checkedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<>(changeIndex, changeIndex, index, checkedIndicesList));
+                        clearCheck(index);
                     }
                 }
             });
         }
+    }
+
+    /***********************************************************************
+     *                                                                     *
+     * Private implementation                                              *
+     *                                                                     *
+     **********************************************************************/
+
+    private class BitSetReadOnlyUnbackedObservableList extends ReadOnlyUnbackedObservableList<Integer> {
+        private final BitSet bitset;
+
+        private int lastGetIndex = -1;
+        private int lastGetValue = -1;
+
+        public BitSetReadOnlyUnbackedObservableList(BitSet bitset) {
+            this.bitset = bitset;
+        }
+
+        @Override public Integer get(int index) {
+            final int itemCount = getItemCount();
+            if (index < 0 || index >= itemCount)  {
+                return -1;
+            }
+
+            if (index == (lastGetIndex + 1) && lastGetValue < itemCount) {
+                // we're iterating forward in order, short circuit for
+                // performance reasons (RT-39776)
+                lastGetIndex++;
+                lastGetValue = bitset.nextSetBit(lastGetValue + 1);
+                return lastGetValue;
+            } else if (index == (lastGetIndex - 1) && lastGetValue > 0) {
+                // we're iterating backward in order, short circuit for
+                // performance reasons (RT-39776)
+                lastGetIndex--;
+                lastGetValue = bitset.previousSetBit(lastGetValue - 1);
+                return lastGetValue;
+            } else {
+                for (lastGetIndex = 0, lastGetValue = bitset.nextSetBit(0);
+                     lastGetValue >= 0 || lastGetIndex == index;
+                     lastGetIndex++, lastGetValue = bitset.nextSetBit(lastGetValue + 1)) {
+                    if (lastGetIndex == index) {
+                        return lastGetValue;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+        @Override public int size() {
+            return bitset.cardinality();
+        }
+
+        @Override public boolean contains(Object o) {
+            if (o instanceof Number) {
+                Number n = (Number) o;
+                int index = n.intValue();
+
+                return index >= 0 && index < bitset.length() &&
+                        bitset.get(index);
+            }
+
+            return false;
+        }
+
+        public void reset() {
+            this.lastGetIndex = -1;
+            this.lastGetValue = -1;
+        }
+    }
+
+    private static ListChangeListener.Change<Integer> createRangeChange(final ObservableList<Integer> list, final List<Integer> addedItems, boolean splitChanges) {
+        ListChangeListener.Change<Integer> change = new ListChangeListener.Change<Integer>(list) {
+            private final int[] EMPTY_PERM = new int[0];
+            private final int addedSize = addedItems.size();
+
+            private boolean invalid = true;
+
+            private int pos = 0;
+            private int from = pos;
+            private int to = pos;
+
+            @Override public int getFrom() {
+                checkState();
+                return from;
+            }
+
+            @Override public int getTo() {
+                checkState();
+                return to;
+            }
+
+            @Override public List<Integer> getRemoved() {
+                checkState();
+                return Collections.<Integer>emptyList();
+            }
+
+            @Override protected int[] getPermutation() {
+                checkState();
+                return EMPTY_PERM;
+            }
+
+            @Override public int getAddedSize() {
+                return to - from;
+            }
+
+            @Override public boolean next() {
+                if (pos >= addedSize) return false;
+
+                // starting from pos, we keep going until the value is
+                // not the next value
+                int startValue = addedItems.get(pos++);
+                from = list.indexOf(startValue);
+                to = from + 1;
+                int endValue = startValue;
+                while (pos < addedSize) {
+                    int previousEndValue = endValue;
+                    endValue = addedItems.get(pos++);
+                    ++to;
+                    if (splitChanges && previousEndValue != (endValue - 1)) {
+                        break;
+                    }
+                }
+
+                if (invalid) {
+                    invalid = false;
+                    return true;
+                }
+
+                // we keep going until we've represented all changes!
+                return splitChanges && pos < addedSize;
+            }
+
+            @Override public void reset() {
+                invalid = true;
+                pos = 0;
+                to = 0;
+                from = 0;
+            }
+
+            private void checkState() {
+                if (invalid) {
+                    throw new IllegalStateException("Invalid Change state: next() must be called before inspecting the Change.");
+                }
+            }
+
+        };
+        return change;
     }
 }

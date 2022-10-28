@@ -357,7 +357,7 @@ public class CheckComboBox<T> extends ControlsFXControl {
      * 
      **************************************************************************/
     
-    private static class CheckComboBoxBitSetCheckModel<T> extends CheckBitSetModelBase<T> {
+    static class CheckComboBoxBitSetCheckModel<T> extends CheckBitSetModelBase<T> {
         
         /***********************************************************************
          *                                                                     *

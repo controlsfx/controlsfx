@@ -39,8 +39,41 @@ import javafx.scene.layout.StackPane;
 
 import org.controlsfx.control.textfield.CustomTextField;
 
-// package-private for now...
-abstract class AbstractObjectField<T> extends HBox {
+/**
+* Helper class to create a custom editor for a type T. The example "how to do" will be found for the Font Editor
+* in the class {@link Editors#createFontEditor(org.controlsfx.control.PropertySheet.Item)}.<br/>
+* See also {@link DefaultPropertyEditorFactory how to integrate a custom type editor in the PropertySheet.
+* 
+* <pre>{@code
+* public static final PropertyEditor<?> createFontEditor( Item property ) {
+*        return new AbstractPropertyEditor<Font, AbstractObjectField<Font>>(property, new AbstractObjectField<Font>() {
+*                    {@literal @}Override protected Class<Font> getType() {
+*                        return Font.class;
+*                    }
+*                    
+*                    {@literal @}Override protected String objectToString(Font font) {
+*                        return font == null? "": String.format("%s, %.1f", font.getName(), font.getSize()); //$NON-NLS-1$ //$NON-NLS-2$
+*                    }
+*        
+*                    {@literal @}Override protected Font edit(Font font) {
+*                        FontSelectorDialog dlg = new FontSelectorDialog(font);
+*                        Optional<Font> optionalFont = dlg.showAndWait();
+*                        return optionalFont.orElse(null);
+*                    }
+*                }) {
+*
+*            {@literal @}Override protected ObservableValue<Font> getObservableValue() {
+*                return getEditor().getObjectProperty();
+*            }
+*
+*            {@literal @}Override public void setValue(Font value) {
+*                getEditor().getObjectProperty().set(value);
+*            }
+*        };
+*    }
+* }</pre>
+*/
+public abstract class AbstractObjectField<T> extends HBox {
 
     //TODO: Replace with CSS
     private static final Image image = new Image(AbstractObjectField.class.getResource("/org/controlsfx/control/open-editor.png").toExternalForm()); //$NON-NLS-1$

@@ -244,6 +244,9 @@ public class RangeSliderSkin extends SkinBase<RangeSlider> {
 
         lowThumb.setOnMouseDragged(me -> {
             Point2D cur = lowThumb.localToParent(me.getX(), me.getY());
+            if (preDragThumbPoint == null) {
+                preDragThumbPoint = cur;
+            }
             double dragPos = (isHorizontal())?
                 cur.getX() - preDragThumbPoint.getX() : -(cur.getY() - preDragThumbPoint.getY());
             lowThumbDragged(me, preDragPos + dragPos / trackLength);
@@ -269,6 +272,9 @@ public class RangeSliderSkin extends SkinBase<RangeSlider> {
             double trackLength = orientation ? track.getWidth() : track.getHeight();
 
             Point2D point2d = highThumb.localToParent(e.getX(), e.getY());
+            if (preDragThumbPoint == null) {
+                preDragThumbPoint = point2d;
+            }
             double d = getSkinnable().getOrientation() != Orientation.HORIZONTAL ? -(point2d.getY() - preDragThumbPoint.getY()) : point2d.getX() - preDragThumbPoint.getX();
             highThumbDragged(e, preDragPos + d / trackLength);
         });

@@ -83,12 +83,21 @@ public class RangeSliderSkin extends SkinBase<RangeSlider> {
         initRangeBar();
         registerChangeListener(rangeSlider.lowValueProperty(), e -> {
             positionLowThumb();
-            rangeBar.resizeRelocate(rangeStart, rangeBar.getLayoutY(), 
-            rangeEnd - rangeStart, rangeBar.getHeight());
+            if (isHorizontal()) {
+                rangeBar.resizeRelocate(rangeStart, rangeBar.getLayoutY(),
+                        rangeEnd - rangeStart, rangeBar.getHeight());
+            } else {
+                rangeBar.resize(rangeBar.getWidth(), rangeEnd - rangeStart);
+            }
         });
         registerChangeListener(rangeSlider.highValueProperty(), e -> {
             positionHighThumb();
-            rangeBar.resize(rangeEnd-rangeStart, rangeBar.getHeight());
+            if (isHorizontal()) {
+                rangeBar.resize(rangeEnd - rangeStart, rangeBar.getHeight());
+            } else {
+                rangeBar.resizeRelocate(rangeBar.getLayoutX(), rangeStart,
+                        rangeBar.getWidth(), rangeEnd - rangeStart);
+            }
         });
         registerChangeListener(rangeSlider.minProperty(), e -> {
             if (showTickMarks && tickLine != null) {

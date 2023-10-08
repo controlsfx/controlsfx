@@ -411,7 +411,7 @@ public class RangeSliderSkin extends SkinBase<RangeSlider> {
         double y = orientation ? lowThumb.getLayoutY() : (getSkinnable().getInsets().getTop() + trackLength) - trackLength * ((slider.getHighValue() - slider.getMin()) / (getMaxMinusMinNoZero()));
         highThumb.setLayoutX(x);
         highThumb.setLayoutY(y);
-        if (orientation) rangeEnd = x; else rangeStart = y + thumbWidth;
+        if (orientation) rangeEnd = x; else rangeStart = y + thumbHeight;
     }
     
     @Override protected void layoutChildren(final double x, final double y,

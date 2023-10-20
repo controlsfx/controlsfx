@@ -596,36 +596,20 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
         result = prime * result + Objects.hashCode(getStyleClass());
         return result;
     }
-    
-    /**
-     * Registers an event handler to this SpreadsheetCell. The SpreadsheetCell class allows 
-     * registration of listeners which will be notified when a corner state of
-     * the editable state of this SpreadsheetCell have changed.
-     *
-     * @param eventType the type of the events to receive by the handler
-     * @param eventHandler the handler to register
-     * @throws NullPointerException if the event type or handler is null
-     */
+
+    /** {@inheritDoc} */
     @Override
-    public void addEventHandler(EventType<Event> eventType, EventHandler<Event> eventHandler) {
-         eventHandlerManager.addEventHandler(eventType, eventHandler);
+    public <E extends Event> void addEventHandler(EventType<E> eventType, EventHandler<? super E> eventHandler) {
+        eventHandlerManager.addEventHandler(eventType, eventHandler);
     }
 
-    /**
-     * Unregisters a previously registered event handler from this SpreadsheetCell. One
-     * handler might have been registered for different event types, so the
-     * caller needs to specify the particular event type from which to
-     * unregister the handler.
-     *
-     * @param eventType the event type from which to unregister
-     * @param eventHandler the handler to unregister
-     * @throws NullPointerException if the event type or handler is null
-     */
+    /** {@inheritDoc} */
     @Override
-    public void removeEventHandler(EventType<Event> eventType, EventHandler<Event> eventHandler) {
-         eventHandlerManager.removeEventHandler(eventType, eventHandler);
+    public <E extends Event> void removeEventHandler(EventType<E> eventType, EventHandler<? super E> eventHandler) {
+        eventHandlerManager.removeEventHandler(eventType, eventHandler);
     }
-    
+
+
     /***************************************************************************
      * 
      * Private Implementation

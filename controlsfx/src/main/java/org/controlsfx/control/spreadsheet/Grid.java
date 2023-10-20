@@ -29,6 +29,7 @@ package org.controlsfx.control.spreadsheet;
 import java.util.Collection;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 
@@ -241,7 +242,7 @@ public interface Grid {
      * @param eventHandler the handler to register
      * @throws NullPointerException if the event type or handler is null
      */
-    public <E extends GridChange> void addEventHandler(EventType<E> eventType, EventHandler<E> eventHandler);
+    public <E extends Event> void addEventHandler(EventType<E> eventType, EventHandler<? super E> eventHandler);
     
     /**
      * Unregisters a previously registered event handler from this Grid. One
@@ -254,5 +255,5 @@ public interface Grid {
      * @param eventHandler the handler to unregister
      * @throws NullPointerException if the event type or handler is null
      */
-    public <E extends GridChange> void removeEventHandler(EventType<E> eventType, EventHandler<E> eventHandler);
+    public <E extends Event> void removeEventHandler(EventType<E> eventType, EventHandler<? super E> eventHandler);
 }

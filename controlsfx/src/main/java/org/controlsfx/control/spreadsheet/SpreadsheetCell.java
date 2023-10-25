@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2018 ControlsFX
+ * Copyright (c) 2014, 2018, 2023 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableSet;
-import javafx.event.*;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;

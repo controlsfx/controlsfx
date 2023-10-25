@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2016, 2018 ControlsFX
+ * Copyright (c) 2013, 2016, 2018, 2023s ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -674,7 +674,6 @@ public class SpreadsheetCellBase implements SpreadsheetCell, EventTarget{
     }
 
     /**
-     * @param mask
      * @param position
      * @return whether the specified bit position is true.
      */

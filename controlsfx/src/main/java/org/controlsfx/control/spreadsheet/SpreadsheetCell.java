@@ -69,26 +69,7 @@ public interface SpreadsheetCell  {
     public static final EventType<Event> CORNER_EVENT_TYPE 
             = new EventType<>("CornerEventType" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
-
-    /**
-     * Registers an event handler to this SpreadsheetCell.
-     *
-     * @param eventType the type of the events to receive by the handler
-     * @param eventHandler the handler to register
-     * @throws NullPointerException if the event type or handler is null
-     */
-     public  <E extends Event> void addEventHandler(EventType<E> eventType, EventHandler<? super E> eventHandler);
-
-    /**
-     * Unregisters a previously registered event handler from this
-     * SpreadsheetCell.
-     *
-     * @param eventType the event type from which to unregister
-     * @param eventHandler the handler to unregister
-     * @throws NullPointerException if the event type or handler is null
-     */
-    public <E extends Event> void removeEventHandler(EventType<E> eventType, EventHandler<? super E> eventHandler);
-    /**
+   /**
      * This enum states the four different corner available for positioning 
      * some elements in a cell.
      */
@@ -424,6 +405,26 @@ public interface SpreadsheetCell  {
      * @return the tooltip associated with this {@code SpreadsheetCell}
      */
     public Optional<String> getTooltip();
+
+    /**
+     * Registers an event handler to this SpreadsheetCell.
+     *
+     * @param eventType the type of the events to receive by the handler
+     * @param eventHandler the handler to register
+     * @throws NullPointerException if the event type or handler is null
+     */
+    public <E extends Event> void addEventHandler(EventType<E> eventType, EventHandler<? super E> eventHandler);
+
+    /**
+     * Unregisters a previously registered event handler from this
+     * SpreadsheetCell.
+     *
+     * @param eventType the event type from which to unregister
+     * @param eventHandler the handler to unregister
+     * @throws NullPointerException if the event type or handler is null
+     */
+    public <E extends Event> void removeEventHandler(EventType<E> eventType, EventHandler<? super E> eventHandler);
+
 
 }
 

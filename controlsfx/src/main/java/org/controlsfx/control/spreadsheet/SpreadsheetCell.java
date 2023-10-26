@@ -69,7 +69,7 @@ public interface SpreadsheetCell  {
     public static final EventType<Event> CORNER_EVENT_TYPE 
             = new EventType<>("CornerEventType" + UUID.randomUUID().toString()); //$NON-NLS-1$
 
-   /**
+    /**
      * This enum states the four different corner available for positioning 
      * some elements in a cell.
      */

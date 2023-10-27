@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2018 ControlsFX
+ * Copyright (c) 2014, 2023 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -68,7 +68,7 @@ public interface SpreadsheetCell  {
      */
     public static final EventType<Event> CORNER_EVENT_TYPE 
             = new EventType<>("CornerEventType" + UUID.randomUUID().toString()); //$NON-NLS-1$
-    
+
     /**
      * This enum states the four different corner available for positioning 
      * some elements in a cell.
@@ -405,7 +405,7 @@ public interface SpreadsheetCell  {
      * @return the tooltip associated with this {@code SpreadsheetCell}
      */
     public Optional<String> getTooltip();
-    
+
     /**
      * Registers an event handler to this SpreadsheetCell.
      *
@@ -413,8 +413,8 @@ public interface SpreadsheetCell  {
      * @param eventHandler the handler to register
      * @throws NullPointerException if the event type or handler is null
      */
-    public void addEventHandler(EventType<Event> eventType, EventHandler<Event> eventHandler);
-    
+    public <E extends Event> void addEventHandler(EventType<E> eventType, EventHandler<? super E> eventHandler);
+
     /**
      * Unregisters a previously registered event handler from this
      * SpreadsheetCell.
@@ -423,5 +423,8 @@ public interface SpreadsheetCell  {
      * @param eventHandler the handler to unregister
      * @throws NullPointerException if the event type or handler is null
      */
-    public void removeEventHandler(EventType<Event> eventType, EventHandler<Event> eventHandler);
+    public <E extends Event> void removeEventHandler(EventType<E> eventType, EventHandler<? super E> eventHandler);
+
+
 }
+

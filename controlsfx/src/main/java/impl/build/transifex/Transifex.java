@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2023, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,36 +25,36 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package impl.build.transifex;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Base64;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Transifex {
     
-    private static final String CHARSET             = "ISO-8859-1"; //$NON-NLS-1$
-    private static final String FILE_NAME           = "controlsfx_%1s.utf8"; //$NON-NLS-1$
-    private static final String NEW_LINE            = System.getProperty("line.separator"); //$NON-NLS-1$
+    private static final String CHARSET             = "ISO-8859-1";
+    private static final String FILE_NAME           = "controlsfx_%1s.utf8";
+    private static final String NEW_LINE            = System.getProperty("line.separator");
 
-    private static final String BASE_URI            = "https://www.transifex.com/api/2/"; //$NON-NLS-1$
-    private static final String PROJECT_PATH        = BASE_URI + "project/controlsfx/resource/controlsfx-core"; // list simple project details //$NON-NLS-1$
-    private static final String PROJECT_DETAILS     = BASE_URI + "project/controlsfx/resource/controlsfx-core?details"; // list all project details //$NON-NLS-1$
-    private static final String LIST_TRANSLATIONS   = BASE_URI + "project/controlsfx/languages/"; // list all translations //$NON-NLS-1$
-    private static final String GET_TRANSLATION     = BASE_URI + "project/controlsfx/resource/controlsfx-core/translation/%1s?file"; // gets a translation for one language //$NON-NLS-1$
-    private static final String TRANSLATION_STATS   = BASE_URI + "project/controlsfx/resource/controlsfx-core/stats/%1s/"; // gets a translation for one language //$NON-NLS-1$
-
+    private static final String BASE_URI            = "https://rest.api.transifex.com/";
+    private static final String CREATE_TRANSLATION  = BASE_URI + "resource_translations_async_downloads";
+    private static final String GET_TRANSLATION     = BASE_URI + "resource_translations_async_downloads/%s";
+    private static final String TRANSLATION_STATS   = BASE_URI + "resource_language_stats?filter[project]=o:controlsfx:p:controlsfx";
     private static final String TRANSIFEX_API       = System.getProperty("transifex.api"); //$NON-NLS-1$
-    private static final boolean FILTER_INCOMPLETE_TRANSLATIONS = Boolean.parseBoolean(System.getProperty("transifex.filterIncompleteTranslations", "false"));
 
     public static void main(String[] args) {
         new Transifex().doTransifexCheck();
@@ -68,21 +68,19 @@ public class Transifex {
             System.out.println("transifex.api system properties must be specified"); //$NON-NLS-1$
             return;
         }
-        
-        System.out.println("  Filtering out incomplete translations: " + FILTER_INCOMPLETE_TRANSLATIONS);
-        
-        Map<String,Object> projectDetails = JSON.parse(transifexRequest(PROJECT_DETAILS));
-        List<Map<String, String>> availableLanguages = (List<Map<String, String>>) projectDetails.get("available_languages");
-        
-        // main loop
-        availableLanguages.parallelStream()
-                .map(map -> map.get("code")) //$NON-NLS-1$
+
+        Map<String,Object> translationStats = JSON.parse(transifexRequest(TRANSLATION_STATS));
+        List<Map<String, Object>> availableLanguages = (List<Map<String, Object>>) translationStats.get("data");
+
+        Map<String, String> resourceIds = availableLanguages.parallelStream()
                 .filter(this::filterOutIncompleteTranslations)
-                .forEach(this::downloadTranslation);
-        
+                .map(this::getLanguageCode)
+                .collect(Collectors.toMap(languageCode -> languageCode, this::createDownloadTranslationFile));
+
+        resourceIds.forEach(this::downloadTranslation);
         System.out.println("Transifex Check Complete"); //$NON-NLS-1$
     }
-    
+
     private String transifexRequest(String request, Object... args) {
         return performTransifexTask(this::parseInputStream, request, args);
     }
@@ -115,9 +113,8 @@ public class Transifex {
             connection.setDoInput(true);
             
             // pass in API details
-            String encoded = Base64.getEncoder().encodeToString(("api" + ":" + TRANSIFEX_API).getBytes()); //$NON-NLS-1$
-            connection.setRequestProperty("Authorization", "Basic " + encoded); //$NON-NLS-1$ //$NON-NLS-2$
-            connection.setRequestProperty("Accept-Charset", CHARSET);  //$NON-NLS-1$
+            connection.setRequestProperty("Authorization", "Bearer " + TRANSIFEX_API);
+            connection.setRequestProperty("Accept-Charset", CHARSET);
             
             return consumer.apply(connection.getInputStream());
         } catch (Exception e) {
@@ -131,39 +128,66 @@ public class Transifex {
         return null;
     }
     
-    private boolean filterOutIncompleteTranslations(String languageCode) {
+    private boolean filterOutIncompleteTranslations(Map<String, Object> languageMap) {
         // filter out any translation that does not have 100% completion and reviewed state.
         // Returns a Map, for example:
-        // { 
-        //     untranslated_entities=8, 
-        //     last_commiter=eryzhikov, 
-        //     translated_entities=34, 
-        //     untranslated_words=16, 
-        //     translated_words=57, 
-        //     last_update=2014-09-12 08:44:33, 
-        //     reviewed_percentage=69%, 
-        //     reviewed=29, 
-        //     completed=80%
-        // }
-        Map<String, String> map = JSON.parse(transifexRequest(TRANSLATION_STATS, languageCode));
-        String completed = map.getOrDefault("completed", "0%"); //$NON-NLS-1$ //$NON-NLS-2$
-        String reviewed = map.getOrDefault("reviewed_percentage", "0%"); //$NON-NLS-1$ //$NON-NLS-2$
-        boolean isAccepted = completed.equals("100%") && reviewed.equals("100%"); //$NON-NLS-1$ //$NON-NLS-2$
-        
-        System.out.println("  Reviewing translation '" + languageCode + "'" +  //$NON-NLS-1$ //$NON-NLS-2$
-                "\tcompletion: " + completed +  //$NON-NLS-1$
-                ",\treviewed: " + reviewed +  //$NON-NLS-1$
-                "\t-> TRANSLATION" + (isAccepted ? " ACCEPTED" : " REJECTED")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        
-        return isAccepted || !FILTER_INCOMPLETE_TRANSLATIONS;
+        // {
+        //      "id": "o:controlsfx:p:controlsfx:r:controlsfx-core:l:ar",
+        //      "type": "resource_language_stats",
+        //      "attributes": {
+        //        "untranslated_words": 0,
+        //        "translated_words": 161,
+        //        "reviewed_words": 0,
+        //        "proofread_words": 0,
+        //        "total_words": 161,
+        //        "untranslated_strings": 0,
+        //        "translated_strings": 93,
+        //        "reviewed_strings": 0,
+        //        "proofread_strings": 0,
+        //        "total_strings": 93,
+        //        "last_translation_update": "2020-08-20T17:16:40Z",
+        //        "last_review_update": "2018-12-17T18:13:15Z",
+        //        "last_proofread_update": null,
+        //        "last_update": "2020-08-20T17:16:40Z"
+        //      },
+        //      "relationships": {
+        //        "resource": {
+        //          "links": {
+        //            "related": "https://rest.api.transifex.com/resources/o:controlsfx:p:controlsfx:r:controlsfx-core"
+        //          },
+        //          "data": {
+        //            "type": "resources",
+        //            "id": "o:controlsfx:p:controlsfx:r:controlsfx-core"
+        //          }
+        //        },
+        //        "language": {
+        //          "links": {
+        //            "related": "https://rest.api.transifex.com/languages/l:ar"
+        //          },
+        //          "data": {
+        //            "type": "languages",
+        //            "id": "l:ar"
+        //          }
+        //        }
+        //      },
+        //      "links": {
+        //        "self": "https://rest.api.transifex.com/resource_language_stats/o:controlsfx:p:controlsfx:r:controlsfx-core:l:ar"
+        //      }
+        //    }
+        Map<String, Object> attributes = (Map<String, Object>) languageMap.get("attributes");
+        boolean isAccepted = (int) attributes.get("untranslated_words") == 0;
+        System.out.println("\tReviewing translation '" +
+                getLanguageCode(languageMap) + "'" +
+                "\t-> TRANSLATION" + (isAccepted ? " ACCEPTED" : " REJECTED"));
+        return isAccepted;
     }
     
-    private void downloadTranslation(String languageCode) {
+    private void downloadTranslation(String languageCode, String resourceId) {
+        if (resourceId.isEmpty()) return;
         // Now we download the translations of the completed languages
-        System.out.println("\tDownloading translation file..."); //$NON-NLS-1$
-
+        System.out.println("\tDownloading translation file for... " + languageCode);
         Function<InputStream, Void> consumer = inputStream -> {
-            final String outputFile = "build/resources/main/" + String.format(FILE_NAME, languageCode); //$NON-NLS-1$
+            final String outputFile = "build/resources/main/" + String.format(FILE_NAME, languageCode);
             try (BufferedWriter writer = new BufferedWriter(new PrintWriter(outputFile, CHARSET))) {
                 writer.write(parseInputStream(inputStream));
             } catch (Exception e) {
@@ -171,6 +195,34 @@ public class Transifex {
             }
             return null;
         };
-        performTransifexTask(consumer, GET_TRANSLATION, languageCode);
+        performTransifexTask(consumer, String.format(GET_TRANSLATION, resourceId));
+    }
+
+    private String getLanguageCode(Map<String, Object> languageMap) {
+        String id = (String) languageMap.get("id");
+        return id.substring(id.lastIndexOf(":") + 1);
+    }
+
+    private String createDownloadTranslationFile(String languageCode) {
+        String requestData = String.format("{\"data\":{\"attributes\":{\"callback_url\":null,\"content_encoding\":\"text\",\"file_type\":\"default\",\"mode\":\"default\",\"pseudo\":false},\"relationships\":{\"language\":{\"data\":{\"type\":\"languages\",\"id\":\"l:%s\"}},\"resource\":{\"data\":{\"type\":\"resources\",\"id\":\"o:controlsfx:p:controlsfx:r:controlsfx-core\"}}},\"type\":\"resource_translations_async_downloads\"}}", languageCode);
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(CREATE_TRANSLATION))
+                    .setHeader("Authorization", "Bearer " + TRANSIFEX_API)
+                    .setHeader("content-type", "application/vnd.api+json")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestData))
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 202) {
+                Map<String, Object> jsonResponse = JSON.parse(response.body());
+                Map<String, Object> data = (Map<String, Object>) jsonResponse.get("data");
+                // return resource id
+                return (String) data.get("id");
+            }
+            return "";
+        } catch (IOException | InterruptedException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

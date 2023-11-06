@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018, 2020 ControlsFX
+ * Copyright (c) 2018, 2023 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@ module org.controlsfx.controls {
     requires static javafx.media;
     requires java.logging;
     requires javafx.base;
+    requires java.net.http;
 
     exports org.controlsfx.control;
     exports org.controlsfx.control.action;

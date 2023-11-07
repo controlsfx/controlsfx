@@ -80,15 +80,13 @@ public abstract class AbstractPropertyEditor<T, C extends Node> implements Prope
         this.control = control;
         this.property = property;
 
-        if (property.getObservableValue().isPresent()) {
-            property.getObservableValue().get().addListener((ObservableValue<? extends Object> o, Object oldValue, Object newValue) -> {
-                if (! suspendUpdate) {
-                    suspendUpdate = true;
-                    AbstractPropertyEditor.this.setValue((T) property.getValue());
-                    suspendUpdate = false;
-                }
-            });
-        }
+        property.getObservableValue().ifPresent(obs -> obs.addListener((ObservableValue<?> o, Object oldValue, Object newValue) -> {
+            if (!suspendUpdate) {
+                suspendUpdate = true;
+                AbstractPropertyEditor.this.setValue((T) property.getValue());
+                suspendUpdate = false;
+            }
+        }));
 
         if (! readonly) {
             getObservableValue().addListener((ObservableValue<? extends Object> o, Object oldValue, Object newValue) -> {

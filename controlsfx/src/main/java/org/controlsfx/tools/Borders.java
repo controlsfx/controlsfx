@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015, ControlsFX
+ * Copyright (c) 2013, 2024, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -723,7 +723,7 @@ public final class Borders {
         }
 
         @Override public Node wrap(final Node n) {
-            StackPane pane = new StackPane() {
+            return new StackPane() {
                 Label titleLabel;
                 
                 {
@@ -733,75 +733,83 @@ public final class Borders {
                     
                     // if the title string is set, then also add in the title label
                     if (title != null) {
-                        titleLabel = new Label(title);
-    
+                        titleLabel = new Label(title) {
+
+                            @Override
+                            protected double computePrefWidth(double v) {
+                                return super.computePrefWidth(v) + 2 * TITLE_PADDING;
+                            }
+
+                            @Override
+                            protected void layoutChildren() {
+                                super.layoutChildren();
+                                final double labelHeight = titleLabel.prefHeight(-1);
+                                titleLabel.relocate(TITLE_PADDING * 2, -labelHeight / 2.0 - 1);
+                            }
+
+                        };
+
                         // give the text a bit of space on the left...
                         titleLabel.setPadding(new Insets(0, 0, 0, TITLE_PADDING));
                         getChildren().add(titleLabel);
+                        needsLayoutProperty().addListener((obs, ov, nv) -> titleLabel.requestLayout());
+                        widthProperty().addListener(o -> setBorder(createTitledBorder(titleLabel, getWidth())));
+                        setBorder(createTitledBorder(titleLabel, getWidth()));
+                    } else {
+                        setBorder(new javafx.scene.layout.Border(borderStrokes));
                     }
                 }
 
-                @Override protected void layoutChildren() {
-                    super.layoutChildren();
+                private javafx.scene.layout.Border createTitledBorder(Label titleLabel, double width) {
+                    final double labelHeight = titleLabel.prefHeight(-1);
+                    final double labelWidth = titleLabel.prefWidth(labelHeight);
 
-                    if (titleLabel != null) {
-                        // layout the title label
-                        final double labelHeight = titleLabel.prefHeight(-1);
-                        final double labelWidth = titleLabel.prefWidth(labelHeight) + TITLE_PADDING;
-                        titleLabel.resize(labelWidth, labelHeight);
-                        titleLabel.relocate(TITLE_PADDING * 2, -labelHeight / 2.0 - 1);
+                    List<BorderStroke> newBorderStrokes = new ArrayList<>(2);
 
-                        List<BorderStroke> newBorderStrokes = new ArrayList<>(2);
+                    // create a line gap for the title label
+                    for (BorderStroke bs : borderStrokes) {
+                        List<Double> dashList = new ArrayList<>();
 
-                        // create a line gap for the title label
-                        for (BorderStroke bs : borderStrokes) {
-                            List<Double> dashList = new ArrayList<>();
+                        // Create a dash list for the line gap or add it at the beginning of an existing dash list. This gap should be wide enough for the title label.
+                        if (bs.getTopStyle().getDashArray().isEmpty())
+                            dashList.addAll(Arrays.asList(GAP_PADDING, labelWidth, Double.MAX_VALUE));
+                        else { // dash pattern exists
+                            // insert gap in existing dash pattern and multiply original pattern so that gap does not show more then once
+                            double origDashWidth = bs.getTopStyle().getDashArray().stream().mapToDouble(d -> d).sum();
 
-                            // Create a dash list for the line gap or add it at the beginning of an existing dash list. This gap should be wide enough for the title label.
-                            if (bs.getTopStyle().getDashArray().isEmpty())
-                                dashList.addAll(Arrays.asList(GAP_PADDING, labelWidth, Double.MAX_VALUE));
-                            else { // dash pattern exists
-                                // insert gap in existing dash pattern and multiply original pattern so that gap does not show more then once
-                                double origDashWidth = bs.getTopStyle().getDashArray().stream().mapToDouble(d -> d).sum();
+                            if (origDashWidth > GAP_PADDING) {
+                                dashList.add(GAP_PADDING);
+                                dashList.add(labelWidth);
+                            } else { // need to insert dash pattern before the gap
+                                int no = (int) (GAP_PADDING / origDashWidth);
 
-                                if (origDashWidth > GAP_PADDING) {
-                                    dashList.add(GAP_PADDING);
-                                    dashList.add(labelWidth);
-                                } else { // need to insert dash pattern before the gap
-                                    int no = (int) (GAP_PADDING / origDashWidth);
-
-                                    for (int i = 0; i < no; i++)
-                                        dashList.addAll(bs.getTopStyle().getDashArray());
-
-                                    if ((dashList.size() & 1) == 0) // if size is even number, add one more element because gap must be at odd index to be transparent
-                                        dashList.add(0d);
-
-                                    dashList.add(labelWidth + GAP_PADDING - no * origDashWidth);
-                                }
-
-                                for (int i = 0; i < (getWidth() - labelWidth - origDashWidth) / origDashWidth; i++)
+                                for (int i = 0; i < no; i++)
                                     dashList.addAll(bs.getTopStyle().getDashArray());
+
+                                if ((dashList.size() & 1) == 0) // if size is even number, add one more element because gap must be at odd index to be transparent
+                                    dashList.add(0d);
+
+                                dashList.add(labelWidth + GAP_PADDING - no * origDashWidth);
                             }
 
-                            // create new border stroke style for the top border line with new dash list
-                            BorderStrokeStyle topStrokeStyle = new BorderStrokeStyle(
+                            for (int i = 0; i < (width - labelWidth - origDashWidth) / origDashWidth; i++)
+                                dashList.addAll(bs.getTopStyle().getDashArray());
+                        }
+
+                        // create new border stroke style for the top border line with new dash list
+                        BorderStrokeStyle topStrokeStyle = new BorderStrokeStyle(
                                 bs.getTopStyle().getType(), bs.getTopStyle().getLineJoin(), bs.getTopStyle().getLineCap(),
                                 bs.getTopStyle().getMiterLimit(), bs.getTopStyle().getDashOffset(), dashList);
 
-                            // change existing border stroke to utilize new top border line stroke style
-                            newBorderStrokes.add(new BorderStroke(
+                        // change existing border stroke to utilize new top border line stroke style
+                        newBorderStrokes.add(new BorderStroke(
                                 bs.getTopStroke(), bs.getRightStroke(), bs.getBottomStroke(), bs.getLeftStroke(),
                                 topStrokeStyle, bs.getRightStyle(), bs.getBottomStyle(), bs.getLeftStyle(),
                                 bs.getRadii(), bs.getWidths(), null));
-                        }
-
-                        setBorder(new javafx.scene.layout.Border(newBorderStrokes.toArray(new BorderStroke[newBorderStrokes.size()])));
                     }
+                    return new javafx.scene.layout.Border(newBorderStrokes.toArray(new BorderStroke[newBorderStrokes.size()]));
                 }
             };
-
-            pane.setBorder(new javafx.scene.layout.Border(borderStrokes));
-            return pane;
         }
     }
 }

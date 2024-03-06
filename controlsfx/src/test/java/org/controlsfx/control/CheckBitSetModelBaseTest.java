@@ -139,4 +139,14 @@ public class CheckBitSetModelBaseTest {
         model.clearChecks();
         assertEquals(1, count.get());
     }
+
+    @Test
+    // needs junit 5
+    // @RepeatedTest(value = 10, failureThreshold = 2)
+    public void testSingleCheckAddsItToIndicesList() {
+        ObservableList<Integer> checkedIndicesList = model.getCheckedIndices();
+        assertTrue(checkedIndicesList.isEmpty());
+        model.check(ROW_3_VALUE);
+        assertFalse(checkedIndicesList.isEmpty());
+    }
 }

@@ -344,6 +344,43 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
             return -1;
         }
 
+        @Override public int indexOf(Object obj) {
+            if (!(obj instanceof Number)) {
+                return -1;
+            }
+            Number n = (Number) obj;
+            int index = n.intValue();
+            if (!bitset.get(index)) {
+                return -1;
+            }
+
+            // is left most bit
+            if (index == 0) {
+                return 0;
+            }
+
+            // is right most bit
+            if (index == bitset.length() - 1) {
+                return size() - 1;
+            }
+
+            // count right bit
+            if (index > bitset.length() / 2) {
+                int count = 1;
+                for (int i = bitset.nextSetBit(index+1); i >= 0; i = bitset.nextSetBit(i+1)) {
+                    count++;
+                }
+                return size() - count;
+            }
+
+            // count left bit
+            int count = 0;
+            for (int i = bitset.previousSetBit(index-1);  i >= 0; i = bitset.previousSetBit(i-1)) {
+                count++;
+            }
+            return count;
+        }
+
         @Override public int size() {
             return bitset.cardinality();
         }

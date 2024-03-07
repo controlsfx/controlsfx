@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2022, ControlsFX
+ * Copyright (c) 2022, 2024, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -40,6 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 public class CheckBitSetModelBaseTest {
@@ -138,5 +138,15 @@ public class CheckBitSetModelBaseTest {
         });
         model.clearChecks();
         assertEquals(1, count.get());
+    }
+
+    @Test
+    // needs junit 5
+    // @RepeatedTest(value = 10, failureThreshold = 2)
+    public void testSingleCheckAddsItToIndicesList() {
+        ObservableList<Integer> checkedIndicesList = model.getCheckedIndices();
+        assertTrue(checkedIndicesList.isEmpty());
+        model.check(ROW_3_VALUE);
+        assertNotEquals(-1, checkedIndicesList.indexOf(model.getItemIndex(ROW_3_VALUE)));
     }
 }

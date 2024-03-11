@@ -258,6 +258,16 @@ public class Wizard {
     public final ObservableMap<String, Object> getSettings() {
         return settings;
     }
+
+    /**
+     * Provides access to the {@link Dialog} object used to display the {@link Wizard}.
+     * @return The {@link Dialog} representing this {@link Wizard}. <br>
+     *         This can be accessed in order to modify its properties if necessary,
+     *         for example setting its window icon or its modality.
+     */
+    public final Dialog<ButtonType> getDialog() {
+        return dialog;
+    }
     
     
     
@@ -724,23 +734,6 @@ public class Wizard {
             int pageIndex = pages.indexOf(currentPage);
             return pages.size()-1 > pageIndex; 
         }
-    }
-    
-    
-    
-    /**************************************************************************
-     * 
-     * Methods for the sake of unit tests
-     * 
-     **************************************************************************/
-    
-    /**
-     * @return The {@link Dialog} representing this {@link Wizard}. <br>
-     *         This is actually for {@link Dialog} reading-purposes, e.g.
-     *         unit testing the {@link DialogPane} content.
-     */
-    Dialog<ButtonType> getDialog() {
-        return dialog;
     }
     
 }

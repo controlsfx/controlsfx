@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2018 ControlsFX
+ * Copyright (c) 2014, 2018, 2024 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

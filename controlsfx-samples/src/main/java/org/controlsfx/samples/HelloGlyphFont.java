@@ -26,7 +26,6 @@
  */
 package org.controlsfx.samples;
 
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -43,8 +42,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.GridCell;
-import org.controlsfx.control.GridView;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 import org.controlsfx.glyphfont.GlyphFont;
@@ -138,6 +135,7 @@ public class HelloGlyphFont extends ControlsFXSample {
         	Color randomColor = new Color( Math.random(), Math.random(), Math.random(), 1);
         	Glyph graphic = Glyph.create( "FontAwesome|" + glyph.name()).sizeFactor(2).color(randomColor).useGradientEffect();
         	Button button = new Button(glyph.name(), graphic);
+            button.setMnemonicParsing(false);
         	button.setContentDisplay(ContentDisplay.TOP);
         	button.setMaxWidth(Double.MAX_VALUE);
         	col = col % maxColumns + 1;

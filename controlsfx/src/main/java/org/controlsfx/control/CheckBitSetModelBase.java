@@ -319,7 +319,7 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
                 return -1;
             }
 
-            if (index == (lastGetIndex + 1) && index < itemCount) {
+            if (index == (lastGetIndex + 1)) {
                 // we're iterating forward in order, short circuit for
                 // performance reasons (RT-39776)
                 lastGetIndex++;

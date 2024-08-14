@@ -50,6 +50,7 @@ import org.controlsfx.control.ListActionView;
 import org.controlsfx.control.ListSelectionView;
 import org.controlsfx.glyphfont.FontAwesome;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class HelloListSelectionView extends ControlsFXSample {
@@ -78,6 +79,18 @@ public class HelloListSelectionView extends ControlsFXSample {
     public Node getControlPanel() {
         VBox root = new VBox(20);
         root.setPadding(new Insets(30, 30, 30, 30));
+
+        CheckBox useComparator = new CheckBox("Use comparator to sort");
+        useComparator.setOnAction(evt -> {
+            if (useComparator.isSelected()) {
+                Comparator<String> comparator = Comparator.naturalOrder();
+                view.setComparator(comparator);
+                FXCollections.sort(view.getSourceItems(), comparator);
+                FXCollections.sort(view.getTargetItems(), comparator);
+            } else {
+                view.setComparator(null);
+            }
+        });
         
         CheckBox useCellFactory = new CheckBox("Use cell factory");
         useCellFactory.setOnAction(evt -> {
@@ -115,7 +128,7 @@ public class HelloListSelectionView extends ControlsFXSample {
         view.getSourceActions().addAll(getSourceAndTargetActions());
         view.getTargetActions().addAll(getSourceAndTargetActions());
 
-        root.getChildren().addAll(useCellFactory, orientation);
+        root.getChildren().addAll(useComparator, useCellFactory, orientation);
         
         return root;
     }

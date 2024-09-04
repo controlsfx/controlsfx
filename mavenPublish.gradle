@@ -2,7 +2,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 signing {
-    required = { false }
+    required = { !version.endsWith("SNAPSHOT") }
     sign publishing.publications
 }
 
@@ -37,8 +37,8 @@ publishing {
                 }
                 developers {
                     developer {
-                        name = 'James Richmond'
-                        email = 'james.b.richmond@gmail.com'
+                        name = 'Jonathan Giles'
+                        email = 'jonathan@jonathangiles.net'
                         roles = [
                                 'author',
                                 'developer'
@@ -46,9 +46,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:https://github.com/JimmyBoomBots3000/controlsfx'
-                    developerConnection = 'scm:git:ssh://hg@github.com/JimmyBoomBots3000/controlsfx'
-                    url = 'https://github.com/JimmyBoomBots3000/controlsfx'
+                    connection = 'scm:git:https://github.com/controlsfx/controlsfx'
+                    developerConnection = 'scm:git:ssh://hg@github.com/controlsfx/controlsfx'
+                    url = 'https://github.com/controlsfx/controlsfx'
                 }
 
                 // Remove classifier for JavaFX dependencies
@@ -60,17 +60,6 @@ publishing {
                         it.parent().remove(it)
                     }
                 }
-            }
-        }
-    }
-    repositories {
-        maven {
-            allowInsecureProtocol = true
-            name = 'internal'
-            url = uri('http://hera.sesco.com:10082/repository/internal/')
-            credentials {
-                username = project.findProperty("repoUser")
-                password = project.findProperty("repoPassword")
             }
         }
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2018 ControlsFX
+ * Copyright (c) 2014, 2024 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,7 @@ import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -111,6 +112,35 @@ public class ListSelectionView<T> extends ControlsFXControl {
     @Override public String getUserAgentStylesheet() {
         return getUserAgentStylesheet(ListSelectionView.class, "listselectionview.css");
     }
+
+    private final ObjectProperty<Comparator<T>> comparator = new SimpleObjectProperty<>(this, "comparator");
+
+    /**
+     * A property to store a comparator used to keep the source and target lists sorted.
+     */
+    public final ObjectProperty<Comparator<T>> comparatorProperty() {
+        return comparator;
+    }
+
+    /**
+     * Returns the value of {@link #comparatorProperty()}.
+     *
+     * @return the comparator
+     */
+    public final Comparator<T> getComparator() {
+        return comparator.get();
+    }
+
+    /**
+     * Sets the value of {@link #comparatorProperty()}.
+     *
+     * @param comparator
+     *            the new comparator for the lists
+     */
+    public final void setComparator(Comparator<T> comparator) {
+        comparatorProperty().set(comparator);
+    }
+
 
     private final ObjectProperty<Node> sourceHeader = new SimpleObjectProperty<>(
             this, "sourceHeader");
@@ -563,33 +593,36 @@ public class ListSelectionView<T> extends ControlsFXControl {
         return new FontAwesome().create(angleDoubleDown);
     }
 
-    private static <T> void moveToTarget(ListView<T> sourceListView, ListView<T> targetListView) {
+    private void moveToTarget(ListView<T> sourceListView, ListView<T> targetListView) {
         move(sourceListView, targetListView);
         sourceListView.getSelectionModel().clearSelection();
     }
 
-    private static <T> void moveToTargetAll(ListView<T> sourceListView, ListView<T> targetListView) {
+    private void moveToTargetAll(ListView<T> sourceListView, ListView<T> targetListView) {
         move(sourceListView, targetListView, new ArrayList<>(sourceListView.getItems()));
         sourceListView.getSelectionModel().clearSelection();
     }
 
-    private static <T> void moveToSource(ListView<T> sourceListView, ListView<T> targetListView) {
+    private void moveToSource(ListView<T> sourceListView, ListView<T> targetListView) {
         move(targetListView, sourceListView);
         targetListView.getSelectionModel().clearSelection();
     }
 
-    private static <T> void moveToSourceAll(ListView<T> sourceListView, ListView<T> targetListView) {
+    private void moveToSourceAll(ListView<T> sourceListView, ListView<T> targetListView) {
         move(targetListView, sourceListView, new ArrayList<>(targetListView.getItems()));
         targetListView.getSelectionModel().clearSelection();
     }
 
-    private static <T> void move(ListView<T> source, ListView<T> target) {
+    private void move(ListView<T> source, ListView<T> target) {
         List<T> selectedItems = new ArrayList<>(source.getSelectionModel().getSelectedItems());
         move(source, target, selectedItems);
     }
 
-    private static <T> void move(ListView<T> source, ListView<T> target, List<T> items) {
+    private void move(ListView<T> source, ListView<T> target, List<T> items) {
         source.getItems().removeAll(items);
         target.getItems().addAll(items);
+        if (getComparator() != null) {
+            FXCollections.sort(target.getItems(), getComparator());
+        }
     }
 }

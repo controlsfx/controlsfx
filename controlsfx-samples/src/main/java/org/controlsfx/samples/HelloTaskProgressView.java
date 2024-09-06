@@ -74,7 +74,8 @@ public class HelloTaskProgressView extends ControlsFXSample {
 
     @Override
     public Node getPanel(Stage stage) {
-        taskProgressView = new TaskProgressView<MyTask>();
+        taskProgressView = new TaskProgressView<>();
+        taskProgressView.setRetainTasks(true);
 
         factory = task -> {
 

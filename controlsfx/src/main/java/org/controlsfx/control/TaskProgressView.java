@@ -85,20 +85,17 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
             }
         };
 
-        getTasks().addListener(new ListChangeListener<Task<?>>() {
-            @Override
-            public void onChanged(Change<? extends Task<?>> c) {
-                while (c.next()) {
-                    if (c.wasAdded()) {
-                        for (Task<?> task : c.getAddedSubList()) {
-                            task.addEventHandler(WorkerStateEvent.ANY,
-                                    taskHandler);
-                        }
-                    } else if (c.wasRemoved()) {
-                        for (Task<?> task : c.getRemoved()) {
-                            task.removeEventHandler(WorkerStateEvent.ANY,
-                                    taskHandler);
-                        }
+        getTasks().addListener((ListChangeListener<Task<?>>) c -> {
+            while (c.next()) {
+                if (c.wasAdded()) {
+                    for (Task<?> task : c.getAddedSubList()) {
+                        task.addEventHandler(WorkerStateEvent.ANY,
+                                taskHandler);
+                    }
+                } else if (c.wasRemoved()) {
+                    for (Task<?> task : c.getRemoved()) {
+                        task.removeEventHandler(WorkerStateEvent.ANY,
+                                taskHandler);
                     }
                 }
             }

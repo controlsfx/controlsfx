@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2019 ControlsFX
+ * Copyright (c) 2014, 2024 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -176,6 +176,7 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
     public final BooleanProperty retainTasksProperty() {
         return retainTasks;
     }
+
 
     /**
      * Do not remove tasks when succeeded, cancelled or failed.

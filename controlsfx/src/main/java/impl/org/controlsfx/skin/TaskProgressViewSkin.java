@@ -144,9 +144,7 @@ public class TaskProgressViewSkin<T extends Task<?>> extends
 
         /**
          * Customize the button for removing finished tasks manually. Can be used in conjunction with retain task property
-         *
-         * @return Button
-         */
+         * */
         protected Button getCustomRemoveFinishedTaskButton() {
             removeTaskButton = new Button("X");
             removeTaskButton.setAlignment(Pos.CENTER);

@@ -271,4 +271,33 @@ public class CheckBitSetModelBaseTest {
         assertTrue(model.isChecked(1));
         assertTrue(model.isChecked(2));
     }
+
+
+    
+    @Test
+    public void testCheckedItemsUnexpectedIndexAfterClear() {
+        // test for issue identified here: https://github.com/controlsfx/controlsfx/issues/1531#issuecomment-1929277168
+        this.itemBooleanMap = new HashMap<>();
+        this.items = FXCollections.observableArrayList(ROW_1_VALUE, ROW_2_VALUE, ROW_3_VALUE);
+        model = new CheckComboBox.CheckComboBoxBitSetCheckModel<>(items, itemBooleanMap);
+
+        model.check(2);
+        model.check(1);
+
+        assertFalse(model.isChecked(0));
+        assertTrue(model.isChecked(1));
+        assertTrue(model.isChecked(2));
+
+        model.clearChecks();
+
+        assertFalse(model.isChecked(0));
+        assertFalse(model.isChecked(1));
+        assertFalse(model.isChecked(2));
+
+        model.check(2);
+
+        assertFalse(model.isChecked(0));
+        assertFalse(model.isChecked(1));
+        assertTrue(model.isChecked(2));
+    }
 }

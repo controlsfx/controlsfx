@@ -133,6 +133,9 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
 
         // first create the filtered combo box
         filteredComboBox = createFilteredComboBox();
+
+        Bindings.bindContentBidirectional(comboBox.getProperties(), filteredComboBox.getProperties());
+
         getChildren().add(filteredComboBox);
 
         // and the search field

@@ -107,12 +107,7 @@ public class PopOver extends PopupControl {
                 PopOver.class.getResource("popover.css").toExternalForm()); //$NON-NLS-1$
 
         setAnchorLocation(AnchorLocation.WINDOW_TOP_LEFT);
-        setOnHiding(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent evt) {
-                setDetached(false);
-            }
-        });
+        setOnHiding(evt -> setDetached(false));
 
         /*
          * Create some initial content.
@@ -138,13 +133,7 @@ public class PopOver extends PopupControl {
         /*
          * A detached popover should of course not automatically hide itself.
          */
-        detached.addListener(it -> {
-            if (isDetached()) {
-                setAutoHide(false);
-            } else {
-                setAutoHide(true);
-            }
-        });
+        detached.addListener(it -> setAutoHide(!isDetached()));
 
         setAutoHide(true);
 
@@ -243,7 +232,7 @@ public class PopOver extends PopupControl {
 
     // Content support.
 
-    private final ObjectProperty<Node> contentNode = new SimpleObjectProperty<Node>(
+    private final ObjectProperty<Node> contentNode = new SimpleObjectProperty<>(
             this, "contentNode") { //$NON-NLS-1$
         @Override
         public void setValue(Node node) {
@@ -251,7 +240,7 @@ public class PopOver extends PopupControl {
                 throw new IllegalArgumentException(
                         "content node can not be null"); //$NON-NLS-1$
             }
-        };
+        }
     };
 
     /**
@@ -286,43 +275,30 @@ public class PopOver extends PopupControl {
         contentNodeProperty().set(content);
     }
 
-    private InvalidationListener hideListener = new InvalidationListener() {
-        @Override
-        public void invalidated(Observable observable) {
-            if (!isDetached()) {
-                hide(Duration.ZERO);
-            }
+    private final InvalidationListener hideListener = observable -> {
+        if (!isDetached()) {
+            hide(Duration.ZERO);
         }
     };
 
-    private WeakInvalidationListener weakHideListener = new WeakInvalidationListener(
+    private final WeakInvalidationListener weakHideListener = new WeakInvalidationListener(
             hideListener);
 
-    private ChangeListener<Number> xListener = new ChangeListener<Number>() {
-        @Override
-        public void changed(ObservableValue<? extends Number> value,
-                Number oldX, Number newX) {
-            if (!isDetached()) {
-                setAnchorX(getAnchorX() + (newX.doubleValue() - oldX.doubleValue()));
-            }
+    private final ChangeListener<Number> xListener = (value, oldX, newX) -> {
+        if (!isDetached()) {
+            setAnchorX(getAnchorX() + (newX.doubleValue() - oldX.doubleValue()));
         }
     };
 
-    private WeakChangeListener<Number> weakXListener = new WeakChangeListener<>(
-            xListener);
+    private final WeakChangeListener<Number> weakXListener = new WeakChangeListener<>(xListener);
 
-    private ChangeListener<Number> yListener = new ChangeListener<Number>() {
-        @Override
-        public void changed(ObservableValue<? extends Number> value,
-                Number oldY, Number newY) {
-            if (!isDetached()) {
-                setAnchorY(getAnchorY() + (newY.doubleValue() - oldY.doubleValue()));
-            }
+    private final ChangeListener<Number> yListener = (value, oldY, newY) -> {
+        if (!isDetached()) {
+            setAnchorY(getAnchorY() + (newY.doubleValue() - oldY.doubleValue()));
         }
     };
 
-    private WeakChangeListener<Number> weakYListener = new WeakChangeListener<>(
-            yListener);
+    private final WeakChangeListener<Number> weakYListener = new WeakChangeListener<>(yListener);
 
     private Window ownerWindow;
     private final EventHandler<WindowEvent> closePopOverOnOwnerWindowCloseLambda = event -> ownerWindowHiding();
@@ -574,7 +550,7 @@ public class PopOver extends PopupControl {
     private final BooleanProperty headerAlwaysVisible = new SimpleBooleanProperty(this, "headerAlwaysVisible"); //$NON-NLS-1$
 
     /**
-     * Determines whether or not the {@link PopOver} header should remain visible, even while attached.
+     * Determines whether the {@link PopOver} header should remain visible, even while attached.
      */
     public final BooleanProperty headerAlwaysVisibleProperty() {
         return headerAlwaysVisible;
@@ -608,7 +584,7 @@ public class PopOver extends PopupControl {
     private final BooleanProperty closeButtonEnabled = new SimpleBooleanProperty(this, "closeButtonEnabled", true); //$NON-NLS-1$
 
     /**
-     * Determines whether or not the header's close button should be available.
+     * Determines whether the header's close button should be available.
      */
     public final BooleanProperty closeButtonEnabledProperty() {
         return closeButtonEnabled;

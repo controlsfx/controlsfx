@@ -27,11 +27,6 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.GridViewSkin;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
@@ -54,9 +49,12 @@ import javafx.scene.control.ScrollToEvent;
 import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
-
 import org.controlsfx.control.cell.ColorGridCell;
 import org.controlsfx.tools.Utils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A GridView is a virtualised control for displaying {@link #getItems()} in a
@@ -182,9 +180,9 @@ public class GridView<T> extends ControlsFXControl {
      * @param item The item to scroll to.
      */
     public void scrollTo(T item) {
-        if( getItems() != null ) {
+        if(getItems() != null) {
             int index = getItems().indexOf(item);
-            if( index >= 0 ) {
+            if(index >= 0) {
                 scrollTo(index);
             }
         }

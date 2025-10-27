@@ -18,22 +18,25 @@ import java.util.concurrent.TimeoutException;
 @RunWith(Parameterized.class)
 public class SegmentedBarSkinTest {
 
-    @Parameterized.Parameters(name = "{index}: {0} = x: {1}, y: {2} ")
+    @Parameterized.Parameters(name = "{index}: {0} = x: {1}, y: {2}, w: {3}, h: {4} ")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] { {Orientation.HORIZONTAL, 100.0, 100.0 }, { Orientation.VERTICAL, 100.0, 200.0  }});
+        return Arrays.asList(new Object[][] { {Orientation.HORIZONTAL, 100.0, 100.0, 0.0, 100.0 }, { Orientation.VERTICAL, 100.0, 200.0, 100.0, 0.0  }});
     }
 
-    public SegmentedBarSkinTest(Orientation orientation, double x, double y) {
+    public SegmentedBarSkinTest(Orientation orientation, double x, double y, double w, double h) {
         this.orientation = orientation;
         this.x = x;
         this.y = y;
+        this.w = w;
+        this.h = h;
     }
 
     private Orientation orientation;
 
     private double x;
-
     private double y;
+    private double w;
+    private double h;
 
     @BeforeClass
     public static void setupSpec() throws TimeoutException {
@@ -46,7 +49,7 @@ public class SegmentedBarSkinTest {
     }
 
     @Test
-    public void testLayoutChildrenNotRelocatingToNaN() {
+    public void testLayoutChildrenDoNotResizeRelocateToNaN() {
         SegmentedBar<SegmentedBar.Segment> control = new SegmentedBar<>();
         control.setOrientation(orientation);
         StackPane segmentView1 = new StackPane();
@@ -63,8 +66,12 @@ public class SegmentedBarSkinTest {
 
         Assert.assertEquals(x, segmentView1.getLayoutX(),0.0);
         Assert.assertEquals(y, segmentView1.getLayoutY(),0.0);
+        Assert.assertEquals(w, segmentView1.getWidth(),0.0);
+        Assert.assertEquals(h, segmentView1.getHeight(),0.0);
 
         Assert.assertEquals(x, segmentView2.getLayoutX(),0.0);
         Assert.assertEquals(y, segmentView2.getLayoutY(),0.0);
+        Assert.assertEquals(w, segmentView2.getWidth(),0.0);
+        Assert.assertEquals(h, segmentView2.getHeight(),0.0);
     }
 }

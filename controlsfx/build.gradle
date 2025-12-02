@@ -10,11 +10,13 @@ ext {
 version = controlsfx_version
 
 dependencies {
-    testCompile 'junit:junit:[4,)'
-    testCompile 'org.testfx:testfx-core:4.0.16-alpha'
-    testRuntime ('org.testfx:openjfx-monocle:jdk-12.0.1+2') {
+    testImplementation 'junit:junit:[4,)'
+    testImplementation 'org.testfx:testfx-core:4.0.16-alpha'
+    testRuntimeOnly ('org.testfx:openjfx-monocle:jdk-12.0.1+2') {
         exclude group: 'org.openjfx'
     }
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'org.hamcrest:hamcrest-library:2.2'
 }
 
 javafx {
@@ -48,8 +50,6 @@ task downloadTranslations {
         }
     }
 }
-
-processResources.finalizedBy(downloadTranslations)
 
 // Java Packager is not available for Java 11
 if (!JavaVersion.current().isJava11Compatible()) {
@@ -86,12 +86,9 @@ javadoc {
                 "javafx.base/com.sun.javafx.event=org.controlsfx.controls",
                 "javafx.web/com.sun.webkit=org.controlsfx.controls",
                 "javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls",
-                "javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
-                "javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
-                "javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls",
                 "javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls"
         ]
-)
+    )
     // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy
     // over the doc-files if they are embedded with the sources. I find this arrangement
     // somewhat cleaner anyway (never was a fan of mixing javadoc files with the sources)
@@ -109,7 +106,8 @@ ext.java9TestArgs = [
         "--add-exports=javafx.graphics/com.sun.javafx.application=org.testfx",
         // For Monocle
         "--add-exports=javafx.graphics/com.sun.glass.ui=org.testfx.monocle",
-        "--add-opens=javafx.graphics/com.sun.glass.ui=org.testfx"
+        "--add-opens=javafx.graphics/com.sun.glass.ui=org.testfx",
+        "--add-reads=$moduleName=org.hamcrest",
 ]
 
 test {
@@ -147,7 +145,6 @@ jar {
             'Implementation-Title': 'ControlsFX',
             'Export-Package': '!impl.org.controlsfx.*, org.controlsfx.*'
     )
-
 }
 
 task native2ascii(type: Copy) {
@@ -165,5 +162,6 @@ task deleteUtf8Files(type: Delete) {
     delete fileTree(dir: "$buildDir/resources/main", include: "**/controlsfx_*.utf8")
 }
 
-downloadTranslations.finalizedBy(native2ascii)
-native2ascii.finalizedBy(deleteUtf8Files)
+processResources.dependsOn(downloadTranslations)
+downloadTranslations.dependsOn(native2ascii)
+native2ascii.dependsOn(deleteUtf8Files)

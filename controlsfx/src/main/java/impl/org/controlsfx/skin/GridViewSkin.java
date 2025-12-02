@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2021, ControlsFX
+ * Copyright (c) 2013, 2022, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,8 +49,6 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
         super(control);
 
         flow = getVirtualFlow();
-        updateGridViewItems();
-
         flow.setId("virtual-flow"); //$NON-NLS-1$
         flow.setPannable(false);
         flow.setVertical(true);
@@ -58,6 +56,7 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
         flow.setCellFactory(param -> createCell());
         getChildren().add(flow);
 
+        updateGridViewItems();
         updateItemCount();
 
         // Register listeners

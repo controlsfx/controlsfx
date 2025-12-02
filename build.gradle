@@ -1,13 +1,13 @@
+plugins {
+    id 'org.openjfx.javafxplugin' version '0.0.13' apply false
+    id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
+}
+
 ext.java9Args = [
-        // For various usages of TraversalEngine
-        "--add-exports=javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",
-        "--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
         // For various behaviors across controls
         "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls",
         // For ReadOnlyUnbackedObservableList across files
         "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls",
-        // For InputMap used in behavior classes
-        "--add-exports=javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls",
         // For EventHandlerManager in AutoCompletionBinding
         "--add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls",
         // For MappingChange, NonIterableChange across files
@@ -26,7 +26,6 @@ ext.java9RuntimeArgs = [
 subprojects {
 
     apply plugin: 'java'
-    apply plugin: 'maven'
     apply plugin: 'org.openjfx.javafxplugin'
     apply from  : '../mavenPublish.gradle'
 
@@ -55,13 +54,13 @@ subprojects {
     task sourceJar(type: Jar) {
         from sourceSets.main.java
         from sourceSets.main.resources
-        archiveClassifier = 'sources'
+        archiveClassifier.set('sources')
     }
 
     task javadocJar(type: Jar) {
         dependsOn javadoc
         from javadoc.destinationDir
-        archiveClassifier = 'javadoc'
+        archiveClassifier.set('javadoc')
     }
 
     artifacts {
@@ -69,15 +68,22 @@ subprojects {
         archives javadocJar
     }
 
-    // Used in Travis
-    task getVersion {
-        doLast {
-            println "$project.version"
-        }
-    }
-
     // Do not publish Gradle modules
     tasks.withType(GenerateModuleMetadata) {
         enabled = false
+    }
+}
+
+// nexus publish plugin needs this
+version = controlsfx_version
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+            username = project.hasProperty('sonatypeUsername') ? project.property('sonatypeUsername') : ''
+            password = project.hasProperty('sonatypePassword') ? project.property('sonatypePassword') : ''
+        }
     }
 }

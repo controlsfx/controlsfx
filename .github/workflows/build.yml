@@ -1,0 +1,49 @@
+name: ControlsFX Build
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Tests (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          export DISPLAY=:90
+          Xvfb -ac :90 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          ./gradlew build test
+
+      - name: Release Snapshots
+        if: github.ref == 'refs/heads/master'
+        run: |
+          ./gradlew publish -PsonatypeUsername=$SONATYPE_USERNAME -PsonatypePassword=$SONATYPE_PASSWORD -Ptransifex.api=$TRANSIFEX_API
+        shell: bash
+        env:
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          TRANSIFEX_API: ${{ secrets.TRANSIFEX_API }}
+
+      - name: Draft release
+        if: github.ref == 'refs/heads/master'
+        # Drafts your next Release notes as Pull Requests are merged into "master"
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

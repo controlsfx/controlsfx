@@ -118,6 +118,7 @@ public class HyperlinkLabel extends ControlsFXControl implements EventTarget {
      */
     public HyperlinkLabel(String text) {
         setText(text);
+        getStyleClass().add(DEFAULT_STYLE_CLASS);
     }
     
     
@@ -201,4 +202,12 @@ public class HyperlinkLabel extends ControlsFXControl implements EventTarget {
     public final EventHandler<ActionEvent> getOnAction() {
         return onAction == null ? null : onAction.get();
     }
+
+    /***************************************************************************
+     *                                                                         *
+     * Stylesheet Handling                                                     *
+     *                                                                         *
+     **************************************************************************/
+
+    private static final String DEFAULT_STYLE_CLASS = "hyperlink-label";
 }

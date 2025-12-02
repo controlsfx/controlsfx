@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018, 2020 ControlsFX
+ * Copyright (c) 2018, 2023 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,6 +24,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+/**
+ * Defines the UI controls, and skins that are available in ControlsFX.
+ */
 module org.controlsfx.controls {
 
     requires java.desktop;
@@ -32,6 +36,7 @@ module org.controlsfx.controls {
     requires static javafx.media;
     requires java.logging;
     requires javafx.base;
+    requires java.net.http;
 
     exports org.controlsfx.control;
     exports org.controlsfx.control.action;

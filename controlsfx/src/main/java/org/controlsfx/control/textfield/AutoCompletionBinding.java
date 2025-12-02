@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2016, 2020 ControlsFX
+ * Copyright (c) 2014, 2023 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -547,7 +547,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      * @param eventHandler the handler to register
      * @throws NullPointerException if the event type or handler is null
      */
-    public <E extends Event> void addEventHandler(EventType<E> eventType, EventHandler<E> eventHandler) {
+    public <E extends Event> void addEventHandler(EventType<E> eventType, EventHandler<? super E> eventHandler) {
         eventHandlerManager.addEventHandler(eventType, eventHandler);
     }
 
@@ -562,7 +562,7 @@ public abstract class AutoCompletionBinding<T> implements EventTarget {
      * @param eventHandler the handler to unregister
      * @throws NullPointerException if the event type or handler is null
      */
-    public <E extends Event> void removeEventHandler(EventType<E> eventType, EventHandler<E> eventHandler) {
+    public <E extends Event> void removeEventHandler(EventType<E> eventType, EventHandler<? super E> eventHandler) {
         eventHandlerManager.removeEventHandler(eventType, eventHandler);
     }
 

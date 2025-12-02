@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2019 ControlsFX
+ * Copyright (c) 2014, 2022 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,14 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
+/**
+ * {@link Dialog} with exception details.<br>
+ * Usage: Simply pass a {@link Throwable} and the dialog will display:<br>
+ * <ul>
+ *     <li>The exception message</li>
+ *     <li>The full exception stack trace in an expandable TextArea.</li>
+ * </ul>
+ */
 public class ExceptionDialog extends Dialog<ButtonType> {
 
     public ExceptionDialog(final Throwable exception) {

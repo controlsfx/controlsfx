@@ -220,11 +220,11 @@ public class SegmentedBarSkin<T extends SegmentedBar.Segment> extends SkinBase<S
             double segmentValue = segment.getValue();
 
             if (getSkinnable().getOrientation().equals(Orientation.HORIZONTAL)) {
-                double segmentWidth = segmentValue / total * contentWidth;
+                double segmentWidth = (total == 0.0) ? 0.0 : segmentValue / total * contentWidth;
                 segmentNode.resizeRelocate(x, contentY, segmentWidth, contentHeight);
                 x += segmentWidth;
             } else {
-                double segmentHeight = segmentValue / total * contentHeight;
+                double segmentHeight = (total == 0.0) ? 0.0 : segmentValue / total * contentHeight;
                 segmentNode.resizeRelocate(contentX, y - segmentHeight, contentWidth, segmentHeight);
                 y -= segmentHeight;
             }

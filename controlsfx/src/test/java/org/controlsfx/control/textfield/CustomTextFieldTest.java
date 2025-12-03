@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019, ControlsFX
+ * Copyright (c) 2019, 2025, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,18 +26,21 @@
  */
 package org.controlsfx.control.textfield;
 
-import java.util.Optional;
-import java.util.concurrent.TimeoutException;
+import javafx.event.Event;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
+
+import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static org.testfx.api.FxToolkit.setupStage;
 
 public class CustomTextFieldTest extends FxRobot {
@@ -98,4 +101,34 @@ public class CustomTextFieldTest extends FxRobot {
         Assert.assertEquals(Optional.empty(), lookup("#right-label").tryQuery());
         Assert.assertEquals(Optional.empty(), lookup("#left-label").tryQuery());
     }
+
+    //issue https://github.com/controlsfx/controlsfx/issues/1296
+    @Test
+    public void clearEventTextField() {
+        CustomTextField clearableField = (CustomTextField) TextFields.createClearableTextField();
+        AtomicBoolean clearButtonPressed = new AtomicBoolean(false);
+        clearableField.addEventHandler(ClearEvent.CLEAR_PRESSED, event -> clearButtonPressed.set(true));
+        Node clearablePane = clearableField.getRight();
+        Event.fireEvent(clearablePane, createMouseReleasedEvent());
+
+        Assert.assertTrue(clearButtonPressed.get());
+    }
+
+    @Test
+    public void clearEventPasswordField() {
+        CustomPasswordField clearableField = (CustomPasswordField) TextFields.createClearablePasswordField();
+        AtomicBoolean clearButtonPressed = new AtomicBoolean(false);
+        clearableField.addEventHandler(ClearEvent.CLEAR_PRESSED, event -> clearButtonPressed.set(true));
+        Node clearablePane = clearableField.getRight();
+        Event.fireEvent(clearablePane, createMouseReleasedEvent());
+
+        Assert.assertTrue(clearButtonPressed.get());
+    }
+
+    private MouseEvent createMouseReleasedEvent() {
+        return new MouseEvent(MouseEvent.MOUSE_RELEASED, 0, 0, 0, 0, MouseButton.PRIMARY,
+                1, false, false, false, false, false, false,
+                false, false, false, false, null);
+    }
+
 }

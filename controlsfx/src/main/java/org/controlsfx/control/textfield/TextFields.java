@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2021, ControlsFX
+ * Copyright (c) 2014, 2025, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,10 +28,6 @@ package org.controlsfx.control.textfield;
 
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import impl.org.controlsfx.autocompletion.SuggestionProvider;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import javafx.animation.FadeTransition;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -46,6 +42,9 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * A class containing useful customizations for the JavaFX {@link TextField}.
@@ -97,7 +96,7 @@ public class TextFields {
         clearButtonPane.getStyleClass().addAll("clear-button"); //$NON-NLS-1$
         clearButtonPane.setOpacity(0.0);
         clearButtonPane.setCursor(Cursor.DEFAULT);
-        clearButtonPane.setOnMouseReleased(e -> inputField.clear());
+        clearButtonPane.setOnMouseReleased(e -> inputField.fireEvent(new ClearEvent(ClearEvent.CLEAR_PRESSED)));
         clearButtonPane.managedProperty().bind(inputField.editableProperty());
         clearButtonPane.visibleProperty().bind(inputField.editableProperty());
 
@@ -127,6 +126,7 @@ public class TextFields {
                 fader.play();
             }
         });
+        inputField.addEventHandler(ClearEvent.CLEAR_PRESSED, event -> inputField.clear());
     }
 
     /***************************************************************************

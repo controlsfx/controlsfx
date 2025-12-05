@@ -36,6 +36,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.text.MessageFormat;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -148,5 +149,155 @@ public class CheckBitSetModelBaseTest {
         assertTrue(checkedIndicesList.isEmpty());
         model.check(ROW_3_VALUE);
         assertNotEquals(-1, checkedIndicesList.indexOf(model.getItemIndex(ROW_3_VALUE)));
+    }
+
+    @Test
+    public void testCheckedItemsContainsCorrectValuesAfterClearCheck() {
+        // derived from https://github.com/controlsfx/controlsfx/issues/1550
+        model.clearChecks();
+        assertTrue(model.isEmpty());
+
+        model.check(2);
+        model.check(4);
+        assertTrue(model.isChecked(2));
+        assertTrue(model.isChecked(4));
+        model.clearCheck(2);
+        assertFalse(model.isChecked(2));
+        assertTrue(model.isChecked(4));
+
+        ObservableList<String> checkedItems = model.getCheckedItems();
+        assertEquals(1, checkedItems.size());
+        assertTrue(checkedItems.contains(ROW_5_VALUE));
+    }
+
+    @Test
+    public void testCheckedItemsContainsCorrectValuesAscendingCheckDescendingUncheck() {
+        model.clearChecks();
+        assertTrue(model.isEmpty());
+
+        ObservableList<String> checkedItems = model.getCheckedItems();
+
+        // check indexes 0 to 4
+        for (int checkIdx = 0; checkIdx < 5; checkIdx++) {
+            model.check(checkIdx);
+            // verify checked size and which items are checked
+            assertEquals(
+                MessageFormat.format("Expected checked items size to be {0} when checking from index 0 to {1}", checkIdx + 1, checkIdx),
+                checkIdx + 1, checkedItems.size());
+
+            for (int checkedIdx = 0; checkedIdx < 5; checkedIdx++) {
+                assertEquals(
+                    MessageFormat.format("Expected index {0} to be {1} when checking in ascending order from 0 to {2}",
+                        checkedIdx,
+                        checkedIdx <= checkIdx ? "checked" : "not checked",
+                        checkIdx),
+                    checkedIdx <= checkIdx, model.isChecked(checkedIdx));
+            }
+        }
+
+        // uncheck indexes 4 to 0
+        for (int uncheckIdx = 4; uncheckIdx >= 0; uncheckIdx--) {
+            model.clearCheck(uncheckIdx);
+            // verify checked size and which items are checked
+            assertEquals(MessageFormat.format("Expected checked items size to be {0} when unchecking from index 4 to {1}", uncheckIdx, uncheckIdx),
+                uncheckIdx, checkedItems.size());
+
+            for (int checkedIdx = 0; checkedIdx < 5; checkedIdx++) {
+                assertEquals(
+                    MessageFormat.format("Expected index {0} to be {1} when checking in descending order from 5 to {2}",
+                        checkedIdx,
+                        checkedIdx < uncheckIdx ? "checked" : "not checked",
+                        uncheckIdx),
+                    checkedIdx < uncheckIdx, model.isChecked(checkedIdx));
+            }
+        }
+    }
+
+    @Test
+    public void testCheckedItemsContainsCorrectValuesDescendingCheckAscendingUncheck() {
+        model.clearChecks();
+        assertTrue(model.isEmpty());
+
+        ObservableList<String> checkedItems = model.getCheckedItems();
+
+        // check indexes 0 to 4
+        for (int checkIdx = 4; checkIdx >= 0; checkIdx--) {
+            model.check(checkIdx);
+            // verify checked size and which items are checked
+            assertEquals(
+                MessageFormat.format("Expected checked items size to be {0} when checking from index 4 to {1}", 5 - checkIdx, checkIdx),
+                5 - checkIdx, checkedItems.size());
+
+            for (int checkedIdx = 0; checkedIdx < 5; checkedIdx++) {
+                assertEquals(
+                    MessageFormat.format("Expected index {0} to be {1} when checking in descending order from 4 to {2}",
+                        checkedIdx,
+                        checkedIdx >= checkIdx ? "checked" : "not checked",
+                        checkIdx),
+                    checkedIdx >= checkIdx, model.isChecked(checkedIdx));
+            }
+        }
+
+        // uncheck indexes 4 to 0
+        for (int uncheckIdx = 0; uncheckIdx < 5; uncheckIdx++) {
+            model.clearCheck(uncheckIdx);
+            // verify checked size and which items are checked
+            assertEquals(
+                MessageFormat.format("Expected checked items size to be {0} when unchecking from index 0 to {1}", 4 - uncheckIdx, uncheckIdx),
+                4 - uncheckIdx, checkedItems.size());
+
+            for (int checkedIdx = 0; checkedIdx < 5; checkedIdx++) {
+                assertEquals(
+                     MessageFormat.format("Expected index {0} to be {1} when checking in ascending order from 0 to {2}",
+                        checkedIdx,
+                        checkedIdx > uncheckIdx ? "checked" : "not checked",
+                        uncheckIdx),
+                    checkedIdx > uncheckIdx, model.isChecked(checkedIdx));
+            }
+        }
+    }
+
+    @Test
+    public void testCheckedItemsContainsCorrectValuesAfterCheckInOrder() {
+        // derived from https://github.com/controlsfx/controlsfx/issues/1549
+        model.clearChecks();
+        assertTrue(model.isEmpty());
+
+        model.check(1);
+        model.check(2);
+        model.check(0);
+
+        assertTrue(model.isChecked(0));
+        assertTrue(model.isChecked(1));
+        assertTrue(model.isChecked(2));
+    }
+
+
+    
+    @Test
+    public void testCheckedItemsUnexpectedIndexAfterClear() {
+        // test for issue identified here: https://github.com/controlsfx/controlsfx/issues/1531#issuecomment-1929277168
+        this.itemBooleanMap = new HashMap<>();
+        this.items = FXCollections.observableArrayList(ROW_1_VALUE, ROW_2_VALUE, ROW_3_VALUE);
+        model = new CheckComboBox.CheckComboBoxBitSetCheckModel<>(items, itemBooleanMap);
+
+        model.check(2);
+        model.check(1);
+
+        assertFalse(model.isChecked(0));
+        assertTrue(model.isChecked(1));
+        assertTrue(model.isChecked(2));
+
+        model.clearChecks();
+
+        assertFalse(model.isChecked(0));
+        assertFalse(model.isChecked(1));
+        assertFalse(model.isChecked(2));
+
+        model.check(2);
+
+        assertFalse(model.isChecked(0));
+        assertFalse(model.isChecked(1));
+        assertTrue(model.isChecked(2));
     }
 }

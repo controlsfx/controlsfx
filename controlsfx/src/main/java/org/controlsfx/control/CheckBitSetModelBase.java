@@ -319,13 +319,13 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
                 return -1;
             }
 
-            if (index == (lastGetIndex + 1) && lastGetValue < itemCount) {
+            if (index == (lastGetIndex + 1)) {
                 // we're iterating forward in order, short circuit for
                 // performance reasons (RT-39776)
                 lastGetIndex++;
                 lastGetValue = bitset.nextSetBit(lastGetValue + 1);
                 return lastGetValue;
-            } else if (index == (lastGetIndex - 1) && lastGetValue > 0) {
+            } else if (index == (lastGetIndex - 1) && index > 0) {
                 // we're iterating backward in order, short circuit for
                 // performance reasons (RT-39776)
                 lastGetIndex--;

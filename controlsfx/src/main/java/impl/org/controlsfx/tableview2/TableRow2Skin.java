@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2020 ControlsFX
+ * Copyright (c) 2013, 2025, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -236,7 +236,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
             boolean increaseFixedWidth = false;
             //Virtualization of column
             // We translate that column by the Hbar Value if it's fixed
-            if (tableView.isColumnFixingEnabled() && tableView.getFixedColumns().contains(column)) {
+            if (tableView.isColumnFixingEnabled() && tableView.getFixedColumns().contains(rootColumn)) {
                 /**
                  * Here we verify if our cell must be shifted. The second
                  * condition is to determine that we are dealing with the very

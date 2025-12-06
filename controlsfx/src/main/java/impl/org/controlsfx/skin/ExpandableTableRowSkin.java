@@ -59,7 +59,7 @@ public class ExpandableTableRowSkin<S> extends TableRowSkin<S> {
         this.expander = expander;
         tableRow.itemProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != null) {
-                Node expandedNode = this.expander.getExpandedNode(oldValue);
+                Node expandedNode = this.expander.removeExpandedNode(oldValue);
                 if (expandedNode != null) getChildren().remove(expandedNode);
             }
         });

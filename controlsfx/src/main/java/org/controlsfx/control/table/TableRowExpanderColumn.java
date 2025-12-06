@@ -107,12 +107,10 @@ public final class TableRowExpanderColumn<S> extends TableColumn<S, Boolean> {
             value = new SimpleBooleanProperty(item, "expanded", false) {
                 /**
                  * When the expanded state change we refresh the tableview.
-                 * If the expanded state changes to false we remove the cached expanded node.
                  */
                 @Override
                 protected void invalidated() {
                     getTableView().refresh();
-                    if (!getValue()) expandedNodeCache.remove(getBean());
                 }
             };
             expansionState.put(item, value);
@@ -141,13 +139,13 @@ public final class TableRowExpanderColumn<S> extends TableColumn<S, Boolean> {
     }
 
     /**
-     * Return the expanded node for the given item, if it exists.
+     * Remove and return the expanded node for the given item, if it exists.
      *
      * @param item The item corresponding to a table row
-     * @return The expanded node, if it exists.
+     * @return The removed expanded node, if it exists.
      */
-    public Node getExpandedNode(S item) {
-        return expandedNodeCache.get(item);
+    public Node removeExpandedNode(S item) {
+        return expandedNodeCache.remove(item);
     }
 
     /**

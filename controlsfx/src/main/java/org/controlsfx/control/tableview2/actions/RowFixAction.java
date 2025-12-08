@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2025, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,6 @@
  */
 package org.controlsfx.control.tableview2.actions;
 
-import javafx.beans.Observable;
 import javafx.scene.Node;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionCheck;
@@ -114,19 +113,17 @@ public class RowFixAction extends Action {
         
         if (tableView != null && row != null) {
             disabledProperty().bind(tableView.rowFixingEnabledProperty().not());
-            
-            tableView.getFixedRows().addListener(((Observable o) -> {
-                setSelected(tableView.getFixedRows().contains(row));
-            }));
-            setSelected(tableView.getFixedRows().contains(row));
-            
             setEventHandler(e -> {
+                if (e == null) {
+                    return;
+                }
                 if (! tableView.getFixedRows().contains(row)) {
                     tableView.getFixedRows().add(row);
                 } else {
                     tableView.getFixedRows().remove(row);
                 }
             });
+            setSelected(tableView.getFixedRows().contains(row));
         }
     }
 

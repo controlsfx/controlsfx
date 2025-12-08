@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2025, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -141,14 +141,17 @@ public class ColumnFixAction extends Action {
         tableView.getFixedColumns().addListener(fixedColumnsListener);
         disabledProperty().bind(tableView.columnFixingEnabledProperty().not()
                 .or(column.parentColumnProperty().isNotNull()));
-        setSelected(isFixedColumn(column));
         setEventHandler(e -> {
+            if (e == null) {
+                return;
+            }
             if (!tableView.getFixedColumns().contains(column)) {
                 tableView.getFixedColumns().add(column);
             } else {
                 tableView.getFixedColumns().remove(column);
             }
         });
+        setSelected(isFixedColumn(column));
     }
 
     private void reset(TableView2 tableView) {

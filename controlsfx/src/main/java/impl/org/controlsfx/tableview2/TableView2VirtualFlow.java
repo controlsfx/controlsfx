@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2020 ControlsFX
+ * Copyright (c) 2013, 2025, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -223,6 +223,9 @@ final class TableView2VirtualFlow<T extends IndexedCell<?>> extends VirtualFlow<
     }
     
     private <S> void removeDeportedCells() {
+        if (skin.deportedCells == null) {
+            return;
+        }
         /**
          * When we layout, we also remove the cell that have been deported into
          * other rows in order not to have some TableCell hanging out.

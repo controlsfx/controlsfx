@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2020 ControlsFX
+ * Copyright (c) 2013, 2025, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,7 @@ import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.skin.TableHeaderRow;
-import javafx.scene.control.skin.TableViewSkinBase;
+import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -77,13 +77,9 @@ import static impl.org.controlsfx.tableview2.SortUtils.SortEndedEvent.SORT_ENDED
 /**
  * This skin for the TableView2 control
  *
- * We need to extend directly from TableViewSkinBase in order to work-around
- * https://bugs.openjdk.java.net/browse/JDK-8090674 if we want to set a custom
- * TableViewBehavior.
- *
  * @param <S> The type of the objects contained within the {@link TableView2} items list.
  */
-public class TableView2Skin<S> extends TableViewSkinBase<S,S, TableView<S>, TableRow<S>, TableColumn<S,?>> {
+public class TableView2Skin<S> extends TableViewSkin<S> {
         
     /***************************************************************************
      * * STATIC FIELDS * *
@@ -94,14 +90,6 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S, TableView<S>, Tabl
 
     static {
         double cell_size = 24.0;
-//        try {
-//            Class<?> clazz = javafx.scene.control.skin.CellSkinBase.class;
-//            Field f = clazz.getDeclaredField("DEFAULT_CELL_SIZE"); //$NON-NLS-1$
-//            f.setAccessible(true);
-//            cell_size = f.getDouble(null);
-//        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-//            e.printStackTrace();
-//        }
         DEFAULT_CELL_HEIGHT = cell_size;
     }
 
@@ -218,7 +206,7 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S, TableView<S>, Tabl
         // chooses to unbind it and provide on his own risk a different row 
         // factory that may or may not work with TableView2 and row freezing.
         tableView.rowFactoryProperty().bind(Bindings.createObjectBinding(
-                () -> param -> new TableRow2(tableView), tableView.skinProperty()));
+                () -> param -> new TableRow2<>(tableView), tableView.skinProperty()));
 
         getCurrentlyFixedRow().addListener(currentlyFixedRowListener);
         this.tableView.getFixedRows().addListener(fixedRowsListener);
@@ -975,9 +963,12 @@ public class TableView2Skin<S> extends TableViewSkinBase<S,S, TableView<S>, Tabl
     private void scrollToVisibleCell(Number newIndex, Number oldIndex) {
         if (key && newIndex != null && oldIndex != null) {
             double posFinalOffset = 0, heightLastRow = 0;
-            for (int j = getRow(0).getIndex(); j < newIndex.intValue(); ++j) {
-                heightLastRow = getRowHeight(j);
-                posFinalOffset += heightLastRow;
+            TableRow<S> row = getRow(0);
+            if (row != null) {
+                for (int j = row.getIndex(); j < newIndex.intValue(); ++j) {
+                    heightLastRow = getRowHeight(j);
+                    posFinalOffset += heightLastRow;
+                }
             }
             final double fixedHeight = getFixedRowHeight();
             if (fixedHeight > posFinalOffset) {

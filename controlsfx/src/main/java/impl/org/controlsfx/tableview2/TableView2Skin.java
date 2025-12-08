@@ -190,13 +190,14 @@ public class TableView2Skin<S> extends TableViewSkin<S> {
      */
     public TableView2Skin(TableView2<S> tableView) {
         super(tableView);
-        
+
         this.flow = getVirtualFlow();
         flow.setCellFactory(p -> createCell());
         this.tableView = tableView;
-        
-        if (tableView.getParent() != null && tableView.getParent() instanceof RowHeader) {
-            parentTableView = ((RowHeader) tableView.getParent()).getParentTableView();
+
+        var tableViewParent = tableView.getParent();
+        if (tableViewParent instanceof RowHeader) {
+            parentTableView = ((RowHeader) tableViewParent).getParentTableView();
         } else {
             parentTableView = null;
         }
@@ -363,8 +364,8 @@ public class TableView2Skin<S> extends TableViewSkin<S> {
          * lay out. Thus we only consider the row with children as really
          * available.
          */
-        for (Object obj : getFlow().getCells()) {
-            if (((TableRow2) obj).getIndex() == index && !((TableRow2) obj).getChildrenUnmodifiable().isEmpty())
+        for (var row : getFlow().getCells()) {
+            if (row.getIndex() == index && !row.getChildrenUnmodifiable().isEmpty())
                 return true;
             }
         return false;

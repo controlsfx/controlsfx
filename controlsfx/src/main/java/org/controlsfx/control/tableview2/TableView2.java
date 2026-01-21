@@ -29,6 +29,7 @@ package org.controlsfx.control.tableview2;
 import impl.org.controlsfx.tableview2.SortUtils.SortEndedEvent;
 import impl.org.controlsfx.tableview2.SortUtils.SortStartedEvent;
 import impl.org.controlsfx.tableview2.TableView2Skin;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -55,6 +56,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -726,18 +728,37 @@ public class TableView2<S> extends TableView<S> {
      * ********************************************************************
      */
 
-    private final ListChangeListener<Integer> fixedRowsListener = (ListChangeListener.Change<? extends Integer> c) -> {
-        while (c.next()) {
-            if (c.wasAdded()) {
-                List<? extends Integer> newRows = c.getAddedSubList();
-                if (! areRowsFixable(newRows)) {
-                    throw new IllegalArgumentException(computeReason(newRows));
+    private final ListChangeListener<Integer> fixedRowsListener = new ListChangeListener<>() {
+
+        private final AtomicBoolean inProgress = new AtomicBoolean(false);
+
+        @Override
+        public void onChanged(Change<? extends Integer> c) {
+            boolean needsSorting = false;
+            while (c.next()) {
+                if (c.wasAdded()) {
+                    List<? extends Integer> newRows = c.getAddedSubList();
+                    if (!TableView2.this.areRowsFixable(newRows)) {
+                        throw new IllegalArgumentException(TableView2.this.computeReason(newRows));
+                    }
+                    needsSorting = true;
                 }
-                FXCollections.sort(fixedRows);
+
+                if (c.wasRemoved()) {
+                    //Handle this case.
+                }
             }
 
-            if(c.wasRemoved()){
-                //Handle this case.
+            if (needsSorting) {
+                if (inProgress.compareAndSet(false, true)) {
+                    Platform.runLater(() -> {
+                        try {
+                            FXCollections.sort(fixedRows);
+                        } finally {
+                            inProgress.set(false);
+                        }
+                    });
+                }
             }
         }
     };

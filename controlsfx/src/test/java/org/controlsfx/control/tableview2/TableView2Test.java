@@ -25,6 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
+import org.testfx.util.WaitForAsyncUtils;
 
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -42,6 +43,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.controlsfx.control.tableview2.TableView2TestUtils.measure;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThan;
@@ -173,6 +175,7 @@ public class TableView2Test extends FxRobot {
         allowedToRun.set(false);
         dataManipulators.shutdownNow();
         FxToolkit.cleanupStages();
+        WaitForAsyncUtils.clearExceptions();
     }
 
     @Test
@@ -211,13 +214,6 @@ public class TableView2Test extends FxRobot {
         assertThat(firstVisibleRow, is(inSyncWithTable(tableView)));
         measure(() -> scrollUp(40));
         assertThat(firstVisibleRow, is(inSyncWithTable(tableView)));
-    }
-
-    private Duration measure(Runnable operation) {
-        LocalTime start = LocalTime.now();
-        operation.run();
-        LocalTime end = LocalTime.now();
-        return Duration.between(start, end);
     }
 
     private void produceUpdateLoad() {

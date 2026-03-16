@@ -43,9 +43,9 @@ import static impl.org.controlsfx.tableview2.SouthTableHeaderRow.SOUTH_HEADER_ST
 public class SouthTableColumnHeader extends Region {
 
     private static final double ROW_HEIGHT = 20;
-    private final TableColumn column;
-    private TableColumn2 column2;
-    private TableView2 tableView2;
+    private final TableColumn<?, ?> column;
+    private TableColumn2<?, ?> column2;
+    private TableView2<?> tableView2;
     private InvalidationListener tableViewListener;
     private final Rectangle clip;
 
@@ -61,8 +61,8 @@ public class SouthTableColumnHeader extends Region {
     private final WeakInvalidationListener weakSouthHeaderBlendedListener =
             new WeakInvalidationListener(southHeaderBlendedListener);
 
-    public SouthTableColumnHeader(final TableColumnBase columnBase) {
-        this.column = (TableColumn) columnBase;
+    public SouthTableColumnHeader(final TableColumnBase<?, ?> columnBase) {
+        this.column = (TableColumn<?, ?>) columnBase;
         getStyleClass().setAll("column-header", "south-header");
         initTableView();
         if (tableView2 == null) {
@@ -79,14 +79,14 @@ public class SouthTableColumnHeader extends Region {
             column.tableViewProperty().addListener(tableViewListener);
         }
         if (column instanceof TableColumn2) {
-            column2 = (TableColumn2) column;
+            column2 = (TableColumn2<?, ?>) column;
             column2.southNodeProperty().addListener(weakSouthNodeListener);
             updateSouthNode();
         }
         columnBase.widthProperty().addListener(weakTableColumnWidthListener);
         
         setOnContextMenuRequested(e -> {
-            TableColumnBase col = columnBase;
+            TableColumnBase<?, ?> col = columnBase;
             ContextMenu cm = col.getContextMenu();
             if (cm == null) {
                 while (col.getParentColumn() != null && cm == null) {
@@ -107,7 +107,7 @@ public class SouthTableColumnHeader extends Region {
 
     private void initTableView() {
         if (column.getTableView() instanceof TableView2) {
-            tableView2 = (TableView2) column.getTableView();
+            tableView2 = (TableView2<?>) column.getTableView();
             if (tableView2 != null) {
                 tableView2.southHeaderBlendedProperty().addListener(weakSouthHeaderBlendedListener);
                 updateSouthHeaderColumnStyle();
@@ -177,7 +177,7 @@ public class SouthTableColumnHeader extends Region {
         }
     }
     
-    public TableColumnBase getTableColumn() {
+    public TableColumnBase<?, ?> getTableColumn() {
         return column; 
     }
 

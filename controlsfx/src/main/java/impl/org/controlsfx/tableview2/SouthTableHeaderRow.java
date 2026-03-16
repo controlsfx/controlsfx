@@ -69,7 +69,7 @@ public class SouthTableHeaderRow extends Region {
         updateSouthHeaderRowStyle();
 
         if (control.getParent() != null && control.getParent() instanceof RowHeader) {
-            parentSouthHeader = ((TableView2Skin) ((RowHeader) control.getParent()).getParentTableView().getSkin()).getSouthHeader();
+            parentSouthHeader = ((TableView2Skin<?>) ((RowHeader<?>) control.getParent()).getParentTableView().getSkin()).getSouthHeader();
         }
     }
 
@@ -95,7 +95,7 @@ public class SouthTableHeaderRow extends Region {
      */
     public ObservableList<SouthTableColumnHeader> getSouthColumnHeaders() {
         if (southColumnHeaders == null) {
-            southColumnHeaders = FXCollections.<SouthTableColumnHeader>observableArrayList();
+            southColumnHeaders = FXCollections.observableArrayList();
         }
         return southColumnHeaders;
     }
@@ -178,7 +178,7 @@ public class SouthTableHeaderRow extends Region {
             orderedHeaders.add(header);
         }
 
-        // keep reorder list of headers, matching current visible-leaf order
+        // keep reordered list of headers, matching current visible-leaf order
         if (!getSouthColumnHeaders().equals(orderedHeaders)) {
             getSouthColumnHeaders().setAll(orderedHeaders);
         }

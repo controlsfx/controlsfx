@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2020 ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,6 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
-import javafx.scene.control.skin.TableViewSkinBase;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.tableview2.TableColumn2;
@@ -44,10 +43,10 @@ import static impl.org.controlsfx.tableview2.SouthTableHeaderRow.SOUTH_HEADER_ST
 public class SouthTableColumnHeader extends Region {
 
     private static final double ROW_HEIGHT = 20;
-    private final TableViewSkinBase skin;
     private final TableColumn column;
     private TableColumn2 column2;
     private TableView2 tableView2;
+    private InvalidationListener tableViewListener;
     private final Rectangle clip;
 
     private final InvalidationListener tableColumnWidthListener = o -> requestLayout();
@@ -62,19 +61,22 @@ public class SouthTableColumnHeader extends Region {
     private final WeakInvalidationListener weakSouthHeaderBlendedListener =
             new WeakInvalidationListener(southHeaderBlendedListener);
 
-    public SouthTableColumnHeader(final TableViewSkinBase skin, final TableColumnBase columnBase) {
-        this.skin = skin;
+    public SouthTableColumnHeader(final TableColumnBase columnBase) {
         this.column = (TableColumn) columnBase;
         getStyleClass().setAll("column-header", "south-header");
         initTableView();
         if (tableView2 == null) {
-            column.tableViewProperty().addListener(new InvalidationListener() {
+            tableViewListener = new InvalidationListener() {
                 @Override
                 public void invalidated(Observable observable) {
                     initTableView();
-                    column.tableViewProperty().removeListener(this);
+                    if (tableView2 != null) {
+                        column.tableViewProperty().removeListener(this);
+                        tableViewListener = null;
+                    }
                 }
-            });
+            };
+            column.tableViewProperty().addListener(tableViewListener);
         }
         if (column instanceof TableColumn2) {
             column2 = (TableColumn2) column;
@@ -116,7 +118,7 @@ public class SouthTableColumnHeader extends Region {
     private void updateSouthNode() {
         final Node southNode = column2.getSouthNode();
         if (southNode != null) {
-            getChildren().add(southNode);
+            getChildren().setAll(southNode);
         } else {
             getChildren().clear();
         }
@@ -157,11 +159,21 @@ public class SouthTableColumnHeader extends Region {
     }
     
     void dispose() {
+        clip.widthProperty().unbind();
+        clip.heightProperty().unbind();
+        setOnContextMenuRequested(null);
         if (column != null) {
+            if (tableViewListener != null) {
+                column.tableViewProperty().removeListener(tableViewListener);
+                tableViewListener = null;
+            }
             column.widthProperty().removeListener(weakTableColumnWidthListener);
         }
         if (column2 != null) {
             column2.southNodeProperty().removeListener(weakSouthNodeListener);
+        }
+        if (tableView2 != null) {
+            tableView2.southHeaderBlendedProperty().removeListener(weakSouthHeaderBlendedListener);
         }
     }
     

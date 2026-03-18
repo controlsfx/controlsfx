@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2020, ControlsFX
+ * Copyright (c) 2014, 2025, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -96,6 +96,17 @@ public class Utils {
         if (value < min) return min;
         if (value > max) return max;
         return value;
+    }
+
+    /**
+     * Simple utility function which clamps the given value to be strictly
+     * between the min and max values.
+     */
+    public static int clamp(int min, int value, int max) {
+        if (min > max) {
+            throw new IllegalArgumentException(min + " > " + max);
+        }
+        return Math.max(min, Math.min(value, max));
     }
 
     /**

@@ -690,7 +690,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
 
         final List<? extends TableColumnBase/*<T,?>*/> visibleLeafColumns = tableView.getVisibleLeafColumns();
         for (int i = 0, max = visibleLeafColumns.size(); i < max; i++) {
-            prefWidth += visibleLeafColumns.get(i).getWidth();
+            prefWidth += snapSizeX(visibleLeafColumns.get(i).getWidth());
         }
 
         return prefWidth;

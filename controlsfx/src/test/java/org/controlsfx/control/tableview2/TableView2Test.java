@@ -1,5 +1,33 @@
+/**
+ * Copyright (c) 2021, 2026, ControlsFX
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *     * Neither the name of ControlsFX, any associated website, nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL CONTROLSFX BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.controlsfx.control.tableview2;
 
+import impl.org.controlsfx.tableview2.SouthTableColumnHeader;
+import impl.org.controlsfx.tableview2.SouthTableHeaderRow;
 import impl.org.controlsfx.tableview2.TableRow2;
 import impl.org.controlsfx.tableview2.TableRow2Skin;
 import impl.org.controlsfx.tableview2.TableView2Skin;
@@ -10,6 +38,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.AccessibleAttribute;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -38,13 +67,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 public class TableView2Test extends FxRobot {
 
@@ -213,6 +250,217 @@ public class TableView2Test extends FxRobot {
         assertThat(firstVisibleRow, is(inSyncWithTable(tableView)));
     }
 
+    @Test
+    public void shouldReuseSouthHeader_When_ColumnIsAdded() {
+        fillTableData();
+
+        final TableColumn2<RowItem, String> firstColumn = (TableColumn2<RowItem, String>) tableView.getColumns().get(0);
+        final AtomicReference<SouthTableColumnHeader> firstHeader = new AtomicReference<>();
+
+        interact(() -> firstHeader.set(getSouthHeaderRow().getSouthColumnHeaderFor(firstColumn)));
+        assertNotNull(firstHeader.get());
+
+        interact(() -> tableView.getColumns().add(createExtraColumn("column_extra")));
+
+        final AtomicReference<SouthTableColumnHeader> afterHeader = new AtomicReference<>();
+        interact(() -> afterHeader.set(getSouthHeaderRow().getSouthColumnHeaderFor(firstColumn)));
+        assertSame(firstHeader.get(), afterHeader.get());
+    }
+
+    @Test
+    public void shouldRemoveSouthHeader_When_ColumnIsRemoved() {
+        fillTableData();
+
+        final TableColumn2<RowItem, String> secondColumn = (TableColumn2<RowItem, String>) tableView.getColumns().get(1);
+        final AtomicReference<SouthTableColumnHeader> secondHeader = new AtomicReference<>();
+
+        interact(() -> secondHeader.set(getSouthHeaderRow().getSouthColumnHeaderFor(secondColumn)));
+        assertNotNull(secondHeader.get());
+
+        interact(() -> tableView.getColumns().remove(secondColumn));
+
+        final AtomicReference<SouthTableColumnHeader> headerAfterRemovalHolder = new AtomicReference<>();
+        final AtomicBoolean stillInList = new AtomicBoolean();
+        interact(() -> {
+            SouthTableHeaderRow southHeaderRow = getSouthHeaderRow();
+            headerAfterRemovalHolder.set(southHeaderRow.getSouthColumnHeaderFor(secondColumn));
+            stillInList.set(southHeaderRow.getSouthColumnHeaders().contains(secondHeader.get()));
+        });
+        assertNull(headerAfterRemovalHolder.get());
+        assertFalse(stillInList.get());
+    }
+
+    /**
+     * Reorders columns and verifies existing headers for unaffected/persistent columns are reused
+     * Confirms south header count stays aligned with visible leaf columns
+     */
+    @Test
+    public void shouldReuseSouthHeaders_When_ColumnsAreReordered() {
+        fillTableData();
+
+        final TableColumn2<RowItem, String> tenthColumn = (TableColumn2<RowItem, String>) tableView.getColumns().get(10);
+        final TableColumn2<RowItem, String> unaffectedColumn = (TableColumn2<RowItem, String>) tableView.getColumns().get(50);
+        final AtomicReference<SouthTableColumnHeader> tenthHeader = new AtomicReference<>();
+        final AtomicReference<SouthTableColumnHeader> unaffectedHeader = new AtomicReference<>();
+
+        interact(() -> {
+            SouthTableHeaderRow southHeaderRow = getSouthHeaderRow();
+            tenthHeader.set(southHeaderRow.getSouthColumnHeaderFor(tenthColumn));
+            unaffectedHeader.set(southHeaderRow.getSouthColumnHeaderFor(unaffectedColumn));
+        });
+        assertNotNull(tenthHeader.get());
+        assertNotNull(unaffectedHeader.get());
+
+        interact(() -> {
+            // swap columns 10 and 11
+            TableColumn<RowItem, ?> moved = tableView.getColumns().remove(11);
+            tableView.getColumns().add(10, moved);
+        });
+
+        final AtomicReference<SouthTableColumnHeader> tenthHeaderAfterHolder = new AtomicReference<>();
+        final AtomicReference<SouthTableColumnHeader> unaffectedHeaderAfterHolder = new AtomicReference<>();
+        final AtomicInteger southHeaderCount = new AtomicInteger();
+        final AtomicInteger visibleLeafCount  = new AtomicInteger();
+        interact(() -> {
+            SouthTableHeaderRow southHeaderRow = getSouthHeaderRow();
+            tenthHeaderAfterHolder.set(southHeaderRow.getSouthColumnHeaderFor(tenthColumn));
+            unaffectedHeaderAfterHolder.set(southHeaderRow.getSouthColumnHeaderFor(unaffectedColumn));
+            southHeaderCount.set(southHeaderRow.getSouthColumnHeaders().size());
+            visibleLeafCount.set(tableView.getVisibleLeafColumns().size());
+        });
+        assertSame(tenthHeader.get(), tenthHeaderAfterHolder.get());
+        assertSame(unaffectedHeader.get(), unaffectedHeaderAfterHolder.get());
+        assertEquals(southHeaderCount.get(), visibleLeafCount.get());
+    }
+
+    /**
+     * Asserts header is removed when column becomes invisible and recreated when visible again
+     */
+    @Test
+    public void shouldRecreateSouthHeader_When_ColumnVisibilityIsToggled() {
+        fillTableData();
+
+        final TableColumn2<RowItem, String> toggledColumn = (TableColumn2<RowItem, String>) tableView.getColumns().get(15);
+        final AtomicReference<SouthTableColumnHeader> originalHeader = new AtomicReference<>();
+
+        interact(() -> originalHeader.set(getSouthHeaderRow().getSouthColumnHeaderFor(toggledColumn)));
+        assertNotNull(originalHeader.get());
+
+        interact(() -> toggledColumn.setVisible(false));
+
+        final AtomicReference<SouthTableColumnHeader> headerAfterHideHolder = new AtomicReference<>();
+        final AtomicBoolean stillInListAfterHide = new AtomicBoolean();
+        interact(() -> {
+            SouthTableHeaderRow southHeaderRow = getSouthHeaderRow();
+            headerAfterHideHolder.set(southHeaderRow.getSouthColumnHeaderFor(toggledColumn));
+            stillInListAfterHide.set(southHeaderRow.getSouthColumnHeaders().contains(originalHeader.get()));
+        });
+        assertNull(headerAfterHideHolder.get());
+        assertFalse(stillInListAfterHide.get());
+
+        interact(() -> toggledColumn.setVisible(true));
+
+        final AtomicReference<SouthTableColumnHeader> recreatedHeader = new AtomicReference<>();
+        interact(() -> recreatedHeader.set(getSouthHeaderRow().getSouthColumnHeaderFor(toggledColumn)));
+        assertNotNull(recreatedHeader.get());
+        assertNotSame(originalHeader.get(), recreatedHeader.get());
+    }
+
+    /**
+     * Verifies SouthTableColumnHeader keeps exactly one child when southNode is replaced
+     */
+    @Test
+    public void shouldKeepSingleSouthNodeChild_When_SouthNodeChanges() {
+        fillTableData();
+
+        final TableColumn2<RowItem, String> column = (TableColumn2<RowItem, String>) tableView.getColumns().get(20);
+        final Label firstNode = new Label("first");
+        final Label secondNode = new Label("second");
+
+        interact(() -> column.setSouthNode(firstNode));
+
+        final AtomicInteger childCount = new AtomicInteger();
+        final AtomicReference<Node> childNode = new AtomicReference<>();
+        interact(() -> {
+            SouthTableColumnHeader header = getSouthHeaderRow().getSouthColumnHeaderFor(column);
+            childCount.set(header != null ? header.getChildrenUnmodifiable().size() : -1);
+            childNode.set((header != null && !header.getChildrenUnmodifiable().isEmpty())
+                    ? header.getChildrenUnmodifiable().get(0) : null);
+        });
+        assertEquals(1, childCount.get());
+        assertSame(firstNode, childNode.get());
+
+        interact(() -> column.setSouthNode(secondNode));
+
+        interact(() -> {
+            SouthTableColumnHeader header = getSouthHeaderRow().getSouthColumnHeaderFor(column);
+            childCount.set(header != null ? header.getChildrenUnmodifiable().size() : -1);
+            childNode.set((header != null && !header.getChildrenUnmodifiable().isEmpty())
+                    ? header.getChildrenUnmodifiable().get(0) : null);
+        });
+        assertEquals(1, childCount.get());
+        assertSame(secondNode, childNode.get());
+    }
+
+    /**
+     * Add 50 columns one by one, to check size remains consistent, added columns have a south header, previous columns
+     * keep the same south header instance.
+     * Remove 50 columns in reverse, one by one, to check size remains consistent, removed columns don't have a south header,
+     * previous columns keep the same south header instance.
+     */
+    @Test
+    public void shouldKeepSouthHeaderCountConsistent_When_ManyColumnsAreAddedAndRemoved() {
+        fillTableData();
+
+        final int iterations = 50;
+        final List<TableColumn2<RowItem, String>> addedColumns = new ArrayList<>();
+        final TableColumn2<RowItem, String> stableColumn = (TableColumn2<RowItem, String>) tableView.getColumns().get(0);
+        final AtomicReference<SouthTableColumnHeader> stableHeader = new AtomicReference<>();
+
+        interact(() -> stableHeader.set(getSouthHeaderRow().getSouthColumnHeaderFor(stableColumn)));
+        assertNotNull(stableHeader.get());
+
+        final AtomicInteger southHeaderCount = new AtomicInteger();
+        final AtomicInteger visibleLeafCount =  new AtomicInteger();
+        final AtomicReference<SouthTableColumnHeader> addedHeader = new AtomicReference<>();
+        final AtomicReference<SouthTableColumnHeader> stableHeaderAfter = new AtomicReference<>();
+
+        for (int i = 0; i < iterations; i++) {
+            final TableColumn2<RowItem, String> added = createExtraColumn("column_stress_" + i);
+            addedColumns.add(added);
+
+            interact(() -> tableView.getColumns().add(added));
+            interact(() -> {
+                SouthTableHeaderRow southHeaderRow = getSouthHeaderRow();
+                southHeaderCount.set(southHeaderRow.getSouthColumnHeaders().size());
+                visibleLeafCount.set(tableView.getVisibleLeafColumns().size());
+                addedHeader.set(southHeaderRow.getSouthColumnHeaderFor(added));
+                stableHeaderAfter.set(southHeaderRow.getSouthColumnHeaderFor(stableColumn));
+            });
+            assertEquals("south header count after add", visibleLeafCount.get(), southHeaderCount.get());
+            assertNotNull("added column should have a south header", addedHeader.get());
+            assertSame("stable column header should be reused after add", stableHeader.get(), stableHeaderAfter.get());
+        }
+
+        final AtomicReference<SouthTableColumnHeader> removedHeader = new AtomicReference<>();
+
+        for (int i = addedColumns.size() - 1; i >= 0; i--) {
+            final TableColumn2<RowItem, String> removed = addedColumns.get(i);
+
+            interact(() -> tableView.getColumns().remove(removed));
+            interact(() -> {
+                SouthTableHeaderRow southHeaderRow = getSouthHeaderRow();
+                southHeaderCount.set(southHeaderRow.getSouthColumnHeaders().size());
+                visibleLeafCount.set(tableView.getVisibleLeafColumns().size());
+                removedHeader.set(southHeaderRow.getSouthColumnHeaderFor(removed));
+                stableHeaderAfter.set(southHeaderRow.getSouthColumnHeaderFor(stableColumn));
+            });
+            assertEquals("south header count after remove", visibleLeafCount.get(), southHeaderCount.get());
+            assertNull("removed column should have no south header", removedHeader.get());
+            assertSame("stable column header should be reused after remove", stableHeader.get(), stableHeaderAfter.get());
+        }
+    }
+
     private Duration measure(Runnable operation) {
         LocalTime start = LocalTime.now();
         operation.run();
@@ -255,6 +503,23 @@ public class TableView2Test extends FxRobot {
             final double value = i * 0.01;
             interact(() -> scrollBar.setValue(value));
         }
+    }
+
+    private SouthTableHeaderRow getSouthHeaderRow() {
+        return tableView.lookupAll(".south-header")
+                .stream()
+                .filter(SouthTableHeaderRow.class::isInstance)
+                .map(SouthTableHeaderRow.class::cast)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Expected SouthTableHeaderRow in lookupAll('.south-header')"));
+    }
+
+    private TableColumn2<RowItem, String> createExtraColumn(String id) {
+        TableColumn2<RowItem, String> column = new TableColumn2<>();
+        column.setId(id);
+        column.setText(id);
+        column.setCellValueFactory(param -> new SimpleStringProperty("extra"));
+        return column;
     }
 
     private static Matcher<TableRow2<?>> inSyncWithTable(TableView2<RowItem> tableView) {

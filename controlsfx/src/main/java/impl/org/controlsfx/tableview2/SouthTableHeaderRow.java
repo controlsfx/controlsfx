@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2020 ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,12 @@ import javafx.scene.control.TableColumnBase;
 import javafx.scene.layout.Region;
 import org.controlsfx.control.tableview2.TableView2;
 
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SouthTableHeaderRow extends Region {
 
@@ -46,6 +51,7 @@ public class SouthTableHeaderRow extends Region {
     private final TableView2Skin<?> skin;
     private final TableView2<?> control;
     private ObservableList<SouthTableColumnHeader> southColumnHeaders;
+    private final Map<TableColumnBase<?, ?>, SouthTableColumnHeader> southColumnHeadersByColumn = new IdentityHashMap<>();
 
     private SouthTableHeaderRow parentSouthHeader;
 
@@ -57,15 +63,13 @@ public class SouthTableHeaderRow extends Region {
     }
 
     private void init() {
-        // listen to table width to keep header in sync
         updateSouthHeaders();
-        control.getVisibleLeafColumns().addListener(weakTableColumnsListener);
-        control.getColumns().addListener(weakTableColumnsListener);
+        control.getVisibleLeafColumns().addListener(weakVisibleLeafColumnsListener);
         control.southHeaderBlendedProperty().addListener(weakSouthHeaderBlendedListener);
         updateSouthHeaderRowStyle();
 
         if (control.getParent() != null && control.getParent() instanceof RowHeader) {
-            parentSouthHeader = ((TableView2Skin) ((RowHeader) control.getParent()).getParentTableView().getSkin()).getSouthHeader();
+            parentSouthHeader = ((TableView2Skin<?>) ((RowHeader<?>) control.getParent()).getParentTableView().getSkin()).getSouthHeader();
         }
     }
 
@@ -73,14 +77,10 @@ public class SouthTableHeaderRow extends Region {
      * Listeners                                                               *
      **************************************************************************/
 
-    private final ListChangeListener tableColumnsListener = c -> {
-        while (c.next()) {
-            updateSouthHeaders();
-        }
-    };
-
-    private final WeakListChangeListener weakTableColumnsListener =
-            new WeakListChangeListener(tableColumnsListener);
+    private final ListChangeListener<TableColumn<?, ?>> visibleLeafColumnsListener =
+            c -> updateSouthHeaders();
+    private final WeakListChangeListener<TableColumn<?, ?>> weakVisibleLeafColumnsListener =
+            new WeakListChangeListener<>(visibleLeafColumnsListener);
 
     private final InvalidationListener southHeaderBlendedListener = o -> updateSouthHeaderRowStyle();
     private final WeakInvalidationListener weakSouthHeaderBlendedListener =
@@ -95,7 +95,7 @@ public class SouthTableHeaderRow extends Region {
      */
     public ObservableList<SouthTableColumnHeader> getSouthColumnHeaders() {
         if (southColumnHeaders == null) {
-            southColumnHeaders = FXCollections.<SouthTableColumnHeader>observableArrayList();
+            southColumnHeaders = FXCollections.observableArrayList();
         }
         return southColumnHeaders;
     }
@@ -105,10 +105,7 @@ public class SouthTableHeaderRow extends Region {
             return null;
         }
 
-        return getSouthColumnHeaders().stream()
-                .filter(header -> header.getTableColumn().equals(col))
-                .findFirst()
-                .orElse(null);
+        return southColumnHeadersByColumn.get(col);
     }
 
     /***************************************************************************
@@ -156,11 +153,38 @@ public class SouthTableHeaderRow extends Region {
      **************************************************************************/
 
     private void updateSouthHeaders() {
-        getSouthColumnHeaders().forEach(SouthTableColumnHeader::dispose);
-        getSouthColumnHeaders().setAll(skin.getSkinnable().getVisibleLeafColumns().stream()
-                .map(col -> new SouthTableColumnHeader(skin, col))
-                .collect(Collectors.toList()));
-        getChildren().setAll(getSouthColumnHeaders());
+        List<? extends TableColumnBase<?, ?>> visibleLeafColumns = control.getVisibleLeafColumns();
+        // Create set of visible columns
+        Set<TableColumnBase<?, ?>> visibleColumns = Collections.newSetFromMap(new IdentityHashMap<>());
+        visibleColumns.addAll(visibleLeafColumns);
+
+        // dispose headers from map for removed/non-visible columns
+        southColumnHeadersByColumn.entrySet().removeIf(entry -> {
+            if (visibleColumns.contains(entry.getKey())) {
+                return false;
+            }
+            entry.getValue().dispose();
+            return true;
+        });
+
+        List<SouthTableColumnHeader> orderedHeaders = new ArrayList<>(visibleLeafColumns.size());
+        for (TableColumnBase<?, ?> visibleLeafColumn : visibleLeafColumns) {
+            SouthTableColumnHeader header = southColumnHeadersByColumn.get(visibleLeafColumn);
+            if (header == null) {
+                // create headers for newly visible columns and cache in map
+                header = new SouthTableColumnHeader(visibleLeafColumn);
+                southColumnHeadersByColumn.put(visibleLeafColumn, header);
+            }
+            orderedHeaders.add(header);
+        }
+
+        // keep reordered list of headers, matching current visible-leaf order
+        if (!getSouthColumnHeaders().equals(orderedHeaders)) {
+            getSouthColumnHeaders().setAll(orderedHeaders);
+        }
+        if (!getChildren().equals(orderedHeaders)) {
+            getChildren().setAll(orderedHeaders);
+        }
     }
 
     private void updateSouthHeaderRowStyle() {

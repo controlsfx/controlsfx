@@ -34,6 +34,7 @@ import impl.org.controlsfx.tableview2.TableView2Skin;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.stage.Screen;
 import javafx.collections.ObservableList;
 import javafx.scene.AccessibleAttribute;
 import javafx.scene.Node;
@@ -459,6 +460,36 @@ public class TableView2Test extends FxRobot {
             assertNull("removed column should have no south header", removedHeader.get());
             assertSame("stable column header should be reused after remove", stableHeader.get(), stableHeaderAfter.get());
         }
+    }
+
+    /**
+     * Verifies that computePrefWidth sums snapped column widths, consistent with how
+     * layoutChildren accumulates x positions. Without the fix (issue #1576), the raw
+     * (unsnapped) sum was used, causing a mismatch with the snapped layout positions.
+     */
+    @Test
+    public void prefWidthShouldMatchSnappedColumnWidthSum_When_ColumnsHaveFractionalWidth() {
+        fillTableData();
+
+        final double fractionalWidth = 75.3;
+        interact(() -> tableView.getVisibleLeafColumns()
+                .forEach(col -> col.setPrefWidth(fractionalWidth)));
+
+        final AtomicReference<Double> actualPrefWidthHolder = new AtomicReference<>();
+        final AtomicReference<Double> expectedPrefWidthHolder = new AtomicReference<>();
+
+        interact(() -> {
+            TableView2Skin<?> skin = (TableView2Skin<?>) tableView.getSkin();
+            TableRow2<?> row = (TableRow2<?>) skin.getRow(0);
+            actualPrefWidthHolder.set(row.prefWidth(-1));
+
+            // Replicate snapSizeX: rounds up to the nearest physical pixel
+            double scale = Screen.getPrimary().getOutputScaleX();
+            double snappedColWidth = Math.ceil(fractionalWidth * scale) / scale;
+            expectedPrefWidthHolder.set(tableView.getVisibleLeafColumns().size() * snappedColWidth);
+        });
+
+        assertEquals(expectedPrefWidthHolder.get(), actualPrefWidthHolder.get(), 0.001);
     }
 
     private Duration measure(Runnable operation) {

@@ -133,9 +133,6 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
 
         // first create the filtered combo box
         filteredComboBox = createFilteredComboBox();
-
-        Bindings.bindContentBidirectional(comboBox.getProperties(), filteredComboBox.getProperties());
-
         getChildren().add(filteredComboBox);
 
         // and the search field
@@ -193,6 +190,7 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
 
         // bidirectional bindings
         box.valueProperty().bindBidirectional(getSkinnable().valueProperty());
+        Bindings.bindContentBidirectional(getSkinnable().getProperties(), filteredComboBox.getProperties());
 
         return box;
     }

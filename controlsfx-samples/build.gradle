@@ -17,6 +17,7 @@ javafx {
 dependencies {
     implementation project(':controlsfx')
     implementation project(':fxsampler')
+    implementation project(':jdk-jsobject')
 }
 
 /** We need Java files as resources for showing them in Source Tab **/
@@ -46,12 +47,7 @@ javadoc {
             classpath = files()
         }
     } else {
-        moduleOptions {
-            addModules = [
-                    'org.controlsfx.controls',
-                    'org.controlsfx.fxsampler'
-            ]
-        }
+        options.addStringOption('-add-modules', 'org.controlsfx.controls,org.controlsfx.fxsampler')
     }
 }
 

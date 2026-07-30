@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2025, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -934,10 +934,13 @@ public class TableView2Skin<S> extends TableViewSkin<S> {
     }
     
     private void updateHeaders() {
+        final int itemCount = tableView.getItems() == null ? 0 : tableView.getItems().size();
+        final int columnCount = tableView.getVisibleLeafColumns().size();
         final ObservableList<TablePosition> selectedCells = tableView.getSelectionModel().getSelectedCells();
         final List<Integer> columns = selectedCells.stream()
                 .map(TablePosition::getColumn)
-                .filter(column -> (column > -1 && tableView.getSelectionModel().isCellSelectionEnabled()))
+                .filter(column -> 0 <= column && column < columnCount &&
+                        tableView.getSelectionModel().isCellSelectionEnabled())
                 .collect(Collectors.toList());
         if (! oldSelectedColumns.equals(columns)) {
             oldSelectedColumns.clear();
@@ -946,6 +949,7 @@ public class TableView2Skin<S> extends TableViewSkin<S> {
         }
         final List<Integer> rows = selectedCells.stream()
                 .map(TablePosition::getRow)
+                .filter(row -> 0 <= row && row < itemCount)
                 .collect(Collectors.toList());
         if (! oldSelectedRows.equals(rows)) {
             oldSelectedRows.clear();

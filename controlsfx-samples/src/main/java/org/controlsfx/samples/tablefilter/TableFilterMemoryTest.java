@@ -55,7 +55,7 @@ public class TableFilterMemoryTest extends Application {
         // Add new data
         ObservableList<Row> ans = FXCollections.observableArrayList();
         for (int i = 0; i < 1024; i++) {
-            ans.add(new Row());
+            ans.add(new Row(rangeStart));
         }
         table.setItems(ans);
 
@@ -73,10 +73,10 @@ public class TableFilterMemoryTest extends Application {
         primaryStage.show();
     }
 
-    class Row {
+    static class Row {
         public final String[] data;
 
-        public Row() {
+        public Row(int rangeStart) {
             data = new String[ColCount];
             for (int i = 0; i < ColCount; i++) {
                 data[i] = String.format("%d", rangeStart + rng.nextInt(10));

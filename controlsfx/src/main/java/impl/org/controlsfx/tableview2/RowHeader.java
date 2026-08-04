@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2020 ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -194,21 +194,30 @@ public class RowHeader<S> extends StackPane {
             skin.getSelectedRows().removeListener(tableSelectionListener);
             while (c.next()) {
                 c.getRemoved().forEach(i -> {
+                        if (!isValidIndex(tableView, i)) {
+                            return;
+                        }
                         if (tableView.getSelectionModel().isCellSelectionEnabled()) {
                             tableView.getVisibleLeafColumns().forEach(col -> tableView.getSelectionModel().clearSelection(i, col));
                         } else {
                             tableView.getSelectionModel().clearSelection(i);
                         }
                     });
-                c.getAddedSubList().forEach(i -> tableView.getSelectionModel().select(i));
+                c.getAddedSubList().stream()
+                        .filter(i -> isValidIndex(tableView, i))
+                        .forEach(i -> tableView.getSelectionModel().select(i));
             }
             skin.getSelectedRows().addListener(tableSelectionListener);
         };
         tableSelectionListener = (ListChangeListener.Change<? extends Integer> c) -> {
             innerTableView.getSelectionModel().getSelectedIndices().removeListener(rowHeaderSelectionListener);
             while (c.next()) {
-                c.getRemoved().forEach(i -> innerTableView.getSelectionModel().clearSelection(i));
-                c.getAddedSubList().forEach(i -> innerTableView.getSelectionModel().select(i));
+                c.getRemoved().stream()
+                        .filter(i -> isValidIndex(innerTableView, i))
+                        .forEach(i -> innerTableView.getSelectionModel().clearSelection(i));
+                c.getAddedSubList().stream()
+                        .filter(i -> isValidIndex(innerTableView, i))
+                        .forEach(i -> innerTableView.getSelectionModel().select(i));
             }
             if (! sorting) {
                 innerTableView.getSelectionModel().getSelectedIndices().addListener(rowHeaderSelectionListener);
@@ -242,7 +251,9 @@ public class RowHeader<S> extends StackPane {
                 }
                 innerTableView.getSelectionModel().clearSelection();
                 if (innerTableView.getItems() != null) {
-                    skin.getSelectedRows().forEach(i -> innerTableView.getSelectionModel().select(i));
+                    skin.getSelectedRows().stream()
+                            .filter(i -> isValidIndex(innerTableView, i))
+                            .forEach(i -> innerTableView.getSelectionModel().select(i));
                 }
                 innerTableView.getSelectionModel().getSelectedIndices().addListener(rowHeaderSelectionListener);
             }
@@ -255,6 +266,15 @@ public class RowHeader<S> extends StackPane {
         tableView.focusedProperty().addListener(focusListener);
         innerTableView.focusedProperty().addListener(focusListener);
 
+    }
+
+    /**
+     * Check that the {@code index} is within range of the {@code table} items list,
+     * as a safeguard to prevent {@link IndexOutOfBoundsException}.
+     */
+    private boolean isValidIndex(TableView2<S> table, Integer index) {
+        return index != null && table != null && table.getItems() != null &&
+                0 <= index && index < table.getItems().size();
     }
 
     public double getRowHeaderWidth() {

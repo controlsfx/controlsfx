@@ -40,6 +40,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -364,6 +365,40 @@ public class TableView2Test extends FxRobot {
         interact(() -> recreatedHeader.set(getSouthHeaderRow().getSouthColumnHeaderFor(toggledColumn)));
         assertNotNull(recreatedHeader.get());
         assertNotSame(originalHeader.get(), recreatedHeader.get());
+    }
+
+    /**
+     * Asserts that clearing the items doesn't throw an IndexOutOfBoundsException when
+     * several cells from different rows are selected and the row header is visible.
+     */
+    @Test
+    public void shouldNotThrow_When_ItemsAreClearedWithMultipleSelectedRows() {
+        fillTableData();
+
+        interact(() -> {
+            tableView.setRowHeaderVisible(true);
+            tableView.getSelectionModel().setCellSelectionEnabled(true);
+            tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        });
+
+        interact(() -> {
+            TableColumn<RowItem, ?> column = tableView.getVisibleLeafColumn(0);
+            tableView.getSelectionModel().select(3, column);
+            tableView.getSelectionModel().select(14, column);
+        });
+
+        final AtomicReference<Throwable> exception = new AtomicReference<>();
+        interact(() -> {
+            try {
+                tableView.getItems().clear();
+            } catch (Throwable t) {
+                exception.set(t);
+            }
+        });
+
+        assertNull(exception.get());
+        assertThat(tableView.getItems().isEmpty(), is(true));
+        assertThat(tableView.getSelectionModel().getSelectedCells().isEmpty(), is(true));
     }
 
     /**

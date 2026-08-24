@@ -129,8 +129,8 @@ public class NestedTableColumnHeader2 extends NestedTableColumnHeader {
                 continue;
             }
             
-            final double prefWidth = snapSize(n.prefWidth(-1));
-            n.resize(prefWidth, snapSize(h - labelHeight));
+            final double prefWidth = snapSizeX(n.prefWidth(-1));
+            n.resize(prefWidth, snapSizeY(h - labelHeight));
             //If the column is fixed
             TableColumn<?, ?> column = (TableColumn<?, ?>) n.getTableColumn();
             boolean isLeafColumn = column.getParentColumn() != null;

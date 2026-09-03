@@ -100,11 +100,11 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
     @Override protected void layoutChildren(double x, double y, double w, double h) {
         final double fullHeight = h + snappedTopInset() + snappedBottomInset();
         
-        final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.prefWidth(fullHeight));
-        final double rightWidth = rightPane == null ? 0.0 : snapSize(rightPane.prefWidth(fullHeight));
+        final double leftWidth = leftPane == null ? 0.0 : snapSizeX(leftPane.prefWidth(fullHeight));
+        final double rightWidth = rightPane == null ? 0.0 : snapSizeX(rightPane.prefWidth(fullHeight));
         
-        final double textFieldStartX = snapPosition(x) + snapSize(leftWidth);
-        final double textFieldWidth = w - snapSize(leftWidth) - snapSize(rightWidth);
+        final double textFieldStartX = snapPositionX(x) + snapSizeX(leftWidth);
+        final double textFieldWidth = w - snapSizeX(leftWidth) - snapSizeX(rightWidth);
         
         super.layoutChildren(textFieldStartX, 0, textFieldWidth, fullHeight);
 
@@ -126,15 +126,15 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
          * when we have a left Node and the click point is badly returned
          * because we weren't considering the shift induced by the leftPane.
          */
-        final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.prefWidth(getSkinnable().getHeight()));
+        final double leftWidth = leftPane == null ? 0.0 : snapSizeX(leftPane.prefWidth(getSkinnable().getHeight()));
         return super.getIndex(x - leftWidth, y);
     }
     
     @Override
     protected double computePrefWidth(double h, double topInset, double rightInset, double bottomInset, double leftInset) {
         final double pw = super.computePrefWidth(h, topInset, rightInset, bottomInset, leftInset);
-        final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.prefWidth(h));
-        final double rightWidth = rightPane == null ? 0.0 : snapSize(rightPane.prefWidth(h));
+        final double leftWidth = leftPane == null ? 0.0 : snapSizeX(leftPane.prefWidth(h));
+        final double rightWidth = rightPane == null ? 0.0 : snapSizeX(rightPane.prefWidth(h));
     
         return pw + leftWidth + rightWidth;
     }
@@ -142,8 +142,8 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
     @Override
     protected double computePrefHeight(double w, double topInset, double rightInset, double bottomInset, double leftInset) {
         final double ph = super.computePrefHeight(w, topInset, rightInset, bottomInset, leftInset);
-        final double leftHeight = leftPane == null ? 0.0 : snapSize(leftPane.prefHeight(-1));
-        final double rightHeight = rightPane == null ? 0.0 : snapSize(rightPane.prefHeight(-1));
+        final double leftHeight = leftPane == null ? 0.0 : snapSizeY(leftPane.prefHeight(-1));
+        final double rightHeight = rightPane == null ? 0.0 : snapSizeY(rightPane.prefHeight(-1));
         
         return Math.max(ph, Math.max(leftHeight, rightHeight));
     }
@@ -151,8 +151,8 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
     @Override
     protected double computeMinWidth(double h, double topInset, double rightInset, double bottomInset, double leftInset) {
         final double mw = super.computeMinWidth(h, topInset, rightInset, bottomInset, leftInset);
-        final double leftWidth = leftPane == null ? 0.0 : snapSize(leftPane.minWidth(h));
-        final double rightWidth = rightPane == null ? 0.0 : snapSize(rightPane.minWidth(h));
+        final double leftWidth = leftPane == null ? 0.0 : snapSizeX(leftPane.minWidth(h));
+        final double rightWidth = rightPane == null ? 0.0 : snapSizeX(rightPane.minWidth(h));
 
         return mw + leftWidth + rightWidth;
     }
@@ -160,8 +160,8 @@ public abstract class CustomTextFieldSkin extends TextFieldSkin {
     @Override
     protected double computeMinHeight(double w, double topInset, double rightInset, double bottomInset, double leftInset) {
         final double mh = super.computeMinHeight(w, topInset, rightInset, bottomInset, leftInset);
-        final double leftHeight = leftPane == null ? 0.0 : snapSize(leftPane.minHeight(-1));
-        final double rightHeight = rightPane == null ? 0.0 : snapSize(rightPane.minHeight(-1));
+        final double leftHeight = leftPane == null ? 0.0 : snapSizeY(leftPane.minHeight(-1));
+        final double rightHeight = rightPane == null ? 0.0 : snapSizeY(rightPane.minHeight(-1));
 
         return Math.max(mh, Math.max(leftHeight, rightHeight));
     }

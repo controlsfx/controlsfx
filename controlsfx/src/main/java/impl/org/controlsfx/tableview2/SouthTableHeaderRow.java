@@ -124,7 +124,7 @@ public class SouthTableHeaderRow extends Region {
             SouthTableColumnHeader n = getSouthColumnHeaders().get(i);
             if (! n.isVisible()) continue;
 
-            double prefWidth = snapSize(n.prefWidth(-1));
+            double prefWidth = snapSizeX(n.prefWidth(-1));
             TableColumn<?, ?> column = (TableColumn<?, ?>) n.getTableColumn();
             while (column.getParentColumn() != null) {
                 column = (TableColumn<?, ?>) column.getParentColumn();
@@ -139,7 +139,7 @@ public class SouthTableHeaderRow extends Region {
                 }
             }
             n.relocate(x + tableCellX, snappedTopInset());
-            n.resize(prefWidth, snapSize(h));
+            n.resize(prefWidth, snapSizeY(h));
             x += prefWidth;
         }
     }

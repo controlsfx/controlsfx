@@ -310,7 +310,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
                 int viewColumn = skin.getViewColumn(indexColumn);
                 final int max = tableView.getVisibleLeafColumns().size() - viewColumn;
                 for (int i = 1, colSpan = columnSpan; i < colSpan && i < max; i++) {
-                    double tempWidth = snapSize(tableView.getVisibleLeafColumn(viewColumn + i).getWidth());
+                    double tempWidth = snapSizeX(tableView.getVisibleLeafColumn(viewColumn + i).getWidth());
                     width += tempWidth;
                     if (increaseFixedWidth) {
                         fixedColumnWidth += tempWidth;
@@ -360,7 +360,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
             }
 
             height = customHeight;
-            height = snapSize(height) - snapSize(verticalPadding);
+            height = snapSizeY(height) - snapSizeY(verticalPadding);
             /**
              * We need to span multiple rows, so we sum up the height of all
              * the rows. The height of the current row is ignored and the
@@ -371,7 +371,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
                 height = 0;
                 final int maxRow = index + rowSpan;
                 for (int i = index; i < maxRow; ++i) {
-                    height += snapSize(skin.getRowHeight(i));
+                    height += snapSizeY(skin.getRowHeight(i));
                 }
             }
 

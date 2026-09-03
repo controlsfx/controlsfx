@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2024 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@ package impl.org.controlsfx.skin;
 
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -45,11 +46,15 @@ import javafx.util.Callback;
 
 import org.controlsfx.control.TaskProgressView;
 
+import java.util.function.Consumer;
+
 public class TaskProgressViewSkin<T extends Task<?>> extends
         SkinBase<TaskProgressView<T>> {
 
+    private Boolean retainTasks;
     public TaskProgressViewSkin(TaskProgressView<T> monitor) {
         super(monitor);
+        retainTasks = monitor.isRetainTasks();
 
         BorderPane borderPane = new BorderPane();
         borderPane.getStyleClass().add("box");
@@ -58,7 +63,17 @@ public class TaskProgressViewSkin<T extends Task<?>> extends
         ListView<T> listView = new ListView<>();
         listView.setPrefSize(500, 400);
         listView.setPlaceholder(new Label("No tasks running"));
-        listView.setCellFactory(param -> new TaskCell());
+
+        if (retainTasks) {
+            listView.setCellFactory(param -> new TaskCell().withRemoveFinishedTaskButton(task -> {
+                        if (task.getState() == Worker.State.FAILED || task.getState() == Worker.State.SUCCEEDED || task.getState() == Worker.State.CANCELLED) {
+                            monitor.getTasks().remove(task);
+                        }
+                    }
+            ));
+        } else {
+            listView.setCellFactory(param -> new TaskCell());
+        }
         listView.setFocusTraversable(false);
 
         Bindings.bindContent(listView.getItems(), monitor.getTasks());
@@ -68,13 +83,15 @@ public class TaskProgressViewSkin<T extends Task<?>> extends
     }
 
     class TaskCell extends ListCell<T> {
-        private ProgressBar progressBar;
-        private Label titleText;
-        private Label messageText;
-        private Button cancelButton;
+        private final ProgressBar progressBar;
+        private final Label titleText;
+        private final Label messageText;
+        private final Button cancelButton;
+        private Button removeTaskButton;
+        private final VBox buttonsContainer;
 
         private T task;
-        private BorderPane borderPane;
+        private final BorderPane borderPane;
 
         public TaskCell() {
             titleText = new Label();
@@ -89,6 +106,7 @@ public class TaskProgressViewSkin<T extends Task<?>> extends
             progressBar.getStyleClass().add("task-progress-bar");
 
             cancelButton = new Button("Cancel");
+            cancelButton.setAlignment(Pos.CENTER);
             cancelButton.getStyleClass().add("task-cancel-button");
             cancelButton.setTooltip(new Tooltip("Cancel Task"));
             cancelButton.setOnAction(evt -> {
@@ -103,13 +121,37 @@ public class TaskProgressViewSkin<T extends Task<?>> extends
             vbox.getChildren().add(progressBar);
             vbox.getChildren().add(messageText);
 
-            BorderPane.setAlignment(cancelButton, Pos.CENTER);
-            BorderPane.setMargin(cancelButton, new Insets(0, 0, 0, 4));
-
             borderPane = new BorderPane();
             borderPane.setCenter(vbox);
-            borderPane.setRight(cancelButton);
+
+            buttonsContainer = new VBox();
+            buttonsContainer.prefHeightProperty().bind(progressBar.prefHeightProperty());
+            buttonsContainer.setAlignment(Pos.CENTER);
+            buttonsContainer.getChildren().add(cancelButton);
+            borderPane.setRight(buttonsContainer);
+            BorderPane.setAlignment(buttonsContainer, Pos.BOTTOM_CENTER);
+            BorderPane.setMargin(buttonsContainer, new Insets(0, 0, 0, 4));
+
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        }
+
+        private TaskCell withRemoveFinishedTaskButton(Consumer<Task<?>> onButtonPress) {
+            Button customButton = getCustomRemoveFinishedTaskButton();
+            customButton.setOnAction(evt -> onButtonPress.accept(task));
+            buttonsContainer.getChildren().add(removeTaskButton);
+            return this;
+        }
+
+        /**
+         * Customize the button for removing finished tasks manually. Can be used in conjunction with retain task property
+         * */
+        protected Button getCustomRemoveFinishedTaskButton() {
+            removeTaskButton = new Button("X");
+            removeTaskButton.setAlignment(Pos.CENTER);
+            removeTaskButton.getStyleClass().add("task-remove-finished-button");
+            removeTaskButton.setTooltip(new Tooltip("Remove finished"));
+
+            return removeTaskButton;
         }
 
         @Override
@@ -135,13 +177,22 @@ public class TaskProgressViewSkin<T extends Task<?>> extends
             if (empty || task == null) {
                 getStyleClass().setAll("task-list-cell-empty");
                 setGraphic(null);
-            } else if (task != null) {
+            } else {
                 getStyleClass().setAll("task-list-cell");
                 progressBar.progressProperty().bind(task.progressProperty());
                 titleText.textProperty().bind(task.titleProperty());
                 messageText.textProperty().bind(task.messageProperty());
-                cancelButton.disableProperty().bind(
-                        Bindings.not(task.runningProperty()));
+
+                if (retainTasks) {
+                    cancelButton.visibleProperty().bind(task.runningProperty());
+                    cancelButton.managedProperty().bind(cancelButton.visibleProperty());
+
+                    removeTaskButton.visibleProperty().bind(Bindings.not(task.runningProperty()));
+                    removeTaskButton.managedProperty().bind(removeTaskButton.visibleProperty());
+                } else {
+                    cancelButton.disableProperty().bind(
+                            Bindings.not(task.runningProperty()));
+                }
 
                 Callback<T, Node> factory = getSkinnable().getGraphicFactory();
                 if (factory != null) {
@@ -152,12 +203,12 @@ public class TaskProgressViewSkin<T extends Task<?>> extends
                         borderPane.setLeft(graphic);
                     }
                 } else {
-                	/*
-                	 * Really needed. The application might have used a graphic
-                	 * factory before and then disabled it. In this case the border
-                	 * pane might still have an old graphic in the left position.
-                	 */
-                	borderPane.setLeft(null);
+                    /*
+                     * Really needed. The application might have used a graphic
+                     * factory before and then disabled it. In this case the border
+                     * pane might still have an old graphic in the left position.
+                     */
+                    borderPane.setLeft(null);
                 }
 
                 setGraphic(borderPane);

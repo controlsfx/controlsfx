@@ -12,7 +12,7 @@ version = controlsfx_version
 dependencies {
     testImplementation 'junit:junit:[4,)'
     testImplementation 'org.testfx:testfx-core:4.0.16-alpha'
-    testRuntimeOnly ('org.testfx:openjfx-monocle:jdk-12.0.1+2') {
+    testRuntimeOnly ('org.testfx:openjfx-monocle:21.0.2') {
         exclude group: 'org.openjfx'
     }
     testImplementation 'org.hamcrest:hamcrest:2.2'
@@ -101,13 +101,12 @@ javadoc {
 }
 
 ext.java9TestArgs = [
-        "--add-reads=$moduleName=org.testfx",
-        "--add-modules=org.testfx",
-        "--add-exports=javafx.graphics/com.sun.javafx.application=org.testfx",
+        "--add-reads=$moduleName=ALL-UNNAMED",
+        "--add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
         // For Monocle
-        "--add-exports=javafx.graphics/com.sun.glass.ui=org.testfx.monocle",
-        "--add-opens=javafx.graphics/com.sun.glass.ui=org.testfx",
-        "--add-reads=$moduleName=org.hamcrest",
+        "--add-exports=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED",
+        "--add-opens=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED",
+        "--add-reads=$moduleName=ALL-UNNAMED",
 ]
 
 test {
@@ -137,14 +136,16 @@ jar {
     exclude '**/128/*'
     exclude '**/oxygen/svg/*'
     exclude '**/impl/build/**'
-    bnd(
-            'Bundle-Name': 'ControlsFX',
-            'Bundle-Description': 'High quality UI controls and other tools to complement the core JavaFX distribution',
-            'Specification-Title': 'ControlsFX',
-            'Specification-Version': controlsfx_version,
-            'Implementation-Title': 'ControlsFX',
-            'Export-Package': '!impl.org.controlsfx.*, org.controlsfx.*'
-    )
+    bundle {
+        bnd(
+                'Bundle-Name': 'ControlsFX',
+                'Bundle-Description': 'High quality UI controls and other tools to complement the core JavaFX distribution',
+                'Specification-Title': 'ControlsFX',
+                'Specification-Version': controlsfx_version,
+                'Implementation-Title': 'ControlsFX',
+                'Export-Package': '!impl.org.controlsfx.*, org.controlsfx.*'
+        )
+    }
 }
 
 task native2ascii(type: Copy) {

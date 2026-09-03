@@ -1,4 +1,4 @@
-include "controlsfx", "fxsampler", "controlsfx-samples"
+include "controlsfx", "fxsampler", "controlsfx-samples", "jdk-jsobject"
 
 buildscript {
     repositories {
@@ -9,7 +9,7 @@ buildscript {
     }
     pluginManagement {
         plugins {
-            id 'biz.aQute.bnd.builder' version '6.3.1'
+            id 'biz.aQute.bnd.builder' version '7.3.0'
         }
     }
 }

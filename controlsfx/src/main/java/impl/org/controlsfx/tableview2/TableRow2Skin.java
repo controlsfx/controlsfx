@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2025, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -690,7 +690,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
 
         final List<? extends TableColumnBase/*<T,?>*/> visibleLeafColumns = tableView.getVisibleLeafColumns();
         for (int i = 0, max = visibleLeafColumns.size(); i < max; i++) {
-            prefWidth += visibleLeafColumns.get(i).getWidth();
+            prefWidth += snapSizeX(visibleLeafColumns.get(i).getWidth());
         }
 
         return prefWidth;

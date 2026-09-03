@@ -26,13 +26,6 @@
  */
 package org.controlsfx.samples.tableview2;
 
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -82,10 +75,22 @@ import org.controlsfx.control.tableview2.actions.RowFixAction;
 import org.controlsfx.control.tableview2.cell.ComboBox2TableCell;
 import org.controlsfx.control.tableview2.cell.TextField2TableCell;
 import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
+import org.controlsfx.control.tableview2.filter.popupfilter.PopupComparableFilter;
 import org.controlsfx.control.tableview2.filter.popupfilter.PopupFilter;
 import org.controlsfx.control.tableview2.filter.popupfilter.PopupNumberFilter;
 import org.controlsfx.control.tableview2.filter.popupfilter.PopupStringFilter;
 import org.controlsfx.samples.Utils;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.chrono.ChronoLocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
+import java.time.temporal.ChronoField;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 /**
  *
@@ -276,7 +281,7 @@ public class HelloFilteredTableView extends ControlsFXSample {
                         if (item != null && ! empty) {
                             setText(null);
                             circle.setFill(getIndex() % 5 == 0 ? Color.RED : Color.BLUE);
-                            label.setText("" + table.getItems().get(getIndex()).getBirthday().getYear() + " " + String.valueOf(item));
+                            label.setText("" + table.getItems().get(getIndex()).getBirthday().get(ChronoField.YEAR) + " " + String.valueOf(item));
                             box.setAlignment(Pos.CENTER);
                             setGraphic(box);
                         } else {
@@ -324,12 +329,31 @@ public class HelloFilteredTableView extends ControlsFXSample {
 
     private class FilteredTableViewSample extends FilteredTableView<Person> {
 
+        private final StringConverter<ChronoLocalDate> chronoLocalDateConverter = new StringConverter<>() {
+            @Override
+            public String toString(ChronoLocalDate date) {
+                if (date == null) {
+                    return "";
+                }
+                return DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).format(date);
+            }
+
+            @Override
+            public ChronoLocalDate fromString(String string) {
+                try {
+                    return LocalDate.parse(string, DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM));
+                } catch (DateTimeParseException ex) {
+                    return null;
+                }
+            }
+        };
+
         private final FilteredTableColumn<Person, String> firstName = new FilteredTableColumn<>("First Name");
         private final FilteredTableColumn<Person, String> lastName = new FilteredTableColumn<>("Last Name");
         private final FilteredTableColumn<Person, Integer> age = new FilteredTableColumn<>("Age");
         private final FilteredTableColumn<Person, Color> color = new FilteredTableColumn<>("Color");
         private final FilteredTableColumn<Person, String> city = new FilteredTableColumn<>("City");
-        private final FilteredTableColumn<Person, LocalDate> birthday = new FilteredTableColumn<>("Birthday");
+        private final FilteredTableColumn<Person, ChronoLocalDate> birthday = new FilteredTableColumn<>("Birthday");
         private final FilteredTableColumn<Person, Boolean> active = new FilteredTableColumn<>("Active");
         private SouthFilter<Person, String> editorFirstName;
         private SouthFilter<Person, String> editorLastName;
@@ -392,21 +416,7 @@ public class HelloFilteredTableView extends ControlsFXSample {
 
             birthday.setCellValueFactory(p -> p.getValue().birthdayProperty());
             birthday.setPrefWidth(100);
-            birthday.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<LocalDate>() {
-                @Override
-                public String toString(LocalDate date) {
-                    if (date == null) {
-                        return "" ;
-                    }
-                    return DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).format(date);
-                }
-
-                @Override
-                public LocalDate fromString(String string) {
-                    return LocalDate.now();
-                }
-
-            }));
+            birthday.setCellFactory(TextFieldTableCell.forTableColumn(chronoLocalDateConverter));
 
             active.setText("Active");
             active.setCellValueFactory(p -> p.getValue().activeProperty());
@@ -617,6 +627,9 @@ public class HelloFilteredTableView extends ControlsFXSample {
                 }
             });
             color.setOnFilterAction(e -> popupColorFilter.showPopup());
+
+            PopupComparableFilter<Person, ChronoLocalDate> popupBirthdayFilter = new PopupComparableFilter<>(birthday, chronoLocalDateConverter);
+            birthday.setOnFilterAction(e -> popupBirthdayFilter.showPopup());
         }
     }
 
@@ -640,18 +653,18 @@ public class HelloFilteredTableView extends ControlsFXSample {
         private final IntegerProperty age = new SimpleIntegerProperty();
         private final StringProperty city = new SimpleStringProperty();
         private final BooleanProperty active = new SimpleBooleanProperty();
-        private final ObjectProperty<LocalDate> birthday = new SimpleObjectProperty<>();
+        private final ObjectProperty<ChronoLocalDate> birthday = new SimpleObjectProperty<>();
         private final ObjectProperty<Color> color = new SimpleObjectProperty<>();
 
-        public final LocalDate getBirthday() {
+        public final ChronoLocalDate getBirthday() {
             return birthday.get();
         }
 
-        public final void setBirthday(LocalDate value) {
+        public final void setBirthday(ChronoLocalDate value) {
             birthday.set(value);
         }
 
-        public final ObjectProperty<LocalDate> birthdayProperty() {
+        public final ObjectProperty<ChronoLocalDate> birthdayProperty() {
             return birthday;
         }
 

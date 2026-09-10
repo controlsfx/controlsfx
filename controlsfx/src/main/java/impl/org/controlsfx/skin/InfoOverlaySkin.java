@@ -150,14 +150,14 @@ public class InfoOverlaySkin extends SkinBase<InfoOverlay> {
 
         // All remaining width goes to the info label
         final Insets infoPanelPadding = infoPanel.getPadding();
-        final double infoLabelWidth = snapSize(contentWidth - toggleButtonPrefWidth - 
+        final double infoLabelWidth = snapSizeX(contentWidth - toggleButtonPrefWidth -
                 infoPanelPadding.getLeft() - infoPanelPadding.getRight());
 
         // we then can work out the necessary height for the info panel, based on
         // whether it is expanded or not, and given the current state of the animation.
-        final double prefInfoPanelHeight = (snapSize(infoLabel.prefHeight(infoLabelWidth)) +
-                snapSpace(infoPanel.getPadding().getTop()) +
-                snapSpace(infoPanel.getPadding().getBottom())) *
+        final double prefInfoPanelHeight = (snapSizeY(infoLabel.prefHeight(infoLabelWidth)) +
+                snapSpaceY(infoPanel.getPadding().getTop()) +
+                snapSpaceY(infoPanel.getPadding().getBottom())) *
                 transition.get();
 
         infoLabel.setMaxWidth(infoLabelWidth);
@@ -168,7 +168,7 @@ public class InfoOverlaySkin extends SkinBase<InfoOverlay> {
                                 contentWidth, contentHeight, -1, HPos.CENTER, VPos.TOP);
         
         // position the infoPanel (the HBox consisting of the Label and ToggleButton)
-        layoutInArea(infoPanel, contentX, snapPosition(contentPrefHeight - prefInfoPanelHeight),
+        layoutInArea(infoPanel, contentX, snapPositionY(contentPrefHeight - prefInfoPanelHeight),
                                 contentWidth, prefInfoPanelHeight, 0, HPos.CENTER, VPos.BOTTOM);
     }
 

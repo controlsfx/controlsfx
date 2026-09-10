@@ -108,7 +108,7 @@ public class HorizontalHeaderColumn extends NestedTableColumnHeader {
         max = max > spreadsheetView.getColumns().size() ? spreadsheetView.getColumns().size() : max;
         for (int j = 0; j < max; j++) {
             final TableColumnHeader n = getColumnHeaders().get(j);
-            final double prefWidth = snapSize(n.prefWidth(-1));
+            final double prefWidth = snapSizeX(n.prefWidth(-1));
             n.setPrefHeight(24.0);
             //If the column is fixed
             if (spreadsheetView.getColumns().get(spreadsheetView.getModelColumn(j)).isFixed()) {

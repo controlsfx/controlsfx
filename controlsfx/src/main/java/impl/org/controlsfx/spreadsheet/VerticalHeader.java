@@ -159,7 +159,7 @@ public class VerticalHeader extends StackPane {
         handle.getView().hiddenColumnsProperty().addListener(layout);
 
         // Clip property to stay within bounds
-        clip = new Rectangle(getVerticalHeaderWidth(), snapSize(skin.getSkinnable().getHeight()));
+        clip = new Rectangle(getVerticalHeaderWidth(), snapSizeY(skin.getSkinnable().getHeight()));
         clip.relocate(snappedTopInset(), snappedLeftInset());
         clip.setSmooth(false);
         clip.heightProperty().bind(skin.getSkinnable().heightProperty());

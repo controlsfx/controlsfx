@@ -487,7 +487,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
                  */
                 final int max = getSkinnable().getVisibleLeafColumns().size() - viewColumn;
                 for (int i = 1, colSpan = spc.getColumnSpan(); i < colSpan && i < max; i++) {
-                    double tempWidth = snapSize(getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
+                    double tempWidth = snapSizeX(getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
                     width += tempWidth;
                 }
             }
@@ -700,7 +700,7 @@ public class GridViewSkin extends TableViewSkinBase<ObservableList<SpreadsheetCe
          * column with his mouse, we must force the column to resize because
          * setting the prefWidth again will not trigger the listeners.
          */
-        widthMax = snapSize(widthMax);
+        widthMax = snapSizeX(widthMax);
         if (col.getPrefWidth() == widthMax && col.getWidth() != widthMax) {
             //FIXME
 //            col.impl_setWidth(widthMax);

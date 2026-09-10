@@ -231,7 +231,7 @@ public class RectangleSelection extends Rectangle {
         //We first compute the total space between the left edge and our first column
         for (int i = 0; i < minColumn; ++i) {
             //Here we use Ceil because we want to "snapSize" otherwise we may end up with a weird shift.
-            x += snapSize(visibleColumns.get(i).getWidth());
+            x += snapSizeX(visibleColumns.get(i).getWidth());
         }
 
         /**
@@ -244,7 +244,7 @@ public class RectangleSelection extends Rectangle {
         //Then we compute the width by adding the space between the min and max column
         double width = 0;
         for (int i = minColumn; i <= maxColumn /*+ (columnSpan - 1)*/; ++i) {
-            width += snapSize(visibleColumns.get(i).getWidth());
+            width += snapSizeX(visibleColumns.get(i).getWidth());
         }
 
         //FIXED COLUMNS
@@ -280,10 +280,10 @@ public class RectangleSelection extends Rectangle {
                 for (SpreadsheetColumn column : skin.spreadsheetView.getFixedColumns()) {
                     int indexColumn = skin.spreadsheetView.getViewColumn(columns.indexOf(column));
                     if (indexColumn < minColumn && indexColumn != minColumn) {
-                        x += snapSize(column.getWidth());
+                        x += snapSizeX(column.getWidth());
                     }
                     if (indexColumn >= minColumn && indexColumn <= maxColumn) {
-                        width += snapSize(column.getWidth());
+                        width += snapSizeX(column.getWidth());
                     }
                 }
                 /**
@@ -296,7 +296,7 @@ public class RectangleSelection extends Rectangle {
                 for (SpreadsheetColumn column : skin.spreadsheetView.getFixedColumns()) {
                     int indexColumn = skin.spreadsheetView.getViewColumn(columns.indexOf(column));
                     if (indexColumn < minColumn && indexColumn != minColumn) {
-                        tempX += snapSize(column.getWidth());
+                        tempX += snapSizeX(column.getWidth());
                     }
                 }
                 width -= tempX - x;
@@ -313,7 +313,7 @@ public class RectangleSelection extends Rectangle {
      * @param value the size value to be snapped
      * @return value ceiled to nearest pixel
      */
-    private double snapSize(double value) {
+    private double snapSizeX(double value) {
         return Math.ceil(value);
     }
 

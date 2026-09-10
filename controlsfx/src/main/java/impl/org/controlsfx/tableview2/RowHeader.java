@@ -133,7 +133,7 @@ public class RowHeader<S> extends StackPane {
 
         // Clip property to stay within bounds
         clip = new Rectangle(getRowHeaderWidth(),
-                snapSize(tableView.getHeight() - tableView.snappedTopInset() - tableView.snappedBottomInset()));
+                snapSizeY(tableView.getHeight() - tableView.snappedTopInset() - tableView.snappedBottomInset()));
         clip.relocate(snappedTopInset(), snappedLeftInset());
         clip.setSmooth(false);
         clip.heightProperty().bind(Bindings.createDoubleBinding(() ->
@@ -312,7 +312,7 @@ public class RowHeader<S> extends StackPane {
             }
             final ScrollBar hBar = skin.getHBar();
             double hBarHeight = hBar.isVisible() && tableView.getItems() != null && ! tableView.getItems().isEmpty() ?
-                    snapSize(hBar.getHeight()) : 0;
+                    snapSizeY(hBar.getHeight()) : 0;
             innerTableView.resizeRelocate(x, 0, innerRowHeaderWidth.get(), tableView.getHeight() - hBarHeight -
                     tableView.snappedTopInset() - tableView.snappedBottomInset());
             if (! innerTableView.getColumns().isEmpty()) {

@@ -196,7 +196,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
             if(!skin.getSkinnable().getColumns().get(indexColumn).isVisible()){
                 continue;
             }
-            width = snapSize(columns.get(indexColumn).getWidth()) - snapSize(horizontalPadding);
+            width = snapSizeX(columns.get(indexColumn).getWidth()) - snapSizeX(horizontalPadding);
             //When setting a new grid with less columns, we may have this situation.
             if (row.size() <= indexColumn) {
                 break;
@@ -308,7 +308,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                      */
                     final int max = skin.getSkinnable().getVisibleLeafColumns().size() - viewColumn;
                     for (int i = 1; i < columnSpan && i < max; i++) {
-                        double tempWidth = snapSize(skin.getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
+                        double tempWidth = snapSizeX(skin.getSkinnable().getVisibleLeafColumn(viewColumn + i).getWidth());
                         width += tempWidth;
                         if (increaseFixedWidth) {
                             fixedColumnWidth += tempWidth;
@@ -347,7 +347,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                 }
 
                 height = customHeight;
-                height = snapSize(height) - snapSize(verticalPadding);
+                height = snapSizeY(height) - snapSizeY(verticalPadding);
                 /**
                  * We need to span multiple rows, so we sum up the height of all
                  * the rows. The height of the current row is ignored and the
@@ -365,7 +365,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                     int newIndex = index - reverseRowSpan;
                     final int maxRow = newIndex + reverseRowSpan + rowSpan;
                     for (int i = newIndex + 1; i < maxRow; ++i) {
-                        height += snapSize(skin.getRowHeight(i));
+                        height += snapSizeY(skin.getRowHeight(i));
                     }
                 }
 

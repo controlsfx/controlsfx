@@ -176,14 +176,14 @@ public class TableHeaderRow2 extends TableHeaderRow {
     /** {@inheritDoc} */
     @Override protected void layoutChildren() {
         double x = scrollX;
-        double headerWidth = snapSize(header.prefWidth(-1));
+        double headerWidth = snapSizeX(header.prefWidth(-1));
         
         double southTableHeaderRowHeight = southHeaderRow.prefHeight(headerWidth);
         
         southHeaderRow.resizeRelocate(x, getHeight() - snappedBottomInset() - southTableHeaderRowHeight, headerWidth, southTableHeaderRowHeight);
             
         double prefHeight = getHeight() - snappedTopInset() - snappedBottomInset();
-        double cornerWidth = snapSize(skin.getFlow().getVerticalBar().prefWidth(-1));
+        double cornerWidth = snapSizeX(skin.getFlow().getVerticalBar().prefWidth(-1));
 
         // position the main nested header
         header.resizeRelocate(x, snappedTopInset(), headerWidth, prefHeight - southTableHeaderRowHeight);

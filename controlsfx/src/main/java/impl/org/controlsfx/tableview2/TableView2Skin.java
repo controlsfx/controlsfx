@@ -487,7 +487,7 @@ public class TableView2Skin<S> extends TableViewSkin<S> {
 ////            widthMax = Math.max(widthMax, col.getWidth());
 ////        }
 ////        
-////        widthMax = snapSize(widthMax);
+////        widthMax = snapSizeX(widthMax);
 ////        
 ////        col.impl_setWidth(widthMax);
 ////    }

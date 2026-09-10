@@ -10,8 +10,3 @@ javafx {
 javadoc {
     options.windowTitle("FXSampler Project ${version}")
 }
-
-// do not publish fxsampler
-tasks.withType(PublishToMavenRepository).configureEach { it.enabled = false }
-
-

@@ -27,7 +27,9 @@ subprojects {
 
     apply plugin: 'java'
     apply plugin: 'org.openjfx.javafxplugin'
-    apply from  : '../mavenPublish.gradle'
+    if (project.name != 'fxsampler') {
+        apply from: '../mavenPublish.gradle'
+    }
 
     sourceCompatibility = '11'
     targetCompatibility = '11'

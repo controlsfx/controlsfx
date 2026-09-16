@@ -39,6 +39,9 @@ import javafx.collections.ListChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.SortEvent;
+import javafx.scene.control.TablePosition;
+import javafx.scene.control.TablePositionBase;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import org.controlsfx.control.tableview2.FilteredTableColumn;
@@ -46,6 +49,12 @@ import org.controlsfx.control.tableview2.FilteredTableView;
 import org.controlsfx.control.tableview2.TableColumn2;
 import org.controlsfx.control.tableview2.TableView2;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static impl.org.controlsfx.tableview2.SortUtils.SortEndedEvent.SORT_ENDED_EVENT;
@@ -192,33 +201,12 @@ public class RowHeader<S> extends StackPane {
         innerTableView.getSelectionModel().selectionModeProperty().bind(tableView.getSelectionModel().selectionModeProperty());
         rowHeaderSelectionListener = (ListChangeListener.Change<? extends Integer> c) -> {
             skin.getSelectedRows().removeListener(tableSelectionListener);
-            while (c.next()) {
-                c.getRemoved().forEach(i -> {
-                        if (!isValidIndex(tableView, i)) {
-                            return;
-                        }
-                        if (tableView.getSelectionModel().isCellSelectionEnabled()) {
-                            tableView.getVisibleLeafColumns().forEach(col -> tableView.getSelectionModel().clearSelection(i, col));
-                        } else {
-                            tableView.getSelectionModel().clearSelection(i);
-                        }
-                    });
-                c.getAddedSubList().stream()
-                        .filter(i -> isValidIndex(tableView, i))
-                        .forEach(i -> tableView.getSelectionModel().select(i));
-            }
+            applyListChange(tableView, c);
             skin.getSelectedRows().addListener(tableSelectionListener);
         };
         tableSelectionListener = (ListChangeListener.Change<? extends Integer> c) -> {
             innerTableView.getSelectionModel().getSelectedIndices().removeListener(rowHeaderSelectionListener);
-            while (c.next()) {
-                c.getRemoved().stream()
-                        .filter(i -> isValidIndex(innerTableView, i))
-                        .forEach(i -> innerTableView.getSelectionModel().clearSelection(i));
-                c.getAddedSubList().stream()
-                        .filter(i -> isValidIndex(innerTableView, i))
-                        .forEach(i -> innerTableView.getSelectionModel().select(i));
-            }
+            applyListChange(innerTableView, c);
             if (! sorting) {
                 innerTableView.getSelectionModel().getSelectedIndices().addListener(rowHeaderSelectionListener);
             }
@@ -250,11 +238,7 @@ public class RowHeader<S> extends StackPane {
                     innerSkin.getFlow().rebuildFixedCells();
                 }
                 innerTableView.getSelectionModel().clearSelection();
-                if (innerTableView.getItems() != null) {
-                    skin.getSelectedRows().stream()
-                            .filter(i -> isValidIndex(innerTableView, i))
-                            .forEach(i -> innerTableView.getSelectionModel().select(i));
-                }
+                selectValidIndices(innerTableView, skin.getSelectedRows());
                 innerTableView.getSelectionModel().getSelectedIndices().addListener(rowHeaderSelectionListener);
             }
         });
@@ -269,8 +253,108 @@ public class RowHeader<S> extends StackPane {
     }
 
     /**
+     * Selects all the given row indices, filtering out any invalid indices.
+     * @param table The table view whose selection model should be updated.
+     * @param rows The row indices to be selected.
+     */
+    private void selectValidIndices(TableView2<S> table, List<? extends Integer> rows) {
+        if (table == null || table.getItems() == null || rows == null || rows.isEmpty()) {
+            return;
+        }
+        selectIndices(table.getSelectionModel(), rows.stream()
+                .filter(i -> isValidIndex(table, i))
+                .collect(Collectors.toList()));
+    }
+
+    /**
+     * Selects all the given row indices in a single batch, so the selection model
+     * fires one single change event, instead of one event per selected row/cell.
+     * @param selectionModel The selection model to update.
+     * @param indices The list of row indices to be selected.
+     */
+    private void selectIndices(TableView.TableViewSelectionModel<S> selectionModel, List<Integer> indices) {
+        if (selectionModel == null || indices == null || indices.isEmpty()) {
+            return;
+        }
+        int first = indices.get(0);
+        if (indices.size() == 1) {
+            selectionModel.select(first);
+            return;
+        }
+        int[] rest = indices.subList(1, indices.size()).stream()
+                .mapToInt(Integer::intValue)
+                .toArray();
+        selectionModel.selectIndices(first, rest);
+    }
+
+    /**
+     * Applies the given list change to the given table view.
+     * @param tableView The table view to update
+     * @param c The list change to apply.
+     */
+    private void applyListChange(TableView2<S> tableView, ListChangeListener.Change<? extends Integer> c) {
+        if (tableView == null || c == null) {
+            return;
+        }
+        while (c.next()) {
+            if (c.wasRemoved()) {
+                clearRowsSelection(tableView, c.getRemoved());
+            }
+            if (c.wasAdded()) {
+                selectValidIndices(tableView, c.getAddedSubList());
+            }
+        }
+    }
+
+    /**
+     * Deselects all the given rows.
+     * <p>
+     * In case of cell selection, if the rows that have to remain selected are fully selected rows, the selection
+     * is cleared at once and those rows are re-selected in a single batch, preventing firing a change event per
+     * removed cell.</p>
+     * <p>For row selection or partial cell selection, the rows are cleared one by one.</p>
+     *
+     * @param table The table view whose selection model should be updated.
+     * @param rows The row indices to be deselected.
+     */
+    private void clearRowsSelection(TableView2<S> table, List<? extends Integer> rows) {
+        if (table == null || rows == null || rows.isEmpty()) {
+            return;
+        }
+        final Set<Integer> rowsToDeselect = rows.stream()
+                .filter(i -> isValidIndex(table, i))
+                .collect(Collectors.toSet());
+        final TableView.TableViewSelectionModel<S> sm = table.getSelectionModel();
+        if (!sm.isCellSelectionEnabled()) {
+            rowsToDeselect.forEach(sm::clearSelection);
+            return;
+        }
+
+        final Map<Integer, Integer> cellsPerRemainingRow = sm.getSelectedCells().stream()
+                .filter(position -> !rowsToDeselect.contains(position.getRow()))
+                .collect(Collectors.toMap(TablePositionBase::getRow, position -> 1, Integer::sum, LinkedHashMap::new));
+        final int columnCount = table.getVisibleLeafColumns().size();
+        final boolean remainingRowsAreFullySelected = cellsPerRemainingRow.values().stream()
+                        .allMatch(count -> count == columnCount);
+        if (remainingRowsAreFullySelected) {
+            final TablePosition<S, ?> focusedCell = table.getFocusModel() == null ? null : table.getFocusModel().getFocusedCell();
+            // clear selection, select rows at once, and restore focus if possible
+            sm.clearSelection();
+            selectIndices(sm, new ArrayList<>(cellsPerRemainingRow.keySet()));
+            if (focusedCell != null && cellsPerRemainingRow.containsKey(focusedCell.getRow())) {
+                table.getFocusModel().focus(focusedCell.getRow(), focusedCell.getTableColumn());
+            }
+        } else {
+            // partial cell selections have to be preserved, so rows are cleared one by one
+            rowsToDeselect.forEach(sm::clearSelection);
+        }
+    }
+
+    /**
      * Check that the {@code index} is within range of the {@code table} items list,
      * as a safeguard to prevent {@link IndexOutOfBoundsException}.
+     * @param table The table view whose items list is to be checked.
+     * @param index The index to be checked.
      */
     private boolean isValidIndex(TableView2<S> table, Integer index) {
         return index != null && table != null && table.getItems() != null &&

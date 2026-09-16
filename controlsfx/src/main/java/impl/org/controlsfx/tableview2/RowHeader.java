@@ -39,8 +39,8 @@ import javafx.collections.ListChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.SortEvent;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
-import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
@@ -50,6 +50,7 @@ import org.controlsfx.control.tableview2.TableColumn2;
 import org.controlsfx.control.tableview2.TableView2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -238,7 +239,8 @@ public class RowHeader<S> extends StackPane {
                     innerSkin.getFlow().rebuildFixedCells();
                 }
                 innerTableView.getSelectionModel().clearSelection();
-                selectValidIndices(innerTableView, skin.getSelectedRows());
+                selectIndices(innerTableView.getSelectionModel(),
+                        validRows(innerTableView, skin.getSelectedRows()));
                 innerTableView.getSelectionModel().getSelectedIndices().addListener(rowHeaderSelectionListener);
             }
         });
@@ -253,35 +255,21 @@ public class RowHeader<S> extends StackPane {
     }
 
     /**
-     * Selects all the given row indices, filtering out any invalid indices.
-     * @param table The table view whose selection model should be updated.
-     * @param rows The row indices to be selected.
-     */
-    private void selectValidIndices(TableView2<S> table, List<? extends Integer> rows) {
-        if (table == null || table.getItems() == null || rows == null || rows.isEmpty()) {
-            return;
-        }
-        selectIndices(table.getSelectionModel(), rows.stream()
-                .filter(i -> isValidIndex(table, i))
-                .collect(Collectors.toList()));
-    }
-
-    /**
      * Selects all the given row indices in a single batch, so the selection model
      * fires one single change event, instead of one event per selected row/cell.
      * @param selectionModel The selection model to update.
-     * @param indices The list of row indices to be selected.
+     * @param indices The list of valid row indices to be selected.
      */
     private void selectIndices(TableView.TableViewSelectionModel<S> selectionModel, List<Integer> indices) {
         if (selectionModel == null || indices == null || indices.isEmpty()) {
             return;
         }
-        int first = indices.get(0);
+        final int first = indices.get(0);
         if (indices.size() == 1) {
             selectionModel.select(first);
             return;
         }
-        int[] rest = indices.subList(1, indices.size()).stream()
+        final int[] rest = indices.subList(1, indices.size()).stream()
                 .mapToInt(Integer::intValue)
                 .toArray();
         selectionModel.selectIndices(first, rest);
@@ -289,76 +277,243 @@ public class RowHeader<S> extends StackPane {
 
     /**
      * Applies the given list change to the given table view.
-     * @param tableView The table view to update
+     * @param table The table view to update
      * @param c The list change to apply.
      */
-    private void applyListChange(TableView2<S> tableView, ListChangeListener.Change<? extends Integer> c) {
-        if (tableView == null || c == null) {
+    private void applyListChange(TableView2<S> table, ListChangeListener.Change<? extends Integer> c) {
+        if (table == null || c == null) {
             return;
         }
+        final List<Integer> removed = new ArrayList<>();
+        final List<Integer> added = new ArrayList<>();
         while (c.next()) {
             if (c.wasRemoved()) {
-                clearRowsSelection(tableView, c.getRemoved());
+                removed.addAll(c.getRemoved());
             }
             if (c.wasAdded()) {
-                selectValidIndices(tableView, c.getAddedSubList());
+                added.addAll(c.getAddedSubList());
             }
         }
+        final List<Integer> rowsToSelect = validRows(table, added);
+        final Set<Integer> rowsToKeep = new HashSet<>(rowsToSelect);
+        final List<Integer> rowsToDeselect = validRows(table, removed).stream()
+                .filter(row -> !rowsToKeep.contains(row))
+                .collect(Collectors.toList());
+        clearRowsSelection(table, rowsToDeselect);
+        selectIndices(table.getSelectionModel(), rowsToSelect);
     }
 
     /**
-     * Deselects all the given rows.
-     * <p>
-     * In case of cell selection, if the rows that have to remain selected are fully selected rows, the selection
-     * is cleared at once and those rows are re-selected in a single batch, preventing firing a change event per
-     * removed cell.</p>
-     * <p>For row selection or partial cell selection, the rows are cleared one by one.</p>
+     * Deselects all the given rows, either one by one, or rebuilding the selection in a single
+     * batch after clearing the full selection, whichever fires fewer change events.
      *
      * @param table The table view whose selection model should be updated.
-     * @param rows The row indices to be deselected.
+     * @param rows The valid row indices to be deselected.
      */
-    private void clearRowsSelection(TableView2<S> table, List<? extends Integer> rows) {
+    private void clearRowsSelection(TableView2<S> table, List<Integer> rows) {
         if (table == null || rows == null || rows.isEmpty()) {
             return;
         }
-        final Set<Integer> rowsToDeselect = rows.stream()
-                .filter(i -> isValidIndex(table, i))
-                .collect(Collectors.toSet());
         final TableView.TableViewSelectionModel<S> sm = table.getSelectionModel();
-        if (!sm.isCellSelectionEnabled()) {
-            rowsToDeselect.forEach(sm::clearSelection);
+        if (sm == null) {
             return;
         }
-
-        final Map<Integer, Integer> cellsPerRemainingRow = sm.getSelectedCells().stream()
-                .filter(position -> !rowsToDeselect.contains(position.getRow()))
-                .collect(Collectors.toMap(TablePositionBase::getRow, position -> 1, Integer::sum, LinkedHashMap::new));
-        final int columnCount = table.getVisibleLeafColumns().size();
-        final boolean remainingRowsAreFullySelected = cellsPerRemainingRow.values().stream()
-                        .allMatch(count -> count == columnCount);
-        if (remainingRowsAreFullySelected) {
-            final TablePosition<S, ?> focusedCell = table.getFocusModel() == null ? null : table.getFocusModel().getFocusedCell();
-            // clear selection, select rows at once, and restore focus if possible
-            sm.clearSelection();
-            selectIndices(sm, new ArrayList<>(cellsPerRemainingRow.keySet()));
-            if (focusedCell != null && cellsPerRemainingRow.containsKey(focusedCell.getRow())) {
-                table.getFocusModel().focus(focusedCell.getRow(), focusedCell.getTableColumn());
-            }
+        final Set<Integer> rowsToDeselect = new HashSet<>(rows);
+        if (sm.isCellSelectionEnabled()) {
+            clearCells(table, sm, rowsToDeselect);
         } else {
-            // partial cell selections have to be preserved, so rows are cleared one by one
-            rowsToDeselect.forEach(sm::clearSelection);
+            clearRows(table, sm, rowsToDeselect);
         }
     }
 
     /**
-     * Check that the {@code index} is within range of the {@code table} items list,
+     * Deselects the given rows when row selection is enabled.
+     * <p>If only a few rows have to be deselected, they are cleared one by one. Otherwise, the selection is
+     * cleared at once and the rows that have to remain selected are re-selected in a single batch, and
+     * only two change events are fired.</p>
+     *
+     * @param table The table view whose selection model should be updated.
+     * @param sm The selection model of the given table view, with cell selection disabled.
+     * @param rowsToDeselect The valid row indices to be deselected.
+     */
+    private void clearRows(TableView2<S> table, TableView.TableViewSelectionModel<S> sm, Set<Integer> rowsToDeselect) {
+        if (rowsToDeselect.size() < 3 || rowsToDeselect.size() < sm.getSelectedIndices().size() / 4) {
+            // if the number of rows to deselect is small, or less than 25% of the selected rows,
+            // clearing them one by one fires fewer events than rebuilding the selection
+            clearRowsOneByOne(sm, rowsToDeselect);
+            return;
+        }
+
+        final int selectedIndex = sm.getSelectedIndex();
+        final TableView.TableViewFocusModel<S> fm = table.getFocusModel();
+        final int focusedIndex = fm == null ? -1 : fm.getFocusedIndex();
+
+        // batch the rows that have to remain selected, preventing firing a change event per selected row
+        final List<Integer> rowsToKeep = sm.getSelectedIndices().stream()
+                .filter(row -> row != null && !rowsToDeselect.contains(row))
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        // TableViewSelectionModel::selectIndices sets the selected index, the selected item and the
+        // focus from the last index of the list, so move the selected index to the end to restore it
+        if (rowsToKeep.remove((Integer) selectedIndex)) {
+            rowsToKeep.add(selectedIndex);
+        }
+
+        sm.clearSelection();
+        selectIndices(sm, rowsToKeep);
+
+        if (fm != null && fm.getFocusedIndex() != focusedIndex) {
+            // if needed, restore focus
+            fm.focus(focusedIndex);
+        }
+    }
+
+    /**
+     * Deselects the given rows when cell selection is enabled.
+     * <p>The selection is cleared at once, and the cells that have to remain selected are restored
+     * with the fewest possible change events, see {@link CellSelectionRestorePath}. As a safeguard, the
+     * selection is only rebuilt if that fires fewer events than deselecting the rows one by one.</p>
+     *
+     * @param table The table view whose selection model should be updated.
+     * @param sm The selection model of the given table view, with cell selection enabled.
+     * @param rowsToDeselect The valid row indices to be deselected.
+     */
+    @SuppressWarnings("unchecked")
+    private void clearCells(TableView2<S> table, TableView.TableViewSelectionModel<S> sm, Set<Integer> rowsToDeselect) {
+        final int columnCount = table.getVisibleLeafColumns().size();
+        final Map<Integer, List<TableColumn<S, ?>>> cellsToKeepPerRow = cellsToKeepPerRow(sm, rowsToDeselect, columnCount);
+        final CellSelectionRestorePath restorePath = new CellSelectionRestorePath(table, cellsToKeepPerRow, columnCount);
+
+        if (restorePath.eventCount() > rowsToDeselect.size() * columnCount) {
+            clearRowsOneByOne(sm, rowsToDeselect);
+            return;
+        }
+
+        final int selectedIndex = sm.getSelectedIndex();
+        final TableView.TableViewFocusModel<S> fm = table.getFocusModel();
+        final TablePosition<S, ?> focusedCell = fm == null ? null : (TablePosition<S, ?>) fm.getFocusedCell();
+
+        // clear the selection, and restore the rows that are selected as a whole
+        sm.clearSelection();
+        selectIndices(sm, restorePath.rowsToSelect);
+
+        // select and clear the remaining individual cells
+        restorePath.cellsToSelect.forEach(cell -> sm.select(cell.getRow(), cell.getTableColumn()));
+        restorePath.cellsToClear.forEach(cell -> sm.clearSelection(cell.getRow(), cell.getTableColumn()));
+
+        // restore the selected index and item: the cell is already selected, so no event is fired
+        final List<TableColumn<S, ?>> selectedRowColumns = cellsToKeepPerRow.get(selectedIndex);
+        if (selectedRowColumns != null && !selectedRowColumns.isEmpty()) {
+            sm.select(selectedIndex, selectedRowColumns.get(0));
+        }
+
+        // restore focus
+        if (focusedCell != null && cellsToKeepPerRow.containsKey(focusedCell.getRow())) {
+            fm.focus(focusedCell.getRow(), focusedCell.getTableColumn());
+        }
+    }
+
+    /**
+     * Groups the currently selected cells that have to remain selected by their row, keeping the
+     * selection order of both the rows and their cells.
+     *
+     * @param sm The selection model with the current cell selection.
+     * @param rowsToDeselect The valid row indices to be deselected.
+     * @param columnCount The number of visible leaf columns of the table view.
+     * @return The columns of the cells that have to remain selected, per row.
+     */
+    @SuppressWarnings("unchecked")
+    private Map<Integer, List<TableColumn<S, ?>>> cellsToKeepPerRow(TableView.TableViewSelectionModel<S> sm,
+            Set<Integer> rowsToDeselect, int columnCount) {
+        final Map<Integer, List<TableColumn<S, ?>>> cellsToKeepPerRow = new LinkedHashMap<>();
+        for (TablePosition<S, ?> cell : (List<TablePosition<S, ?>>) (List<?>) sm.getSelectedCells()) {
+            final Integer row = cell.getRow();
+            if (!rowsToDeselect.contains(row)) {
+                cellsToKeepPerRow.computeIfAbsent(row, r -> new ArrayList<>(columnCount))
+                        .add(cell.getTableColumn());
+            }
+        }
+        return cellsToKeepPerRow;
+    }
+
+    /**
+     * Deselects the given rows one by one.
+     *
+     * @param sm The selection model to update.
+     * @param rowsToDeselect The valid row indices to be deselected.
+     */
+    private void clearRowsOneByOne(TableView.TableViewSelectionModel<S> sm, Set<Integer> rowsToDeselect) {
+        if (sm == null || rowsToDeselect == null || rowsToDeselect.isEmpty()) {
+            return;
+        }
+        rowsToDeselect.forEach(sm::clearSelection);
+    }
+
+    /**
+     * The set of operations needed to restore a cell selection after it has been cleared at once.
+     * <p>Fully selected rows are restored in a single batch. A partially selected row can't be part
+     * of that batch, so it is restored either by selecting the whole row and then clearing its
+     * missing cells, or by selecting its cells one by one, whichever needs fewer events.</p>
+     */
+    private class CellSelectionRestorePath {
+
+        private final List<Integer> rowsToSelect;
+        private final List<TablePosition<S, ?>> cellsToSelect = new ArrayList<>();
+        private final List<TablePosition<S, ?>> cellsToClear = new ArrayList<>();
+
+        CellSelectionRestorePath(TableView2<S> table, Map<Integer, List<TableColumn<S, ?>>> cellsToKeepPerRow, int columnCount) {
+            rowsToSelect = new ArrayList<>(cellsToKeepPerRow.size());
+            for (Map.Entry<Integer, List<TableColumn<S, ?>>> entry : cellsToKeepPerRow.entrySet()) {
+                final int row = entry.getKey();
+                final List<TableColumn<S, ?>> columnsToKeep = entry.getValue();
+                if (columnsToKeep.size() > columnCount / 2) {
+                    // if the number of cells to keep is more than half of the row,
+                    // select the whole row and clear the missing cells
+                    rowsToSelect.add(row);
+                    if (columnsToKeep.size() < columnCount) {
+                        final Set<TableColumn<S, ?>> keep = new HashSet<>(columnsToKeep);
+                        table.getVisibleLeafColumns().stream()
+                                .filter(column -> !keep.contains(column))
+                                .map(column -> new TablePosition<>(table, row, column))
+                                .forEach(cellsToClear::add);
+                    }
+                } else {
+                    // else, select cells one by one
+                    columnsToKeep.stream()
+                            .map(column -> new TablePosition<>(table, row, column))
+                            .forEach(cellsToSelect::add);
+                }
+            }
+        }
+
+        /**
+         * @return The number of change events fired by applying this plan, without counting the
+         * two events fired by clearing the selection and selecting the full rows in a batch.
+         */
+        int eventCount() {
+            return cellsToSelect.size() + cellsToClear.size();
+        }
+    }
+
+    /**
+     * Filters out the row indices that are duplicated or out of the range of the items list of the given table,
      * as a safeguard to prevent {@link IndexOutOfBoundsException}.
      * @param table The table view whose items list is to be checked.
-     * @param index The index to be checked.
+     * @param rows The row indices to be filtered.
+     * @return The valid row indices, keeping their original order.
      */
-    private boolean isValidIndex(TableView2<S> table, Integer index) {
-        return index != null && table != null && table.getItems() != null &&
-                0 <= index && index < table.getItems().size();
+    private List<Integer> validRows(TableView2<S> table, List<? extends Integer> rows) {
+        if (table == null || rows == null || rows.isEmpty()) {
+            return Collections.emptyList();
+        }
+        final int itemCount = table.getItems() == null ? 0 : table.getItems().size();
+        if (itemCount == 0) {
+            return Collections.emptyList();
+        }
+        return rows.stream()
+                .filter(row -> row != null && 0 <= row && row < itemCount)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public double getRowHeaderWidth() {

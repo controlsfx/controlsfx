@@ -87,6 +87,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 public class TableView2Test extends FxRobot {
 
@@ -637,6 +638,54 @@ public class TableView2Test extends FxRobot {
         assertEquals(19 * NUMBER_OF_COLUMNS, tableView.getSelectionModel().getSelectedCells().size());
         assertFalse(getSelectedRows().contains(10));
         assertThat("one event per deselected cell was fired", events.get(), is(lessThan(MAX_SELECTION_EVENTS)));
+    }
+
+    /**
+     * A single partially selected row must not disable the batched deselection of the remaining
+     * rows, and its cells have to stay selected.
+     */
+    @Test
+    public void shouldFireSingleSelectionEvent_When_RowIsDeselectedFromPartialLargeSelection() {
+        fillTableData();
+        enableRowHeaderCellSelection();
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        interact(() -> {
+            rowHeaderTable.getSelectionModel().selectRange(0, 20);
+            tableView.getSelectionModel().clearSelection(5, tableView.getColumns().get(0));
+        });
+        assertEquals(20 * NUMBER_OF_COLUMNS - 1, tableView.getSelectionModel().getSelectedCells().size());
+
+        final AtomicInteger events = countSelectedCellsEvents();
+        interact(() -> rowHeaderTable.getSelectionModel().clearSelection(10));
+
+        assertEquals(19 * NUMBER_OF_COLUMNS - 1, tableView.getSelectionModel().getSelectedCells().size());
+        assertFalse(getSelectedRows().contains(10));
+        assertTrue("the partially selected row was lost", getSelectedRows().contains(5));
+        assertThat("one event per deselected cell was fired", events.get(), is(lessThan(MAX_SELECTION_EVENTS)));
+    }
+
+    /**
+     * Deselecting rows from the row header, while row selection is used instead of cell
+     * selection, has to be batched as well.
+     */
+    @Test
+    public void shouldFireSingleSelectionEvent_When_RowsAreDeselectedInRowSelectionMode() {
+        fillTableData();
+        interact(() -> {
+            tableView.setRowHeaderVisible(true);
+            tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        });
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        interact(() -> rowHeaderTable.getSelectionModel().selectRange(0, NUMBER_OF_ROWS));
+        assertEquals(NUMBER_OF_ROWS, tableView.getSelectionModel().getSelectedIndices().size());
+
+        final AtomicInteger events = countSelectedCellsEvents();
+        interact(() -> rowHeaderTable.getSelectionModel().clearAndSelect(5));
+
+        assertEquals(Collections.singletonList(5), getSelectedRows());
+        assertThat("one event per deselected row was fired", events.get(), is(lessThan(MAX_SELECTION_EVENTS)));
     }
 
     /**

@@ -666,6 +666,52 @@ public class TableView2Test extends FxRobot {
     }
 
     /**
+     * A plain click on a row header after a range selection replaces the selection, so the single
+     * row that has to remain selected has to be restored in a single batch too, instead of
+     * selecting its cells one by one.
+     */
+    @Test
+    public void shouldFireSingleSelectionEvent_When_SelectionIsReplacedWithSingleRowFromRowHeader() {
+        fillTableData();
+        enableRowHeaderCellSelection();
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        interact(() -> rowHeaderTable.getSelectionModel().selectRange(0, 20));
+
+        final AtomicInteger events = countSelectedCellsEvents();
+        interact(() -> rowHeaderTable.getSelectionModel().clearAndSelect(5));
+
+        assertEquals(NUMBER_OF_COLUMNS, tableView.getSelectionModel().getSelectedCells().size());
+        assertEquals(Collections.singletonList(5), getSelectedRows());
+        assertThat("one event per selected cell was fired", events.get(), is(lessThan(MAX_SELECTION_EVENTS)));
+    }
+
+    /**
+     * The focus is independent of the selection, so deselecting from the row header the row that
+     * holds the focused cell must not move the focus to a different cell, or the arrow keys would
+     * move from a row that the user didn't touch.
+     */
+    @Test
+    public void shouldKeepFocusedCell_When_ItsRowIsDeselectedFromRowHeader() {
+        fillTableData();
+        enableRowHeaderCellSelection();
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+        final TableColumn<RowItem, ?> focusedColumn = tableView.getColumns().get(3);
+
+        interact(() -> {
+            rowHeaderTable.getSelectionModel().selectRange(0, 20);
+            tableView.getFocusModel().focus(10, focusedColumn);
+        });
+
+        interact(() -> rowHeaderTable.getSelectionModel().clearSelection(10));
+
+        assertEquals(19 * NUMBER_OF_COLUMNS, tableView.getSelectionModel().getSelectedCells().size());
+        assertFalse(getSelectedRows().contains(10));
+        assertEquals(10, tableView.getFocusModel().getFocusedCell().getRow());
+        assertSame(focusedColumn, tableView.getFocusModel().getFocusedCell().getTableColumn());
+    }
+
+    /**
      * Deselecting rows from the row header, while row selection is used instead of cell
      * selection, has to be batched as well.
      */

@@ -264,15 +264,10 @@ public class RowHeader<S> extends StackPane {
         if (selectionModel == null || indices == null || indices.isEmpty()) {
             return;
         }
-        final int first = indices.get(0);
-        if (indices.size() == 1) {
-            selectionModel.select(first);
-            return;
-        }
-        final int[] rest = indices.subList(1, indices.size()).stream()
+        // Duplicated first index is discarded by the selection model
+        selectionModel.selectIndices(indices.get(0), indices.stream()
                 .mapToInt(Integer::intValue)
-                .toArray();
-        selectionModel.selectIndices(first, rest);
+                .toArray());
     }
 
     /**
@@ -328,18 +323,18 @@ public class RowHeader<S> extends StackPane {
 
     /**
      * Deselects the given rows when row selection is enabled.
-     * <p>If only a few rows have to be deselected, they are cleared one by one. Otherwise, the selection is
-     * cleared at once and the rows that have to remain selected are re-selected in a single batch, and
-     * only two change events are fired.</p>
+     * <p>If one or two rows have to be deselected, they are cleared one by one, which fires one event
+     * per row. Otherwise, the selection is cleared at once and the rows that have to remain selected are
+     * re-selected in a single batch, so only two change events are fired, no matter how many rows are
+     * deselected.</p>
      *
      * @param table The table view whose selection model should be updated.
      * @param sm The selection model of the given table view, with cell selection disabled.
      * @param rowsToDeselect The valid row indices to be deselected.
      */
     private void clearRows(TableView2<S> table, TableView.TableViewSelectionModel<S> sm, Set<Integer> rowsToDeselect) {
-        if (rowsToDeselect.size() < 3 || rowsToDeselect.size() < sm.getSelectedIndices().size() / 4) {
-            // if the number of rows to deselect is small, or less than 25% of the selected rows,
-            // clearing them one by one fires fewer events than rebuilding the selection
+        if (rowsToDeselect.size() < 3) {
+            // TableViewSelectionModel::clearSelection(row) fires one event per row
             clearRowsOneByOne(sm, rowsToDeselect);
             return;
         }
@@ -382,9 +377,13 @@ public class RowHeader<S> extends StackPane {
     private void clearCells(TableView2<S> table, TableView.TableViewSelectionModel<S> sm, Set<Integer> rowsToDeselect) {
         final int columnCount = table.getVisibleLeafColumns().size();
         final Map<Integer, List<TableColumn<S, ?>>> cellsToKeepPerRow = cellsToKeepPerRow(sm, rowsToDeselect, columnCount);
-        final CellSelectionRestorePath restorePath = new CellSelectionRestorePath(table, cellsToKeepPerRow, columnCount);
+        final CellSelectionRestorePath<S> restorePath = new CellSelectionRestorePath<>(table, cellsToKeepPerRow, columnCount);
 
-        if (restorePath.eventCount() > rowsToDeselect.size() * columnCount) {
+        final int cellsToKeep = cellsToKeepPerRow.values().stream()
+                .mapToInt(List::size)
+                .sum();
+        if (sm.getSelectedCells().size() - cellsToKeep < restorePath.eventCount()) {
+            // TableViewSelectionModel::clearSelection(row) fires one event per row
             clearRowsOneByOne(sm, rowsToDeselect);
             return;
         }
@@ -408,7 +407,7 @@ public class RowHeader<S> extends StackPane {
         }
 
         // restore focus
-        if (focusedCell != null && cellsToKeepPerRow.containsKey(focusedCell.getRow())) {
+        if (fm != null && focusedCell != null && ! focusedCell.equals(fm.getFocusedCell())) {
             fm.focus(focusedCell.getRow(), focusedCell.getTableColumn());
         }
     }
@@ -455,7 +454,7 @@ public class RowHeader<S> extends StackPane {
      * of that batch, so it is restored either by selecting the whole row and then clearing its
      * missing cells, or by selecting its cells one by one, whichever needs fewer events.</p>
      */
-    private class CellSelectionRestorePath {
+    private static class CellSelectionRestorePath<S> {
 
         private final List<Integer> rowsToSelect;
         private final List<TablePosition<S, ?>> cellsToSelect = new ArrayList<>();
@@ -487,11 +486,12 @@ public class RowHeader<S> extends StackPane {
         }
 
         /**
-         * @return The number of change events fired by applying this plan, without counting the
-         * two events fired by clearing the selection and selecting the full rows in a batch.
+         * @return The number of change events fired by applying this path: one for clearing the
+         * selection, one for selecting the fully selected rows in a single batch, and one for each
+         * individual cell that has to be selected or cleared.
          */
         int eventCount() {
-            return cellsToSelect.size() + cellsToClear.size();
+            return 1 + (rowsToSelect.isEmpty() ? 0 : 1) + cellsToSelect.size() + cellsToClear.size();
         }
     }
 

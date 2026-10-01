@@ -43,6 +43,7 @@ import javafx.scene.control.ScrollBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
@@ -402,6 +403,47 @@ public class TableView2Test extends FxRobot {
     }
 
     /**
+     * Asserts that adding rows to a table that is scrolled down doesn't scroll the table, and
+     * doesn't leave the row header out of line with the rows of the table.
+     */
+    @Test
+    public void shouldKeepRowHeaderInLine_When_RowsAreAddedWhileScrolled() {
+        fillTableData();
+        interact(() -> tableView.setRowHeaderVisible(true));
+        scrollDown(40);
+
+        final AtomicReference<Double> tableOffset = new AtomicReference<>();
+        final AtomicReference<Double> rowHeaderOffset = new AtomicReference<>();
+        interact(() -> {
+            tableOffset.set(getScrollOffset(tableView));
+            rowHeaderOffset.set(getScrollOffset(getRowHeaderTableView()));
+        });
+        final double initialOffset = tableOffset.get();
+        assertThat(initialOffset > 0, is(true));
+        assertEquals(initialOffset, rowHeaderOffset.get(), 0.5);
+
+        for (int i = 0; i < 5; i++) {
+            interact(() -> {
+                data.add(new RowItem(data.size(), NUMBER_OF_COLUMNS));
+                // layout pass of the next pulse
+                tableView.applyCss();
+                tableView.layout();
+                tableOffset.set(getScrollOffset(tableView));
+                rowHeaderOffset.set(getScrollOffset(getRowHeaderTableView()));
+            });
+            assertEquals("row header offset after adding a row", tableOffset.get(), rowHeaderOffset.get(), 0.5);
+            assertEquals("table offset after adding a row", initialOffset, tableOffset.get(), 0.5);
+        }
+
+        interact(() -> {
+            tableOffset.set(getScrollOffset(tableView));
+            rowHeaderOffset.set(getScrollOffset(getRowHeaderTableView()));
+        });
+        assertEquals("row header offset", tableOffset.get(), rowHeaderOffset.get(), 0.5);
+        assertEquals("table offset", initialOffset, tableOffset.get(), 0.5);
+    }
+
+    /**
      * Verifies SouthTableColumnHeader keeps exactly one child when southNode is replaced
      */
     @Test
@@ -547,6 +589,23 @@ public class TableView2Test extends FxRobot {
                 .map(SouthTableHeaderRow.class::cast)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Expected SouthTableHeaderRow in lookupAll('.south-header')"));
+    }
+
+    private TableView2<?> getRowHeaderTableView() {
+        return tableView.lookupAll(".row-header .table-view")
+                .stream()
+                .filter(TableView2.class::isInstance)
+                .map(TableView2.class::cast)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Expected TableView2 in lookupAll('.row-header .table-view')"));
+    }
+
+    /**
+     * Returns how far the table is scrolled from its first row, in pixels
+     */
+    private static double getScrollOffset(TableView2<?> table) {
+        TableRow<?> firstRow = ((TableView2Skin<?>) table.getSkin()).getRow(0);
+        return firstRow.getIndex() * firstRow.getHeight() - firstRow.getLayoutY();
     }
 
     private TableColumn2<RowItem, String> createExtraColumn(String id) {

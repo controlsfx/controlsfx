@@ -372,10 +372,22 @@ public class RowHeader<S> extends StackPane {
         ScrollBar scrollBar = innerSkin.getVBar();
         scrollBar.setMin(scrollBarParent.getMin());
         scrollBar.setMax(scrollBarParent.getMax());
-        scrollBar.valueProperty().bindBidirectional(scrollBarParent.valueProperty());
+        bindScrollbars();
 
         // If adjustPixels is called in one tableView, sync the other one
         innerSkin.getFlow().adjustedPixelsProperty().bindBidirectional(skin.getFlow().adjustedPixelsProperty());
+    }
+
+    void bindScrollbars() {
+        if (innerSkin != null) {
+            innerSkin.getVBar().valueProperty().bindBidirectional(skin.getVBar().valueProperty());
+        }
+    }
+
+    void unbindScrollbars() {
+        if (innerSkin != null) {
+            innerSkin.getVBar().valueProperty().unbindBidirectional(skin.getVBar().valueProperty());
+        }
     }
 
     /**

@@ -63,7 +63,7 @@ import javafx.scene.control.TextField;
  * <pre>
  * {@code 
  * TextField textfield = new TextField();
- * Decorator.addDecoration(textfield, new StyleClassDecoration("warning");}
+ * Decorator.addDecoration(textfield, new StyleClassDecoration("warning"));}
  * </pre>
  * 
  * @see Decoration

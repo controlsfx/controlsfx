@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019, ControlsFX
+ * Copyright (c) 2019, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -72,6 +72,7 @@ public class HelloSearchableComboBox extends ControlsFXSample {
         ObservableList<Person> personList = FXCollections.observableArrayList(
                 new Person("Jack Nicholson"),
                 new Person("Marlon Brando"),
+                new Person("Marlon Wayans"),
                 new Person("Robert De Niro"),
                 new Person("Al Pacino"),
                 new Person("Daniel Day-Lewis"),

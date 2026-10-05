@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2022, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -121,11 +121,12 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
         buttonCell = new ListCell<T>() {
             @Override protected void updateItem(T item, boolean empty) {
                 // we ignore whatever item is selected, instead choosing
-                // to display the selected item text using commas to separate
+                // to display the selected item text using the delimiter to separate
                 // each item
                 setText(getTextString());
             }
         };
+        registerChangeListener(control.delimiterProperty(), observable -> buttonCell.setText(getTextString()));
         comboBox.setButtonCell(buttonCell);
         comboBox.setValue((T)getTextString());
 
@@ -224,7 +225,10 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
                 sb.append(control.getConverter().toString(item));
             }
             if (i < max - 1) {
-                sb.append(", "); //$NON-NLS-1$
+                String delimiter = control.getDelimiter();
+                if (delimiter != null) {
+                    sb.append(delimiter);
+                }
             }
         }
         return sb.toString();

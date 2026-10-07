@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, 2016 ControlsFX
+ * Copyright (c) 2015, 2026 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -107,24 +107,26 @@ public class PrefixSelectionCustomizer {
     private static final String SELECTION_PREFIX_STRING = "selectionPrefixString";
     private static final Object SELECTION_PREFIX_TASK = "selectionPrefixTask";
 
-    public static final BiFunction<ComboBox, String, Optional> DEFAULT_LOOKUP_COMBOBOX = 
-            (comboBox, selection) -> {
-                if (comboBox == null || selection == null || selection.isEmpty()) {
-                    return Optional.empty();
-                }
-                
-                return comboBox.getItems().stream()
-                        .filter(Objects::nonNull)
-                        .filter(item -> {
-                            String s = comboBox.getConverter() == null ? item.toString() : comboBox.getConverter().toString(item);
-                            if (s != null && ! s.isEmpty()) {
-                                return s.toUpperCase(Locale.ROOT).startsWith(selection.toUpperCase(Locale.ROOT));
-                            }
-                            return false;
-                        })
-                        .findFirst();
-    };
-    
+    public static final BiFunction<ComboBox, String, Optional> DEFAULT_LOOKUP_COMBOBOX =
+            PrefixSelectionCustomizer::lookupComboBox;
+
+    public static <T> Optional<T> lookupComboBox(ComboBox<T> comboBox, String selection) {
+        if (comboBox == null || selection == null || selection.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return comboBox.getItems().stream()
+                .filter(Objects::nonNull)
+                .filter(item -> {
+                    String s = comboBox.getConverter() == null ? item.toString() : comboBox.getConverter().toString(item);
+                    if (s != null && ! s.isEmpty()) {
+                        return s.toUpperCase(Locale.ROOT).startsWith(selection.toUpperCase(Locale.ROOT));
+                    }
+                    return false;
+                })
+                .findFirst();
+    }
+
     public static final BiFunction<ChoiceBox, String, Optional> DEFAULT_LOOKUP_CHOICEBOX = 
             (choiceBox, selection) -> {
                 if (choiceBox == null || selection == null || selection.isEmpty()) {
@@ -145,7 +147,6 @@ public class PrefixSelectionCustomizer {
 
     private static EventHandler<KeyEvent> handler = new EventHandler<KeyEvent>() {
         private ScheduledExecutorService executorService = null;
-        private PrefixSelectionComboBox prefixSelectionComboBox;
         private int typingDelay;
         private Object result;
         
@@ -185,19 +186,20 @@ public class PrefixSelectionCustomizer {
         private <T> T getEntryWithKey(String letter, Control control) {
             result = null;
             typingDelay = DEFAULT_TYPING_DELAY;
-            prefixSelectionComboBox = (control instanceof PrefixSelectionComboBox) ? (PrefixSelectionComboBox) control : null;
+            PrefixSelectionComboBox<T> prefixSelectionComboBox = (control instanceof PrefixSelectionComboBox)
+                    ? (PrefixSelectionComboBox<T>) control : null;
             
             String selectionPrefixString = processInput((String) control.getProperties().get(SELECTION_PREFIX_STRING), letter);
             control.getProperties().put(SELECTION_PREFIX_STRING, selectionPrefixString);
 
             if (prefixSelectionComboBox != null) {
                 typingDelay = prefixSelectionComboBox.getTypingDelay();
-                final BiFunction<ComboBox, String, Optional> lookup = prefixSelectionComboBox.getLookup();
+                final BiFunction<ComboBox<T>, String, Optional<T>> lookup = prefixSelectionComboBox.getLookup();
                 if (lookup != null) {
                     lookup.apply(prefixSelectionComboBox, selectionPrefixString).ifPresent(t -> result = t);
                 }
             } else if (control instanceof ComboBox) {
-                DEFAULT_LOOKUP_COMBOBOX.apply((ComboBox) control, selectionPrefixString).ifPresent(t -> result = t);
+                lookupComboBox((ComboBox<T>) control, selectionPrefixString).ifPresent(t -> result = t);
             } else if (control instanceof ChoiceBox) {
                 DEFAULT_LOOKUP_CHOICEBOX.apply((ChoiceBox) control, selectionPrefixString).ifPresent(t -> result = t);
             }

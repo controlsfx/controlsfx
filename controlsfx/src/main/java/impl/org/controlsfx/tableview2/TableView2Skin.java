@@ -909,6 +909,32 @@ public class TableView2Skin<S> extends TableViewSkin<S> {
         return getSkinnable().getItems() == null ? 0 : getSkinnable().getItems().size();
     }
 
+    /** {@inheritDoc} */
+    @Override protected void updateItemCount() {
+        final RowHeader<S> header = getRowHeader();
+        if (header == null) {
+            super.updateItemCount();
+            return;
+        }
+        // Sync the row header only after the tableView scrollbars are updated.
+        header.unbindScrollbars();
+        try {
+            super.updateItemCount();
+        } finally {
+            header.bindScrollbars();
+        }
+    }
+
+    private RowHeader<S> getRowHeader() {
+        if (parentTableView == null) {
+            return rowHeader;
+        }
+        if (parentTableView.getSkin() instanceof TableView2Skin) {
+            return ((TableView2Skin<S>) parentTableView.getSkin()).rowHeader;
+        }
+        return null;
+    }
+
     /**
      * If the scene is not yet instantiated, we need to wait otherwise the
      * VirtualFlow will not shift the cells properly.

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -63,7 +63,7 @@ import javafx.scene.control.TextField;
  * <pre>
  * {@code 
  * TextField textfield = new TextField();
- * Decorator.addDecoration(textfield, new StyleClassDecoration("warning");}
+ * Decorator.addDecoration(textfield, new StyleClassDecoration("warning"));}
  * </pre>
  * 
  * @see Decoration

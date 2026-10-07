@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, ControlsFX
+ * Copyright (c) 2018, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,12 +31,17 @@ import java.util.List;
 
 class ChangeHelper {
     
-    static String addRemoveChangeToString(int from, int to, List<?> list, List<?> removed) {
+    /**
+     * The text of the given add/remove change, built from the elements it added and the ones it
+     * removed. The added elements are taken as given rather than read back from the list, which a
+     * change reported from a snapshot is free to no longer stand for.
+     */
+    static String addRemoveChangeToString(int from, int to, List<?> added, List<?> removed) {
         
         StringBuilder b = new StringBuilder();
 
         if (removed.isEmpty()) {
-            b.append(list.subList(from, to));
+            b.append(added);
             b.append(" addition at ").append(from);
         } else {
             b.append(removed);
@@ -44,7 +49,7 @@ class ChangeHelper {
                 b.append(" removal at ").append(from);
             } else {
                 b.append(" replaced by ");
-                b.append(list.subList(from, to));
+                b.append(added);
                 b.append(" at ").append(from);
             }
         }

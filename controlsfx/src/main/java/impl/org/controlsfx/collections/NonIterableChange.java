@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, ControlsFX
+ * Copyright (c) 2018, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -92,7 +92,7 @@ public abstract class NonIterableChange<E> extends Change<E> {
         } else if (wasUpdated()) {
             string = ChangeHelper.updateChangeToString(from, to);
         } else {
-            string = ChangeHelper.addRemoveChangeToString(from, to, getList(), getRemoved());
+            string = ChangeHelper.addRemoveChangeToString(from, to, getAddedSubList(), getRemoved());
         }
         invalid = tempInvalid;
         return "{ " + string + " }";

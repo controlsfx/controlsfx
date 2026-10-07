@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2018 ControlsFX
+ * Copyright (c) 2014, 2024 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,6 +50,7 @@ import org.controlsfx.control.ListActionView;
 import org.controlsfx.control.ListSelectionView;
 import org.controlsfx.glyphfont.FontAwesome;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class HelloListSelectionView extends ControlsFXSample {
@@ -78,7 +79,19 @@ public class HelloListSelectionView extends ControlsFXSample {
     public Node getControlPanel() {
         VBox root = new VBox(20);
         root.setPadding(new Insets(30, 30, 30, 30));
-        
+
+        CheckBox useComparator = new CheckBox("Use comparator to sort");
+        useComparator.setOnAction(evt -> {
+            if (useComparator.isSelected()) {
+                Comparator<String> comparator = Comparator.naturalOrder();
+                view.setComparator(comparator);
+                FXCollections.sort(view.getSourceItems(), comparator);
+                FXCollections.sort(view.getTargetItems(), comparator);
+            } else {
+                view.setComparator(null);
+            }
+        });
+
         CheckBox useCellFactory = new CheckBox("Use cell factory");
         useCellFactory.setOnAction(evt -> {
             if (useCellFactory.isSelected()) {
@@ -108,7 +121,7 @@ public class HelloListSelectionView extends ControlsFXSample {
 
         ChoiceBox<Orientation> orientation = new ChoiceBox<>(FXCollections.observableArrayList(Orientation.values()));
         orientation.setTooltip(new Tooltip("The orientation of ListSelectionView"));
-        
+
         orientation.getSelectionModel().select(Orientation.HORIZONTAL);
         view.orientationProperty().bind(orientation.getSelectionModel().selectedItemProperty());
 
@@ -116,7 +129,7 @@ public class HelloListSelectionView extends ControlsFXSample {
         view.getTargetActions().addAll(getSourceAndTargetActions());
 
         root.getChildren().addAll(useCellFactory, orientation);
-        
+
         return root;
     }
 
@@ -141,21 +154,21 @@ public class HelloListSelectionView extends ControlsFXSample {
 
     private ListActionView.ListAction[] getSourceAndTargetActions() {
         return new ListActionView.ListAction[] {
-            new ListActionView.ListAction<String>(new FontAwesome().create(FontAwesome.Glyph.ANGLE_UP)) {
-                @Override
-                public void initialize(ListView<String> listView) {
-                    setEventHandler(ae -> moveSelectedItemsUp(listView));
-                }
-            },
+                new ListActionView.ListAction<String>(new FontAwesome().create(FontAwesome.Glyph.ANGLE_UP)) {
+                    @Override
+                    public void initialize(ListView<String> listView) {
+                        setEventHandler(ae -> moveSelectedItemsUp(listView));
+                    }
+                },
 
-            new ListActionView.ListAction<String>(new FontAwesome().create(FontAwesome.Glyph.ANGLE_DOWN)) {
-                @Override
-                public void initialize(ListView<String> listView) {
-                    {
-                        setEventHandler(ae -> moveSelectedItemsDown(listView));
+                new ListActionView.ListAction<String>(new FontAwesome().create(FontAwesome.Glyph.ANGLE_DOWN)) {
+                    @Override
+                    public void initialize(ListView<String> listView) {
+                        {
+                            setEventHandler(ae -> moveSelectedItemsDown(listView));
+                        }
                     }
                 }
-            }
         };
     }
 

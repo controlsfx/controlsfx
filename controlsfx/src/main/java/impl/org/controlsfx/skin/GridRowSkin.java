@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2022, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -71,7 +71,8 @@ public class GridRowSkin<T> extends CellSkinBase<GridRow<T>> {
             GridViewSkin<?> gridViewSkin = (GridViewSkin<?>) gridView.getSkin();
             if (gridViewSkin == null) return;
             int maxCellsInRow = gridViewSkin.computeMaxCellsInRow();
-            int totalCellsInGrid = gridView.getItems().size();
+            // VirtualFlow may update existing rows while the items list is null.
+            int totalCellsInGrid = gridView.getItems() == null ? 0 : gridView.getItems().size();
             int startCellIndex = rowIndex * maxCellsInRow;
             int endCellIndex = startCellIndex + maxCellsInRow - 1;
             int cacheIndex = 0;

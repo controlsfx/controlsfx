@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, ControlsFX
+ * Copyright (c) 2014, 2024 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,11 +49,11 @@ import org.controlsfx.glyphfont.FontAwesome.Glyph;
 
 public class HelloTaskProgressView extends ControlsFXSample {
 
-    private ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private TaskProgressView<MyTask> taskProgressView;
 
-    private FontAwesome fontAwesome = new FontAwesome();
+    private final FontAwesome fontAwesome = new FontAwesome();
 
     private Callback<MyTask, Node> factory;
 
@@ -74,7 +74,8 @@ public class HelloTaskProgressView extends ControlsFXSample {
 
     @Override
     public Node getPanel(Stage stage) {
-        taskProgressView = new TaskProgressView<MyTask>();
+        taskProgressView = new TaskProgressView<>();
+        taskProgressView.setRetainTasks(true);
 
         factory = task -> {
 
@@ -137,7 +138,7 @@ public class HelloTaskProgressView extends ControlsFXSample {
             /*
              * Cancel all tasks before changing the factory.
              */
-            (new ArrayList<>(taskProgressView.getTasks())).forEach(task -> task.cancel());
+            (new ArrayList<>(taskProgressView.getTasks())).forEach(Task::cancel);
             if (useFactory.isSelected()) {
                 taskProgressView.setGraphicFactory(factory);
             } else {
@@ -168,8 +169,8 @@ public class HelloTaskProgressView extends ControlsFXSample {
         TYPE1, TYPE2, TYPE3;
     }
 
-    class MyTask extends Task<Void> {
-        private TaskType type;
+    static class MyTask extends Task<Void> {
+        private final TaskType type;
 
         public MyTask(String title) {
             updateTitle(title);

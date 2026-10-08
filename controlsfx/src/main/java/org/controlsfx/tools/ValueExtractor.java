@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 ControlsFX
+ * Copyright (c) 2014, 2026 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,7 @@ import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TreeTableView;
@@ -84,6 +85,7 @@ public class ValueExtractor {
         addObservableValueExtractor( c -> c instanceof Slider,           c -> ((Slider)c).valueProperty());
         addObservableValueExtractor( c -> c instanceof ColorPicker,      c -> ((ColorPicker)c).valueProperty());
         addObservableValueExtractor( c -> c instanceof DatePicker,       c -> ((DatePicker)c).valueProperty());
+        addObservableValueExtractor( c -> c instanceof Spinner,          c -> ((Spinner<?>)c).valueProperty());
 
         addObservableValueExtractor( c -> c instanceof ListView,         c -> ((ListView<?>)c).itemsProperty());
         addObservableValueExtractor( c -> c instanceof TableView,        c -> ((TableView<?>)c).itemsProperty());
@@ -94,6 +96,16 @@ public class ValueExtractor {
 	
 	
 	
+    /**
+     * Finds an observable value extractor for the given control. Custom extractors
+     * take precedence over the built-in extractors.
+     * <p>For a {@link Spinner}, the extracted value is its committed value, not
+     * uncommitted text in its editor. Observing the spinner's value property also
+     * follows changes to its value factory.
+     *
+     * @param c the control whose value should be observed
+     * @return the matching extractor, or an empty optional if unsupported
+     */
     public static final Optional<Callback<Control, ObservableValue<?>>> getObservableValueExtractor(final Control c) {
         for( ObservableValueExtractor e: extractors ) {
             if ( e.applicability.test(c)) return Optional.of(e.extraction);

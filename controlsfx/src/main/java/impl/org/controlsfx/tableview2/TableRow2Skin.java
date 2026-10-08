@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2025, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -128,7 +128,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
          */
         if (index < 0) {
             getChildren().clear();
-            putCellsInCache();
+            putCellsInCache(getCellsMap());
             return;
         }
 
@@ -165,8 +165,13 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
         double fixedColumnWidth = 0;
         List<TableCell<S, ?>> fixedCells = new ArrayList<>();
 
+        // the cache is only weakly reachable, so it is taken once and held in a local for the
+        // whole layout pass: that keeps it from being collected halfway through, which would
+        // leave the cells of the previous pass both uncached and still children of this row
+        final HashMap<TableColumnBase, TableCell<S, ?>> map = getCellsMap();
+
         //We compute the cells here
-        putCellsInCache();
+        putCellsInCache(map);
 
         boolean firstVisibleCell = false;
         TableCell<S, ?> lastCell = null;
@@ -197,7 +202,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
             }
 
             if (!isVisible) {
-                TableCell<S, ?> cell = getCellsMap().remove(column);
+                TableCell<S, ?> cell = map.remove(column);
                 if (cell != null) {
                     getChildren().remove(cell);
                 }
@@ -208,7 +213,7 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
                 continue;
             }
 
-            final TableCell<S, ?> tableCell = getCell(column);
+            final TableCell<S, ?> tableCell = getCell(column, map);
             if (! isFirstColumn) {
                 tableCell.pseudoClassStateChanged(LEFT_CELL, true);
                 isFirstColumn = true;
@@ -569,30 +574,37 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
     }
 
     /**
-     * Return the Cache. Here we use a WeakReference because the WeakHashMap is
-     * not working. TableCell added to it are not removed if the GC wants them.
-     * So we put the whole cache in WeakReference. In normal condition, the
-     * cache is not trashed that much and is efficient. In the case where the
-     * user scroll horizontally a lot, that cache can then be trashed in order
-     * to avoid OutOfMemoryError.
+     * Returns the cache that holds the cells of this row that are not currently displayed, keyed
+     * by their column.
+     * <p>The cache is held through a {@link WeakReference} so that the garbage collector can drop
+     * it as a whole under memory pressure, which is what keeps a long horizontal scroll from
+     * ending up in an {@link OutOfMemoryError}. A {@code WeakHashMap} would not do: its keys are
+     * the columns, which the table keeps strongly reachable, so its entries would never be
+     * evicted. Under normal conditions the cache survives and saves recreating the cells.</p>
+     * <p>As nothing else keeps it reachable, the cache can be collected between two calls to this
+     * method. Callers must therefore keep the returned map in a local variable for as long as they
+     * use it, and never call this method twice within a single operation, as the second call would
+     * then create and return a different, empty cache.</p>
      *
-     * @return
+     * @return the cache of the cells of this row, never {@code null}
      */
     private HashMap<TableColumnBase, TableCell<S, ?>> getCellsMap() {
-        if (cellsMap == null || cellsMap.get() == null) {
-            HashMap<TableColumnBase, TableCell<S, ?>> map = new HashMap<>();
-            cellsMap = new WeakReference<>(map);
-            return map;
+        HashMap<TableColumnBase, TableCell<S, ?>> cellsHashMap = cellsMap == null ? null : cellsMap.get();
+        if (cellsHashMap == null) {
+            cellsHashMap = new HashMap<>();
+            cellsMap = new WeakReference<>(cellsHashMap);
         }
-        return cellsMap.get();
+        return cellsHashMap;
     }
 
     /**
      * This will put all current displayed cell into the cache.
+     *
+     * @param map The cache of this row, as returned by {@link #getCellsMap()}.
      */
-    private void putCellsInCache() {
+    private void putCellsInCache(HashMap<TableColumnBase, TableCell<S, ?>> map) {
         for (TableCell<S, ?> cell : cells) {
-            getCellsMap().put(cell.getTableColumn(), cell);
+            map.put(cell.getTableColumn(), cell);
         }
         cells.clear();
     }
@@ -601,15 +613,14 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
      * This will retrieve a cell for the specified column. If the cell exists in
      * the cache, it's extracted from it. Otherwise, a cell is created.
      *
-     * @param tcb
-     * @return
+     * @param tcb The column the cell belongs to.
+     * @param map The cache of this row, as returned by {@link #getCellsMap()}.
+     * @return The cell of the given column, taken out of the cache if it was there.
      */
-    private TableCell<S, ?> getCell(TableColumnBase tcb) {
+    private TableCell<S, ?> getCell(TableColumnBase tcb, HashMap<TableColumnBase, TableCell<S, ?>> map) {
         TableColumn tableColumn = (TableColumn<TableCell<S, ?>, ?>) tcb;
-        TableCell<S, ?> cell;
-        if (getCellsMap().containsKey(tableColumn)) {
-            cell = getCellsMap().remove(tableColumn);
-        } else {
+        TableCell<S, ?> cell = map.remove(tableColumn);
+        if (cell == null) {
             Callback cellFactory = tableColumn.getCellFactory();
             if (cellFactory == null) {
                 cellFactory = TableColumn.DEFAULT_CELL_FACTORY;

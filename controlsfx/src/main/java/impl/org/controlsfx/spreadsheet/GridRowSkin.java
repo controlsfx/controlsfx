@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2018 ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -136,7 +136,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
          */
         if (index < 0 || index >= gridView.getItems().size()) {
             getChildren().clear();
-            putCellsInCache();
+            putCellsInCache(getCellsMap());
             return;
         }
 
@@ -183,8 +183,13 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
         double fixedColumnWidth = 0;
         List<CellView> fixedCells = new ArrayList();
 
+        // the cache is only weakly reachable, so it is taken once and held in a local for the
+        // whole layout pass: that keeps it from being collected halfway through, which would
+        // leave the cells of the previous pass out of the cache
+        final HashMap<TableColumnBase, CellView> map = getCellsMap();
+
         //We compute the cells here
-        putCellsInCache();
+        putCellsInCache(map);
 
         boolean firstVisibleCell = false;
         CellView lastCell = null;
@@ -216,7 +221,7 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
                 x += width;
                 continue;
             }
-            final CellView tableCell = getCell(gridView.getColumns().get(indexColumn));
+            final CellView tableCell = getCell(gridView.getColumns().get(indexColumn), map);
 
             cells.add(0, tableCell);
 
@@ -529,30 +534,37 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
     }
 
     /**
-     * Return the Cache. Here we use a WeakReference because the WeakHashMap is
-     * not working. TableCell added to it are not removed if the GC wants them.
-     * So we put the whole cache in WeakReference. In normal condition, the
-     * cache is not trashed that much and is efficient. In the case where the
-     * user scroll horizontally a lot, that cache can then be trashed in order
-     * to avoid OutOfMemoryError.
+     * Returns the cache that holds the cells of this row that are not currently displayed, keyed
+     * by their column.
+     * <p>The cache is held through a {@link WeakReference} so that the garbage collector can drop
+     * it as a whole under memory pressure, which is what keeps a long horizontal scroll from
+     * ending up in an {@link OutOfMemoryError}. A {@code WeakHashMap} would not do: its keys are
+     * the columns, which the table keeps strongly reachable, so its entries would never be
+     * evicted. Under normal conditions the cache survives and saves recreating the cells.</p>
+     * <p>As nothing else keeps it reachable, the cache can be collected between two calls to this
+     * method. Callers must therefore keep the returned map in a local variable for as long as they
+     * use it, and never call this method twice within a single operation, as the second call would
+     * then create and return a different, empty cache.</p>
      *
-     * @return
+     * @return the cache of the cells of this row, never {@code null}
      */
     private HashMap<TableColumnBase, CellView> getCellsMap() {
-        if (cellsMap == null || cellsMap.get() == null) {
-            HashMap<TableColumnBase, CellView> map = new HashMap<>();
+        HashMap<TableColumnBase, CellView> map = cellsMap == null ? null : cellsMap.get();
+        if (map == null) {
+            map = new HashMap<>();
             cellsMap = new WeakReference<>(map);
-            return map;
         }
-        return cellsMap.get();
+        return map;
     }
 
     /**
      * This will put all current displayed cell into the cache.
+     *
+     * @param map The cache of this row, as returned by {@link #getCellsMap()}.
      */
-    private void putCellsInCache() {
+    private void putCellsInCache(HashMap<TableColumnBase, CellView> map) {
         for (CellView cell : cells) {
-            getCellsMap().put(cell.getTableColumn(), cell);
+            map.put(cell.getTableColumn(), cell);
         }
         cells.clear();
     }
@@ -561,15 +573,14 @@ public class GridRowSkin extends CellSkinBase<TableRow<ObservableList<Spreadshee
      * This will retrieve a cell for the specified column. If the cell exists in
      * the cache, it's extracted from it. Otherwise, a cell is created.
      *
-     * @param tcb
-     * @return
+     * @param tcb The column the cell belongs to.
+     * @param map The cache of this row, as returned by {@link #getCellsMap()}.
+     * @return The cell of the given column, taken out of the cache if it was there.
      */
-    private CellView getCell(TableColumnBase tcb) {
+    private CellView getCell(TableColumnBase tcb, HashMap<TableColumnBase, CellView> map) {
         TableColumn tableColumn = (TableColumn<CellView, ?>) tcb;
-        CellView cell;
-        if (getCellsMap().containsKey(tableColumn)) {
-            return getCellsMap().remove(tableColumn);
-        } else {
+        CellView cell = map.remove(tableColumn);
+        if (cell == null) {
             cell = (CellView) tableColumn.getCellFactory().call(tableColumn);
             cell.updateTableColumn(tableColumn);
             cell.updateTableView(tableColumn.getTableView());

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015, ControlsFX
+ * Copyright (c) 2013, 2025, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,13 +27,10 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.GridViewSkin;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -42,15 +39,22 @@ import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableDoubleProperty;
 import javafx.css.StyleableProperty;
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.control.Cell;
 import javafx.scene.control.Control;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.ScrollToEvent;
 import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
-
 import org.controlsfx.control.cell.ColorGridCell;
+import org.controlsfx.tools.Utils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A GridView is a virtualised control for displaying {@link #getItems()} in a
@@ -125,6 +129,11 @@ public class GridView<T> extends ControlsFXControl {
     public GridView(ObservableList<T> items) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         setItems(items);
+
+        addEventHandler(LayoutEvent.LAYOUT_UPDATED, event -> {
+            columnCount.set(event.getColumnCount());
+            rowCount.set(event.getRowCount());
+        });
     }
     
     
@@ -146,7 +155,39 @@ public class GridView<T> extends ControlsFXControl {
     @Override public String getUserAgentStylesheet() {
         return getUserAgentStylesheet(GridView.class, "gridview.css");
     }
-    
+
+    /**
+     * Programmatically scrolls the GridView to display the cell for the given index.
+     * If the GridView has not been rendered yet (e.g., it's not on a visible stage),
+     * this method may have no effect.
+     *
+     * @param index The index of the item to scroll to.
+     */
+    public void scrollTo(int index) {
+        if (getItems() == null || getItems().isEmpty() || getColumnCount() == 0) {
+            return;
+        }
+        int newIndex = Utils.clamp(0, index, getItems().size() - 1);
+        int rowIndex = newIndex / getColumnCount();
+        Event.fireEvent(this, new ScrollToEvent<>(this, this, ScrollToEvent.scrollToTopIndex(), rowIndex));
+    }
+
+    /**
+     * Programmatically scrolls the GridView to display the cell for the given item.
+     * If the item is not found or the GridView has not been rendered yet, this method
+     * may have no effect.
+     *
+     * @param item The item to scroll to.
+     */
+    public void scrollTo(T item) {
+        if(getItems() != null) {
+            int index = getItems().indexOf(item);
+            if(index >= 0) {
+                scrollTo(index);
+            }
+        }
+    }
+
     /**************************************************************************
      * 
      * Properties
@@ -425,8 +466,109 @@ public class GridView<T> extends ControlsFXControl {
         return items == null ? null : items.get();
     }
 
-    
-    
+    /**
+     * A read-only property that represents the current number of columns
+     * in the GridView. This value is calculated and updated by the skin
+     * during layout passes. Note that this represents the maximum number of
+     * columns a row can have; the last row may contain fewer cells.
+     */
+    private final ReadOnlyIntegerWrapper columnCount = new ReadOnlyIntegerWrapper(this, "columnCount");
+
+    /**
+     * Gets the maximum number of columns that a row can contain. The skin
+     * calculates this value based on the available width. The last row of the
+     * grid may contain fewer cells than this value.
+     *
+     * @return The maximum number of columns per row.
+     */
+    public final int getColumnCount() {
+        return columnCount.get();
+    }
+
+    /**
+     * A read-only property representing the maximum number of columns a row can
+     * contain. This value is calculated by the skin based on the available width
+     * and cell settings. It is the basis for determining the total number of
+     * rows needed to display all items.
+     *
+     * @return The read-only property for the maximum column count.
+     */
+    public final ReadOnlyIntegerProperty columnCountProperty() {
+        return columnCount.getReadOnlyProperty();
+    }
+
+    /**
+     * A read-only property that represents the current number of rows
+     * in the GridView. This value is calculated and updated by the skin
+     * during layout passes.
+     */
+    private final ReadOnlyIntegerWrapper rowCount = new ReadOnlyIntegerWrapper(this, "rowCount");
+
+    /**
+     * Gets the value of the {@link #rowCountProperty()}.
+     *
+     * @return The current number of rows in the GridView.
+     */
+    public final int getRowCount() {
+        return rowCount.get();
+    }
+
+    /**
+     * A read-only property that represents the current number of rows
+     * in the GridView. This value is calculated by the skin during layout
+     * passes, based on the total number of items and the column count.
+     *
+     * @return The read-only property for the row count.
+     */
+    public final ReadOnlyIntegerProperty rowCountProperty() {
+        return rowCount.getReadOnlyProperty();
+    }
+
+    /**
+     * An event fired by a GridViewSkin whenever its layout-related properties,
+     * such as row and column count, have been recalculated. The GridView control
+     * listens for this event to update its own properties.
+     * <p>
+     * <b>Note:</b> This event is intended for internal use between the skin and the
+     * control. It should not be created or fired manually by developers.
+     */
+    public static class LayoutEvent extends Event {
+
+        /**
+         * The single, static event type for all layout update events.
+         */
+        public static final EventType<LayoutEvent> LAYOUT_UPDATED = new EventType<>(Event.ANY, "GRID_VIEW_LAYOUT_UPDATED");
+
+        private final int rowCount;
+        private final int columnCount;
+
+        /**
+         * Constructs a new LayoutEvent.
+         * @param rowCount The new row count calculated by the skin.
+         * @param columnCount The new column count calculated by the skin.
+         */
+        public LayoutEvent(int rowCount, int columnCount) {
+            super(LAYOUT_UPDATED);
+            this.rowCount = rowCount;
+            this.columnCount = columnCount;
+        }
+
+        /**
+         * Returns the number of rows calculated by the skin.
+         * @return The number of rows.
+         */
+        public int getRowCount() {
+            return rowCount;
+        }
+
+        /**
+         * Returns the number of columns calculated by the skin.
+         * @return The number of columns.
+         */
+        public int getColumnCount() {
+            return columnCount;
+        }
+    }
     
     
     /***************************************************************************

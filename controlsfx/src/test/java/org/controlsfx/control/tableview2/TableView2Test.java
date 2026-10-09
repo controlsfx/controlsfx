@@ -43,6 +43,7 @@ import javafx.scene.control.ScrollBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
@@ -61,6 +62,8 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -84,6 +87,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 public class TableView2Test extends FxRobot {
 
@@ -107,6 +111,7 @@ public class TableView2Test extends FxRobot {
     private static final int NUMBER_OF_COLUMNS = 500;
     private static final int NUMBER_OF_SELECTION_CHANGES = 20;
     private static final Duration MAX_DURATION_FOR_SELECTION_CHANGES = Duration.ofSeconds(NUMBER_OF_SELECTION_CHANGES);
+    private static final int MAX_SELECTION_EVENTS = 10;
 
     private TableView2<RowItem> tableView;
     private ObservableList<RowItem> data;
@@ -538,6 +543,309 @@ public class TableView2Test extends FxRobot {
         }
     }
 
+    /**
+     * Selects a range of rows from the row header, and checks that every cell of those rows,
+     * and only those, gets selected in the table, and that both selection models stay in sync.
+     */
+    @Test
+    public void shouldSelectWholeRows_When_RangeIsSelectedFromRowHeader() {
+        fillTableData();
+        enableRowHeaderCellSelection();
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        interact(() -> rowHeaderTable.getSelectionModel().selectRange(0, 10));
+
+        assertEquals(10 * NUMBER_OF_COLUMNS, tableView.getSelectionModel().getSelectedCells().size());
+        assertEquals(rangeOf(0, 10), getSelectedRows());
+        assertEquals(rangeOf(0, 10), new ArrayList<>(rowHeaderTable.getSelectionModel().getSelectedIndices()));
+    }
+
+    /**
+     * Deselects one row from the row header, and checks that only that row is deselected,
+     * both in the table and in the row header.
+     */
+    @Test
+    public void shouldDeselectSingleRow_When_RowIsDeselectedFromRowHeader() {
+        fillTableData();
+        enableRowHeaderCellSelection();
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        interact(() -> rowHeaderTable.getSelectionModel().selectRange(0, 5));
+        interact(() -> rowHeaderTable.getSelectionModel().clearSelection(2));
+
+        assertEquals(4 * NUMBER_OF_COLUMNS, tableView.getSelectionModel().getSelectedCells().size());
+        assertEquals(Arrays.asList(0, 1, 3, 4), getSelectedRows());
+        assertEquals(Arrays.asList(0, 1, 3, 4), new ArrayList<>(rowHeaderTable.getSelectionModel().getSelectedIndices()));
+    }
+
+    /**
+     * Cells selected directly in the table, that don't make up a fully selected row, have to
+     * be preserved when a different row is deselected from the row header.
+     */
+    @Test
+    public void shouldKeepPartialCellSelection_When_OtherRowIsDeselectedFromRowHeader() {
+        fillTableData();
+        enableRowHeaderCellSelection();
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        interact(() -> {
+            rowHeaderTable.getSelectionModel().select(1);
+            tableView.getSelectionModel().select(4, tableView.getColumns().get(0));
+            tableView.getSelectionModel().select(4, tableView.getColumns().get(1));
+        });
+        assertEquals(NUMBER_OF_COLUMNS + 2, tableView.getSelectionModel().getSelectedCells().size());
+
+        interact(() -> rowHeaderTable.getSelectionModel().clearSelection(1));
+
+        assertEquals(2, tableView.getSelectionModel().getSelectedCells().size());
+        assertEquals(Collections.singletonList(4), getSelectedRows());
+    }
+
+    /**
+     * The selected rows and columns of the skin are used to highlight the headers, so they
+     * must hold every selected row and column only once, and not one entry per selected cell.
+     */
+    @Test
+    public void shouldNotDuplicateSelectedRowsAndColumns_When_CellSelectionIsEnabled() {
+        fillTableData();
+        enableRowHeaderCellSelection();
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        interact(() -> rowHeaderTable.getSelectionModel().selectRange(0, 3));
+
+        final TableView2Skin<?> skin = (TableView2Skin<?>) tableView.getSkin();
+        assertEquals(3 * NUMBER_OF_COLUMNS, tableView.getSelectionModel().getSelectedCells().size());
+        assertEquals(Arrays.asList(0, 1, 2), new ArrayList<>(skin.getSelectedRows()));
+        assertEquals(NUMBER_OF_COLUMNS, skin.getSelectedColumns().size());
+        assertEquals(NUMBER_OF_COLUMNS, skin.getSelectedColumns().stream().distinct().count());
+    }
+
+    /**
+     * Selecting rows from the row header, under cell selection, used to sync the selection one
+     * index at a time, firing one change event per row and per cell, so the number of events
+     * grew with the size of the selection and froze the UI thread on large selections.
+     */
+    @Test
+    public void shouldFireSingleSelectionEvent_When_RowsAreSelectedFromRowHeader() {
+        fillTableData();
+        enableRowHeaderCellSelection();
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        final AtomicInteger events = countSelectedCellsEvents();
+        interact(() -> rowHeaderTable.getSelectionModel().selectRange(0, 20));
+
+        assertEquals(20 * NUMBER_OF_COLUMNS, tableView.getSelectionModel().getSelectedCells().size());
+        assertThat("one event per selected row/cell was fired", events.get(), is(lessThan(MAX_SELECTION_EVENTS)));
+    }
+
+    /**
+     * Replacing a selection from the row header, which is what a shift+click does (the behavior
+     * clears the selection before selecting the new range), used to deselect one cell at a time.
+     */
+    @Test
+    public void shouldFireSingleSelectionEvent_When_SelectionIsReplacedFromRowHeader() {
+        fillTableData();
+        enableRowHeaderCellSelection();
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        interact(() -> rowHeaderTable.getSelectionModel().selectRange(0, 20));
+
+        final AtomicInteger events = countSelectedCellsEvents();
+        interact(() -> {
+            rowHeaderTable.getSelectionModel().clearSelection();
+            rowHeaderTable.getSelectionModel().selectRange(0, 30);
+        });
+
+        assertEquals(30 * NUMBER_OF_COLUMNS, tableView.getSelectionModel().getSelectedCells().size());
+        assertEquals(rangeOf(0, 30), getSelectedRows());
+        assertThat("one event per deselected row/cell was fired", events.get(), is(lessThan(MAX_SELECTION_EVENTS)));
+    }
+
+    /**
+     * Deselecting a single row out of a large selection used to remove its cells one by one,
+     * firing a change event per cell.
+     */
+    @Test
+    public void shouldFireSingleSelectionEvent_When_RowIsDeselectedFromLargeSelection() {
+        fillTableData();
+        enableRowHeaderCellSelection();
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        interact(() -> rowHeaderTable.getSelectionModel().selectRange(0, 20));
+
+        final AtomicInteger events = countSelectedCellsEvents();
+        interact(() -> rowHeaderTable.getSelectionModel().clearSelection(10));
+
+        assertEquals(19 * NUMBER_OF_COLUMNS, tableView.getSelectionModel().getSelectedCells().size());
+        assertFalse(getSelectedRows().contains(10));
+        assertThat("one event per deselected cell was fired", events.get(), is(lessThan(MAX_SELECTION_EVENTS)));
+    }
+
+    /**
+     * A single partially selected row must not disable the batched deselection of the remaining
+     * rows, and its cells have to stay selected.
+     */
+    @Test
+    public void shouldFireSingleSelectionEvent_When_RowIsDeselectedFromPartialLargeSelection() {
+        fillTableData();
+        enableRowHeaderCellSelection();
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        interact(() -> {
+            rowHeaderTable.getSelectionModel().selectRange(0, 20);
+            tableView.getSelectionModel().clearSelection(5, tableView.getColumns().get(0));
+        });
+        assertEquals(20 * NUMBER_OF_COLUMNS - 1, tableView.getSelectionModel().getSelectedCells().size());
+
+        final AtomicInteger events = countSelectedCellsEvents();
+        interact(() -> rowHeaderTable.getSelectionModel().clearSelection(10));
+
+        assertEquals(19 * NUMBER_OF_COLUMNS - 1, tableView.getSelectionModel().getSelectedCells().size());
+        assertFalse(getSelectedRows().contains(10));
+        assertTrue("the partially selected row was lost", getSelectedRows().contains(5));
+        assertThat("one event per deselected cell was fired", events.get(), is(lessThan(MAX_SELECTION_EVENTS)));
+    }
+
+    /**
+     * A plain click on a row header after a range selection replaces the selection, so the single
+     * row that has to remain selected has to be restored in a single batch too, instead of
+     * selecting its cells one by one.
+     */
+    @Test
+    public void shouldFireSingleSelectionEvent_When_SelectionIsReplacedWithSingleRowFromRowHeader() {
+        fillTableData();
+        enableRowHeaderCellSelection();
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        interact(() -> rowHeaderTable.getSelectionModel().selectRange(0, 20));
+
+        final AtomicInteger events = countSelectedCellsEvents();
+        interact(() -> rowHeaderTable.getSelectionModel().clearAndSelect(5));
+
+        assertEquals(NUMBER_OF_COLUMNS, tableView.getSelectionModel().getSelectedCells().size());
+        assertEquals(Collections.singletonList(5), getSelectedRows());
+        assertThat("one event per selected cell was fired", events.get(), is(lessThan(MAX_SELECTION_EVENTS)));
+    }
+
+    /**
+     * The focus is independent of the selection, so deselecting from the row header the row that
+     * holds the focused cell must not move the focus to a different cell, or the arrow keys would
+     * move from a row that the user didn't touch.
+     */
+    @Test
+    public void shouldKeepFocusedCell_When_ItsRowIsDeselectedFromRowHeader() {
+        fillTableData();
+        enableRowHeaderCellSelection();
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+        final TableColumn<RowItem, ?> focusedColumn = tableView.getColumns().get(3);
+
+        interact(() -> {
+            rowHeaderTable.getSelectionModel().selectRange(0, 20);
+            tableView.getFocusModel().focus(10, focusedColumn);
+        });
+
+        interact(() -> rowHeaderTable.getSelectionModel().clearSelection(10));
+
+        assertEquals(19 * NUMBER_OF_COLUMNS, tableView.getSelectionModel().getSelectedCells().size());
+        assertFalse(getSelectedRows().contains(10));
+        assertEquals(10, tableView.getFocusModel().getFocusedCell().getRow());
+        assertSame(focusedColumn, tableView.getFocusModel().getFocusedCell().getTableColumn());
+    }
+
+    /**
+     * Deselecting rows from the row header, while row selection is used instead of cell
+     * selection, has to be batched as well.
+     */
+    @Test
+    public void shouldFireSingleSelectionEvent_When_RowsAreDeselectedInRowSelectionMode() {
+        fillTableData();
+        interact(() -> {
+            tableView.setRowHeaderVisible(true);
+            tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        });
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        interact(() -> rowHeaderTable.getSelectionModel().selectRange(0, NUMBER_OF_ROWS));
+        assertEquals(NUMBER_OF_ROWS, tableView.getSelectionModel().getSelectedIndices().size());
+
+        final AtomicInteger events = countSelectedCellsEvents();
+        interact(() -> rowHeaderTable.getSelectionModel().clearAndSelect(5));
+
+        assertEquals(Collections.singletonList(5), getSelectedRows());
+        assertThat("one event per deselected row was fired", events.get(), is(lessThan(MAX_SELECTION_EVENTS)));
+    }
+
+    /**
+     * Deselecting every row from the row header, while row selection is used instead of cell
+     * selection, has to keep both selection models empty and in sync.
+     */
+    @Test
+    public void shouldClearBothSelectionModels_When_AllRowsAreDeselectedFromRowHeader() {
+        fillTableData();
+        interact(() -> {
+            tableView.setRowHeaderVisible(true);
+            tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        });
+        final TableView<RowItem> rowHeaderTable = getRowHeaderTableView();
+
+        interact(() -> rowHeaderTable.getSelectionModel().selectRange(0, NUMBER_OF_ROWS));
+        assertEquals(NUMBER_OF_ROWS, tableView.getSelectionModel().getSelectedIndices().size());
+
+        interact(() -> rowHeaderTable.getSelectionModel().clearSelection());
+
+        assertEquals(0, tableView.getSelectionModel().getSelectedCells().size());
+        assertEquals(0, rowHeaderTable.getSelectionModel().getSelectedIndices().size());
+    }
+
+    /**
+     * Counts the change events fired by the selected cells list of the table, which has to stay
+     * independent of the number of selected rows and cells.
+     */
+    private AtomicInteger countSelectedCellsEvents() {
+        final AtomicInteger events = new AtomicInteger();
+        interact(() -> tableView.getSelectionModel().getSelectedCells()
+                .addListener((ListChangeListener<Object>) c -> events.incrementAndGet()));
+        return events;
+    }
+
+    private void enableRowHeaderCellSelection() {
+        interact(() -> {
+            tableView.setRowHeaderVisible(true);
+            tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            tableView.getSelectionModel().setCellSelectionEnabled(true);
+        });
+    }
+
+    /**
+     * @return the inner TableView of the {@link impl.org.controlsfx.tableview2.RowHeader}, that
+     * holds the row header cells and its own selection model.
+     */
+    private TableView2<RowItem> getRowHeaderTableView() {
+        final AtomicReference<TableView2<RowItem>> rowHeaderTableView = new AtomicReference<>();
+        interact(() -> {
+            tableView.lookupAll(".row-header .table-view")
+                    .stream()
+                    .filter(TableView2.class::isInstance)
+                    .map(TableView2.class::cast)
+                    .findFirst()
+                    .ifPresent(rowHeaderTableView::set);
+        });
+        assertNotNull("row header table view not found", rowHeaderTableView.get());
+        return rowHeaderTableView.get();
+    }
+
+    private List<Integer> getSelectedRows() {
+        return tableView.getSelectionModel().getSelectedCells().stream()
+                .map(TablePositionBase::getRow)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    private List<Integer> rangeOf(int from, int to) {
+        return IntStream.range(from, to).boxed().collect(Collectors.toList());
+    }
+
     private Duration measure(Runnable operation) {
         LocalTime start = LocalTime.now();
         operation.run();
@@ -589,15 +897,6 @@ public class TableView2Test extends FxRobot {
                 .map(SouthTableHeaderRow.class::cast)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Expected SouthTableHeaderRow in lookupAll('.south-header')"));
-    }
-
-    private TableView2<?> getRowHeaderTableView() {
-        return tableView.lookupAll(".row-header .table-view")
-                .stream()
-                .filter(TableView2.class::isInstance)
-                .map(TableView2.class::cast)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Expected TableView2 in lookupAll('.row-header .table-view')"));
     }
 
     /**

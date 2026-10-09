@@ -967,6 +967,7 @@ public class TableView2Skin<S> extends TableViewSkin<S> {
                 .map(TablePosition::getColumn)
                 .filter(column -> 0 <= column && column < columnCount &&
                         tableView.getSelectionModel().isCellSelectionEnabled())
+                .distinct()
                 .collect(Collectors.toList());
         if (! oldSelectedColumns.equals(columns)) {
             oldSelectedColumns.clear();
@@ -976,6 +977,7 @@ public class TableView2Skin<S> extends TableViewSkin<S> {
         final List<Integer> rows = selectedCells.stream()
                 .map(TablePosition::getRow)
                 .filter(row -> 0 <= row && row < itemCount)
+                .distinct()
                 .collect(Collectors.toList());
         if (! oldSelectedRows.equals(rows)) {
             oldSelectedRows.clear();

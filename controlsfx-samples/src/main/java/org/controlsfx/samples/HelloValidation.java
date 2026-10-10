@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2019 ControlsFX
+ * Copyright (c) 2014, 2026 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,9 +44,11 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -146,6 +148,16 @@ public class HelloValidation extends ControlsFXSample {
         root.add(new Label("Slider"), 0, row);
         root.add(slider, 1, row);
         GridPane.setHgrow(slider, Priority.ALWAYS);
+
+        //spinner
+        row++;
+        Spinner<Integer> spinner = new Spinner<>(1, 20, 2);
+        validationSupport.registerValidator(spinner, false,
+                Validator.<Integer>createPredicateValidator(
+                        value -> value != null && value % 2 == 0, "Only even values are valid"));
+        root.add(new Label("Spinner"), 0, row);
+        root.add(spinner, 1, row);
+        GridPane.setHgrow(spinner, Priority.ALWAYS);
 
         // color picker
         row++;

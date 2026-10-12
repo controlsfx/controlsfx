@@ -4,7 +4,6 @@ ControlsFX
 [![Maven Central](http://img.shields.io/maven-central/v/org.controlsfx/controlsfx)](https://search.maven.org/search?q=g:org.controlsfx%20AND%20a:controlsfx)
 [![Build](https://github.com/controlsfx/controlsfx/actions/workflows/build.yml/badge.svg)](https://github.com/controlsfx/controlsfx/actions/workflows/build.yml)
 [![BSD-3 license](https://img.shields.io/badge/license-BSD--3-%230778B9.svg)](https://opensource.org/licenses/BSD-3-Clause)
-[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/controlsfx/controlsfx.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/controlsfx/controlsfx/context:java)
 
 ControlsFX is an open source project for JavaFX that aims to provide really high quality UI controls and other tools to complement the core JavaFX distribution.
 It has been developed for JavaFX 8.0 and beyond, and has a guiding principle of only accepting new controls / features when all existing code is at an acceptably high level, including thankless jobs like having [high quality javadoc documentation](https://controlsfx.github.io/javadoc/).

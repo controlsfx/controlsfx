@@ -53,4 +53,4 @@ Please feel free to report issues. If you want to submit a bug fix, or an enhanc
 | Company              | For..                          |
 |----------------------|--------------------------------|
 | <a href="http://gluonhq.com"><img width="200" src="http://fxexperience.com/wp-content/uploads/2016/08/Gluon_combined_logo_vertical.png"></a>| For substantial contributions towards project hosting and development of major features and improvements.|
-|<img width="200" src="http://fxexperience.com/wp-content/uploads/2013/04/jetbrains.png">| For the <a href="https://www.jetbrains.com/idea">IntelliJ IDEA</a> licenses.|
+|<img width="200" src="https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg">| For the <a href="https://www.jetbrains.com/idea">IntelliJ IDEA</a> licenses.|

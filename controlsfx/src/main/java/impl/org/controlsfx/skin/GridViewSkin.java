@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2022, ControlsFX
+ * Copyright (c) 2013, 2025, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@ package impl.org.controlsfx.skin;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
+import javafx.event.Event;
 import javafx.scene.control.skin.VirtualContainerBase;
 import javafx.scene.control.skin.VirtualFlow;
 import org.controlsfx.control.GridView;
@@ -107,6 +108,16 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
         double h1 = getSkinnable().getHeight() - (getSkinnable().getInsets().getTop() + getSkinnable().getInsets().getBottom());
 
         flow.resizeRelocate(x1, y1, w1, h1);
+
+        int newRowCount = getItemCount();
+        int newColumnCount = computeMaxCellsInRow();
+        int currentColumnCount = getSkinnable().getColumnCount();
+        int currentRowCount = getSkinnable().getRowCount();
+
+        // Fire a layout event if the row or column count has changed.
+        if (newRowCount != currentRowCount || newColumnCount != currentColumnCount) {
+            Event.fireEvent(getSkinnable(), new GridView.LayoutEvent(newRowCount, newColumnCount));
+        }
     }
 
     /**

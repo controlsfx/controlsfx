@@ -190,6 +190,7 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
 
         // bidirectional bindings
         box.valueProperty().bindBidirectional(getSkinnable().valueProperty());
+        Bindings.bindContentBidirectional(getSkinnable().getProperties(), filteredComboBox.getProperties());
 
         return box;
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2022, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,11 @@ import org.controlsfx.control.GridView;
 public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T>> {
 
     private VirtualFlow<GridRow<T>> flow;
+    /**
+     * The items list currently observed by this skin, retained so its listener
+     * can be removed after the control switches to another list.
+     */
+    private ObservableList<T> gridViewItems;
 
     private final ListChangeListener<T> gridViewItemsListener = change -> {
         updateItemCount();
@@ -87,17 +92,28 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
     }
 
     public void updateGridViewItems() {
-        if (getSkinnable().getItems() != null) {
-            getSkinnable().getItems().removeListener(weakGridViewItemsListener);
+        // The control already holds the new list, so detach from the observed one.
+        if (gridViewItems != null) {
+            gridViewItems.removeListener(weakGridViewItemsListener);
         }
 
-        if (getSkinnable().getItems() != null) {
-            getSkinnable().getItems().addListener(weakGridViewItemsListener);
+        gridViewItems = getSkinnable().getItems();
+        if (gridViewItems != null) {
+            gridViewItems.addListener(weakGridViewItemsListener);
         }
 
         updateItemCount();
         getFlow().recreateCells();
         getSkinnable().requestLayout();
+    }
+
+    @Override public void dispose() {
+        // A weak listener can still fire until this skin is collected.
+        if (gridViewItems != null) {
+            gridViewItems.removeListener(weakGridViewItemsListener);
+            gridViewItems = null;
+        }
+        super.dispose();
     }
 
     @Override protected void layoutChildren(double x, double y, double w, double h) {

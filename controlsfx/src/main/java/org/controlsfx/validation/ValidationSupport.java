@@ -327,6 +327,21 @@ public class ValidationSupport {
     public <T> boolean registerValidator( final Control c, final Validator<T> validator  ) {
         return registerValidator(c, true, validator);
     }
+    
+    /**
+     * Deregisters any registered {@link Validator} for specified control
+     * @param c control whose validator will be removed
+     * @return {@code true} if deregistration is successful, otherwisee {@code false}
+     * @throws NullPointerException if the specified control is {@code null}
+     */
+    public boolean deregisterValidator(final Control c) {
+       if (controls.contains(c)) {
+    	   controls.remove(c);
+    	   validationResults.remove(c);
+    	   return true;
+       }
+       return false;
+    }
 
     /**
      * Returns currently registered controls

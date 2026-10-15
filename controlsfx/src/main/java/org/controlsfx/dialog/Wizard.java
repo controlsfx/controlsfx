@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2025, ControlsFX
+ * Copyright (c) 2014, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -519,6 +519,8 @@ public class Wizard {
             double previousHeight = dialog.getHeight();
             // and then switch to the new pane
             dialog.setDialogPane(currentPage);
+            // Finalize the buttons before measuring the new page.
+            validateActionState();
             // Resize Wizard to new page
             Window wizard = currentPage.getScene().getWindow();
             wizard.sizeToScene();
@@ -556,7 +558,9 @@ public class Wizard {
             }
         });
         
-        validateActionState();
+        if (!currentPage.isPresent()) {
+            validateActionState();
+        }
     }
 
     private static void addButtonIfMissing(WizardPane page, ButtonType buttonType, EventHandler<ActionEvent> actionHandler) {

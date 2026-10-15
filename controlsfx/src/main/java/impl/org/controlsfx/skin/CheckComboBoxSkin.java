@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2022, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,6 @@
  */
 package impl.org.controlsfx.skin;
 
-import impl.org.controlsfx.collections.ReadOnlyUnbackedObservableList;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -44,6 +43,9 @@ import javafx.scene.input.KeyCombination;
 import org.controlsfx.control.CheckComboBox;
 
 import org.controlsfx.control.IndexedCheckModel;
+
+import java.util.Collections;
+import java.util.List;
 
 import static org.controlsfx.control.CheckComboBox.COMBO_BOX_ROWS_TO_MEASURE_WIDTH_KEY;
 
@@ -70,8 +72,8 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
     // data
     private final CheckComboBox<T> control;
     private final ObservableList<T> items;
-    private final ReadOnlyUnbackedObservableList<Integer> selectedIndices;
-    private final ReadOnlyUnbackedObservableList<T> selectedItems;
+    // the listener through which this skin follows the checks of the model the control has
+    private final ListChangeListener<Integer> checkedIndicesListener;
     
     
     /**************************************************************************
@@ -86,9 +88,6 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
         
         this.control = control;
         this.items = control.getItems();
-        
-        selectedIndices = (ReadOnlyUnbackedObservableList<Integer>) control.getCheckModel().getCheckedIndices();
-        selectedItems = (ReadOnlyUnbackedObservableList<T>) control.getCheckModel().getCheckedItems();
         
         comboBox = new ComboBox<T>(items) {
             @Override
@@ -135,7 +134,15 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
 
         // The zero is a dummy value - it just has to be legally within the bounds of the
         // item count for the CheckComboBox items list.
-        selectedIndices.addListener((ListChangeListener<Integer>) c -> buttonCell.updateIndex(0));
+        checkedIndicesListener = c -> buttonCell.updateIndex(0);
+
+        // the button renders the checks of the model the control has, which an application is
+        // free to replace through CheckComboBox.setCheckModel(IndexedCheckModel)
+        followCheckModel(null, control.getCheckModel());
+        control.checkModelProperty().addListener((o, oldModel, newModel) -> {
+            followCheckModel(oldModel, newModel);
+            buttonCell.updateIndex(0);
+        });
         
         getChildren().add(comboBox);
     }
@@ -204,7 +211,7 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
             String vResult = control.getTitle();
             if (control.isShowCheckedCount()) {
                 //...adding also the count of how many are selected, if so configured
-                vResult = String.format("%s (%d/%d)", vResult, selectedItems.size(), items.size());
+                vResult = String.format("%s (%d/%d)", vResult, getCheckedItems().size(), items.size());
             }
             return vResult;
         } else {            
@@ -214,10 +221,27 @@ public class CheckComboBoxSkin<T> extends SkinBase<CheckComboBox<T>> {
         
     }
     
+    /** Follows the checked indices of the model the control is given, and only of that one. */
+    private void followCheckModel(IndexedCheckModel<T> droppedModel, IndexedCheckModel<T> newModel) {
+        if (droppedModel != null) {
+            droppedModel.getCheckedIndices().removeListener(checkedIndicesListener);
+        }
+        if (newModel != null) {
+            newModel.getCheckedIndices().addListener(checkedIndicesListener);
+        }
+    }
+
+    /** The items checked in the model the control has - what the button is to render. */
+    private List<T> getCheckedItems() {
+        final IndexedCheckModel<T> checkModel = control.getCheckModel();
+        return checkModel == null ? Collections.emptyList() : checkModel.getCheckedItems();
+    }
+
     private String buildString() {
         final StringBuilder sb = new StringBuilder();
-        for (int i = 0, max = selectedItems.size(); i < max; i++) {
-            T item = selectedItems.get(i);
+        final List<T> checkedItems = getCheckedItems();
+        for (int i = 0, max = checkedItems.size(); i < max; i++) {
+            T item = checkedItems.get(i);
             if (control.getConverter() == null) {
                 sb.append(item);
             } else {

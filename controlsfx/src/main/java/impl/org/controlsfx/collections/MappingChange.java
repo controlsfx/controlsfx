@@ -138,7 +138,7 @@ public final class MappingChange<E, F> extends Change<F> {
             } else if (wasUpdated()) {
                 b.append(ChangeHelper.updateChangeToString(getFrom(), getTo()));
             } else {
-                b.append(ChangeHelper.addRemoveChangeToString(getFrom(), getTo(), getList(), getRemoved()));
+                b.append(ChangeHelper.addRemoveChangeToString(getFrom(), getTo(), getAddedSubList(), getRemoved()));
             }
             if (pos != size) {
                 b.append(", ");

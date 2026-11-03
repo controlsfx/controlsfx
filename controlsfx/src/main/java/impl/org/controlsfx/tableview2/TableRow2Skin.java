@@ -357,9 +357,9 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
                     }
                     customHeight = tempHeight;
                     if (parentTableView != null) {
-                        ((TableView2Skin<S>) tableView.getSkin()).getFlow().layoutChildren();
+                        ((TableView2Skin<S>) tableView.getSkin()).getFlow().requestLayout();
                     } else {
-                        ((TableView2Skin<S>) skin).getFlow().layoutChildren();
+                        skin.getFlow().requestLayout();
                     }
                 }
             }

@@ -54,13 +54,13 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.control.TablePositionBase;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.skin.TableColumnHeader;
 import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
-import javafx.scene.transform.Translate;
 import org.controlsfx.control.tableview2.TableView2;
 
 import java.util.ArrayList;
@@ -179,6 +179,9 @@ public class TableView2Skin<S> extends TableViewSkin<S> {
     private final List<Integer> oldSelectedRows = new ArrayList<>();
     
     private final VirtualFlow<TableRow<S>> flow;
+
+    private final Region columnReorderOverlay;
+    private final Region columnReorderLine;
     
     /***************************************************************************
      * * CONSTRUCTOR * *
@@ -194,6 +197,8 @@ public class TableView2Skin<S> extends TableViewSkin<S> {
         this.flow = getVirtualFlow();
         flow.setCellFactory(p -> createCell());
         this.tableView = tableView;
+        this.columnReorderOverlay = findRegion("column-overlay");
+        this.columnReorderLine = findRegion("column-resize-line");
         
         if (tableView.getParent() != null && tableView.getParent() instanceof RowHeader) {
             parentTableView = ((RowHeader) tableView.getParent()).getParentTableView();
@@ -536,24 +541,7 @@ public class TableView2Skin<S> extends TableViewSkin<S> {
         /*
          * Column Header Drag
          */ 
-        // Adjust column overlay based on headers offset
-        getChildren().stream()
-                .filter(n -> n.getStyleClass().contains("column-overlay"))
-                .findFirst()
-                .ifPresent(n -> {
-                    n.translateXProperty().bind(rowHeader.rowHeaderWidthProperty());
-                });
-        
-        // Adjust line based in rowHeader offset
-        final Region columnReorderLine = (Region) getChildren().get(3); // getColumnReorderLine();
-        columnReorderLine.translateXProperty().addListener((obs, ov, nv) -> {
-            if (! tableView.isRowHeaderVisible() && ! columnReorderLine.getTransforms().isEmpty()) {
-                columnReorderLine.getTransforms().clear();
-            } else if (tableView.isRowHeaderVisible()) {
-                columnReorderLine.getTransforms().setAll(new Translate(getRowHeaderOffset(), 0));
-            }
-        });
-        columnReorderLine.boundsInParentProperty().addListener((obs, ov, nv) -> 
+        columnReorderLine.boundsInParentProperty().addListener((obs, ov, nv) ->
             columnReorderLine.setOpacity(nv.getMaxX() > tableView.getWidth() ? 0 : 1));
         
         // Adjust corner region based in rowHeader offset
@@ -599,6 +587,8 @@ public class TableView2Skin<S> extends TableViewSkin<S> {
         }
         
         super.layoutChildren(x, y, width, height);
+
+        layoutColumnReorderNodes(x);
 
         final double baselineOffset = getSkinnable().getLayoutBounds().getHeight() / 2;
         double tableHeaderRowHeight = 0;
@@ -705,6 +695,33 @@ public class TableView2Skin<S> extends TableViewSkin<S> {
             return rowHeader.computeHeaderWidth();
         }
         return 0d;
+    }
+
+    /**
+     * Positions the column overlay and the reorder line while a column header is
+     * being dragged. {@code TableViewSkinBase::layoutChildren} places them in
+     * coordinates relative to the table header row.
+     *
+     * @param x the left edge of the table header row, in skin coordinates
+     */
+    private void layoutColumnReorderNodes(double x) {
+        final TableColumnHeader reorderingHeader = getTableHeaderRow2().getReorderingRegion();
+        if (reorderingHeader == null) {
+            return;
+        }
+        // same computation as in TableViewSkinBase::layoutChildren
+        double headerX = tableHeaderRow.sceneToLocal(reorderingHeader.localToScene(reorderingHeader.getBoundsInLocal())).getMinX();
+        columnReorderOverlay.setLayoutX(x + Math.max(0, headerX));
+        columnReorderLine.setLayoutX(x);
+    }
+
+    private Region findRegion(String styleClass) {
+        return getChildren().stream()
+                .filter(n -> n.getStyleClass().contains(styleClass))
+                .filter(Region.class::isInstance)
+                .map(Region.class::cast)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("TableViewSkinBase has no region with style class " + styleClass));
     }
     
     protected SouthTableHeaderRow getSouthHeader() {

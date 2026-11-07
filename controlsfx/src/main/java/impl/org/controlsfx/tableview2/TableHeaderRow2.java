@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2020 ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,12 +31,15 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
+import javafx.event.EventTarget;
+import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.skin.NestedTableColumnHeader;
 import javafx.scene.control.skin.TableColumnHeader;
 import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -82,6 +85,8 @@ public class TableHeaderRow2 extends TableHeaderRow {
     private final Pane cornerRegion;
     private final StackPane dragHeader;
     private TableColumnHeader reorderingRegion;
+    private double dragOffset;
+    private double dragHeaderX;
 
     private final SouthTableHeaderRow southHeaderRow;
 
@@ -109,6 +114,23 @@ public class TableHeaderRow2 extends TableHeaderRow {
         
         southHeaderRow = new SouthTableHeaderRow(skin);
         getChildren().add(0, southHeaderRow);
+
+        addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+            TableColumnHeader pressedHeader = findColumnHeader(e.getTarget());
+            dragOffset = pressedHeader == null ? 0 : pressedHeader.sceneToLocal(e.getSceneX(), e.getSceneY()).getX();
+        });
+        addEventFilter(MouseEvent.MOUSE_DRAGGED, e -> 
+            dragHeaderX = sceneToLocal(e.getSceneX(), e.getSceneY()).getX() - dragOffset);
+        dragHeader.translateXProperty().addListener((obs, ov, nv) -> 
+            dragHeader.setLayoutX(dragHeaderX - nv.doubleValue()));
+    }
+
+    private static TableColumnHeader findColumnHeader(EventTarget target) {
+        Node node = target instanceof Node ? (Node) target : null;
+        while (node != null && !(node instanceof TableColumnHeader)) {
+            node = node.getParent();
+        }
+        return (TableColumnHeader) node;
     }
 
     /**************************************************************************
@@ -271,8 +293,7 @@ public class TableHeaderRow2 extends TableHeaderRow {
             reorderingProperty().addListener(new InvalidationListener() {
                 @Override
                 public void invalidated(Observable observable) {
-                    // Adjust dragHeader region based in rowHeader and southHeaderRow offsets
-                    dragHeader.setLayoutX(- skin.rowHeader.getRowHeaderWidth());
+                    // Adjust dragHeader region based in southHeaderRow offset
                     dragHeader.setTranslateY(dragHeader.getTranslateY() - southHeaderRow.getHeight());
                     dragHeader.resize(reorderingRegion.getWidth(), dragHeader.getHeight() + southHeaderRow.getHeight());
                     reorderingProperty().removeListener(this);

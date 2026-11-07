@@ -1,11 +1,14 @@
 name: CLA verification
 on:
   pull_request_target:
-    types: [opened, synchronize]
+    types: [opened, reopened, synchronize]
 
 jobs:
   cla-verify:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
       - id: 'query-worksheet'
         uses: jroehl/gsheet.action@release
@@ -25,46 +28,57 @@ jobs:
           GITHUB_USER_NAME: ${{ github.event.pull_request.user.login }}
         shell: bash
         run: |
-          index=`echo "$RESULTS" | jq -c '.results[].result.rawData | flatten | index(env.GITHUB_USER_NAME)'`
-          [ "$index" = "null" ] && echo "Username not found in list"
-          echo "::set-output name=index::$index"
+          # GitHub logins are case-insensitive; form responses may also include whitespace.
+          index=$(jq -c -s '
+            def normalize: gsub("^\\s+|\\s+$"; "") | ascii_downcase;
+            if length != 1 then error("Expected CLA worksheet response") else .[0] end
+            | .results[0].result.rawData
+            | if type != "array" then error("Missing CLA worksheet data") else . end
+            | flatten
+            | map(select(type == "string") | normalize)
+            | index(env.GITHUB_USER_NAME | normalize)
+          ' <<< "$RESULTS")
+          if [ "$index" = "null" ]; then
+            echo "Username not found in list"
+          fi
+          echo "index=$index" >> "$GITHUB_OUTPUT"
       - name: Add CLA Label and Comment
         if: steps.username-index.outputs.index == 'null' && !contains(github.event.pull_request.labels.*.name, 'CLA')
-        uses: actions/github-script@v3
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            github.issues.createComment({
+            await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'Hi ${{ github.event.pull_request.user.login }},\n\nWelcome to ControlsFX and thank you for taking time to contribute to this project.\n\nWe do not recognise you as a contributor. Can you please sign ControlsFX Individual Contributor Agreement: https://cla.controlsfx.org ?'
             })
-            github.issues.addLabels({
+            await github.rest.issues.addLabels({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               labels: ['CLA']
             })
       - name: Add CLA-VERIFIED Label
-        if: steps.username-index.outputs.index != 'null' && !contains(github.event.pull_request.labels.*.name, 'CLA-VERIFIED')
-        uses: actions/github-script@v3
+        if: steps.username-index.outputs.index != '' && steps.username-index.outputs.index != 'null' && !contains(github.event.pull_request.labels.*.name, 'CLA-VERIFIED')
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            github.issues.addLabels({
+            await github.rest.issues.addLabels({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               labels: ['CLA-VERIFIED']
             })
       - name: Remove CLA Label
-        if: steps.username-index.outputs.index != 'null' && contains(github.event.pull_request.labels.*.name, 'CLA')
-        uses: actions/github-script@v3
+        if: steps.username-index.outputs.index != '' && steps.username-index.outputs.index != 'null' && contains(github.event.pull_request.labels.*.name, 'CLA')
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            github.issues.removeLabel({
+            await github.rest.issues.removeLabel({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015, ControlsFX
+ * Copyright (c) 2015, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,6 @@ import javafx.scene.control.ComboBox;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-import static impl.org.controlsfx.tools.PrefixSelectionCustomizer.DEFAULT_LOOKUP_COMBOBOX;
 import static impl.org.controlsfx.tools.PrefixSelectionCustomizer.DEFAULT_TYPING_DELAY;
 
 /**
@@ -145,9 +144,9 @@ public class PrefixSelectionComboBox<T> extends ComboBox<T> {
      * The default criteria searchs for the first matching item that starts with 
      * the typed selection, being case insenstitive.
      */
-    private final ObjectProperty<BiFunction<ComboBox, String, Optional>> lookup = new SimpleObjectProperty<>(this, "lookup", DEFAULT_LOOKUP_COMBOBOX);
-    public final BiFunction<ComboBox, String, Optional> getLookup() { return lookup.get(); }
-    public final void setLookup(BiFunction<ComboBox, String, Optional> value) { lookup.set(value); }
-    public final ObjectProperty<BiFunction<ComboBox, String, Optional>> lookupProperty() { return lookup; }
+    private final ObjectProperty<BiFunction<ComboBox<T>, String, Optional<T>>> lookup = new SimpleObjectProperty<>(this, "lookup", PrefixSelectionCustomizer::lookupComboBox);
+    public final BiFunction<ComboBox<T>, String, Optional<T>> getLookup() { return lookup.get(); }
+    public final void setLookup(BiFunction<ComboBox<T>, String, Optional<T>> value) { lookup.set(value); }
+    public final ObjectProperty<BiFunction<ComboBox<T>, String, Optional<T>>> lookupProperty() { return lookup; }
     
 }

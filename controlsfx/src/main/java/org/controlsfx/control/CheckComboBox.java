@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2022, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -251,6 +251,34 @@ public class CheckComboBox<T> extends ControlsFXControl {
         return converterProperty().get(); 
     }
     
+    // --- delimiter
+    private final StringProperty delimiter = new SimpleStringProperty(this, "delimiter", ", "); //$NON-NLS-1$ //$NON-NLS-2$
+
+    /**
+     * The separator between checked items when no fixed title is set.
+     * The default is comma-space. A null or empty value displays no separator.
+     * @return the delimiter property
+     */
+    public final StringProperty delimiterProperty() {
+        return delimiter;
+    }
+
+    /**
+     * Sets the separator between checked items.
+     * @param value the separator, or null for no separator
+     */
+    public final void setDelimiter(String value) {
+        delimiterProperty().set(value);
+    }
+
+    /**
+     * Returns the separator between checked items.
+     * @return the delimiter
+     */
+    public final String getDelimiter() {
+        return delimiterProperty().get();
+    }
+
     // --- title
     private StringProperty title = new SimpleStringProperty(null);
     

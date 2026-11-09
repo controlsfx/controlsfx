@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2022, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,18 +26,34 @@
  */
 package impl.org.controlsfx.skin;
 
+import impl.org.controlsfx.control.GridViewSelectionModel;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
+import javafx.event.EventHandler;
+import javafx.geometry.NodeOrientation;
+import javafx.scene.Node;
+import javafx.scene.control.FocusModel;
+import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.control.skin.VirtualContainerBase;
 import javafx.scene.control.skin.VirtualFlow;
 import org.controlsfx.control.GridView;
+import org.controlsfx.control.GridCell;
 
 public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T>> {
 
     private VirtualFlow<GridRow<T>> flow;
+    private ObservableList<T> observedItems;
+    private int anchor = -1;
+    private final EventHandler<MouseEvent> mouseHandler = this::mousePressed;
+    private final EventHandler<KeyEvent> keyHandler = this::keyPressed;
 
     private final ListChangeListener<T> gridViewItemsListener = change -> {
+        while (change.next()) anchor = GridViewSelectionModel.mapIndex(anchor, change);
         updateItemCount();
         getSkinnable().requestLayout();
     };
@@ -52,12 +68,17 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
         flow.setId("virtual-flow"); //$NON-NLS-1$
         flow.setPannable(false);
         flow.setVertical(true);
-        flow.setFocusTraversable(getSkinnable().isFocusTraversable());
+        flow.setFocusTraversable(false);
         flow.setCellFactory(param -> createCell());
         getChildren().add(flow);
 
         updateGridViewItems();
         updateItemCount();
+
+        // A skin can be constructed without being installed. Only the active
+        // skin should handle input (not another candidate created during CSS).
+        registerChangeListener(control.skinProperty(), e -> updateInputHandlers());
+        registerChangeListener(control.selectionModelProperty(), e -> anchor = -1);
 
         // Register listeners
         registerChangeListener(control.itemsProperty(), e -> updateGridViewItems());
@@ -87,17 +108,115 @@ public class GridViewSkin<T> extends VirtualContainerBase<GridView<T>, GridRow<T
     }
 
     public void updateGridViewItems() {
-        if (getSkinnable().getItems() != null) {
-            getSkinnable().getItems().removeListener(weakGridViewItemsListener);
-        }
-
-        if (getSkinnable().getItems() != null) {
-            getSkinnable().getItems().addListener(weakGridViewItemsListener);
-        }
+        if (observedItems != null) observedItems.removeListener(weakGridViewItemsListener);
+        observedItems = getSkinnable().getItems();
+        if (observedItems != null) observedItems.addListener(weakGridViewItemsListener);
+        anchor = -1;
 
         updateItemCount();
         getFlow().recreateCells();
         getSkinnable().requestLayout();
+    }
+
+    private void updateInputHandlers() {
+        GridView<T> view = getSkinnable();
+        view.removeEventFilter(MouseEvent.MOUSE_PRESSED, mouseHandler);
+        view.removeEventHandler(KeyEvent.KEY_PRESSED, keyHandler);
+        if (view.getSkin() == this) {
+            view.addEventFilter(MouseEvent.MOUSE_PRESSED, mouseHandler);
+            view.addEventHandler(KeyEvent.KEY_PRESSED, keyHandler);
+        }
+    }
+
+    private void mousePressed(MouseEvent event) {
+        if (event.getButton() != MouseButton.PRIMARY && event.getButton() != MouseButton.SECONDARY) return;
+        Node target = event.getTarget() instanceof Node ? (Node) event.getTarget() : null;
+        while (target != null && !(target instanceof GridCell) && target != getSkinnable()) {
+            target = target.getParent();
+        }
+        if (!(target instanceof GridCell)) return;
+        GridCell<?> cell = (GridCell<?>) target;
+        if (cell.getGridView() != getSkinnable() || cell.isEmpty()) return;
+        MultipleSelectionModel<T> selection = getSkinnable().getSelectionModel();
+        if (selection == null) return;
+        int index = cell.getIndex();
+        getSkinnable().requestFocus();
+        if (event.getButton() == MouseButton.SECONDARY) {
+            if (!selection.isSelected(index)) selection.clearAndSelect(index);
+            anchor = index;
+        } else {
+            select(index, event.isShiftDown(), event.isShortcutDown(), true);
+        }
+        focus(index);
+    }
+
+    private void focus(int index) {
+        FocusModel<T> model = getSkinnable().getFocusModel();
+        if (model != null) model.focus(index);
+    }
+
+    private void select(int index, boolean shift, boolean shortcut, boolean toggle) {
+        MultipleSelectionModel<T> model = getSkinnable().getSelectionModel();
+        if (model == null) return;
+        if (shift && model.getSelectionMode() == SelectionMode.MULTIPLE) {
+            if (anchor < 0) {
+                FocusModel<T> focus = getSkinnable().getFocusModel();
+                anchor = focus == null || focus.getFocusedIndex() < 0 ? index : focus.getFocusedIndex();
+            }
+            if (!shortcut) model.clearSelection();
+            model.selectRange(anchor, index >= anchor ? index + 1 : index - 1);
+        } else if (shortcut && toggle && model.getSelectionMode() == SelectionMode.MULTIPLE) {
+            if (model.isSelected(index)) model.clearSelection(index);
+            else model.select(index);
+            anchor = index;
+        } else if (!shortcut) {
+            model.clearAndSelect(index);
+            anchor = index;
+        }
+    }
+
+    private void keyPressed(KeyEvent event) {
+        GridView<T> view = getSkinnable();
+        if (event.getTarget() != view || view.getItems() == null || view.getItems().isEmpty()) return;
+        MultipleSelectionModel<T> selection = view.getSelectionModel();
+        FocusModel<T> focus = view.getFocusModel();
+        if (selection == null || focus == null || event.isAltDown()) return;
+        int count = view.getItems().size();
+        int current = focus.getFocusedIndex();
+        int index = current;
+        int columns = computeMaxCellsInRow();
+        boolean rtl = view.getEffectiveNodeOrientation() == NodeOrientation.RIGHT_TO_LEFT;
+        switch (event.getCode()) {
+            case LEFT: index = current < 0 ? 0 : current + (rtl ? 1 : -1); break;
+            case RIGHT: index = current < 0 ? 0 : current + (rtl ? -1 : 1); break;
+            case UP: index = current < 0 ? 0 : current - columns; break;
+            case DOWN: index = current < 0 ? 0 : current + columns; break;
+            case HOME: index = 0; break;
+            case END: index = count - 1; break;
+            case SPACE:
+                if (current >= 0) select(current, event.isShiftDown(), event.isShortcutDown(), true);
+                event.consume();
+                return;
+            case A:
+                if (!event.isShortcutDown()) return;
+                selection.selectAll();
+                event.consume();
+                return;
+            default: return;
+        }
+        index = Math.max(0, Math.min(count - 1, index));
+        select(index, event.isShiftDown(), event.isShortcutDown(), false);
+        focus(index);
+        flow.scrollTo(index / columns);
+        event.consume();
+    }
+
+    @Override public void dispose() {
+        GridView<T> view = getSkinnable();
+        view.removeEventFilter(MouseEvent.MOUSE_PRESSED, mouseHandler);
+        view.removeEventHandler(KeyEvent.KEY_PRESSED, keyHandler);
+        if (observedItems != null) observedItems.removeListener(weakGridViewItemsListener);
+        super.dispose();
     }
 
     @Override protected void layoutChildren(double x, double y, double w, double h) {

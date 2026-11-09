@@ -5,3 +5,33 @@
 	-fx-cell-width: 64;
 	-fx-horizontal-alignment: CENTER;
 }
+
+.grid-view .grid-cell {
+    -fx-border-width: 2;
+    -fx-border-insets: -2;
+    -fx-border-color: transparent;
+}
+
+.grid-view .grid-cell:selected {
+    -fx-border-color: -fx-selection-bar-non-focused;
+    -fx-effect: dropshadow(two-pass-box, -fx-selection-bar-non-focused, 5, 0.6, 0, 0);
+}
+
+.grid-view:focused .grid-cell:selected {
+    -fx-border-color: -fx-selection-bar;
+    -fx-effect: dropshadow(two-pass-box, -fx-selection-bar, 5, 0.6, 0, 0);
+}
+
+.grid-view:focused .grid-cell:focused {
+    -fx-border-color: -fx-focus-color;
+    -fx-border-style: segments(2, 2);
+    -fx-border-width: 1;
+    -fx-border-insets: -4;
+}
+
+.grid-view:focused .grid-cell:selected:focused {
+    -fx-border-color: -fx-selection-bar, -fx-focus-color;
+    -fx-border-style: solid, segments(2, 2);
+    -fx-border-width: 2, 1;
+    -fx-border-insets: -2, -5;
+}

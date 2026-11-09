@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2025, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -692,7 +692,9 @@ public class PopOver extends PopupControl {
             "arrowSize", 12); //$NON-NLS-1$
 
     /**
-     * Controls the size of the arrow. Default value is 12.
+     * Controls how far the arrow extends from the edge of the pop over, in
+     * pixels. The base of the arrow is twice this size. The default is 12,
+     * so the arrow extends 12 pixels from the edge and has a 24-pixel base.
      *
      * @return the arrow size property
      */

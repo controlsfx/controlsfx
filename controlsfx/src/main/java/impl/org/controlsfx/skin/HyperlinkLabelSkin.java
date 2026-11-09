@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2022, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,6 @@ package impl.org.controlsfx.skin;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
@@ -60,12 +58,6 @@ public class HyperlinkLabelSkin extends SkinBase<HyperlinkLabel> {
      **************************************************************************/
 
     private final TextFlow textFlow;
-    private final EventHandler<ActionEvent> eventHandler = event -> {
-        EventHandler<ActionEvent> onActionHandler = getSkinnable().getOnAction();
-        if (onActionHandler != null) {
-            onActionHandler.handle(event);
-        }
-    };
 
     /***************************************************************************
      * 
@@ -142,7 +134,6 @@ public class HyperlinkLabelSkin extends SkinBase<HyperlinkLabel> {
             // if endPos is greater than startPos, create a hyperlink
             Hyperlink hyperlink = new Hyperlink(text.substring(startPos + 1, endPos));
             hyperlink.setPadding(new Insets(0, 0, 0, 0));
-            hyperlink.setOnAction(eventHandler);
             nodes.add(hyperlink);
 
             start = endPos + 1;

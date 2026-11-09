@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2019, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -179,7 +179,18 @@ public class HyperlinkLabel extends ControlsFXControl implements EventTarget {
         if (onAction == null) {
             onAction = new SimpleObjectProperty<EventHandler<ActionEvent>>(this, "onAction") { //$NON-NLS-1$
                 @Override protected void invalidated() {
-                    setEventHandler(ActionEvent.ACTION, get());
+                    EventHandler<ActionEvent> handler = get();
+                    setEventHandler(ActionEvent.ACTION, handler == null ? null : event -> {
+                        // Bubbling changes the source; retain the clicked link for onAction.
+                        EventTarget target = event.getTarget();
+                        ActionEvent action = target instanceof Hyperlink
+                                ? event.copyFor(target, target) : event;
+                        handler.handle(action);
+                        // Consumption of the callback's copy must stop the original event too.
+                        if (action.isConsumed()) {
+                            event.consume();
+                        }
+                    });
                 }
             };
         }

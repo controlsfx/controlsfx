@@ -342,7 +342,9 @@ public class TableRow2Skin<S> extends CellSkinBase<TableRow<S>> {
                     }
                 }
 
-                if (tempHeight > customHeight) {
+                // with a fixed cell size the rows never grow to fit their content
+                final boolean fixedCellSize = (parentTableView != null ? parentTableView : tableView).getFixedCellSize() > 0;
+                if (tempHeight > customHeight && !fixedCellSize) {
                     rowHeightChange = true;
                     skin.rowHeightMap.put(control.getIndex(), tempHeight);
                     for (TableCell<S, ?> cell : cells) {

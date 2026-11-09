@@ -51,3 +51,12 @@
 	-fx-border-radius: 0;
 	-fx-background-radius: 0;
 }
+
+.task-remove-finished-button {
+	-fx-base-color: red;
+	-fx-font-size: .75em;
+	-fx-font-weight: bold;
+	-fx-padding: 4px;
+	-fx-border-radius: 0;
+	-fx-background-radius: 0;
+}

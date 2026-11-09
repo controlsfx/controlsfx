@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2014 ControlsFX
+ * Copyright (c) 2013, 2025 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,6 @@
  */
 package org.controlsfx.samples;
 
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -43,8 +42,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.controlsfx.ControlsFXSample;
-import org.controlsfx.control.GridCell;
-import org.controlsfx.control.GridView;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 import org.controlsfx.glyphfont.GlyphFont;
@@ -135,16 +132,17 @@ public class HelloGlyphFont extends ControlsFXSample {
         int row = 0;
         
         for ( FontAwesome.Glyph glyph:  FontAwesome.Glyph.values() ){
-        	Color randomColor = new Color( Math.random(), Math.random(), Math.random(), 1);
-        	Glyph graphic = Glyph.create( "FontAwesome|" + glyph.name()).sizeFactor(2).color(randomColor).useGradientEffect();
-        	Button button = new Button(glyph.name(), graphic);
-        	button.setContentDisplay(ContentDisplay.TOP);
-        	button.setMaxWidth(Double.MAX_VALUE);
-        	col = col % maxColumns + 1;
-        	if ( col == 1 ) row++;
-        	fontDemo.add( button, col, row);
-        	GridPane.setFillHeight(button, true);
-        	GridPane.setFillWidth(button, true);
+            Color randomColor = new Color( Math.random(), Math.random(), Math.random(), 1);
+            Glyph graphic = Glyph.create( "FontAwesome|" + glyph.name()).sizeFactor(2).color(randomColor).useGradientEffect();
+            Button button = new Button(glyph.name(), graphic);
+            button.setMnemonicParsing(false);
+            button.setContentDisplay(ContentDisplay.TOP);
+            button.setMaxWidth(Double.MAX_VALUE);
+            col = col % maxColumns + 1;
+            if (col == 1) row++;
+            fontDemo.add(button, col, row);
+            GridPane.setFillHeight(button, true);
+            GridPane.setFillWidth(button, true);
         }
         
         ScrollPane scroller = new ScrollPane(fontDemo);

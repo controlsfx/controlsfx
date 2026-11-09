@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2021, ControlsFX
+ * Copyright (c) 2014, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -105,12 +105,27 @@ public class BreadCrumbBarSkin<T> extends SkinBase<BreadCrumbBar<T>> {
         }
     }
     
+    @Override protected double computePrefWidth(double height, double topInset, double rightInset,
+                                                double bottomInset, double leftInset) {
+        double h = height == -1 ? -1 : Math.max(0, height - topInset - bottomInset);
+        double x = leftInset;
+        for (int i = 0; i < getChildren().size(); i++) {
+            Node n = getChildren().get(i);
+            if (i > 0) {
+                double ins = n instanceof BreadCrumbButton ? ((BreadCrumbButton) n).getArrowWidth() : 0;
+                x = snapPositionX(x - ins);
+            }
+            // Match the overlap and per-crumb snapping used during layout.
+            x += snapSizeX(n.prefWidth(h));
+        }
+        return x + rightInset;
+    }
+
     @Override protected void layoutChildren(double x, double y, double w, double h) {
         for (int i = 0; i < getChildren().size(); i++) {
             Node n = getChildren().get(i);
             
             double nw = snapSizeX(n.prefWidth(h));
-            double nh = snapSizeY(n.prefHeight(-1));
             
             if (i > 0) {
                 // We have to position the bread crumbs slightly overlapping
@@ -118,7 +133,7 @@ public class BreadCrumbBarSkin<T> extends SkinBase<BreadCrumbBar<T>> {
                 x = snapPositionX(x - ins);
             }
 
-            n.resize(nw, nh);
+            n.resize(nw, h);
             n.relocate(x, y);
             x += nw;
         }
@@ -149,10 +164,6 @@ public class BreadCrumbBarSkin<T> extends SkinBase<BreadCrumbBar<T>> {
         Button crumb = factory.call(selectedCrumb);
         
         crumb.getStyleClass().add("crumb"); //$NON-NLS-1$
-
-        // We want all buttons to have the same height
-        // so we bind their preferred height to the enclosing container
-        // crumb.prefHeightProperty().bind(getSkinnable().heightProperty());
 
         // listen to the action event of each bread crumb
         crumb.setOnAction(ae -> onBreadCrumbAction(selectedCrumb));

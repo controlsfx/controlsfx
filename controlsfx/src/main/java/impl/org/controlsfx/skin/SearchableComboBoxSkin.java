@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019, 2021, ControlsFX
+ * Copyright (c) 2019, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,9 +27,11 @@
 package impl.org.controlsfx.skin;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.transformation.FilteredList;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.skin.ComboBoxListViewSkin;
@@ -128,6 +130,20 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
      */
     private T previousValue;
 
+    private Node popupContent;
+    private EventHandler<? super KeyEvent> previousPopupKeyPressedHandler;
+    private final EventHandler<KeyEvent> popupKeyPressedHandler = this::checkApplyAndCancel;
+    private final EventHandler<KeyEvent> spaceKeyFilter = event -> {
+        if (event.getCode() == KeyCode.SPACE &&
+                (event.getEventType() == KeyEvent.KEY_PRESSED ||
+                        event.getEventType() == KeyEvent.KEY_RELEASED)) {
+            // Stop selection and popup closing, but let KEY_TYPED reach the search field.
+            event.consume();
+        }
+    };
+    private final ChangeListener<Skin<?>> delegateSkinListener =
+            (observable, oldSkin, newSkin) -> updatePopupKeyHandling(newSkin);
+
     public SearchableComboBoxSkin(ComboBox<T> comboBox) {
         super(comboBox);
 
@@ -201,7 +217,13 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
         getSkinnable().itemsProperty()
                 .addListener((obs, oldVal, newVal) -> filteredComboBox.setItems(createFilteredList()));
         // and update the filter, when the text in the search field changes
-        searchField.textProperty().addListener(o -> updateFilter());
+        searchField.textProperty().addListener((observable, oldText, newText) -> {
+            // Leading and trailing spaces do not change the filter. Replacing the
+            // list anyway would clear and restore the selection, firing actions.
+            if (!oldText.trim().equals(newText.trim())) {
+                updateFilter();
+            }
+        });
 
         // the search field must only be visible, when the popup is showing
         searchField.visibleProperty().bind(filteredComboBox.showingProperty());
@@ -288,17 +310,42 @@ public class SearchableComboBoxSkin<T> extends SkinBase<ComboBox<T>> {
      * ENTER and SPACE, but we need to override this behavior.
      */
     private void preventDefaultComboBoxKeyListener() {
-        filteredComboBox.skinProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal instanceof ComboBoxListViewSkin) {
-                ComboBoxListViewSkin cblwSkin = (ComboBoxListViewSkin)newVal;
-                if(cblwSkin.getPopupContent() instanceof ListView) {
-                    final ListView<T> listView = (ListView<T>) cblwSkin.getPopupContent();
-                    if (listView != null) {
-                        listView.setOnKeyPressed(this::checkApplyAndCancel);
-                    }
-                }
+        filteredComboBox.skinProperty().addListener(delegateSkinListener);
+        // Also handle a delegate whose skin is already installed.
+        updatePopupKeyHandling(filteredComboBox.getSkin());
+    }
+
+    private void updatePopupKeyHandling(Skin<?> skin) {
+        // A replacement skin has its own popup; detach from the old one first.
+        removePopupKeyHandling();
+        if (skin instanceof ComboBoxListViewSkin) {
+            popupContent = ((ComboBoxListViewSkin<?>) skin).getPopupContent();
+            if (popupContent != null) {
+                previousPopupKeyPressedHandler = popupContent.getOnKeyPressed();
+                popupContent.setOnKeyPressed(popupKeyPressedHandler);
+                // Selection runs before onKeyPressed, so SPACE needs a filter.
+                popupContent.addEventFilter(KeyEvent.ANY, spaceKeyFilter);
             }
-        });
+        }
+    }
+
+    private void removePopupKeyHandling() {
+        if (popupContent != null) {
+            popupContent.removeEventFilter(KeyEvent.ANY, spaceKeyFilter);
+            // Restore the original handler unless someone else has replaced ours.
+            if (popupContent.getOnKeyPressed() == popupKeyPressedHandler) {
+                popupContent.setOnKeyPressed(previousPopupKeyPressedHandler);
+            }
+            popupContent = null;
+            previousPopupKeyPressedHandler = null;
+        }
+    }
+
+    @Override
+    public void dispose() {
+        filteredComboBox.skinProperty().removeListener(delegateSkinListener);
+        removePopupKeyHandling();
+        super.dispose();
     }
 
     /**

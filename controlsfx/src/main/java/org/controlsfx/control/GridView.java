@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, 2015, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,7 @@
 package org.controlsfx.control;
 
 import impl.org.controlsfx.skin.GridViewSkin;
+import impl.org.controlsfx.control.GridViewSelectionModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +47,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Cell;
 import javafx.scene.control.Control;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.FocusModel;
 import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
@@ -125,6 +128,9 @@ public class GridView<T> extends ControlsFXControl {
     public GridView(ObservableList<T> items) {
         getStyleClass().add(DEFAULT_STYLE_CLASS);
         setItems(items);
+        setFocusTraversable(true);
+        setFocusModel(new GridViewSelectionModel.GridFocusModel<>(this));
+        setSelectionModel(new GridViewSelectionModel<>(this));
     }
     
     
@@ -153,6 +159,62 @@ public class GridView<T> extends ControlsFXControl {
      * 
      **************************************************************************/
     
+    /**
+     * The selection model. The default model starts in single-selection mode;
+     * use {@code getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE)}
+     * to allow multiple selected cells. Setting this property to null disables
+     * selection. Selected indices refer to the items list, independently of the
+     * number of columns currently visible.
+     * <p>The default model follows items through insertions, removals and
+     * permutations. Replacing the items list clears selection.
+     * @return the selection model property
+     */
+    public final ObjectProperty<MultipleSelectionModel<T>> selectionModelProperty() {
+        return selectionModel;
+    }
+    private final ObjectProperty<MultipleSelectionModel<T>> selectionModel =
+            new SimpleObjectProperty<>(this, "selectionModel");
+
+    /**
+     * @return the current selection model, or null if selection is disabled
+     */
+    public final MultipleSelectionModel<T> getSelectionModel() {
+        return selectionModel.get();
+    }
+
+    /**
+     * @param value the selection model, or null to disable selection
+     */
+    public final void setSelectionModel(MultipleSelectionModel<T> value) {
+        selectionModel.set(value);
+    }
+
+    /**
+     * The model that tracks the focused item for keyboard navigation. Cell
+     * focus is independent of selection; shortcut-arrow keys move focus without
+     * changing selection. Setting the model to null disables item focus.
+     * @return the focus model property
+     */
+    public final ObjectProperty<FocusModel<T>> focusModelProperty() {
+        return focusModel;
+    }
+    private final ObjectProperty<FocusModel<T>> focusModel =
+            new SimpleObjectProperty<>(this, "focusModel");
+
+    /**
+     * @return the current focus model, or null if item focus is disabled
+     */
+    public final FocusModel<T> getFocusModel() {
+        return focusModel.get();
+    }
+
+    /**
+     * @param value the focus model, or null to disable item focus
+     */
+    public final void setFocusModel(FocusModel<T> value) {
+        focusModel.set(value);
+    }
+
     // --- horizontal cell spacing
     /**
      * Property for specifying how much spacing there is between each cell

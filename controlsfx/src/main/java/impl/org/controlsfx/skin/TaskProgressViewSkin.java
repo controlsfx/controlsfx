@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2015 ControlsFX
+ * Copyright (c) 2014, 2026 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -57,7 +57,7 @@ public class TaskProgressViewSkin<T extends Task<?>> extends
         // list view
         ListView<T> listView = new ListView<>();
         listView.setPrefSize(500, 400);
-        listView.setPlaceholder(new Label("No tasks running"));
+        listView.placeholderProperty().bind(monitor.placeholderProperty());
         listView.setCellFactory(param -> new TaskCell());
         listView.setFocusTraversable(false);
 

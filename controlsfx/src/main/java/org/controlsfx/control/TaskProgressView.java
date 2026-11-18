@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, 2019 ControlsFX
+ * Copyright (c) 2014, 2026 ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.util.Callback;
 
@@ -49,6 +50,8 @@ import javafx.util.Callback;
  * An optional graphic factory can be set to place a graphic in each row.
  * This allows the user to more easily distinguish between different types
  * of tasks.
+ * The node displayed when there are no tasks can be customized with
+ * {@link #placeholderProperty()}.
  *
  * <h3>Screenshots</h3>
  * The picture below shows the default appearance of the task progress view
@@ -125,6 +128,39 @@ public class TaskProgressView<T extends Task<?>> extends ControlsFXControl {
      */
     public final ObservableList<T> getTasks() {
         return tasks;
+    }
+
+    private final ObjectProperty<Node> placeholder = new SimpleObjectProperty<>(
+            this, "placeholder", new Label("No tasks running"));
+
+    /**
+     * The node displayed when there are no tasks. The default is a label with
+     * the text "No tasks running". For example, to change the wording:
+     * <pre>{@code view.setPlaceholder(new Label("No jobs running"));}</pre>
+     * If null, the internal list view displays its default empty-list placeholder.
+     *
+     * @return the placeholder property
+     */
+    public final ObjectProperty<Node> placeholderProperty() {
+        return placeholder;
+    }
+
+    /**
+     * Returns the value of {@link #placeholderProperty()}.
+     *
+     * @return the placeholder node
+     */
+    public final Node getPlaceholder() {
+        return placeholder.get();
+    }
+
+    /**
+     * Sets the node displayed when there are no tasks.
+     *
+     * @param value the placeholder node, or null for the list view's default
+     */
+    public final void setPlaceholder(Node value) {
+        placeholder.set(value);
     }
 
     private ObjectProperty<Callback<T, Node>> graphicFactory;

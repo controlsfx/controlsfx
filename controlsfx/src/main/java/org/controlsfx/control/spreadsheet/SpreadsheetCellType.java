@@ -289,7 +289,7 @@ public abstract class SpreadsheetCellType<T> {
     /**
      * The {@link SpreadsheetCell} {@link Object} type instance.
      */
-    public static final SpreadsheetCellType<Object> OBJECT = new ObjectType();
+    public static final ObjectType OBJECT = new ObjectType();
 
     /**
      * The {@link SpreadsheetCell} {@link Object} type base class.

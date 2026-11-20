@@ -120,9 +120,11 @@ public class RangeSliderSkin extends SkinBase<RangeSlider> {
         });
         registerChangeListener(rangeSlider.showTickMarksProperty(), e -> {
             setShowTickMarks(getSkinnable().isShowTickMarks(), getSkinnable().isShowTickLabels());
+            readdHighThumbAndRangeBar();
         });
         registerChangeListener(rangeSlider.showTickLabelsProperty(), e -> {
             setShowTickMarks(getSkinnable().isShowTickMarks(), getSkinnable().isShowTickLabels());
+            readdHighThumbAndRangeBar();
         });
         registerChangeListener(rangeSlider.majorTickUnitProperty(), e -> {
             if (tickLine != null) {
@@ -361,6 +363,13 @@ public class RangeSliderSkin extends SkinBase<RangeSlider> {
         }
 
         getSkinnable().requestLayout();
+    }
+    
+    private void readdHighThumbAndRangeBar() {
+	if (!getChildren().contains(highThumb))
+	    getChildren().add(highThumb);
+	if (!getChildren().contains(rangeBar))
+	    getChildren().add(rangeBar);
     }
 
     /**

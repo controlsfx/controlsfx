@@ -321,6 +321,16 @@ public class Notifications {
         return styleClass;
     }
 
+    /**
+     * Gets the current notification count.
+     *
+     * @param position Notification position
+     */
+    public static int getNotificationCount(Pos position) {
+        List<Popup> popups = NotificationPopupHandler.getInstance().popupsMap.get(position);
+        return popups == null ? 0 : popups.size();
+    }
+
     /***************************************************************************
      * * Private support classes * *
      **************************************************************************/

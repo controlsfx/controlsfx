@@ -91,6 +91,17 @@ import static impl.org.controlsfx.i18n.Localization.getString;
  * }
  * </pre>
  * 
+ * <p>To prepare notification styling during startup, call {@link #warmup(Scene)}
+ * on the JavaFX Application Thread for each owner scene before it is first shown:
+ * <pre>
+ * {@code
+ * Scene scene = new Scene(root);
+ * Notifications.warmup(scene);
+ * stage.setScene(scene);
+ * stage.show();
+ * }
+ * </pre>
+ *
  * <p>When there are too many notifications on the screen, one can opt to collapse
  * the notifications into a single notification using {@link Notifications#threshold(int, Notifications)}.</p>
  * <pre>
@@ -150,6 +161,31 @@ public class Notifications {
      */
     public static Notifications create() {
         return new Notifications();
+    }
+
+    /**
+     * Registers the notification stylesheet on the given scene without creating
+     * a popup. Call this on the JavaFX Application Thread for each actual owner
+     * scene before it is initially displayed, so normal startup CSS processing
+     * can absorb the cost. For popup owners, prepare the scene of the first
+     * non-popup owner window.
+     * <p>
+     * Registration does not force immediate CSS parsing or layout. If the
+     * stylesheet is absent, it is added before existing stylesheets so custom
+     * styles retain precedence. If already present, its position is unchanged.
+     * Notifications also register the stylesheet automatically when shown, so
+     * calling this method is optional.
+     *
+     * @param scene the owner scene to prepare
+     * @throws NullPointerException if scene is null
+     */
+    public static void warmup(Scene scene) {
+        Objects.requireNonNull(scene, "scene"); //$NON-NLS-1$
+        String stylesheetUrl = Notifications.class.getResource("notificationpopup.css").toExternalForm(); //$NON-NLS-1$
+        if (!scene.getStylesheets().contains(stylesheetUrl)) {
+            // Add first so styling can be adjusted with custom stylesheets.
+            scene.getStylesheets().add(0, stylesheetUrl);
+        }
     }
 
     /**
@@ -404,12 +440,7 @@ public class Notifications {
             // need to install our CSS
             Scene ownerScene = ownerWindow == null ? null : ownerWindow.getScene();
             if (ownerScene != null) {
-                String stylesheetUrl = Notifications.class.getResource("notificationpopup.css").toExternalForm(); //$NON-NLS-1$
-                if (!ownerScene.getStylesheets().contains(stylesheetUrl)) {
-                    // The stylesheet needs to be added at the beginning so that
-                    // the styling can be adjusted with custom stylesheets.
-                    ownerScene.getStylesheets().add(0, stylesheetUrl);
-                }
+                warmup(ownerScene);
             }
 
             final Popup popup = new Popup();

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019, 2020, ControlsFX
+ * Copyright (c) 2019, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,12 +29,18 @@ package org.controlsfx.control;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.*;
@@ -45,6 +51,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -398,6 +406,94 @@ public class SearchableComboBoxTest extends FxRobot{
         // then: "filter is reset"
         assertEquals(filteredComboBox.getItems(), comboBox.getItems());
         assertEquals("", searchField.getText());
+    }
+
+    @Test
+    public void spaceAllowsContinuingAMultiwordSearch() {
+        withSteelItems(actions -> checkSpaceWhileSearching(null, actions));
+    }
+
+    @Test
+    public void spaceDoesNotAcceptTheExistingSelection() {
+        withSteelItems(actions -> checkSpaceWhileSearching("Steel Rod", actions));
+    }
+
+    private void checkSpaceWhileSearching(String initialValue, AtomicInteger actions) {
+        invokeAndWait(() -> comboBox.setValue(initialValue));
+        robot.clickOn(comboBox);
+        robot.write("steel");
+        int actionsBeforeSpace = actions.get();
+        Object valueBeforeSpace = comboBox.getValue();
+
+        robot.type(SPACE);
+        invokeAndWait(() -> {
+            assertEquals("steel ", searchField.getText());
+            assertTrue(comboBox.isShowing());
+            assertEquals(valueBeforeSpace, comboBox.getValue());
+            assertEquals(actionsBeforeSpace, actions.get());
+        });
+
+        robot.write("rod");
+        invokeAndWait(() -> {
+            assertEquals(asList("Steel Rod"), filteredComboBox.getItems());
+            assertEquals("steel rod", searchField.getText());
+            assertTrue(comboBox.isShowing());
+        });
+    }
+
+    @Test
+    public void spaceOnPopupDoesNotSelectTheFocusedItem() {
+        withSteelItems(actions -> {
+            robot.clickOn(comboBox);
+            invokeAndWait(() -> checkSpaceOnPopup(actions));
+        });
+    }
+
+    @Test
+    public void spaceStillWorksAfterReplacingTheDelegateSkin() {
+        withSteelItems(actions -> {
+            robot.clickOn(comboBox);
+            invokeAndWait(() -> {
+                filteredComboBox.hide();
+                filteredComboBox.setSkin(new ComboBoxListViewSkin<>(filteredComboBox));
+                comboBox.show();
+                checkSpaceOnPopup(actions);
+            });
+        });
+    }
+
+    private void checkSpaceOnPopup(AtomicInteger actions) {
+        Node popup = ((ComboBoxListViewSkin<?>) filteredComboBox.getSkin()).getPopupContent();
+        ((ListView<?>) popup).getFocusModel().focus(0);
+        int actionsBeforeSpace = actions.get();
+        Object valueBeforeSpace = comboBox.getValue();
+        popup.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED,
+                "", " ", SPACE, false, false, false, false));
+        popup.fireEvent(new KeyEvent(KeyEvent.KEY_RELEASED,
+                "", " ", SPACE, false, false, false, false));
+        assertTrue(comboBox.isShowing());
+        assertEquals(valueBeforeSpace, comboBox.getValue());
+        assertEquals(actionsBeforeSpace, actions.get());
+    }
+
+    private void withSteelItems(Consumer<AtomicInteger> test) {
+        ObservableList originalItems = comboBox.getItems();
+        AtomicInteger actions = new AtomicInteger();
+        EventHandler<ActionEvent> actionHandler = event -> actions.incrementAndGet();
+        invokeAndWait(() -> {
+            comboBox.setItems(FXCollections.observableArrayList("Steel Rod", "Steel Beam", "Iron Rod"));
+            comboBox.addEventHandler(ActionEvent.ACTION, actionHandler);
+        });
+        try {
+            test.accept(actions);
+        } finally {
+            invokeAndWait(() -> {
+                comboBox.removeEventHandler(ActionEvent.ACTION, actionHandler);
+                comboBox.hide();
+                comboBox.setItems(originalItems);
+                comboBox.setValue(null);
+            });
+        }
     }
 
     private void setValue(Object value) throws InterruptedException {

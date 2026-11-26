@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013, ControlsFX
+ * Copyright (c) 2013, 2026, ControlsFX
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,14 @@ import java.util.Random;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.beans.binding.Bindings;
 import javafx.scene.Node;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.layout.Priority;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -52,6 +58,9 @@ public class HelloGridView extends ControlsFXSample {
 
     private GridView<?> myGrid;
     private final VBox root = new VBox();
+    private final ComboBox<SelectionMode> selectionMode = new ComboBox<>(
+            FXCollections.observableArrayList(SelectionMode.values()));
+    private final Label selectedItems = new Label();
     
     public static void main(String[] args) {
         launch();
@@ -114,7 +123,16 @@ public class HelloGridView extends ControlsFXSample {
             new ActionShowGrid("Images (preserve properties)", getImageGrid(true))
         );
         root.getChildren().clear();
-        root.getChildren().add(new ToolBar(selector));
+        selectionMode.setValue(SelectionMode.MULTIPLE);
+        selectionMode.setOnAction(event -> {
+            if (myGrid != null) myGrid.getSelectionModel().setSelectionMode(selectionMode.getValue());
+        });
+        Button clearSelection = new Button("Clear selection");
+        clearSelection.setOnAction(event -> myGrid.getSelectionModel().clearSelection());
+        Label instructions = new Label("Click to select; Ctrl/Cmd-click to toggle; Shift-click for a range. "
+                + "Use arrow keys to navigate, Ctrl/Cmd-arrows to move focus, and Space to select.");
+        instructions.setWrapText(true);
+        root.getChildren().addAll(new ToolBar(selector, selectionMode, clearSelection), instructions, selectedItems);
         selector.getButtons().get(0).fire();
         return root;
     }
@@ -134,6 +152,12 @@ public class HelloGridView extends ControlsFXSample {
                 root.getChildren().remove(myGrid);
             }
             myGrid = grid;
+            myGrid.getSelectionModel().setSelectionMode(selectionMode.getValue());
+            selectedItems.textProperty().unbind();
+            selectedItems.textProperty().bind(Bindings.createStringBinding(
+                    () -> "Selected indices: " + myGrid.getSelectionModel().getSelectedIndices(),
+                    myGrid.getSelectionModel().getSelectedIndices()));
+            VBox.setVgrow(myGrid, Priority.ALWAYS);
             root.getChildren().add(myGrid);
         }
         

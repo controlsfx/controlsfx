@@ -212,6 +212,7 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
         if (index < 0 || index >= getItemCount()) return;
         final int changeIndex = checkedIndicesList.indexOf(index);
         checkedIndices.clear(index);
+        checkedIndicesList.bitSetModified(index, false);
         checkedIndicesList.callObservers(new NonIterableChange.SimpleRemovedChange<>(changeIndex, changeIndex, index, checkedIndicesList));
     }
     
@@ -255,6 +256,7 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
     public void check(int index) {
         if (index < 0 || index >= getItemCount()) return;
         checkedIndices.set(index);
+        checkedIndicesList.bitSetModified(index, true);
         final int changeIndex = checkedIndicesList.indexOf(index);
         checkedIndicesList.callObservers(new NonIterableChange.SimpleAddChange<>(changeIndex, changeIndex+1, checkedIndicesList));
     }
@@ -400,6 +402,24 @@ abstract class CheckBitSetModelBase<T> implements IndexedCheckModel<T> {
         public void reset() {
             this.lastGetIndex = -1;
             this.lastGetValue = -1;
+        }
+
+        public void bitSetModified(int index, boolean added) {
+            if (lastGetValue < 0) return;
+
+            if (added) {
+                if (index <= lastGetValue) {
+                    lastGetIndex++;
+                }
+            } else {
+                if (index < lastGetValue) {
+                    lastGetIndex--;
+                } else if (index == lastGetValue) {
+                    lastGetIndex--;
+                    lastGetValue = bitset.previousSetBit(lastGetValue-1);
+                }
+            }
+            if (lastGetIndex < -1) reset();
         }
     }
 
